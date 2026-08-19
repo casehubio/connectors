@@ -19,7 +19,7 @@ No Camel, no vendor SDKs -- pure `java.net.http.HttpClient` for HTTP-based conne
 
 ## Module Structure
 
-There are 17 active modules in the build (pom.xml `<modules>`):
+There are 19 active modules in the build (pom.xml `<modules>`):
 
 | Module (artifactId prefix: `casehub-connectors-`) | What consumers need to know |
 |----------------------------------------------------|-----------------------------|
@@ -35,6 +35,8 @@ There are 17 active modules in the build (pom.xml `<modules>`):
 | `chat-irc` | IRC `ChatPlatform` (3 native capabilities: Messaging, Discovery, Members) |
 | `chat-discord` | Discord `ChatPlatform` (8 native capabilities), `DiscordInboundConnector` (Gateway-based), RichCard-to-DiscordEmbed translation |
 | `chat-slack` | Slack `ChatPlatform` (9 native capabilities -- most complete), RichCard-to-Block Kit translation |
+| `signal-cli` | `SignalClient` HTTP client + `SignalWebSocket` WebSocket client for `signal-cli-rest-api`. Pure `java.net.http` -- no AGPL dependencies |
+| `chat-signal` | Signal `ChatPlatform` (6 native capabilities: Messaging, Discovery, Members, Reactions, ChannelManagement, MemberManagement), `SignalInboundConnector` (WebSocket-based), `SignalInboundTranslator` |
 | `notification-bridge` | Bridges platform notification delivery system to connector SPI. `NotificationBridgeStartup`, `ConnectorNotificationDeliverer`, `DigestFormatter` SPI, `ConfigDestinationResolver` |
 | `calendar-spi` | `CalendarPlatform` SPI, `CalendarPlatformService` routing, model records (`CalendarEvent`, `CalendarInfo`, `EventDetails`), sealed `EventTiming` (Timed/AllDay) |
 | `calendar-ref` | In-memory reference `CalendarPlatform` for testing (`RefCalendarPlatform`) |
@@ -78,6 +80,7 @@ connectorService.send("slack", new ConnectorMessage(webhookUrl, "Title", "Body")
 | `teams` | `TeamsConnector` | core | Webhook URL in `destination` | Renders as Adaptive Card (v1.4) |
 | `twilio-sms` | `TwilioSmsConnector` | core | Account SID + Auth Token + From number in MP Config | `channelType()` returns `"sms"`. E.164 phone number in `destination` |
 | `whatsapp` | `WhatsAppConnector` | core | API Token + Phone Number ID in MP Config | Template messages via `attributes("templateName")` + `attributes("templateLanguage")` (default `en_US`) |
+| `signal` | `SignalConnector` | core | signal-cli-rest-api URL + sender number in MP Config | Backed by external `signal-cli-rest-api` Docker container |
 | `email` | `EmailConnector` | `email` | SMTP via `quarkus-mailer` config | Supports `format=html` attribute for HTML rendering via `Mail.withHtml()` |
 
 ### ConnectorMessage Record
@@ -156,6 +159,7 @@ Constants for connector types: `InboundConnectorTypes` (e.g. `SLACK = "slack"`, 
 | `twilio-sms-inbound` | `TwilioSmsInboundConnector` | `webhook` | Webhook POST | HMAC-SHA1 (Twilio algorithm), form-encoded |
 | `discord-inbound` | `DiscordInboundConnector` | `chat-discord` | Discord Gateway WebSocket | Discord bot token |
 | `irc-inbound` | `IrcInboundConnector` | `chat-irc` | IRC connection | IRC server config |
+| `signal-inbound` | `SignalInboundConnector` | `chat-signal` | signal-cli-rest-api WebSocket | signal-cli URL + registered number |
 
 ### ConnectorDiscovery SPI
 
@@ -220,6 +224,7 @@ ChatPlatform.builder("my-platform")
 | `IrcChatPlatform` | `irc` | 3 (Messaging, Discovery, Members) |
 | `DiscordChatPlatform` | `discord` | 8 (all except MemberManagement, which is degraded) |
 | `SlackChatPlatform` | `slack` | 9 (most complete) |
+| `SignalChatPlatform` | `signal` | 6 (Messaging, Discovery, Members, Reactions, ChannelManagement, MemberManagement) |
 
 ### CalendarPlatform SPI
 
@@ -310,6 +315,8 @@ Slack and Teams webhook connectors require no configuration -- the webhook URL i
 | `casehub.connectors.calendar.google.client-id` | calendar-google | Google OAuth2 client ID |
 | `casehub.connectors.calendar.google.client-secret` | calendar-google | Google OAuth2 client secret |
 | `casehub.connectors.calendar.google.refresh-token` | calendar-google | Google OAuth2 refresh token |
+| `casehub.connectors.signal.api-url` | signal-cli | signal-cli-rest-api base URL (e.g. `http://localhost:8080`) |
+| `casehub.connectors.signal.sender` | signal-cli | Registered Signal phone number (E.164) |
 | `quarkus.mailer.*` | email | SMTP configuration (host, port, from, username, password) |
 | IMAP host, port, username, password | email-inbound | Email inbound polling (via `EmailInboundAccountProvider` SPI) |
 | `casehub.notification.destinations.<channel>.<userId>` | notification-bridge | Config-based destination resolution fallback |
@@ -320,7 +327,7 @@ Connectors with blank credentials are no-ops -- they log a warning and return `f
 
 ## Dependencies
 
-Nothing in the casehubio ecosystem except `casehub-platform-api` (for `notification-bridge` only). Core module: `java.net.http.HttpClient`, `cloudevents-core` (CNCF CloudEvents SDK), `jackson-databind`. Optional modules: `quarkus-mailer` (email), `jakarta.mail` (email inbound), `quarkus-mcp-server` (MCP tools), Google Calendar API client (calendar-google), Vert.x WebSocket (Discord Gateway).
+Nothing in the casehubio ecosystem except `casehub-platform-api` (for `notification-bridge` only). Core module: `java.net.http.HttpClient`, `cloudevents-core` (CNCF CloudEvents SDK), `jackson-databind`. Optional modules: `quarkus-mailer` (email), `jakarta.mail` (email inbound), `quarkus-mcp-server` (MCP tools), Google Calendar API client (calendar-google), Vert.x WebSocket (Discord Gateway). Signal connector uses `java.net.http.HttpClient` and `java.net.http.WebSocket` -- no AGPL signal-cli dependencies in the JVM.
 
 GroupId: `io.casehub` -- published to GitHub Packages at `0.2-SNAPSHOT`.
 
@@ -333,4 +340,4 @@ GroupId: `io.casehub` -- published to GitHub Packages at `0.2-SNAPSHOT`.
 - Depend on casehub-work, casehub-ledger, or casehub-engine
 - Include vendor SDKs (Slack SDK, Twilio SDK) -- all HTTP-based connectors use `java.net.http.HttpClient` directly
 
-**Consolidation rule:** Do not implement a new Slack, Teams, SMS, email, WhatsApp, Discord, IRC, or inbound connector in any other repo. All outbound and inbound messaging routes through these SPIs. If a new channel type is needed, add it here.
+**Consolidation rule:** Do not implement a new Slack, Teams, SMS, email, WhatsApp, Discord, IRC, Signal, or inbound connector in any other repo. All outbound and inbound messaging routes through these SPIs. If a new channel type is needed, add it here.
