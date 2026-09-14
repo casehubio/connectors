@@ -27,8 +27,7 @@ class TeamsInboundConnectorTest {
 
     @BeforeEach
     void setUp() {
-        connector = new TeamsInboundConnector();
-        connector.sharedSecret = BASE64_SECRET;
+        connector = new TeamsInboundConnector(BASE64_SECRET);
     }
 
     // ── Helpers ──────────────────────────────────────────────────────────────
@@ -60,7 +59,7 @@ class TeamsInboundConnectorTest {
 
     @Test
     void blankSecret_returnsIgnored() {
-        connector.sharedSecret = "";
+        connector = new TeamsInboundConnector("");
 
         assertThat(connector.handle(signedPostRequest(teamsEvent("hi"))))
                 .isInstanceOf(WebhookResult.Ignored.class);

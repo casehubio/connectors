@@ -8,11 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
-
-import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import io.casehub.connectors.HttpMethod;
 import io.casehub.connectors.InboundConnectorIds;
@@ -40,14 +37,15 @@ import io.casehub.connectors.WebhookResult;
  * <p>Teams Outgoing Webhooks do not use GET challenges. GET requests return
  * {@link WebhookResult.Ignored}.
  */
-@ApplicationScoped
 public class TeamsInboundConnector extends WebhookInboundConnector {
 
     private static final Logger LOG = Logger.getLogger(TeamsInboundConnector.class.getName());
 
-    @ConfigProperty(name = "casehub.connectors.teams-inbound.shared-secret",
-                    defaultValue = "")
-    String sharedSecret;
+    private final String sharedSecret;
+
+    public TeamsInboundConnector(final String sharedSecret) {
+        this.sharedSecret = sharedSecret;
+    }
 
     @Override
     public String id() {

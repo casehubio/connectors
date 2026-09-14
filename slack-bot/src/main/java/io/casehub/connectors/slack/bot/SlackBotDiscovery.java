@@ -2,11 +2,6 @@ package io.casehub.connectors.slack.bot;
 
 import java.util.List;
 
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
-
-import org.eclipse.microprofile.config.inject.ConfigProperty;
-
 import io.casehub.connectors.ConnectorDiscovery;
 import io.casehub.connectors.DiscoveredTarget;
 
@@ -17,16 +12,12 @@ import io.casehub.connectors.DiscoveredTarget;
  * {@link SlackBotClient} so the shared HTTP client is not contaminated with
  * config that is irrelevant to Qhorus consumers.
  */
-@ApplicationScoped
 public class SlackBotDiscovery implements ConnectorDiscovery {
 
     private final SlackBotClient slackBotClient;
     private final String botToken;
 
-    @Inject
-    SlackBotDiscovery(final SlackBotClient slackBotClient,
-                      @ConfigProperty(name = "casehub.connectors.slack-bot.token",
-                                      defaultValue = "") final String botToken) {
+    public SlackBotDiscovery(final SlackBotClient slackBotClient, final String botToken) {
         this.slackBotClient = slackBotClient;
         this.botToken = botToken;
     }

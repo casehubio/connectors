@@ -20,9 +20,7 @@ class WhatsAppInboundConnectorTest {
 
     @BeforeEach
     void setUp() {
-        connector = new WhatsAppInboundConnector();
-        connector.appSecret = "test-whatsapp-secret";
-        connector.verifyToken = "test-verify-token";
+        connector = new WhatsAppInboundConnector("test-whatsapp-secret", "test-verify-token");
     }
 
     // ── Helpers ──────────────────────────────────────────────────────────────
@@ -67,7 +65,7 @@ class WhatsAppInboundConnectorTest {
 
     @Test
     void blankAppSecret_returnsIgnored() {
-        connector.appSecret = "";
+        connector = new WhatsAppInboundConnector("", "test-verify-token");
 
         assertThat(connector.handle(signedPostRequest(textMessage("15551234", "15559999", "hi"))))
                 .isInstanceOf(WebhookResult.Ignored.class);

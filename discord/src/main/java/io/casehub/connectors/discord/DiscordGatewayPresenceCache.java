@@ -3,8 +3,6 @@ package io.casehub.connectors.discord;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import jakarta.enterprise.context.ApplicationScoped;
-
 /**
  * In-memory cache of Discord user presence statuses.
  *
@@ -13,7 +11,6 @@ import jakarta.enterprise.context.ApplicationScoped;
  * The mapping to {@link io.casehub.connectors.chat.model.PresenceStatus} happens in
  * {@code chat-discord}.
  */
-@ApplicationScoped
 public class DiscordGatewayPresenceCache {
 
     private final Map<String, String> cache = new ConcurrentHashMap<>();

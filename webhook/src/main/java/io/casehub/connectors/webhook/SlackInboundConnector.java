@@ -10,11 +10,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.logging.Logger;
 
-import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
-
-import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import io.casehub.connectors.HttpMethod;
 import io.casehub.connectors.InboundConnectorIds;
@@ -43,7 +40,6 @@ import io.casehub.connectors.WebhookResult;
  * Compared to {@code x-slack-signature} header ({@code "v0=" + hex(hmac)}) using
  * constant-time comparison.
  */
-@ApplicationScoped
 public class SlackInboundConnector extends WebhookInboundConnector {
 
     public static final String ID = InboundConnectorIds.SLACK_INBOUND;
@@ -51,9 +47,11 @@ public class SlackInboundConnector extends WebhookInboundConnector {
     private static final Logger LOG = Logger.getLogger(SlackInboundConnector.class.getName());
     private static final long REPLAY_WINDOW_SECONDS = 300; // 5 minutes
 
-    @ConfigProperty(name = "casehub.connectors.slack-inbound.signing-secret",
-                    defaultValue = "")
-    String signingSecret;
+    private final String signingSecret;
+
+    public SlackInboundConnector(final String signingSecret) {
+        this.signingSecret = signingSecret;
+    }
 
     @Override
     public String id() {

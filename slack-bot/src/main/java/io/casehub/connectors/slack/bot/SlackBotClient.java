@@ -12,14 +12,11 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.logging.Logger;
 
-import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonObjectBuilder;
 import jakarta.json.JsonString;
 import jakarta.json.JsonValue;
-
-import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import io.casehub.connectors.DiscoveredTarget;
 import io.casehub.connectors.http.HttpHelper;
@@ -40,7 +37,6 @@ import io.casehub.connectors.http.HttpHelper;
  *
  * <p>Consumed by {@code SlackChannelBackend} in {@code casehub-qhorus-slack-channel}.
  */
-@ApplicationScoped
 public class SlackBotClient {
 
     public static final String ID = "slack-bot";
@@ -52,10 +48,15 @@ public class SlackBotClient {
     private static final Duration REQUEST_TIMEOUT = Duration.ofSeconds(10);
     private static final int MAX_PAGES = 50;
 
-    /** Override in tests by setting this field directly before use. */
-    @ConfigProperty(name = "casehub.connectors.slack-bot.api-base-url",
-                    defaultValue = "https://slack.com")
-    String apiBaseUrl;
+    private final String apiBaseUrl;
+
+    public SlackBotClient(final String apiBaseUrl) {
+        this.apiBaseUrl = apiBaseUrl;
+    }
+
+    public SlackBotClient() {
+        this("https://slack.com");
+    }
 
     /**
      * Posts a message to a Slack channel.

@@ -5,14 +5,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import jakarta.enterprise.context.ApplicationScoped;
-
 import io.casehub.connectors.ConnectorMessage;
 import io.casehub.platform.api.delivery.DigestGroupBy;
 import io.casehub.platform.api.delivery.DigestSummary;
 import io.casehub.platform.api.notification.NotificationInput;
 
-@ApplicationScoped
 public class EmailDigestFormatter implements DigestFormatter {
 
     @Override

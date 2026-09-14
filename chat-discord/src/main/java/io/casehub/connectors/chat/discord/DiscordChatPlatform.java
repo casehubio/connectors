@@ -7,12 +7,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import jakarta.annotation.PostConstruct;
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
-
-import org.eclipse.microprofile.config.inject.ConfigProperty;
-
 import io.casehub.connectors.Attachment;
 import io.casehub.connectors.InboundConnectorTypes;
 import io.casehub.connectors.chat.degraded.*;
@@ -23,7 +17,6 @@ import io.casehub.connectors.discord.DiscordClient;
 import io.casehub.connectors.discord.DiscordGatewayPresenceCache;
 import io.casehub.connectors.discord.model.*;
 
-@ApplicationScoped
 public class DiscordChatPlatform implements ChatPlatform {
 
     private static final Logger LOG = Logger.getLogger(DiscordChatPlatform.class.getName());
@@ -60,20 +53,16 @@ public class DiscordChatPlatform implements ChatPlatform {
     private final MemberManagement memberManagement = new NoOpMemberManagement();
     private MessageHistory messageHistory;
 
-    @Inject
     public DiscordChatPlatform(
             final DiscordClient client,
             final DiscordGatewayPresenceCache presenceCache,
-            @ConfigProperty(name = "casehub.discord.token", defaultValue = "") final String token) {
+            final String token) {
         this.client = client;
         this.presenceCache = presenceCache;
         this.token = token;
+        init();
     }
 
-    /**
-     * Initialize capabilities. If token or guild-id is blank, use degraded/no-op implementations.
-     */
-    @PostConstruct
     void init() {
         if (token.isBlank()) {
             LOG.warning("discord: token not configured, platform inactive");

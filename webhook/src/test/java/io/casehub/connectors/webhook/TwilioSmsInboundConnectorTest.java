@@ -26,8 +26,7 @@ class TwilioSmsInboundConnectorTest {
 
     @BeforeEach
     void setUp() {
-        connector = new TwilioSmsInboundConnector();
-        connector.authToken = AUTH_TOKEN;
+        connector = new TwilioSmsInboundConnector(AUTH_TOKEN);
     }
 
     // ── Helpers ──────────────────────────────────────────────────────────────
@@ -76,7 +75,7 @@ class TwilioSmsInboundConnectorTest {
 
     @Test
     void blankAuthToken_returnsIgnored() {
-        connector.authToken = "";
+        connector = new TwilioSmsInboundConnector("");
 
         assertThat(connector.handle(signedSmsRequest("+447700900001", "+447700900002", "hi")))
                 .isInstanceOf(WebhookResult.Ignored.class);

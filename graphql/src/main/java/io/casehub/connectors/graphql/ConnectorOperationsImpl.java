@@ -26,17 +26,12 @@ import io.casehub.connectors.graphql.dto.OutboundConnectorInfo;
 import io.casehub.connectors.graphql.dto.SendNotificationResult;
 import io.casehub.connectors.graphql.dto.SentMessageEntry;
 import io.casehub.platform.api.identity.CurrentPrincipal;
-import io.quarkus.arc.All;
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.enterprise.inject.Instance;
-import jakarta.inject.Inject;
-
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
-@ApplicationScoped
 public class ConnectorOperationsImpl implements ConnectorOperations {
 
     private final InboundConnectorService inboundService;
@@ -44,17 +39,16 @@ public class ConnectorOperationsImpl implements ConnectorOperations {
     private final ChatPlatformService chatPlatformService;
     private final List<Connector> connectors;
     private final List<WebhookInboundConnector> webhookConnectors;
-    private final Instance<SentMessageCapture> sentMessageCapture;
+    private final Optional<SentMessageCapture> sentMessageCapture;
     private final CurrentPrincipal currentPrincipal;
 
-    @Inject
     public ConnectorOperationsImpl(
             final InboundConnectorService inboundService,
             final ConnectorService connectorService,
             final ChatPlatformService chatPlatformService,
-            @All final List<Connector> connectors,
-            @All final List<WebhookInboundConnector> webhookConnectors,
-            final Instance<SentMessageCapture> sentMessageCapture,
+            final List<Connector> connectors,
+            final List<WebhookInboundConnector> webhookConnectors,
+            final Optional<SentMessageCapture> sentMessageCapture,
             final CurrentPrincipal currentPrincipal) {
         this.inboundService = inboundService;
         this.connectorService = connectorService;
@@ -138,7 +132,7 @@ public class ConnectorOperationsImpl implements ConnectorOperations {
 
     @Override
     public List<SentMessageEntry> sentMessages(final String connectorId, final Integer limit) {
-        if (sentMessageCapture == null || !sentMessageCapture.isResolvable()) {
+        if (sentMessageCapture.isEmpty()) {
             return List.of();
         }
         int effectiveLimit = limit != null ? limit : 50;

@@ -112,33 +112,33 @@ class InboundConnectorServiceTest {
     // ── Lifecycle ───────────────────────────────────────────────────────────
 
     @Test
-    void onStart_callsStartOnAllConnectors() {
+    void start_callsStartOnAllConnectors() {
         final RecordingConnector a = new RecordingConnector("email-inbound");
         final RecordingConnector b = new RecordingConnector("jira-inbound");
         final InboundConnectorService service = new InboundConnectorService(
                 List.of(a, b), msg -> {});
 
-        service.onStart(null);
+        service.start();
 
         assertThat(a.startCount).isEqualTo(1);
         assertThat(b.startCount).isEqualTo(1);
     }
 
     @Test
-    void onStop_callsStopOnAllConnectors() {
+    void stop_callsStopOnAllConnectors() {
         final RecordingConnector a = new RecordingConnector("email-inbound");
         final RecordingConnector b = new RecordingConnector("jira-inbound");
         final InboundConnectorService service = new InboundConnectorService(
                 List.of(a, b), msg -> {});
 
-        service.onStop(null);
+        service.stop();
 
         assertThat(a.stopCount).isEqualTo(1);
         assertThat(b.stopCount).isEqualTo(1);
     }
 
     @Test
-    void onStart_sinkPassedToConnector_deliversMessages() {
+    void start_sinkPassedToConnector_deliversMessages() {
         final List<InboundMessage> captured = new ArrayList<>();
         final InboundMessage msg = sampleMessage("email-inbound");
 
@@ -156,7 +156,7 @@ class InboundConnectorServiceTest {
 
         final InboundConnectorService service = new InboundConnectorService(
                 List.of(eager), captured::add);
-        service.onStart(null);
+        service.start();
 
         assertThat(captured).containsExactly(msg);
     }

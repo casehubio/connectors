@@ -12,9 +12,6 @@ import io.casehub.connectors.calendar.model.CalendarEvent;
 import io.casehub.connectors.calendar.model.CalendarInfo;
 import io.casehub.connectors.calendar.model.EventDetails;
 import io.casehub.connectors.calendar.spi.CalendarPlatform;
-import jakarta.annotation.PostConstruct;
-import jakarta.enterprise.context.ApplicationScoped;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.logging.Logger;
 
 import java.io.IOException;
@@ -24,30 +21,30 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-@ApplicationScoped
 public class GoogleCalendarPlatform implements CalendarPlatform {
 
     private static final Logger LOG = Logger.getLogger(GoogleCalendarPlatform.class);
     private static final int MAX_PAGES = 20;
 
-    @ConfigProperty(name = "casehub.connectors.calendar.google.client-id", defaultValue = "")
-    String clientId;
-
-    @ConfigProperty(name = "casehub.connectors.calendar.google.client-secret", defaultValue = "")
-    String clientSecret;
-
-    @ConfigProperty(name = "casehub.connectors.calendar.google.refresh-token", defaultValue = "")
-    String refreshToken;
-
+    private final String clientId;
+    private final String clientSecret;
+    private final String refreshToken;
     private Calendar calendarService;
 
-    GoogleCalendarPlatform() {}
+    public GoogleCalendarPlatform(String clientId, String clientSecret, String refreshToken) {
+        this.clientId = clientId;
+        this.clientSecret = clientSecret;
+        this.refreshToken = refreshToken;
+        init();
+    }
 
     GoogleCalendarPlatform(Calendar calendarService) {
+        this.clientId = "";
+        this.clientSecret = "";
+        this.refreshToken = "";
         this.calendarService = calendarService;
     }
 
-    @PostConstruct
     void init() {
         if (clientId.isBlank() || clientSecret.isBlank() || refreshToken.isBlank()) {
             LOG.warn("Google Calendar credentials not configured — platform inactive");

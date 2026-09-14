@@ -3,11 +3,8 @@ package io.casehub.connectors.notification;
 import io.casehub.connectors.ConnectorMessage;
 import io.casehub.platform.api.delivery.DigestSummary;
 import io.casehub.platform.api.notification.NotificationInput;
-import jakarta.enterprise.context.ApplicationScoped;
-
 import java.util.Comparator;
 
-@ApplicationScoped
 public class SmsDigestFormatter implements DigestFormatter {
 
     private static final Comparator<NotificationInput> BY_SEVERITY =

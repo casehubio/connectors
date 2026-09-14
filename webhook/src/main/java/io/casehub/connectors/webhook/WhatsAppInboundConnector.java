@@ -8,13 +8,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonString;
-
-import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import io.casehub.connectors.HttpMethod;
 import io.casehub.connectors.InboundConnectorTypes;
@@ -41,18 +38,19 @@ import io.casehub.connectors.WebhookResult;
  * document, sticker) set {@code content} to the media URL if available, or empty string
  * (v1 limitation — binary media is out of scope).
  */
-@ApplicationScoped
 public class WhatsAppInboundConnector extends WebhookInboundConnector {
 
     public static final String ID = io.casehub.connectors.InboundConnectorIds.WHATSAPP;
 
     private static final Logger LOG = Logger.getLogger(WhatsAppInboundConnector.class.getName());
 
-    @ConfigProperty(name = "casehub.connectors.whatsapp-inbound.app-secret", defaultValue = "")
-    String appSecret;
+    private final String appSecret;
+    private final String verifyToken;
 
-    @ConfigProperty(name = "casehub.connectors.whatsapp-inbound.verify-token", defaultValue = "")
-    String verifyToken;
+    public WhatsAppInboundConnector(final String appSecret, final String verifyToken) {
+        this.appSecret = appSecret;
+        this.verifyToken = verifyToken;
+    }
 
     @Override
     public String id() {

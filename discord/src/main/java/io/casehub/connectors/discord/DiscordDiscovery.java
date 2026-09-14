@@ -2,17 +2,12 @@ package io.casehub.connectors.discord;
 
 import io.casehub.connectors.ConnectorDiscovery;
 import io.casehub.connectors.DiscoveredTarget;
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 import io.casehub.connectors.discord.model.DiscordGuild;
 
-@ApplicationScoped
 public class DiscordDiscovery implements ConnectorDiscovery {
 
     public static final String ID = "discord";
@@ -22,10 +17,7 @@ public class DiscordDiscovery implements ConnectorDiscovery {
     private final DiscordClient client;
     private final String        token;
 
-    @Inject
-    DiscordDiscovery(final DiscordClient client,
-                     @ConfigProperty(name = "casehub.discord.token",
-                                     defaultValue = "") final String token) {
+    public DiscordDiscovery(final DiscordClient client, final String token) {
         this.client = client;
         this.token  = token;
     }

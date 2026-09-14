@@ -9,11 +9,6 @@ import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
-
-import org.eclipse.microprofile.config.inject.ConfigProperty;
-
 import io.casehub.connectors.InboundConnector;
 import io.casehub.connectors.InboundConnectorIds;
 import io.casehub.connectors.InboundConnectorTypes;
@@ -21,7 +16,6 @@ import io.casehub.connectors.InboundMessage;
 import io.casehub.connectors.InboundMessageSink;
 import io.casehub.connectors.chat.irc.protocol.IrcMessage;
 
-@ApplicationScoped
 public class IrcInboundConnector implements InboundConnector {
 
     private static final Logger LOG = Logger.getLogger(
@@ -32,10 +26,8 @@ public class IrcInboundConnector implements InboundConnector {
     private volatile boolean stopping = false;
     private volatile ExecutorService executor;
 
-    @Inject
     public IrcInboundConnector(
             final IrcClient client,
-            @ConfigProperty(name = "casehub.connectors.chat-irc.channels")
             final Optional<List<String>> channels) {
         this.client = client;
         this.channels = channels;

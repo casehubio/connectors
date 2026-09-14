@@ -4,9 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
-
 import io.casehub.connectors.chat.model.Channel;
 import io.casehub.connectors.chat.model.ChatChannelRef;
 import io.casehub.connectors.chat.model.ChatMessageRef;
@@ -25,7 +22,6 @@ import io.casehub.connectors.chat.spi.Presence;
 import io.casehub.connectors.chat.spi.Reactions;
 import io.casehub.connectors.chat.spi.Threading;
 
-@ApplicationScoped
 public class RefChatPlatform implements ChatPlatform {
 
     private static final Set<Class<?>> ALL_CAPABILITIES = Set.of(
@@ -33,10 +29,7 @@ public class RefChatPlatform implements ChatPlatform {
             Reactions.class, Presence.class, Members.class,
             ChannelManagement.class, MemberManagement.class, MessageHistory.class);
 
-    @Inject
-    ChatBackend backend;
-
-    RefChatPlatform() {}
+    private final ChatBackend backend;
 
     public RefChatPlatform(final ChatBackend backend) {
         this.backend = backend;

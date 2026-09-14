@@ -41,7 +41,7 @@ class ConnectorOperationsImplTest {
 
         ops = new ConnectorOperationsImpl(
                 inboundService, connectorService, chatPlatformService,
-                List.of(connector), List.of(), null, null);
+                List.of(connector), List.of(), java.util.Optional.empty(), null);
     }
 
     @Test

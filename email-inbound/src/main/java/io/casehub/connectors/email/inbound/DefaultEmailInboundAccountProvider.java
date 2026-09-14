@@ -3,51 +3,21 @@ package io.casehub.connectors.email.inbound;
 import java.util.List;
 import java.util.Optional;
 
-import jakarta.enterprise.context.ApplicationScoped;
-
-import io.quarkus.arc.DefaultBean;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
-
-/**
- * Default {@link EmailInboundAccountProvider} — reads a single IMAP account from
- * MP Config. Returns an empty list when {@code host} is blank (connector is inactive).
- *
- * <p>Override by providing an {@code @ApplicationScoped} bean without {@code @DefaultBean}.
- */
-@DefaultBean
-@ApplicationScoped
 public class DefaultEmailInboundAccountProvider implements EmailInboundAccountProvider {
 
-    @ConfigProperty(name = "casehub.connectors.email-inbound.host", defaultValue = "")
-    String host;
+    private final String host;
+    private final int port;
+    private final boolean tls;
+    private final String username;
+    private final String password;
+    private final String folder;
+    private final int reconnectDelaySeconds;
+    private final Optional<String> tenancyId;
 
-    @ConfigProperty(name = "casehub.connectors.email-inbound.port", defaultValue = "993")
-    int port;
-
-    @ConfigProperty(name = "casehub.connectors.email-inbound.tls", defaultValue = "true")
-    boolean tls;
-
-    @ConfigProperty(name = "casehub.connectors.email-inbound.username", defaultValue = "")
-    String username;
-
-    @ConfigProperty(name = "casehub.connectors.email-inbound.password", defaultValue = "")
-    String password;
-
-    @ConfigProperty(name = "casehub.connectors.email-inbound.folder", defaultValue = "INBOX")
-    String folder;
-
-    @ConfigProperty(name = "casehub.connectors.email-inbound.reconnect-delay-seconds", defaultValue = "60")
-    int reconnectDelaySeconds;
-
-    @ConfigProperty(name = "casehub.connectors.email-inbound.tenancy-id")
-    Optional<String> tenancyId;
-
-    DefaultEmailInboundAccountProvider() {}
-
-    DefaultEmailInboundAccountProvider(final String host, final int port, final boolean tls,
-                                       final String username, final String password,
-                                       final String folder, final int reconnectDelaySeconds,
-                                       final String tenancyId) {
+    public DefaultEmailInboundAccountProvider(final String host, final int port, final boolean tls,
+                                              final String username, final String password,
+                                              final String folder, final int reconnectDelaySeconds,
+                                              final String tenancyId) {
         this.host = host;
         this.port = port;
         this.tls = tls;

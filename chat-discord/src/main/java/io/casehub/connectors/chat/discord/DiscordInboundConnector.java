@@ -7,11 +7,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
-
-import org.eclipse.microprofile.config.inject.ConfigProperty;
-
 import com.fasterxml.jackson.databind.JsonNode;
 
 import io.casehub.connectors.Attachment;
@@ -26,7 +21,6 @@ import io.casehub.connectors.discord.DiscordGatewayPresenceCache;
 import io.casehub.connectors.discord.GatewayEventListener;
 import io.casehub.connectors.discord.model.DiscordAttachment;
 
-@ApplicationScoped
 public class DiscordInboundConnector implements InboundConnector {
 
     private static final Logger LOG = Logger.getLogger(
@@ -44,11 +38,9 @@ public class DiscordInboundConnector implements InboundConnector {
     private volatile DiscordGateway gateway;
     private volatile boolean stopping = false;
 
-    @Inject
     public DiscordInboundConnector(
             final DiscordClient client,
             final DiscordGatewayPresenceCache presenceCache,
-            @ConfigProperty(name = "casehub.discord.token", defaultValue = "")
             final String token) {
         this.client = client;
         this.presenceCache = presenceCache;

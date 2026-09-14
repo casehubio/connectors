@@ -6,18 +6,13 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import jakarta.enterprise.context.ApplicationScoped;
-
-import io.quarkus.arc.All;
-
 import io.casehub.connectors.calendar.spi.CalendarPlatform;
 
-@ApplicationScoped
 public class CalendarPlatformService {
 
     private final Map<String, CalendarPlatform> registry;
 
-    public CalendarPlatformService(@All final List<CalendarPlatform> platforms) {
+    public CalendarPlatformService(final List<CalendarPlatform> platforms) {
         this.registry = platforms.stream()
                 .collect(Collectors.toMap(
                         CalendarPlatform::id,

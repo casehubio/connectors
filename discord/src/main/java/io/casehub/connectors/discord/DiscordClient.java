@@ -16,8 +16,7 @@ import io.casehub.connectors.discord.model.DiscordUser;
 import io.casehub.connectors.discord.model.PermissionOverwrite;
 import io.casehub.connectors.discord.model.PostResult;
 import io.casehub.connectors.http.HttpHelper;
-import jakarta.enterprise.context.ApplicationScoped;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
+
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -45,38 +44,29 @@ import java.util.logging.Logger;
  * <p>{@code apiBaseUrl} is package-private to allow direct field injection in unit tests,
  * mirroring the {@code SlackBotClient.apiBaseUrl} pattern.
  */
-@ApplicationScoped
 public class DiscordClient {
 
     private static final Logger LOG = Logger.getLogger(DiscordClient.class.getName());
     private static final Duration REQUEST_TIMEOUT = Duration.ofSeconds(10);
     private static final int MAX_PAGES = 50;
     private static final long VIEW_CHANNEL_PERMISSION = 1024L; // 1 << 10
-    @ConfigProperty(name = "casehub.discord.attachment.allowed-cdn-hosts",
-                    defaultValue = "cdn.discordapp.com,media.discordapp.net")
-    String allowedCdnHostsConfig;
 
-    Set<String> allowedCdnHosts;
-
+    private final Set<String> allowedCdnHosts;
     private final ObjectMapper mapper;
+    private final String apiBaseUrl;
+    private final long maxAttachmentBytes;
 
-    @ConfigProperty(name = "casehub.discord.api-base-url",
-                    defaultValue = "https://discord.com/api/v10")
-    String apiBaseUrl;
-
-    @ConfigProperty(name = "casehub.discord.attachment.max-bytes",
-                    defaultValue = "8388608")
-    long maxAttachmentBytes;
-
-    @jakarta.annotation.PostConstruct
-    void init() {
+    public DiscordClient(final String apiBaseUrl, final String allowedCdnHostsConfig,
+                         final long maxAttachmentBytes) {
+        this.apiBaseUrl = apiBaseUrl;
         this.allowedCdnHosts = Set.of(allowedCdnHostsConfig.split(","));
-    }
-
-
-    public DiscordClient() {
+        this.maxAttachmentBytes = maxAttachmentBytes;
         this.mapper = new ObjectMapper();
         this.mapper.registerModule(new JavaTimeModule());
+    }
+
+    public DiscordClient() {
+        this("https://discord.com/api/v10", "cdn.discordapp.com,media.discordapp.net", 8388608L);
     }
 
     /**

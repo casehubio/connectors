@@ -3,21 +3,14 @@ package io.casehub.connectors.calendar.ref;
 import java.time.Instant;
 import java.util.List;
 
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
-
 import io.casehub.connectors.calendar.model.CalendarEvent;
 import io.casehub.connectors.calendar.model.CalendarInfo;
 import io.casehub.connectors.calendar.model.EventDetails;
 import io.casehub.connectors.calendar.spi.CalendarPlatform;
 
-@ApplicationScoped
 public class RefCalendarPlatform implements CalendarPlatform {
 
-    @Inject
-    CalendarBackend backend;
-
-    RefCalendarPlatform() {}
+    private final CalendarBackend backend;
 
     public RefCalendarPlatform(CalendarBackend backend) {
         this.backend = backend;

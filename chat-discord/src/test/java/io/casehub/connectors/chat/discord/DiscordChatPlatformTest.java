@@ -61,26 +61,9 @@ class DiscordChatPlatformTest {
     }
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         wireMock.resetAll();
-        client = new DiscordClient();
-
-        // Use reflection to set package-private fields
-        var apiBaseUrlField = DiscordClient.class.getDeclaredField("apiBaseUrl");
-        apiBaseUrlField.setAccessible(true);
-        apiBaseUrlField.set(client, "http://localhost:" + wireMock.port());
-
-        var allowedCdnHostsConfigField = DiscordClient.class.getDeclaredField("allowedCdnHostsConfig");
-        allowedCdnHostsConfigField.setAccessible(true);
-        allowedCdnHostsConfigField.set(client, "cdn.discordapp.com,media.discordapp.net,localhost");
-
-        var allowedCdnHostsField = DiscordClient.class.getDeclaredField("allowedCdnHosts");
-        allowedCdnHostsField.setAccessible(true);
-        allowedCdnHostsField.set(client, java.util.Set.of("cdn.discordapp.com", "media.discordapp.net", "localhost"));
-
-        var maxAttachmentBytesField = DiscordClient.class.getDeclaredField("maxAttachmentBytes");
-        maxAttachmentBytesField.setAccessible(true);
-        maxAttachmentBytesField.set(client, 8388608L); // 8 MB
+        client = new DiscordClient("http://localhost:" + wireMock.port(), "cdn.discordapp.com,media.discordapp.net,localhost", 8_388_608);
 
         // Stub guild discovery for single-guild default
         wireMock.stubFor(get(urlEqualTo("/users/@me/guilds?limit=200"))

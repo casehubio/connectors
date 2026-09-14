@@ -21,8 +21,7 @@ class SlackInboundConnectorTest {
 
     @BeforeEach
     void setUp() {
-        connector = new SlackInboundConnector();
-        connector.signingSecret = "test-slack-secret";
+        connector = new SlackInboundConnector("test-slack-secret");
     }
 
     // ── Helpers ─────────────────────────────────────────────────────────────
@@ -97,7 +96,7 @@ class SlackInboundConnectorTest {
 
     @Test
     void blankSecret_returnsIgnored() {
-        connector.signingSecret = "";
+        connector = new SlackInboundConnector("");
 
         final WebhookResult result = connector.handle(postRequest(messageEvent("U1", "C1", "hi")));
 
@@ -124,7 +123,7 @@ class SlackInboundConnectorTest {
 
     @Test
     void urlVerification_blankSecret_stillReturnsChallenge() {
-        connector.signingSecret = "";
+        connector = new SlackInboundConnector("");
         final String body = urlVerification("tok");
         final WebhookRequest req = new WebhookRequest(
                 body, Map.of(), Map.of(), HttpMethod.POST,

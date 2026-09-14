@@ -47,11 +47,8 @@ class DiscordClientTest {
         wireMock = new WireMockServer(WireMockConfiguration.options().dynamicPort());
         wireMock.start();
 
-        client                       = new DiscordClient();
-        client.apiBaseUrl            = wireMock.baseUrl();
-        client.maxAttachmentBytes    = 8_388_608;
-        client.allowedCdnHostsConfig = "cdn.discordapp.com,media.discordapp.net";
-        client.init();}
+        client = new DiscordClient(wireMock.baseUrl(), "cdn.discordapp.com,media.discordapp.net", 8_388_608);
+    }
 
     @AfterEach
     void teardown() {
@@ -599,10 +596,10 @@ class DiscordClientTest {
         wireMock.stubFor(get(urlPathEqualTo("/cdn/chunked.bin"))
                 .willReturn(aResponse().withStatus(200).withBody(oversized)));
 
-        client.maxAttachmentBytes = 1024 * 1024;
+        final var smallClient = new DiscordClient(wireMock.baseUrl(), "cdn.discordapp.com,media.discordapp.net", 1024 * 1024);
         final var att = new DiscordAttachment("a1", "chunked.bin", "application/octet-stream",
                 0, wireMock.baseUrl() + "/cdn/chunked.bin");
-        final Attachment result = client.downloadAttachment(att, Set.of("localhost"));
+        final Attachment result = smallClient.downloadAttachment(att, Set.of("localhost"));
 
         assertThat(result).isNull();
     }

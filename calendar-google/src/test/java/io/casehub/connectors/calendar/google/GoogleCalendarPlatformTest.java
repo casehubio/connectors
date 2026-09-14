@@ -325,7 +325,7 @@ class GoogleCalendarPlatformTest {
 
     @Test
     void requireClient_noClient_throwsIllegalState() {
-        var unconfigured = new GoogleCalendarPlatform();
+        var unconfigured = new GoogleCalendarPlatform("", "", "");
 
         assertThatThrownBy(() -> unconfigured.listCalendars())
                 .isInstanceOf(IllegalStateException.class)
@@ -339,7 +339,7 @@ class GoogleCalendarPlatformTest {
 
     @Test
     void isActive_withoutClient_false() {
-        var unconfigured = new GoogleCalendarPlatform();
+        var unconfigured = new GoogleCalendarPlatform("", "", "");
         assertThat(unconfigured.isActive()).isFalse();
     }
 

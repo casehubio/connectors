@@ -6,30 +6,13 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import jakarta.enterprise.context.ApplicationScoped;
-
-import io.quarkus.arc.All;
-
 import io.casehub.connectors.chat.spi.ChatPlatform;
 
-/**
- * Routes chat platform operations to the appropriate {@link ChatPlatform} by id.
- *
- * <p>
- * All registered {@link ChatPlatform} CDI beans are discovered at startup and indexed
- * by id. Duplicate ids cause startup failure. Unknown ids throw
- * {@link IllegalArgumentException} with the set of available ids in the message.
- *
- * <p>
- * Callers should inject this service rather than working with {@link ChatPlatform}
- * beans directly.
- */
-@ApplicationScoped
 public class ChatPlatformService {
 
     private final Map<String, ChatPlatform> registry;
 
-    public ChatPlatformService(@All final List<ChatPlatform> platforms) {
+    public ChatPlatformService(final List<ChatPlatform> platforms) {
         this.registry = platforms.stream()
                 .collect(Collectors.toMap(
                         ChatPlatform::id,

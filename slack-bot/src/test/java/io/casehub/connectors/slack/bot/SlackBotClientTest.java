@@ -42,8 +42,7 @@ class SlackBotClientTest {
     void start() {
         wireMock = new WireMockServer(WireMockConfiguration.wireMockConfig().dynamicPort());
         wireMock.start();
-        client = new SlackBotClient();
-        client.apiBaseUrl = "http://localhost:" + wireMock.port();
+        client = new SlackBotClient("http://localhost:" + wireMock.port());
     }
 
     @AfterEach

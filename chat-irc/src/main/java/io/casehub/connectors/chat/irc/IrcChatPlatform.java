@@ -5,9 +5,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
-
 import io.casehub.connectors.chat.degraded.ChannelFallbackThreading;
 import io.casehub.connectors.chat.degraded.EmptyMessageHistory;
 import io.casehub.connectors.chat.degraded.NoOpChannelManagement;
@@ -31,7 +28,6 @@ import io.casehub.connectors.chat.spi.Presence;
 import io.casehub.connectors.chat.spi.Reactions;
 import io.casehub.connectors.chat.spi.Threading;
 
-@ApplicationScoped
 public class IrcChatPlatform implements ChatPlatform {
 
     private static final Set<Class<?>> NATIVE_CAPABILITIES = Set.of(
@@ -48,7 +44,6 @@ public class IrcChatPlatform implements ChatPlatform {
     private final MemberManagement memberManagement = new NoOpMemberManagement();
     private final MessageHistory messageHistory = new EmptyMessageHistory();
 
-    @Inject
     public IrcChatPlatform(final IrcClient client) {
         this.client = client;
         this.messaging = (channel, content) -> {

@@ -10,10 +10,6 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Logger;
 
-import jakarta.enterprise.context.ApplicationScoped;
-
-import org.eclipse.microprofile.config.inject.ConfigProperty;
-
 import io.casehub.connectors.HttpMethod;
 import io.casehub.connectors.InboundConnectorTypes;
 import io.casehub.connectors.InboundMessage;
@@ -44,15 +40,17 @@ import io.casehub.connectors.WebhookResult;
  * quarkus.http.proxy.allow-forwarded=true
  * </pre>
  */
-@ApplicationScoped
 public class TwilioSmsInboundConnector extends WebhookInboundConnector {
 
     public static final String ID = io.casehub.connectors.InboundConnectorIds.TWILIO_SMS;
 
     private static final Logger LOG = Logger.getLogger(TwilioSmsInboundConnector.class.getName());
 
-    @ConfigProperty(name = "casehub.connectors.twilio-sms-inbound.auth-token", defaultValue = "")
-    String authToken;
+    private final String authToken;
+
+    public TwilioSmsInboundConnector(final String authToken) {
+        this.authToken = authToken;
+    }
 
     @Override
     public String id() {

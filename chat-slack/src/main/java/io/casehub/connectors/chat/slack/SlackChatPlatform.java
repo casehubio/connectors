@@ -9,12 +9,7 @@ import java.util.function.Function;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-import jakarta.annotation.PostConstruct;
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 import jakarta.json.Json;
-
-import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import io.casehub.connectors.InboundConnectorTypes;
 import io.casehub.connectors.chat.degraded.*;
@@ -30,7 +25,6 @@ import io.casehub.connectors.slack.bot.SlackBotClient.PresenceResult;
 import io.casehub.connectors.slack.bot.SlackBotClient.ReactionListResult;
 import io.casehub.connectors.slack.bot.SlackBotClient.UserInfo;
 
-@ApplicationScoped
 public class SlackChatPlatform implements ChatPlatform {
 
     private static final Logger LOG = Logger.getLogger(SlackChatPlatform.class.getName());
@@ -60,21 +54,14 @@ public class SlackChatPlatform implements ChatPlatform {
     private MemberManagement memberManagement;
     private MessageHistory messageHistory;
 
-    /**
-     * CDI constructor.
-     */
-    @Inject
     public SlackChatPlatform(
             final SlackBotClient client,
-            @ConfigProperty(name = "casehub.slack.token", defaultValue = "") final String token) {
+            final String token) {
         this.client = client;
         this.token = token;
+        init();
     }
 
-    /**
-     * Initialize capabilities. If token is blank, use degraded/no-op implementations.
-     */
-    @PostConstruct
     void init() {
         if (token.isBlank()) {
             LOG.warning("slack: token not configured, platform inactive");

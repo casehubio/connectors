@@ -30,15 +30,11 @@ class DiscordInboundConnectorTest {
     private CopyOnWriteArrayList<InboundMessage> received;
 
     @BeforeEach
-    void setup() throws Exception {
+    void setup() {
         wireMock = new WireMockServer(WireMockConfiguration.options().dynamicPort());
         wireMock.start();
 
-        final DiscordClient client = new DiscordClient();
-        setField(client, "apiBaseUrl", wireMock.baseUrl());
-        setField(client, "maxAttachmentBytes", 8_388_608L);
-        setField(client, "allowedCdnHostsConfig", "localhost");
-        setField(client, "allowedCdnHosts", Set.of("localhost"));
+        final DiscordClient client = new DiscordClient(wireMock.baseUrl(), "localhost", 8_388_608);
 
         connector = new DiscordInboundConnector(
                 client, new DiscordGatewayPresenceCache(), "test-token");
@@ -180,10 +176,5 @@ class DiscordInboundConnectorTest {
     }
 
 
-    private static void setField(final Object target, final String fieldName,
-                                  final Object value) throws Exception {
-        final var field = target.getClass().getDeclaredField(fieldName);
-        field.setAccessible(true);
-        field.set(target, value);
-    }
+
 }

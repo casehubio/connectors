@@ -14,8 +14,6 @@ import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 import jakarta.mail.Address;
 import jakarta.mail.Flags;
 import jakarta.mail.Folder;
@@ -53,7 +51,6 @@ import io.casehub.connectors.InboundMessageSink;
  * after 5+ consecutive failures. {@code FolderClosedException}/{@code StoreClosedException}
  * reconnect immediately at INFO — covers normal server-side IDLE timeouts.
  */
-@ApplicationScoped
 public class EmailInboundConnector implements InboundConnector {
 
     public static final String ID = io.casehub.connectors.InboundConnectorIds.EMAIL;
@@ -65,7 +62,6 @@ public class EmailInboundConnector implements InboundConnector {
     private volatile boolean stopping = false;
     private ExecutorService executor;
 
-    @Inject
     public EmailInboundConnector(final EmailInboundAccountProvider provider) {
         this.provider = provider;
     }
