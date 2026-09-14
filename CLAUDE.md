@@ -1,11 +1,11 @@
 # connectors Workspace
 **Name:** casehub-connectors
-**Project repo:** /Users/mdproctor/claude/casehub/slots/192/connectors
+**Project repo:** /Users/mdproctor/claude/casehub/slots/194/connectors
 **Workspace type:** public
 
 ## Session Start
 
-Run `add-dir /Users/mdproctor/claude/casehub/slots/192/connectors` before any other work.
+Run `add-dir /Users/mdproctor/claude/casehub/slots/194/connectors` before any other work.
 
 ## Artifact Locations
 
