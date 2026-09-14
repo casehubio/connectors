@@ -31,6 +31,7 @@ public final class EmbeddedDiscordGateway {
     private final CopyOnWriteArrayList<ServerWebSocket> sessions = new CopyOnWriteArrayList<>();
     private final CopyOnWriteArrayList<String> receivedIdentifies = new CopyOnWriteArrayList<>();
     private final CopyOnWriteArrayList<String> receivedResumes = new CopyOnWriteArrayList<>();
+    private final CopyOnWriteArrayList<String> receivedHeartbeats = new CopyOnWriteArrayList<>();
     private final AtomicInteger connectionCount = new AtomicInteger(0);
     private volatile CountDownLatch connectionLatch;
     private final AtomicInteger dispatchSeq = new AtomicInteger(0);
@@ -142,6 +143,10 @@ public final class EmbeddedDiscordGateway {
         return List.copyOf(receivedResumes);
     }
 
+    public int getReceivedHeartbeatCount() {
+        return receivedHeartbeats.size();
+    }
+
     public int getConnectionCount() {
         return connectionCount.get();
     }
@@ -174,6 +179,7 @@ public final class EmbeddedDiscordGateway {
 
             switch (op) {
                 case 1: // HEARTBEAT
+                    receivedHeartbeats.add(message);
                     if (!suppressAcks) {
                         ws.writeTextMessage("{\"op\":11,\"d\":null}");
                     }

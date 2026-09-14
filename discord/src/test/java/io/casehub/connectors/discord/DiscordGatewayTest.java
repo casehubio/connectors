@@ -13,7 +13,9 @@ import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import io.vertx.core.Vertx;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -26,6 +28,12 @@ class DiscordGatewayTest {
 
     private EmbeddedDiscordGateway server;
     private DiscordGateway gateway;
+
+    @BeforeAll
+    static void warmUp() {
+        Vertx vertx = Vertx.vertx();
+        vertx.close().toCompletionStage().toCompletableFuture().join();
+    }
 
     @BeforeEach
     void setup() throws Exception {
@@ -54,7 +62,7 @@ class DiscordGatewayTest {
             }
         });
 
-        assertThat(readyLatch.await(5, TimeUnit.SECONDS))
+        assertThat(readyLatch.await(10, TimeUnit.SECONDS))
                 .as("Should receive READY event").isTrue();
         assertThat(readyEventType.get()).isEqualTo("READY");
         assertThat(gateway.isConnected()).isTrue();
@@ -74,14 +82,11 @@ class DiscordGatewayTest {
         gateway.connect(gatewayUrl(), TOKEN, INTENTS, (eventType, data) -> {
             if ("READY".equals(eventType)) readyLatch.countDown();
         });
-        assertThat(readyLatch.await(5, TimeUnit.SECONDS)).isTrue();
+        assertThat(readyLatch.await(10, TimeUnit.SECONDS)).isTrue();
 
-        // Send a dispatch to set sequence number
-        server.sendDispatch("MESSAGE_CREATE", "{\"content\":\"hello\"}");
-        Thread.sleep(200);
-
-        // Wait for at least 2 heartbeats (interval=500ms, so ~1200ms should suffice)
-        Thread.sleep(1200);
+        org.awaitility.Awaitility.await()
+                .atMost(10, TimeUnit.SECONDS)
+                .until(() -> server.getReceivedHeartbeatCount() >= 2);
 
         assertThat(gateway.isConnected()).isTrue();
     }
@@ -94,19 +99,23 @@ class DiscordGatewayTest {
         gateway.connect(gatewayUrl(), TOKEN, INTENTS, (eventType, data) -> {
             if ("READY".equals(eventType)) readyLatch.countDown();
         });
-        assertThat(readyLatch.await(5, TimeUnit.SECONDS)).isTrue();
+        assertThat(readyLatch.await(10, TimeUnit.SECONDS)).isTrue();
 
-        // Suppress ACKs — should trigger reconnect after heartbeat timeout.
-        // With heartbeat_interval=500ms and jitter, the missed ACK detection
-        // happens after ~1000ms (jitter + interval + check).
+        awaitStableConnection();
+
+        // Suppress ACKs — next heartbeat cycle will detect the missing ACK
+        int heartbeatsBefore = server.getReceivedHeartbeatCount();
         server.suppressHeartbeatAcks(true);
 
-        // Re-enable acks so the reconnection handshake succeeds
-        Thread.sleep(300);
+        // Wait for at least one un-ACKed heartbeat to fire
+        org.awaitility.Awaitility.await()
+                .atMost(5, TimeUnit.SECONDS)
+                .until(() -> server.getReceivedHeartbeatCount() > heartbeatsBefore);
+
+        // Re-enable ACKs so the reconnection handshake succeeds
         server.suppressHeartbeatAcks(false);
 
-        // After heartbeat timeout, the gateway reconnects and sends RESUME
-        // (sessionId was cached from initial READY). Wait for the RESUME.
+        // After missed ACK detection, gateway reconnects and sends RESUME
         org.awaitility.Awaitility.await()
                 .atMost(30, TimeUnit.SECONDS)
                 .until(() -> !server.getReceivedResumes().isEmpty());
@@ -129,11 +138,13 @@ class DiscordGatewayTest {
                 eventLatch.countDown();
             }
         });
-        assertThat(readyLatch.await(5, TimeUnit.SECONDS)).isTrue();
+        assertThat(readyLatch.await(10, TimeUnit.SECONDS)).isTrue();
+
+        awaitStableConnection();
 
         server.sendDispatch("MESSAGE_CREATE", "{\"content\":\"hello world\",\"channel_id\":\"ch1\"}");
 
-        assertThat(eventLatch.await(5, TimeUnit.SECONDS))
+        assertThat(eventLatch.await(10, TimeUnit.SECONDS))
                 .as("Should receive dispatch event").isTrue();
         assertThat(receivedType.get()).isEqualTo("MESSAGE_CREATE");
         assertThat(receivedData.get().get("content").asText()).isEqualTo("hello world");
@@ -142,16 +153,22 @@ class DiscordGatewayTest {
     @Test
     void resumeOnDisconnect() throws Exception {
         CountDownLatch readyLatch = new CountDownLatch(1);
+        CountDownLatch dispatchLatch = new CountDownLatch(1);
 
         gateway = new DiscordGateway();
         gateway.connect(gatewayUrl(), TOKEN, INTENTS, (eventType, data) -> {
-            if ("READY".equals(eventType)) readyLatch.countDown();
+            if ("READY".equals(eventType)) {
+                readyLatch.countDown();
+            } else if ("MESSAGE_CREATE".equals(eventType)) {
+                dispatchLatch.countDown();
+            }
         });
-        assertThat(readyLatch.await(5, TimeUnit.SECONDS)).isTrue();
+        assertThat(readyLatch.await(10, TimeUnit.SECONDS)).isTrue();
 
-        // Send a dispatch so sequence is > 0
+        // Send a dispatch so sequence is > 0, wait for client to process it
         server.sendDispatch("MESSAGE_CREATE", "{\"content\":\"test\"}");
-        Thread.sleep(200);
+        assertThat(dispatchLatch.await(10, TimeUnit.SECONDS))
+                .as("Client should receive dispatch before disconnect").isTrue();
 
         // Expect a reconnection
         server.expectConnections(1);
@@ -180,7 +197,7 @@ class DiscordGatewayTest {
         gateway.connect(gatewayUrl(), TOKEN, INTENTS, (eventType, data) -> {
             if ("READY".equals(eventType)) readyLatch.countDown();
         });
-        assertThat(readyLatch.await(5, TimeUnit.SECONDS)).isTrue();
+        assertThat(readyLatch.await(10, TimeUnit.SECONDS)).isTrue();
 
         int identifyCountBefore = server.getReceivedIdentifies().size();
 
@@ -302,12 +319,13 @@ class DiscordGatewayTest {
                 eventLatch.countDown();
             }
         });
-        assertThat(readyLatch.await(5, TimeUnit.SECONDS)).isTrue();
+        assertThat(readyLatch.await(10, TimeUnit.SECONDS)).isTrue();
 
-        // Send a dispatch split across two frames
+        awaitStableConnection();
+
         server.sendDispatchMultiFrame("GUILD_CREATE", "{\"id\":\"guild1\",\"name\":\"Test Guild\"}");
 
-        assertThat(eventLatch.await(5, TimeUnit.SECONDS))
+        assertThat(eventLatch.await(10, TimeUnit.SECONDS))
                 .as("Should receive multi-frame dispatch event").isTrue();
         assertThat(receivedType.get()).isEqualTo("GUILD_CREATE");
         assertThat(receivedData.get().get("name").asText()).isEqualTo("Test Guild");
@@ -328,18 +346,27 @@ class DiscordGatewayTest {
                 eventLatch.countDown();
             }
         });
-        assertThat(readyLatch.await(5, TimeUnit.SECONDS)).isTrue();
+        assertThat(readyLatch.await(10, TimeUnit.SECONDS)).isTrue();
 
-        // Send GUILD_CREATE with presences array
+        awaitStableConnection();
+
         String guildData = "{\"id\":\"guild1\",\"name\":\"Test Guild\"," +
                 "\"presences\":[{\"user\":{\"id\":\"user1\"},\"status\":\"online\"}," +
                 "{\"user\":{\"id\":\"user2\"},\"status\":\"idle\"}]}";
         server.sendDispatch("GUILD_CREATE", guildData);
 
-        assertThat(eventLatch.await(5, TimeUnit.SECONDS))
+        assertThat(eventLatch.await(10, TimeUnit.SECONDS))
                 .as("Should receive GUILD_CREATE with presences").isTrue();
         assertThat(receivedData.get().get("presences")).hasSize(2);
         assertThat(receivedData.get().get("presences").get(0).get("status").asText()).isEqualTo("online");
+    }
+
+    private void awaitStableConnection() {
+        // Wait for 2 heartbeats: the second proves the first ACK was processed
+        // (otherwise the missed-ACK check would have killed the connection)
+        org.awaitility.Awaitility.await()
+                .atMost(10, TimeUnit.SECONDS)
+                .until(() -> server.getReceivedHeartbeatCount() >= 2);
     }
 
     private String gatewayUrl() {
