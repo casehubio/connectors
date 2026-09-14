@@ -1,21 +1,13 @@
 package io.casehub.connectors;
 
-import io.quarkus.arc.All;
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.enterprise.event.Event;
-import jakarta.inject.Inject;
-
-import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-@ApplicationScoped
 public class ConnectorService {
 
     private static final Logger LOG = Logger.getLogger(ConnectorService.class.getName());
@@ -23,18 +15,8 @@ public class ConnectorService {
     private final Map<String, Connector> registry;
     private final Consumer<SentMessage>  eventSink;
 
-    @Inject
-    public ConnectorService(@All final List<Connector> connectors,
-                            final Event<SentMessage> sentMessageEvent) {
-        this(connectors, msg -> sentMessageEvent.fireAsync(msg)
-                                                .exceptionally(ex -> {
-                                                    LOG.log(Level.SEVERE, "Async SentMessage dispatch failed", ex);
-                                                    return null;
-                                                }));
-    }
-
-    ConnectorService(final List<Connector> connectors,
-                     final Consumer<SentMessage> eventSink) {
+    public ConnectorService(final List<Connector> connectors,
+                            final Consumer<SentMessage> eventSink) {
         this.eventSink = eventSink;
         this.registry  = connectors.stream()
                                    .collect(Collectors.toMap(
@@ -50,7 +32,6 @@ public class ConnectorService {
         return new ConnectorService(connectors, eventSink);
     }
 
-
     public boolean send(final String connectorId, final ConnectorMessage message) {
         final Connector connector = registry.get(connectorId);
         if (connector == null) {
@@ -61,7 +42,7 @@ public class ConnectorService {
         boolean success = connector.send(message);
         eventSink.accept(new SentMessage(
                 connectorId, message.destination(), message.title(),
-                message.body(), Instant.now(), success));
+                message.body(), java.time.Instant.now(), success));
         return success;
     }
 

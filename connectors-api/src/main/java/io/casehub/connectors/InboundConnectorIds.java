@@ -5,8 +5,8 @@ package io.casehub.connectors;
  *
  * <p>These match the value returned by each connector's {@link InboundConnector#id()} /
  * {@link WebhookInboundConnector#id()} method. Routing code in downstream modules
- * (e.g. {@code casehub-qhorus/connector-backend}) can reference these constants
- * without depending on the specific connector implementation modules.
+ * can reference these constants without depending on the specific connector
+ * implementation modules.
  */
 public final class InboundConnectorIds {
 

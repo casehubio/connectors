@@ -3,7 +3,7 @@ package io.casehub.connectors;
 /**
  * SPI for <em>pull-based</em> inbound message transports (e.g. IMAP polling).
  *
- * <p>Implementations are CDI {@code @ApplicationScoped} beans discovered at startup.
+ * <p>Implementations are discovered at startup via framework-specific mechanisms.
  * {@link InboundConnectorService} calls {@link #start(InboundMessageSink)} at startup
  * and {@link #stop()} at shutdown.
  *
@@ -26,12 +26,12 @@ public interface InboundConnector {
     String id();
 
     /**
-     * Start receiving messages. Called once at Quarkus startup.
+     * Start receiving messages. Called once at application startup.
      *
      * @param sink the callback to invoke when a message arrives
      */
     void start(InboundMessageSink sink);
 
-    /** Stop receiving messages. Called at Quarkus shutdown. */
+    /** Stop receiving messages. Called at application shutdown. */
     void stop();
 }

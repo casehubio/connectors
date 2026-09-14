@@ -4,15 +4,14 @@ package io.casehub.connectors;
  * Base class for webhook-based inbound connectors (Slack, Teams, WhatsApp, Twilio SMS).
  *
  * <p>This class does <strong>not</strong> implement {@link InboundConnector}. Webhook
- * connectors have no pull lifecycle — their lifecycle is JAX-RS. They are discovered
- * by {@code WebhookRouter} via {@code @All List<WebhookInboundConnector>} and by
- * {@code InboundConnectorService} only when the latter also needs to manage pull connectors
- * in the same deployment.
+ * connectors have no pull lifecycle — their lifecycle is HTTP/JAX-RS. They are discovered
+ * by the webhook router and by the inbound connector service only when the latter also
+ * needs to manage pull connectors in the same deployment.
  *
  * <h2>ID contract</h2>
  * {@code id()} must be lowercase, URL-safe, no slashes or spaces (pattern:
  * {@code [a-z0-9][a-z0-9\-]*}). It is also the URL path segment:
- * {@code POST /connectors/{id}/webhook}. Validated at startup by {@code WebhookRouter}.
+ * {@code POST /connectors/{id}/webhook}. Validated at startup by the webhook router.
  *
  * <h2>Exception safety</h2>
  * {@code handle()} must not throw. Catch all exceptions internally and return

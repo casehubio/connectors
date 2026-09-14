@@ -4,17 +4,13 @@ package io.casehub.connectors;
  * SPI for outbound message delivery.
  *
  * <p>
- * Implementations are CDI {@code @ApplicationScoped} beans discoverable at startup.
+ * Implementations are discovered at startup via framework-specific mechanisms.
  * The {@link #id()} string identifies the connector type and is used to route
  * messages to the correct implementation.
  *
  * <p>
  * Built-in implementations: {@code "slack"}, {@code "teams"}, {@code "twilio-sms"},
  * {@code "whatsapp"}. The {@code connectors-email} module provides {@code "email"}.
- *
- * <p>
- * Custom connectors: provide a CDI {@code @ApplicationScoped} bean implementing this
- * interface. It will be discovered automatically.
  *
  * <h2>Contract</h2>
  * <ul>

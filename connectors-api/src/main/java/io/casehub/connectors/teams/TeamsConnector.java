@@ -3,22 +3,9 @@ package io.casehub.connectors.teams;
 import io.casehub.connectors.Connector;
 import io.casehub.connectors.ConnectorMessage;
 import io.casehub.connectors.http.HttpHelper;
-import jakarta.enterprise.context.ApplicationScoped;
 
 import java.util.logging.Logger;
 
-/**
- * Microsoft Teams connector via Incoming Webhooks (Adaptive Cards).
- *
- * <p>
- * {@link ConnectorMessage#destination()} must be a Teams Incoming Webhook URL.
- * {@link ConnectorMessage#title()} becomes the card title.
- * {@link ConnectorMessage#body()} becomes the card body text.
- *
- * <p>
- * No Teams SDK required. No Microsoft API credentials needed — the webhook URL is the credential.
- */
-@ApplicationScoped
 public class TeamsConnector implements Connector {
 
     public static final String ID = "teams";
@@ -40,8 +27,6 @@ public class TeamsConnector implements Connector {
         return ok;
     }
 
-
-    /** Package-private for unit testing. */
     public static String buildPayload(final String title, final String body) {
         final String safeTitle = title != null ? HttpHelper.jsonEscape(title) : "";
         final String safeBody = body != null ? HttpHelper.jsonEscape(body) : "";

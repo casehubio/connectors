@@ -8,9 +8,9 @@ import java.util.List;
  * <p>The router pattern-matches exhaustively on this sealed type, making it
  * impossible to add a new result variant without updating the router.
  *
- * <h2>HTTP status mapping (applied by WebhookRouter)</h2>
+ * <h2>HTTP status mapping (applied by the webhook router)</h2>
  * <ul>
- * <li>{@code Delivered} → 200 OK (after firing CDI events)
+ * <li>{@code Delivered} → 200 OK (after firing events)
  * <li>{@code Challenged} → 200 OK with the challenge body
  * <li>{@code Ignored} → 200 OK (no event fired)
  * <li>{@code Unauthorized} from POST → 200 OK + SECURITY WARNING log

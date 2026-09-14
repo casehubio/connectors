@@ -3,9 +3,6 @@ package io.casehub.connectors.twilio;
 import io.casehub.connectors.Connector;
 import io.casehub.connectors.ConnectorMessage;
 import io.casehub.connectors.http.HttpHelper;
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import java.net.URI;
 import java.net.http.HttpRequest;
@@ -15,26 +12,6 @@ import java.time.Duration;
 import java.util.Base64;
 import java.util.logging.Logger;
 
-/**
- * Twilio SMS connector via the Twilio Messages REST API.
- *
- * <p>
- * {@link ConnectorMessage#destination()} is the recipient E.164 phone number
- * (e.g. {@code +447700900000}).
- * {@link ConnectorMessage#body()} is the SMS text (max 1600 chars for concatenated SMS).
- *
- * <h2>Configuration</h2>
- * <pre>
- * casehub.connectors.twilio.account-sid=ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
- * casehub.connectors.twilio.auth-token=your_auth_token
- * casehub.connectors.twilio.from=+14155552671
- * </pre>
- *
- * <p>
- * This connector is only active when the above config properties are present.
- * If {@code account-sid} is blank, all {@code send()} calls are logged and no-op'd.
- */
-@ApplicationScoped
 public class TwilioSmsConnector implements Connector {
 
     public static final String ID = "twilio-sms";
@@ -42,17 +19,15 @@ public class TwilioSmsConnector implements Connector {
     private static final Logger LOG = Logger.getLogger(TwilioSmsConnector.class.getName());
     private static final String TWILIO_API = "https://api.twilio.com/2010-04-01/Accounts/";
 
-    @Inject
-    @ConfigProperty(name = "casehub.connectors.twilio.account-sid", defaultValue = "")
-    String accountSid;
+    private final String accountSid;
+    private final String authToken;
+    private final String from;
 
-    @Inject
-    @ConfigProperty(name = "casehub.connectors.twilio.auth-token", defaultValue = "")
-    String authToken;
-
-    @Inject
-    @ConfigProperty(name = "casehub.connectors.twilio.from", defaultValue = "")
-    String from;
+    public TwilioSmsConnector(final String accountSid, final String authToken, final String from) {
+        this.accountSid = accountSid;
+        this.authToken = authToken;
+        this.from = from;
+    }
 
     @Override
     public String id() {
@@ -99,7 +74,6 @@ public class TwilioSmsConnector implements Connector {
 
     @Override
     public String channelType() {return "sms";}
-
 
     private static String encode(final String s) {
         return java.net.URLEncoder.encode(s, StandardCharsets.UTF_8);

@@ -5,9 +5,8 @@ import java.util.List;
 /**
  * Optional SPI for connectors whose delivery targets are discoverable at runtime.
  *
- * <p>Implementations are {@code @ApplicationScoped} CDI beans discovered automatically.
- * The {@code list_channels} MCP tool aggregates all registered implementations via
- * {@code @All List<ConnectorDiscovery>}.
+ * <p>Implementations are discovered automatically via framework-specific mechanisms.
+ * The {@code list_channels} MCP tool aggregates all registered implementations.
  *
  * <h2>Contract for implementations</h2>
  * <ul>
