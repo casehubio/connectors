@@ -26,13 +26,17 @@ import io.casehub.connectors.graphql.dto.OutboundConnectorInfo;
 import io.casehub.connectors.graphql.dto.SendNotificationResult;
 import io.casehub.connectors.graphql.dto.SentMessageEntry;
 import io.casehub.platform.api.identity.CurrentPrincipal;
+import io.casehub.platform.api.mcp.McpDomain;
+import io.casehub.platform.api.mcp.PlatformMutation;
+import io.casehub.platform.api.mcp.PlatformQuery;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class ConnectorOperationsImpl implements ConnectorOperations {
+@McpDomain("connectors")
+public class ConnectorOperationsImpl {
 
     private final InboundConnectorService inboundService;
     private final ConnectorService connectorService;
@@ -59,7 +63,7 @@ public class ConnectorOperationsImpl implements ConnectorOperations {
         this.currentPrincipal = currentPrincipal;
     }
 
-    @Override
+    @PlatformMutation("Inject a chat message as if a customer sent it")
     public InjectChatResult injectChat(final String platform, final String sender,
                                        final String channel, final String text) {
         if (!chatPlatformService.supports(platform)) {
@@ -85,7 +89,7 @@ public class ConnectorOperationsImpl implements ConnectorOperations {
         return new InjectChatResult(true, platform, channel);
     }
 
-    @Override
+    @PlatformMutation("Send a notification via a named connector")
     public SendNotificationResult sendNotification(
             final String connectorId, final String destination,
             final String body, final String title,
@@ -97,7 +101,7 @@ public class ConnectorOperationsImpl implements ConnectorOperations {
         return new SendNotificationResult(ok, connectorId, destination);
     }
 
-    @Override
+    @PlatformQuery("List registered connectors, chat platforms, and their capabilities")
     public ConnectorStatusResult connectorStatus() {
         var outbound = connectors.stream()
                 .map(c -> new OutboundConnectorInfo(c.id(), c.channelType()))
@@ -130,7 +134,7 @@ public class ConnectorOperationsImpl implements ConnectorOperations {
         return new ConnectorStatusResult(outbound, chatPlatforms, List.copyOf(inbound));
     }
 
-    @Override
+    @PlatformQuery("Retrieve recently sent messages for verification")
     public List<SentMessageEntry> sentMessages(final String connectorId, final Integer limit) {
         if (sentMessageCapture.isEmpty()) {
             return List.of();
