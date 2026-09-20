@@ -285,6 +285,13 @@ public interface BankFeedPlatform {
 
 **Simulation:** Annotated with `@SimulationEligible` -- the platform simulation framework generates a CDI decorator at build time. Configure strategies and corpus data via `Simulation.forTest()` or scenario YAML. Qualified names: `bank-feed-platform.listAccounts`, `bank-feed-platform.balance`, `bank-feed-platform.listTransactions`, `bank-feed-platform.getTransaction`.
 
+**Shipped corpus data:** The module includes example corpus YAML files on the classpath under `simulation/bank-feed/`:
+- `accounts-corpus.yaml` -- 3 accounts (current, savings, credit card) with balances
+- `transactions-corpus.yaml` -- 12 transactions with UK merchants, categories, pending/booked status
+- `simulation.yaml` -- ready-to-use simulation config with strategies and key extractors
+
+To use in your app: add `bank-spi` as a dependency -- the corpus files are on the classpath automatically. Point your simulation config's `corpus-files` at `classpath:simulation/bank-feed/accounts-corpus.yaml` etc., or copy `simulation/bank-feed/simulation.yaml` as a starting point. A combined config for both SPIs is available at `docs/examples/simulation/household-finance/simulation.yaml`.
+
 **Dependency:**
 ```xml
 <dependency>
@@ -322,6 +329,11 @@ public interface EmailPlatform {
 **Correlation with EmailInboundConnector:** RFC 2822 `Message-ID` correlates queries with push events (`InboundMessage.metadata["message-id"]`). Consumers observing both paths must be idempotent. Messages with null `messageId` cannot be deduplicated.
 
 **Simulation:** Same as BankFeedPlatform. Qualified names: `email-platform.listMailboxes`, `email-platform.listMessages`, `email-platform.getMessage`, `email-platform.getAttachmentContent`.
+
+**Shipped corpus data:** Under `simulation/email/` on the classpath:
+- `mailbox-corpus.yaml` -- 2 mailboxes, 6 messages with realistic UK senders/subjects
+- `messages-corpus.yaml` -- full message bodies, attachments, RFC 2822 Message-IDs
+- `simulation.yaml` -- ready-to-use simulation config
 
 **Dependency:**
 ```xml
