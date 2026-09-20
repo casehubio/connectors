@@ -7,7 +7,7 @@ import io.casehub.connectors.calendar.spi.CalendarPlatform;
 import io.casehub.connectors.calendar.spi.EventTiming;
 import io.casehub.connectors.graphql.dto.CalendarEventInfo;
 import io.casehub.connectors.graphql.dto.CalendarEventRequest;
-import io.casehub.connectors.graphql.dto.SendResult;
+import io.casehub.connectors.graphql.dto.OperationResult;
 import io.casehub.platform.api.mcp.McpDomain;
 import io.casehub.platform.api.mcp.PathParam;
 import io.casehub.platform.api.mcp.PlatformMutation;
@@ -101,17 +101,17 @@ public class ConnectorCalendarApi {
 
     @PlatformMutation("Delete a calendar event")
     @RestPath("/events/{eventId}/delete")
-    public SendResult deleteEvent(
+    public OperationResult deleteEvent(
             @QueryParam("platform") String platform,
             @QueryParam("calendarId") String calendarId,
             @PathParam String eventId) {
         CalendarPlatform p = calendarService.platform(platform);
-        if (p == null) return new SendResult(false, platform, calendarId, "Unknown platform");
+        if (p == null) return new OperationResult(false, platform, calendarId, "Unknown platform");
         try {
             p.deleteEvent(calendarId, eventId);
-            return new SendResult(true, platform, calendarId, "Deleted " + eventId);
+            return new OperationResult(true, platform, calendarId, "Deleted " + eventId);
         } catch (Exception e) {
-            return new SendResult(false, platform, calendarId, e.getMessage());
+            return new OperationResult(false, platform, calendarId, e.getMessage());
         }
     }
 

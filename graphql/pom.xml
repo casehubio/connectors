@@ -34,6 +34,16 @@ sendNotification, connectorStatus, sentMessages.</description>
     </dependency>
     <dependency>
       <groupId>io.casehub</groupId>
+      <artifactId>casehub-connectors-bank-spi</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.casehub</groupId>
+      <artifactId>casehub-connectors-email-spi</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.casehub</groupId>
       <artifactId>casehub-connectors-email</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -113,7 +123,7 @@ sendNotification, connectorStatus, sentMessages.</description>
             </path>
           </annotationProcessorPaths>
           <compilerArgs>
-            <arg>-AdomainFilter=connectors,connectors/messaging,connectors/chat,connectors/calendar</arg>
+            <arg>-AdomainFilter=connectors,connectors/messaging,connectors/chat,connectors/calendar,connectors/bank-feed,connectors/email</arg>
             <arg>-AgenerateGraphQL=false</arg>
           </compilerArgs>
         </configuration>
