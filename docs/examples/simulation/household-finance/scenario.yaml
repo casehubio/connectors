@@ -1,0 +1,136 @@
+scenario: household-finance
+speed: 1.0
+
+simulation:
+  strategies:
+    bank-feed-platform.id: constant
+    bank-feed-platform.listAccounts: seq
+    bank-feed-platform.balance: key
+    bank-feed-platform.listTransactions: seq
+    bank-feed-platform.getTransaction: key
+    email-platform.id: constant
+    email-platform.listMailboxes: seq
+    email-platform.listMessages: seq
+    email-platform.getMessage: key
+    email-platform.getAttachmentContent: key
+  key-extractor:
+    bank-feed-platform.balance: "field:accountId"
+    bank-feed-platform.getTransaction: "field:transactionId"
+    email-platform.getMessage: "field:messageId"
+    email-platform.getAttachmentContent: "field:attachmentId"
+  exhaustion-policy:
+    bank-feed-platform.listTransactions: WRAP
+    email-platform.listMessages: WRAP
+  constants:
+    bank-feed-platform.id: "sim"
+    email-platform.id: "sim"
+  corpus:
+    - classpath:simulation/bank-feed/accounts-corpus.yaml
+    - classpath:simulation/bank-feed/transactions-corpus.yaml
+    - classpath:simulation/email/mailbox-corpus.yaml
+    - classpath:simulation/email/messages-corpus.yaml
+
+sections:
+  - label: "Bank Accounts"
+    steps:
+      - name: list-accounts
+        label: "View accounts"
+        target: app
+        commands:
+          - action: graphql
+            domain: connectors/bank-feed
+            data:
+              operation: listAccounts
+              params:
+                platform: sim
+
+      - name: check-balance
+        label: "Check current account balance"
+        target: app
+        commands:
+          - action: graphql
+            domain: connectors/bank-feed
+            data:
+              operation: balance
+              params:
+                platform: sim
+                accountId: acc-current-001
+
+      - name: list-transactions
+        label: "View recent transactions"
+        target: app
+        commands:
+          - action: graphql
+            domain: connectors/bank-feed
+            data:
+              operation: listTransactions
+              params:
+                platform: sim
+                accountId: acc-current-001
+                pageSize: 10
+
+      - name: view-transaction
+        label: "View salary payment detail"
+        target: app
+        commands:
+          - action: graphql
+            domain: connectors/bank-feed
+            data:
+              operation: getTransaction
+              params:
+                platform: sim
+                accountId: acc-current-001
+                transactionId: txn-002
+
+  - label: "Email Inbox"
+    steps:
+      - name: list-mailboxes
+        label: "View mailboxes"
+        target: app
+        commands:
+          - action: graphql
+            domain: connectors/email
+            data:
+              operation: listMailboxes
+              params:
+                platform: sim
+
+      - name: list-messages
+        label: "View inbox messages"
+        target: app
+        commands:
+          - action: graphql
+            domain: connectors/email
+            data:
+              operation: listMessages
+              params:
+                platform: sim
+                mailboxId: inbox
+                pageSize: 10
+
+      - name: read-statement-email
+        label: "Open bank statement email"
+        target: app
+        commands:
+          - action: graphql
+            domain: connectors/email
+            data:
+              operation: getMessage
+              params:
+                platform: sim
+                mailboxId: inbox
+                messageId: msg-002
+
+      - name: download-attachment
+        label: "Download statement PDF"
+        target: app
+        commands:
+          - action: graphql
+            domain: connectors/email
+            data:
+              operation: getAttachmentContent
+              params:
+                platform: sim
+                mailboxId: inbox
+                messageId: msg-002
+                attachmentId: att-001
