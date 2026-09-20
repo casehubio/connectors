@@ -184,6 +184,11 @@ C4Context
 | `chat-discord` | `casehub-connectors-chat-discord` | `chat-spi`, `core`, `discord` |
 | `chat-slack` | `casehub-connectors-chat-slack` | `chat-spi`, `core`, `slack-bot` |
 | `chat-demo` | `casehub-connectors-chat-demo` | `chat-spi`, `chat-ref`, `core`, `casehub-pages-auth`, `quarkus-rest-jackson`, `quarkus-websockets-next`, `sqlite-jdbc`, `HikariCP` (profile-gated `-Pdemo`) |
+| `calendar-spi` | `casehub-connectors-calendar-spi` | `quarkus-arc` |
+| `calendar-ref` | `casehub-connectors-calendar-ref` | `calendar-spi`, `quarkus-arc` |
+| `calendar-google` | `casehub-connectors-calendar-google` | `calendar-spi`, `google-api-services-calendar` |
+| `bank-spi` | `casehub-connectors-bank-spi` | `connectors-api`, `simulation-api`, `quarkus-arc` |
+| `email-spi` | `casehub-connectors-email-spi` | `connectors-api`, `simulation-api`, `quarkus-arc` |
 
 `email` and `email-inbound` are separate because `quarkus-mailer` (SMTP) and `angus-mail` (IMAP) share no infrastructure. `webhook` is separate because `quarkus-rest` is unnecessary for outbound-only deployments. `mcp` is separate because `quarkus-mcp-server-core` is not in the Quarkus BOM. `discord` (HTTP client + Gateway) is separate from `chat-discord` (ChatPlatform) because the client can be consumed independently. `chat-slack` depends on `slack-bot` (existing HTTP client) rather than duplicating Slack API calls.
 
@@ -233,6 +238,16 @@ C4Container
   Container_Boundary(b10, "Layer L10 — MCP Chat Surface") {
     Container(chat_mcp, "ChatPlatformMcpTool", "Quarkus MCP, @Blocking", "send_chat · list_chat_channels")
     Container(disc_mcp, "ChannelDiscoveryMcpTool", "Quarkus MCP, @Blocking", "list_channels")
+  }
+  Container_Boundary(b12, "Layer L12 — Bank Feed Platform SPI") {
+    Container(bank_spi, "BankFeedPlatform SPI", "Java interface, @SimulationEligible", "id() + listAccounts() + balance()\nlistTransactions() + getTransaction()")
+    Container(bank_model, "Model", "Java records", "AccountInfo · AccountBalance\nTransaction · Page<T>")
+    Container(bank_service, "BankFeedPlatformService", "CDI", "Platform lookup by id")
+  }
+  Container_Boundary(b13, "Layer L13 — Email Platform SPI") {
+    Container(email_spi, "EmailPlatform SPI", "Java interface, @SimulationEligible", "id() + listMailboxes()\nlistMessages() + getMessage()\ngetAttachmentContent()")
+    Container(email_model, "Model", "Java records", "Mailbox · EmailSummary\nEmailMessage · EmailAttachment")
+    Container(email_service, "EmailPlatformService", "CDI", "Platform lookup by id")
   }
 ```
 

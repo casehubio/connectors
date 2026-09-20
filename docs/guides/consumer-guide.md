@@ -19,7 +19,7 @@ No Camel, no vendor SDKs -- pure `java.net.http.HttpClient` for HTTP-based conne
 
 ## Module Structure
 
-There are 19 active modules in the build (pom.xml `<modules>`):
+There are 21 active modules in the build (pom.xml `<modules>`):
 
 | Module (artifactId prefix: `casehub-connectors-`) | What consumers need to know |
 |----------------------------------------------------|-----------------------------|
@@ -41,6 +41,8 @@ There are 19 active modules in the build (pom.xml `<modules>`):
 | `calendar-spi` | `CalendarPlatform` SPI, `CalendarPlatformService` routing, model records (`CalendarEvent`, `CalendarInfo`, `EventDetails`), sealed `EventTiming` (Timed/AllDay) |
 | `calendar-ref` | In-memory reference `CalendarPlatform` for testing (`RefCalendarPlatform`) |
 | `calendar-google` | Google Calendar API provider with OAuth2 refresh token auth, paginated `listEvents` |
+| `bank-spi` | `BankFeedPlatform` SPI with `@SimulationEligible`, model records (`AccountInfo`, `AccountBalance`, `Transaction`), `BankFeedPlatformService` routing, `NoOpBankFeedPlatform` `@DefaultBean` fallback |
+| `email-spi` | `EmailPlatform` SPI with `@SimulationEligible`, model records (`Mailbox`, `EmailSummary`, `EmailMessage`, `EmailAttachment`), `EmailPlatformService` routing. Complements `email` (outbound) and `email-inbound` (push) |
 | `graphql` | `ConnectorOperations` `@McpDomain("connectors")` SPI — GraphQL/MCP surface with 4 operations: `injectChat` (constructs `InboundMessage`, fires via `InboundConnectorService`), `sendNotification` (delegates to `ConnectorService.send()`), `connectorStatus` (aggregates outbound + chat + inbound connectors), `sentMessages` (queries `SentMessageCapture`, profile-gated). `ConnectorsModelEnricher` provides domain summary/state for MCP. `SentMessageCapture` (`@UnlessBuildProfile("prod")`) CDI observer for test/dev message capture. |
 
 **CDI events:** `ConnectorService.send()` fires `Event<SentMessage>` on every outbound delivery. `SentMessage` record carries the connector ID, recipient, message content, and timestamp. Observe with `@ObservesAsync SentMessage` for delivery tracking.
@@ -254,6 +256,81 @@ public interface CalendarPlatform {
 |----------------|------------|-------|
 | `RefCalendarPlatform` | `ref` | In-memory reference for testing |
 | `GoogleCalendarPlatform` | `google` | Google Calendar API with OAuth2 refresh token auth, paginated listEvents (max 20 pages) |
+
+### BankFeedPlatform SPI
+
+Financial data integration -- account listing, balance queries, paginated transaction history.
+
+```java
+@SimulationEligible(name = "bank-feed-platform")
+public interface BankFeedPlatform {
+    String id();
+    List<AccountInfo> listAccounts();
+    AccountBalance balance(String accountId);
+    Page<Transaction> listTransactions(String accountId, Instant from, Instant to, PageRequest pagination);
+    Transaction getTransaction(String accountId, String transactionId);
+}
+```
+
+**BankFeedPlatformService** -- inject for routing. Same pattern as `CalendarPlatformService`.
+
+**Model records:**
+- `AccountInfo(id, name, type, currency)` -- `type` is `AccountType` enum (CURRENT, SAVINGS, CREDIT_CARD, LOAN, MORTGAGE, OTHER)
+- `AccountBalance(accountId, available, current, currency, asOf)` -- `BigDecimal` amounts; `available` = spendable, `current` = ledger balance
+- `Transaction(id, accountId, amount, direction, currency, description, merchantName, category, date, status)` -- `amount` always positive, `direction` is DEBIT/CREDIT; `merchantName` and `category` nullable
+
+**Pagination:** Uses `Page<T>` and `PageRequest` from `connectors-api`. Call `PageRequest.first(25)` for the first page, then use `page.nextCursor()` for subsequent pages.
+
+**Error contract:** `balance()` and `getTransaction()` throw `NoSuchElementException` on not-found. List operations return empty collections.
+
+**Simulation:** Annotated with `@SimulationEligible` -- the platform simulation framework generates a CDI decorator at build time. Configure strategies and corpus data via `Simulation.forTest()` or scenario YAML. Qualified names: `bank-feed-platform.listAccounts`, `bank-feed-platform.balance`, `bank-feed-platform.listTransactions`, `bank-feed-platform.getTransaction`.
+
+**Dependency:**
+```xml
+<dependency>
+    <groupId>io.casehub</groupId>
+    <artifactId>casehub-connectors-bank-spi</artifactId>
+    <version>${casehub.version}</version>
+</dependency>
+```
+
+### EmailPlatform SPI
+
+Email query/read integration -- mailbox listing, paginated message listing, message retrieval, attachment content. Complements `EmailConnector` (outbound) and `EmailInboundConnector` (push inbound).
+
+```java
+@SimulationEligible(name = "email-platform")
+public interface EmailPlatform {
+    String id();
+    List<Mailbox> listMailboxes();
+    Page<EmailSummary> listMessages(String mailboxId, Instant from, Instant to, PageRequest pagination);
+    EmailMessage getMessage(String mailboxId, String messageId);
+    byte[] getAttachmentContent(String mailboxId, String messageId, String attachmentId);
+}
+```
+
+**EmailPlatformService** -- inject for routing. Same pattern as `CalendarPlatformService`.
+
+**Model records:**
+- `Mailbox(id, name, unreadCount)`
+- `EmailSummary(id, mailboxId, messageId, from, subject, receivedAt, read)` -- `messageId` (RFC 2822 Message-ID) nullable
+- `EmailMessage(id, mailboxId, messageId, from, to, cc, subject, bodyText, bodyHtml, receivedAt, read, attachments)` -- `bodyText`/`bodyHtml` nullable (at least one non-null); `messageId` nullable
+- `EmailAttachment(id, filename, contentType, size)` -- `id` is provider-assigned part identifier (always non-null); `filename` nullable
+
+**Error contract:** `getMessage()` and `getAttachmentContent()` throw `NoSuchElementException` on not-found.
+
+**Correlation with EmailInboundConnector:** RFC 2822 `Message-ID` correlates queries with push events (`InboundMessage.metadata["message-id"]`). Consumers observing both paths must be idempotent. Messages with null `messageId` cannot be deduplicated.
+
+**Simulation:** Same as BankFeedPlatform. Qualified names: `email-platform.listMailboxes`, `email-platform.listMessages`, `email-platform.getMessage`, `email-platform.getAttachmentContent`.
+
+**Dependency:**
+```xml
+<dependency>
+    <groupId>io.casehub</groupId>
+    <artifactId>casehub-connectors-email-spi</artifactId>
+    <version>${casehub.version}</version>
+</dependency>
+```
 
 ### Notification Bridge
 

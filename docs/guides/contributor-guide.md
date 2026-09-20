@@ -94,6 +94,32 @@ public interface InboundTranslator {
 
 **`GoogleCalendarPlatform`** (`calendar-google`) -- uses `google-api-services-calendar` with OAuth2 refresh token auth via `UserCredentials`. `listEvents` paginates up to 20 pages. `GoogleEventMapper` handles bidirectional mapping between Google Calendar model and `CalendarEvent`/`EventDetails`. Inactive when credentials are blank.
 
+### Bank Feed Platform Architecture
+
+**`BankFeedPlatform` SPI** (`bank-spi`) -- 5 methods: `id()`, `listAccounts()`, `balance(accountId)`, `listTransactions(accountId, from, to, pagination)`, `getTransaction(accountId, transactionId)`. Annotated with `@SimulationEligible(name = "bank-feed-platform")` -- first connector SPI to use the platform simulation framework for decorator generation.
+
+**`BankFeedPlatformService`** (`bank-spi`) -- routing service, same `@All List<BankFeedPlatform>` pattern.
+
+**Pagination:** `listTransactions` returns `Page<Transaction>` with cursor-based pagination via `PageRequest` (shared types in `connectors-api`). Financial data volumes require explicit pagination -- unlike CalendarPlatform's bounded list returns.
+
+**Error contract:** `balance()` and `getTransaction()` throw `NoSuchElementException` on not-found. `NoOpBankFeedPlatform` (`@DefaultBean`) throws `UnsupportedOperationException` -- semantically different (no provider vs entity not found).
+
+**Model:** `AccountInfo`, `AccountBalance` (`BigDecimal` amounts -- available vs current), `Transaction` (amount always positive, `TransactionDirection` DEBIT/CREDIT), `AccountType`, `TransactionStatus`.
+
+**No live provider yet.** The SPI is designed for Open Banking (TrueLayer/Yapily) and aggregator (Plaid) providers. PSD2 consent management is a documented future concern.
+
+### Email Platform Architecture
+
+**`EmailPlatform` SPI** (`email-spi`) -- 5 methods: `id()`, `listMailboxes()`, `listMessages(mailboxId, from, to, pagination)`, `getMessage(mailboxId, messageId)`, `getAttachmentContent(mailboxId, messageId, attachmentId)`. Annotated with `@SimulationEligible(name = "email-platform")`.
+
+**Complements existing email modules:** `EmailConnector` handles outbound delivery (L1), `EmailInboundConnector` handles push inbound (L3), `EmailPlatform` adds query/read capability (platform SPI level). These are architecturally separate layers.
+
+**`EmailPlatformService`** (`email-spi`) -- routing service, same pattern. Service, beans, and no-op live in `io.casehub.connectors.email.spi` package (not `io.casehub.connectors.email`) to avoid split-package with the existing `email` module.
+
+**Attachment content:** Retrieved separately via `getAttachmentContent()` -- `EmailAttachment` record carries metadata only (id, filename, contentType, size). `EmailAttachment.id` is the unique part identifier (IMAP section number, Gmail attachment ID); `filename` is nullable.
+
+**Correlation with EmailInboundConnector:** RFC 2822 `Message-ID` on `EmailMessage.messageId` / `EmailSummary.messageId` matches `InboundMessage.metadata["message-id"]`. Nullable -- messages with null `messageId` cannot be deduplicated across poll/push paths.
+
 ### Notification Bridge Architecture
 
 **`NotificationBridgeStartup`** (`notification-bridge`) -- `@Startup @ApplicationScoped`. At `@PostConstruct`:
@@ -288,6 +314,28 @@ Sealed `EventTiming`: `Timed(Instant, Instant, ZoneId)` | `AllDay(LocalDate, Loc
 `GoogleCalendarPlatform` (ID `"google"`) -- Google Calendar API via `google-api-services-calendar`. OAuth2 refresh token auth via `UserCredentials`. Paginated `listEvents` (max 20 pages). Inactive when credentials are blank.
 
 `GoogleEventMapper` -- bidirectional mapping between Google Calendar API model and `CalendarEvent`/`EventDetails`, including `EventTiming` sealed type handling.
+
+### bank-spi
+
+`BankFeedPlatform` SPI with `@SimulationEligible`, `BankFeedPlatformService` routing.
+
+Model records: `AccountInfo`, `AccountBalance`, `Transaction`. Enums: `AccountType`, `TransactionDirection`, `TransactionStatus`.
+
+`NoOpBankFeedPlatform` (`@DefaultBean`) -- empty lists for list ops, throws `UnsupportedOperationException` for lookups.
+
+Depends on: `connectors-api` (Page, PageRequest), `simulation-api` (@SimulationEligible).
+
+### email-spi
+
+`EmailPlatform` SPI with `@SimulationEligible`, `EmailPlatformService` routing.
+
+Model records: `Mailbox`, `EmailSummary`, `EmailMessage`, `EmailAttachment`.
+
+`NoOpEmailPlatform` (`@DefaultBean`) -- same no-op pattern.
+
+Package note: service/beans in `io.casehub.connectors.email.spi` to avoid split-package with existing `email` module.
+
+Depends on: `connectors-api` (Page, PageRequest), `simulation-api` (@SimulationEligible).
 
 ---
 
