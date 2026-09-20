@@ -1,0 +1,45 @@
+bank-feed-platform.listAccounts:
+  - tenancy-id: household
+    input: null
+    output:
+      - id: acc-current-001
+        name: "Joint Current Account"
+        type: CURRENT
+        currency: GBP
+      - id: acc-savings-001
+        name: "Emergency Fund"
+        type: SAVINGS
+        currency: GBP
+      - id: acc-credit-001
+        name: "Rewards Credit Card"
+        type: CREDIT_CARD
+        currency: GBP
+
+bank-feed-platform.balance:
+  - tenancy-id: household
+    key: acc-current-001
+    input: acc-current-001
+    output:
+      accountId: acc-current-001
+      available: 2847.63
+      current: 3147.63
+      currency: GBP
+      asOf: "2026-09-20T08:00:00Z"
+  - tenancy-id: household
+    key: acc-savings-001
+    input: acc-savings-001
+    output:
+      accountId: acc-savings-001
+      available: 15200.00
+      current: 15200.00
+      currency: GBP
+      asOf: "2026-09-20T08:00:00Z"
+  - tenancy-id: household
+    key: acc-credit-001
+    input: acc-credit-001
+    output:
+      accountId: acc-credit-001
+      available: 3750.00
+      current: -1250.42
+      currency: GBP
+      asOf: "2026-09-20T08:00:00Z"

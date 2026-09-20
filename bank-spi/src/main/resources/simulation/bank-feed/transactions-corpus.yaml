@@ -1,0 +1,157 @@
+bank-feed-platform.listTransactions:
+  - tenancy-id: household
+    input: null
+    output:
+      items:
+        - id: txn-001
+          accountId: acc-current-001
+          amount: 45.80
+          direction: DEBIT
+          currency: GBP
+          description: "Tesco Superstore"
+          merchantName: "Tesco"
+          category: groceries
+          date: "2026-09-19"
+          status: BOOKED
+        - id: txn-002
+          accountId: acc-current-001
+          amount: 2500.00
+          direction: CREDIT
+          currency: GBP
+          description: "SALARY - ACME CORP"
+          merchantName: null
+          category: income
+          date: "2026-09-18"
+          status: BOOKED
+        - id: txn-003
+          accountId: acc-current-001
+          amount: 12.99
+          direction: DEBIT
+          currency: GBP
+          description: "Netflix"
+          merchantName: "Netflix"
+          category: entertainment
+          date: "2026-09-18"
+          status: BOOKED
+        - id: txn-004
+          accountId: acc-current-001
+          amount: 89.50
+          direction: DEBIT
+          currency: GBP
+          description: "Shell Garage - Fuel"
+          merchantName: "Shell"
+          category: transport
+          date: "2026-09-17"
+          status: BOOKED
+        - id: txn-005
+          accountId: acc-current-001
+          amount: 300.00
+          direction: DEBIT
+          currency: GBP
+          description: "Transfer to Emergency Fund"
+          merchantName: null
+          category: null
+          date: "2026-09-17"
+          status: BOOKED
+        - id: txn-006
+          accountId: acc-current-001
+          amount: 34.20
+          direction: DEBIT
+          currency: GBP
+          description: "Costa Coffee"
+          merchantName: "Costa"
+          category: dining
+          date: "2026-09-16"
+          status: BOOKED
+        - id: txn-007
+          accountId: acc-current-001
+          amount: 156.00
+          direction: DEBIT
+          currency: GBP
+          description: "British Gas - Direct Debit"
+          merchantName: "British Gas"
+          category: utilities
+          date: "2026-09-15"
+          status: BOOKED
+        - id: txn-008
+          accountId: acc-current-001
+          amount: 22.50
+          direction: DEBIT
+          currency: GBP
+          description: "Amazon.co.uk"
+          merchantName: "Amazon"
+          category: shopping
+          date: "2026-09-15"
+          status: BOOKED
+        - id: txn-009
+          accountId: acc-current-001
+          amount: 850.00
+          direction: DEBIT
+          currency: GBP
+          description: "RENT - 14 MAPLE DRIVE"
+          merchantName: null
+          category: housing
+          date: "2026-09-14"
+          status: BOOKED
+        - id: txn-010
+          accountId: acc-current-001
+          amount: 67.80
+          direction: DEBIT
+          currency: GBP
+          description: "Waitrose"
+          merchantName: "Waitrose"
+          category: groceries
+          date: "2026-09-13"
+          status: BOOKED
+        - id: txn-011
+          accountId: acc-current-001
+          amount: 15.00
+          direction: DEBIT
+          currency: GBP
+          description: "Spotify Premium"
+          merchantName: "Spotify"
+          category: entertainment
+          date: "2026-09-13"
+          status: BOOKED
+        - id: txn-012
+          accountId: acc-current-001
+          amount: 42.75
+          direction: DEBIT
+          currency: GBP
+          description: "PENDING - Card 4521"
+          merchantName: null
+          category: null
+          date: "2026-09-20"
+          status: PENDING
+      nextCursor: null
+      hasMore: false
+
+bank-feed-platform.getTransaction:
+  - tenancy-id: household
+    key: txn-001
+    input: txn-001
+    output:
+      id: txn-001
+      accountId: acc-current-001
+      amount: 45.80
+      direction: DEBIT
+      currency: GBP
+      description: "Tesco Superstore"
+      merchantName: "Tesco"
+      category: groceries
+      date: "2026-09-19"
+      status: BOOKED
+  - tenancy-id: household
+    key: txn-002
+    input: txn-002
+    output:
+      id: txn-002
+      accountId: acc-current-001
+      amount: 2500.00
+      direction: CREDIT
+      currency: GBP
+      description: "SALARY - ACME CORP"
+      merchantName: null
+      category: income
+      date: "2026-09-18"
+      status: BOOKED

@@ -1,0 +1,31 @@
+default-tenancy-id: household
+
+methods:
+  bank-feed-platform.id:
+    strategy: constant
+    corpus:
+      - input: null
+        output: "sim"
+
+  bank-feed-platform.listAccounts:
+    strategy: seq
+    corpus-files:
+      - classpath:simulation/bank-feed/accounts-corpus.yaml
+
+  bank-feed-platform.balance:
+    strategy: key
+    key-extractor: "field:accountId"
+    corpus-files:
+      - classpath:simulation/bank-feed/accounts-corpus.yaml
+
+  bank-feed-platform.listTransactions:
+    strategy: seq
+    exhaustion-policy: WRAP
+    corpus-files:
+      - classpath:simulation/bank-feed/transactions-corpus.yaml
+
+  bank-feed-platform.getTransaction:
+    strategy: key
+    key-extractor: "field:transactionId"
+    corpus-files:
+      - classpath:simulation/bank-feed/transactions-corpus.yaml

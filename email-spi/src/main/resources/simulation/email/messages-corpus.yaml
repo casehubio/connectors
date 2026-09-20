@@ -1,0 +1,78 @@
+email-platform.getMessage:
+  - tenancy-id: household
+    key: msg-001
+    input: msg-001
+    output:
+      id: msg-001
+      mailboxId: inbox
+      messageId: "<20260919-order-confirm@amazon.co.uk>"
+      from: "order-confirm@amazon.co.uk"
+      to: ["j.smith@example.com"]
+      cc: []
+      subject: "Your order has been dispatched"
+      bodyText: |
+        Hi,
+
+        Your order #206-4782913 has been dispatched and is on its way.
+
+        Items: Wireless Keyboard (x1), USB-C Hub (x1)
+        Estimated delivery: 21 September 2026
+        Tracking: Royal Mail - RM123456789GB
+
+        Thank you for your order.
+      bodyHtml: null
+      receivedAt: "2026-09-19T14:23:00Z"
+      read: true
+      attachments: []
+  - tenancy-id: household
+    key: msg-002
+    input: msg-002
+    output:
+      id: msg-002
+      mailboxId: inbox
+      messageId: "<20260919-statement@hsbc.co.uk>"
+      from: "statements@hsbc.co.uk"
+      to: ["j.smith@example.com"]
+      cc: []
+      subject: "Your September statement is ready"
+      bodyText: "Your statement for account ending 4521 is now available. Please see the attached PDF."
+      bodyHtml: null
+      receivedAt: "2026-09-19T09:00:00Z"
+      read: false
+      attachments:
+        - id: att-001
+          filename: "statement-sept-2026.pdf"
+          contentType: "application/pdf"
+          size: 245760
+  - tenancy-id: household
+    key: msg-004
+    input: msg-004
+    output:
+      id: msg-004
+      mailboxId: inbox
+      messageId: "<20260918-gp-appt@nhs.uk>"
+      from: "appointments@nhs.uk"
+      to: ["j.smith@example.com"]
+      cc: []
+      subject: "Appointment confirmation - Dr. Patel"
+      bodyText: |
+        Dear J. Smith,
+
+        This confirms your appointment:
+          Date: Wednesday 24 September 2026
+          Time: 10:30
+          Doctor: Dr. A. Patel
+          Location: Elm Surgery, 42 High Street
+
+        Please arrive 10 minutes early. If you need to cancel,
+        call 020 7946 0958 at least 24 hours in advance.
+      bodyHtml: null
+      receivedAt: "2026-09-18T11:30:00Z"
+      read: false
+      attachments: []
+
+email-platform.getAttachmentContent:
+  - tenancy-id: household
+    key: att-001
+    input: att-001
+    output: "JVBERi0xLjQKMSAwIG9iago8PAovVHlwZSAvQ2F0YWxvZwo+PgplbmRvYmoK"

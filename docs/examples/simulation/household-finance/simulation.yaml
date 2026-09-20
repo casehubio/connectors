@@ -1,0 +1,71 @@
+# Household finance scenario — simulation config
+#
+# Exercises BankFeedPlatform and EmailPlatform SPIs together.
+# Place on classpath (src/main/resources/ or src/test/resources/)
+# for convention discovery by SimulationRuntime.
+#
+# Prerequisite: MCP tools for bank-feed and email-platform
+# (not yet implemented — tracked separately).
+
+default-tenancy-id: household
+
+methods:
+  # --- Bank Feed Platform ---
+  bank-feed-platform.id:
+    strategy: constant
+    corpus:
+      - input: null
+        output: "sim"
+
+  bank-feed-platform.listAccounts:
+    strategy: seq
+    corpus-files:
+      - classpath:simulation/bank-feed/accounts-corpus.yaml
+
+  bank-feed-platform.balance:
+    strategy: key
+    key-extractor: "field:accountId"
+    corpus-files:
+      - classpath:simulation/bank-feed/accounts-corpus.yaml
+
+  bank-feed-platform.listTransactions:
+    strategy: seq
+    exhaustion-policy: WRAP
+    corpus-files:
+      - classpath:simulation/bank-feed/transactions-corpus.yaml
+
+  bank-feed-platform.getTransaction:
+    strategy: key
+    key-extractor: "field:transactionId"
+    corpus-files:
+      - classpath:simulation/bank-feed/transactions-corpus.yaml
+
+  # --- Email Platform ---
+  email-platform.id:
+    strategy: constant
+    corpus:
+      - input: null
+        output: "sim"
+
+  email-platform.listMailboxes:
+    strategy: seq
+    corpus-files:
+      - classpath:simulation/email/mailbox-corpus.yaml
+
+  email-platform.listMessages:
+    strategy: seq
+    exhaustion-policy: WRAP
+    corpus-files:
+      - classpath:simulation/email/mailbox-corpus.yaml
+
+  email-platform.getMessage:
+    strategy: key
+    key-extractor: "field:messageId"
+    corpus-files:
+      - classpath:simulation/email/messages-corpus.yaml
+
+  email-platform.getAttachmentContent:
+    strategy: key
+    key-extractor: "field:attachmentId"
+    corpus-files:
+      - classpath:simulation/email/messages-corpus.yaml

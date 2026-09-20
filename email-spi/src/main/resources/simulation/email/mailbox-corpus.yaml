@@ -1,0 +1,60 @@
+email-platform.listMailboxes:
+  - tenancy-id: household
+    input: null
+    output:
+      - id: inbox
+        name: "Inbox"
+        unreadCount: 3
+      - id: sent
+        name: "Sent"
+        unreadCount: 0
+
+email-platform.listMessages:
+  - tenancy-id: household
+    input: null
+    output:
+      items:
+        - id: msg-001
+          mailboxId: inbox
+          messageId: "<20260919-order-confirm@amazon.co.uk>"
+          from: "order-confirm@amazon.co.uk"
+          subject: "Your order has been dispatched"
+          receivedAt: "2026-09-19T14:23:00Z"
+          read: true
+        - id: msg-002
+          mailboxId: inbox
+          messageId: "<20260919-statement@hsbc.co.uk>"
+          from: "statements@hsbc.co.uk"
+          subject: "Your September statement is ready"
+          receivedAt: "2026-09-19T09:00:00Z"
+          read: false
+        - id: msg-003
+          mailboxId: inbox
+          messageId: "<20260918-meeting@acme.com>"
+          from: "calendar@acme.com"
+          subject: "Reminder: Q3 Review tomorrow at 10:00"
+          receivedAt: "2026-09-18T16:00:00Z"
+          read: true
+        - id: msg-004
+          mailboxId: inbox
+          messageId: "<20260918-gp-appt@nhs.uk>"
+          from: "appointments@nhs.uk"
+          subject: "Appointment confirmation - Dr. Patel"
+          receivedAt: "2026-09-18T11:30:00Z"
+          read: false
+        - id: msg-005
+          mailboxId: inbox
+          messageId: "<20260917-school@stmarys.edu>"
+          from: "office@stmarys.edu"
+          subject: "Parents' Evening - Thursday 25th September"
+          receivedAt: "2026-09-17T08:45:00Z"
+          read: true
+        - id: msg-006
+          mailboxId: inbox
+          messageId: null
+          from: "noreply@britishgas.co.uk"
+          subject: "Your energy bill for September"
+          receivedAt: "2026-09-16T07:00:00Z"
+          read: false
+      nextCursor: null
+      hasMore: false
