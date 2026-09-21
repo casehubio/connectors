@@ -63,6 +63,28 @@ Chosen option: **Option C**, because the simulation framework generates decorato
 * ❌ Framework dependency (recently landed, may evolve)
 * ❌ YAML parity gaps for some configuration (platform#370)
 
+## Capability-Based SPI Findings (Issue #105)
+
+Flat SPIs (BankFeedPlatform, EmailPlatform, CalendarPlatform) adopt `@SimulationEligible`
+identically — the decorator intercepts direct methods with corpus-driven strategies.
+
+Capability-based SPIs (ChatPlatform) require a generator enhancement (platform#375):
+a `capabilities` attribute on `@SimulationEligible` lists methods that return
+sub-interfaces. The generator produces recursive wrapper classes for each capability,
+using dotted qualified names (`chat-platform.messaging.send`). Wrappers follow the
+same intercept-or-delegate pattern as the top-level decorator.
+
+Key findings:
+
+* Flat SPIs work identically to BankFeedPlatform — no framework change needed
+* Capability-based SPIs require `capabilities = {...}` on the annotation
+* Dotted qualified names compose naturally with the strategy system
+* `supports()` override unions delegate capabilities with simulation-active ones
+* CRUD SPIs (CalendarPlatform, ChatPlatform) keep ref modules for state coherence —
+  simulation replaces sim/demo modules, not ref modules
+* The hybrid layering (`Caller → Decorator → [Ref | NoOp]`) composes three modes:
+  scenario (overlay active), test (ref seeded), interactive (ref with corpus data)
+
 ## Links
 
 * casehubio/connectors#94 — BankFeedPlatform and EmailPlatform SPIs
@@ -70,3 +92,6 @@ Chosen option: **Option C**, because the simulation framework generates decorato
 * `platform/simulation-api/SimulationEligible.java` — annotation
 * `platform/simulation-generator/SimulationDecoratorProcessor.java` — code generator
 * `docs/specs/issue-94-bankfeed-email-spis/decisions.md` — D1 (full decision rationale)
+* casehubio/connectors#105 — CalendarPlatform and ChatPlatform @SimulationEligible adoption
+* casehubio/platform#375 — Recursive wrapper generation for capability-based SPIs
+* `docs/specs/issue-105-simulation-eligible-calendar-chat/decisions.md` — D1-D8 (capability-based findings)

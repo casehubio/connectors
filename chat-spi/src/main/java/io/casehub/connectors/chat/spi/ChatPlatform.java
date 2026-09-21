@@ -12,6 +12,7 @@ import io.casehub.connectors.chat.degraded.NoOpChannelManagement;
 import io.casehub.connectors.chat.degraded.NoOpMemberManagement;
 import io.casehub.connectors.chat.degraded.NoOpReactions;
 import io.casehub.connectors.chat.degraded.UnknownPresence;
+import io.casehub.platform.simulation.SimulationEligible;
 
 /**
  * SPI for chat platform integration.
@@ -39,6 +40,10 @@ import io.casehub.connectors.chat.degraded.UnknownPresence;
  * <li>All methods must be thread-safe — they may be called from multiple threads.</li>
  * </ul>
  */
+@SimulationEligible(name = "chat-platform",
+    capabilities = {"messaging", "threading", "discovery", "reactions",
+                    "presence", "members", "channelManagement",
+                    "memberManagement", "messageHistory"})
 public interface ChatPlatform {
 
     /**

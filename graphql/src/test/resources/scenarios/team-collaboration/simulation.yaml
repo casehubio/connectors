@@ -1,0 +1,51 @@
+# Team collaboration scenario — exercises CalendarPlatform (flat)
+# and ChatPlatform (capability-based) simulation together.
+
+default-tenancy-id: household
+
+methods:
+  # --- Calendar (flat SPI) ---
+  calendar-platform.id:
+    strategy: constant
+    corpus:
+      - input: null
+        output: "sim"
+
+  calendar-platform.listCalendars:
+    strategy: seq
+    corpus-files:
+      - classpath:simulation/calendar/calendars-corpus.yaml
+
+  calendar-platform.listEvents:
+    strategy: seq
+    exhaustion-policy: WRAP
+    corpus-files:
+      - classpath:simulation/calendar/events-corpus.yaml
+
+  calendar-platform.getEvent:
+    strategy: key
+    key-extractor: "field:eventId"
+    corpus-files:
+      - classpath:simulation/calendar/events-corpus.yaml
+
+  # --- Chat (capability-based SPI) ---
+  chat-platform.id:
+    strategy: constant
+    corpus:
+      - input: null
+        output: "sim"
+
+  chat-platform.messaging.send:
+    strategy: seq
+    corpus-files:
+      - classpath:simulation/chat/messages-corpus.yaml
+
+  chat-platform.discovery.listChannels:
+    strategy: seq
+    corpus-files:
+      - classpath:simulation/chat/channels-corpus.yaml
+
+  chat-platform.members.list:
+    strategy: seq
+    corpus-files:
+      - classpath:simulation/chat/members-corpus.yaml

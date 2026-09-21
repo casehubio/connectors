@@ -1,0 +1,25 @@
+chat-platform.discovery.listChannels:
+  - tenancy-id: household
+    input: null
+    output:
+      - ref:
+          id: ch-general
+        name: "#general"
+        topic: "General discussion"
+        description: "General discussion channel"
+        isPrivate: false
+        memberCount: 12
+      - ref:
+          id: ch-support
+        name: "#support"
+        topic: "Customer support queue"
+        description: "Customer support channel"
+        isPrivate: false
+        memberCount: 5
+      - ref:
+          id: ch-engineering
+        name: "#engineering"
+        topic: "Engineering team"
+        description: "Engineering team channel"
+        isPrivate: true
+        memberCount: 8

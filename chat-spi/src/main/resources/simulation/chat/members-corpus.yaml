@@ -1,0 +1,16 @@
+chat-platform.members.list:
+  - tenancy-id: household
+    input: null
+    output:
+      - ref:
+          id: user-001
+        displayName: "alice"
+      - ref:
+          id: user-002
+        displayName: "bob"
+      - ref:
+          id: user-003
+        displayName: "carol"
+      - ref:
+          id: user-004
+        displayName: "dan"

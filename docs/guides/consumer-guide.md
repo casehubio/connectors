@@ -30,7 +30,7 @@ There are 21 active modules in the build (pom.xml `<modules>`):
 | `mcp` | MCP tool surface for LLM agents: `send_slack`, `send_teams`, `send_sms`, `send_whatsapp`, `send_email`, `send_chat`, `list_channels`, `list_chat_channels`, plus 6 calendar tools |
 | `slack-bot` | `SlackBotClient` -- pure `java.net.http` client for the Slack Web API (16 methods including 2 `postMessage` overloads). Pagination via generic `paginateGet<T>` with fail-soft partial results |
 | `discord` | `DiscordClient` (REST API v10), `DiscordGateway` (Gateway v10 WebSocket via Vert.x), `DiscordGatewayPresenceCache`, `DiscordDiscovery` |
-| `chat-spi` | `ChatPlatform` SPI, 9 capability interfaces, `ChatPlatformService` routing, `ChatInboundAdapter`, `InboundTranslator` SPI, model records (`RichCard`, `Channel`, `ChatContent`, `ReceivedMessage`, `SendResult`, `Member`, `PresenceStatus`) |
+| `chat-spi` | `ChatPlatform` SPI with `@SimulationEligible` (capability-based), 9 capability interfaces, `ChatPlatformService` routing, `ChatInboundAdapter`, `InboundTranslator` SPI, `NoOpChatPlatform` `@DefaultBean` fallback, model records (`RichCard`, `Channel`, `ChatContent`, `ReceivedMessage`, `SendResult`, `Member`, `PresenceStatus`) |
 | `chat-ref` | In-memory reference `ChatPlatform` for testing (`RefChatPlatform`) |
 | `chat-irc` | IRC `ChatPlatform` (3 native capabilities: Messaging, Discovery, Members) |
 | `chat-discord` | Discord `ChatPlatform` (8 native capabilities), `DiscordInboundConnector` (Gateway-based), RichCard-to-DiscordEmbed translation |
@@ -38,7 +38,7 @@ There are 21 active modules in the build (pom.xml `<modules>`):
 | `signal-cli` | `SignalClient` HTTP client + `SignalWebSocket` WebSocket client for `signal-cli-rest-api`. Pure `java.net.http` -- no AGPL dependencies |
 | `chat-signal` | Signal `ChatPlatform` (6 native capabilities: Messaging, Discovery, Members, Reactions, ChannelManagement, MemberManagement), `SignalInboundConnector` (WebSocket-based), `SignalInboundTranslator` |
 | `notification-bridge` | Bridges platform notification delivery system to connector SPI. `NotificationBridgeStartup`, `ConnectorNotificationDeliverer`, `DigestFormatter` SPI, `ConfigDestinationResolver` |
-| `calendar-spi` | `CalendarPlatform` SPI, `CalendarPlatformService` routing, model records (`CalendarEvent`, `CalendarInfo`, `EventDetails`), sealed `EventTiming` (Timed/AllDay) |
+| `calendar-spi` | `CalendarPlatform` SPI with `@SimulationEligible`, `CalendarPlatformService` routing, `NoOpCalendarPlatform` `@DefaultBean` fallback, model records (`CalendarEvent`, `CalendarInfo`, `EventDetails`), sealed `EventTiming` (Timed/AllDay with Jackson `@JsonTypeInfo`) |
 | `calendar-ref` | In-memory reference `CalendarPlatform` for testing (`RefCalendarPlatform`) |
 | `calendar-google` | Google Calendar API provider with OAuth2 refresh token auth, paginated `listEvents` |
 | `bank-spi` | `BankFeedPlatform` SPI with `@SimulationEligible`, model records (`AccountInfo`, `AccountBalance`, `Transaction`), `BankFeedPlatformService` routing, `NoOpBankFeedPlatform` `@DefaultBean` fallback |

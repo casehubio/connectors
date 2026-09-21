@@ -1,0 +1,31 @@
+default-tenancy-id: household
+
+methods:
+  calendar-platform.id:
+    strategy: constant
+    corpus:
+      - input: null
+        output: "sim"
+
+  calendar-platform.listCalendars:
+    strategy: seq
+    corpus-files:
+      - classpath:simulation/calendar/calendars-corpus.yaml
+
+  calendar-platform.listEvents:
+    strategy: seq
+    exhaustion-policy: WRAP
+    corpus-files:
+      - classpath:simulation/calendar/events-corpus.yaml
+
+  calendar-platform.getEvent:
+    strategy: key
+    key-extractor: "field:eventId"
+    corpus-files:
+      - classpath:simulation/calendar/events-corpus.yaml
+
+  calendar-platform.deleteEvent:
+    strategy: constant
+    corpus:
+      - input: null
+        output: null

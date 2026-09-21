@@ -1,0 +1,12 @@
+calendar-platform.listCalendars:
+  - tenancy-id: household
+    input: null
+    output:
+      - id: cal-work-001
+        summary: "Work Calendar"
+        description: "Team meetings and deadlines"
+        primary: true
+      - id: cal-personal-001
+        summary: "Personal Calendar"
+        description: "Family events and appointments"
+        primary: false

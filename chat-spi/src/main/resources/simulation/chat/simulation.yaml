@@ -1,0 +1,23 @@
+default-tenancy-id: household
+
+methods:
+  chat-platform.id:
+    strategy: constant
+    corpus:
+      - input: null
+        output: "sim"
+
+  chat-platform.messaging.send:
+    strategy: seq
+    corpus-files:
+      - classpath:simulation/chat/messages-corpus.yaml
+
+  chat-platform.discovery.listChannels:
+    strategy: seq
+    corpus-files:
+      - classpath:simulation/chat/channels-corpus.yaml
+
+  chat-platform.members.list:
+    strategy: seq
+    corpus-files:
+      - classpath:simulation/chat/members-corpus.yaml

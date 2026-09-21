@@ -17,6 +17,15 @@ and CalendarPlatformService routing.</description>
 
   <dependencies>
     <dependency>
+      <groupId>io.casehub</groupId>
+      <artifactId>casehub-platform-simulation-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-annotations</artifactId>
+    </dependency>
+    <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-arc</artifactId>
     </dependency>

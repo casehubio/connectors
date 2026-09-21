@@ -1,0 +1,97 @@
+calendar-platform.listEvents:
+  - tenancy-id: household
+    input: null
+    output:
+      - id: evt-standup-001
+        calendarId: cal-work-001
+        summary: "Daily Standup"
+        description: "Team sync"
+        location: "Room 3A"
+        timing:
+          "@type": "Timed"
+          start: "2026-09-20T09:00:00Z"
+          end: "2026-09-20T09:15:00Z"
+          timeZone: "Europe/London"
+        attendees: ["alice@example.com", "bob@example.com"]
+        recurringEventId: "recur-standup"
+      - id: evt-review-002
+        calendarId: cal-work-001
+        summary: "Project Review"
+        description: "Q3 progress review"
+        location: "Board Room"
+        timing:
+          "@type": "Timed"
+          start: "2026-09-20T14:00:00Z"
+          end: "2026-09-20T15:00:00Z"
+          timeZone: "Europe/London"
+        attendees: ["alice@example.com", "carol@example.com"]
+        recurringEventId: null
+      - id: evt-1on1-003
+        calendarId: cal-work-001
+        summary: "Weekly 1:1"
+        description: "Manager sync"
+        location: null
+        timing:
+          "@type": "Timed"
+          start: "2026-09-20T11:00:00Z"
+          end: "2026-09-20T11:30:00Z"
+          timeZone: "Europe/London"
+        attendees: ["alice@example.com"]
+        recurringEventId: "recur-1on1"
+      - id: evt-dentist-004
+        calendarId: cal-personal-001
+        summary: "Dentist Appointment"
+        description: "Regular checkup"
+        location: "123 High Street"
+        timing:
+          "@type": "Timed"
+          start: "2026-09-21T10:00:00Z"
+          end: "2026-09-21T10:30:00Z"
+          timeZone: "Europe/London"
+        attendees: []
+        recurringEventId: null
+      - id: evt-school-005
+        calendarId: cal-personal-001
+        summary: "School Sports Day"
+        description: "Annual sports day"
+        location: "School Field"
+        timing:
+          "@type": "AllDay"
+          start: "2026-09-22"
+          end: "2026-09-22"
+        attendees: []
+        recurringEventId: null
+
+calendar-platform.getEvent:
+  - tenancy-id: household
+    key: evt-standup-001
+    input: evt-standup-001
+    output:
+      id: evt-standup-001
+      calendarId: cal-work-001
+      summary: "Daily Standup"
+      description: "Team sync"
+      location: "Room 3A"
+      timing:
+        "@type": "Timed"
+        start: "2026-09-20T09:00:00Z"
+        end: "2026-09-20T09:15:00Z"
+        timeZone: "Europe/London"
+      attendees: ["alice@example.com", "bob@example.com"]
+      recurringEventId: "recur-standup"
+  - tenancy-id: household
+    key: evt-review-002
+    input: evt-review-002
+    output:
+      id: evt-review-002
+      calendarId: cal-work-001
+      summary: "Project Review"
+      description: "Q3 progress review"
+      location: "Board Room"
+      timing:
+        "@type": "Timed"
+        start: "2026-09-20T14:00:00Z"
+        end: "2026-09-20T15:00:00Z"
+        timeZone: "Europe/London"
+      attendees: ["alice@example.com", "carol@example.com"]
+      recurringEventId: null

@@ -178,13 +178,13 @@ C4Context
 | `slack-bot` | `casehub-connectors-slack-bot` | `core` |
 | `discord` | `casehub-connectors-discord` | `core`, `quarkus-arc`, `vertx-core` |
 | `mcp` | `casehub-connectors-mcp` | `core`, `email`, `slack-bot`, `chat-spi`, `quarkus-mcp-server-core` |
-| `chat-spi` | `casehub-connectors-chat-spi` | `core`, `quarkus-arc` |
+| `chat-spi` | `casehub-connectors-chat-spi` | `core`, `simulation-api`, `quarkus-arc` |
 | `chat-ref` | `casehub-connectors-chat-ref` | `chat-spi`, `quarkus-arc` |
 | `chat-irc` | `casehub-connectors-chat-irc` | `chat-spi`, `core` |
 | `chat-discord` | `casehub-connectors-chat-discord` | `chat-spi`, `core`, `discord` |
 | `chat-slack` | `casehub-connectors-chat-slack` | `chat-spi`, `core`, `slack-bot` |
 | `chat-demo` | `casehub-connectors-chat-demo` | `chat-spi`, `chat-ref`, `core`, `casehub-pages-auth`, `quarkus-rest-jackson`, `quarkus-websockets-next`, `sqlite-jdbc`, `HikariCP` (profile-gated `-Pdemo`) |
-| `calendar-spi` | `casehub-connectors-calendar-spi` | `quarkus-arc` |
+| `calendar-spi` | `casehub-connectors-calendar-spi` | `simulation-api`, `jackson-annotations`, `quarkus-arc` |
 | `calendar-ref` | `casehub-connectors-calendar-ref` | `calendar-spi`, `quarkus-arc` |
 | `calendar-google` | `casehub-connectors-calendar-google` | `calendar-spi`, `google-api-services-calendar` |
 | `bank-spi` | `casehub-connectors-bank-spi` | `connectors-api`, `simulation-api`, `quarkus-arc` |

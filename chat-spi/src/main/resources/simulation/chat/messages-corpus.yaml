@@ -1,0 +1,21 @@
+chat-platform.messaging.send:
+  - tenancy-id: household
+    input: null
+    output:
+      ok: true
+      messageRef:
+        channel:
+          id: "ch-general"
+        messageId: "msg-sim-001"
+      timestamp: "2026-09-20T10:00:00Z"
+      error: null
+  - tenancy-id: household
+    input: null
+    output:
+      ok: true
+      messageRef:
+        channel:
+          id: "ch-support"
+        messageId: "msg-sim-002"
+      timestamp: "2026-09-20T10:01:00Z"
+      error: null
