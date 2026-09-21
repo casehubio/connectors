@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
@@ -16,7 +15,6 @@ import io.casehub.connectors.InboundMessage;
 import io.casehub.connectors.chat.model.*;
 import io.casehub.connectors.chat.spi.InboundTranslator;
 
-@ApplicationScoped
 public class SlackInboundTranslator implements InboundTranslator {
 
     private static final Logger LOG = Logger.getLogger(SlackInboundTranslator.class.getName());

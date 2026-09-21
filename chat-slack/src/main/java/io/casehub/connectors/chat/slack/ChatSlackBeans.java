@@ -15,4 +15,10 @@ public class ChatSlackBeans {
             @ConfigProperty(name = "casehub.slack.token", defaultValue = "") String token) {
         return new SlackChatPlatform(client, token);
     }
+
+    @Produces
+    @ApplicationScoped
+    public SlackInboundTranslator slackInboundTranslator() {
+        return new SlackInboundTranslator();
+    }
 }

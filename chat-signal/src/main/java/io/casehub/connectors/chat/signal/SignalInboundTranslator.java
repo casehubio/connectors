@@ -2,8 +2,6 @@ package io.casehub.connectors.chat.signal;
 
 import java.util.List;
 
-import jakarta.enterprise.context.ApplicationScoped;
-
 import io.casehub.connectors.InboundConnectorTypes;
 import io.casehub.connectors.InboundMessage;
 import io.casehub.connectors.chat.model.ChatChannelRef;
@@ -13,7 +11,6 @@ import io.casehub.connectors.chat.model.MemberRef;
 import io.casehub.connectors.chat.model.ReceivedMessage;
 import io.casehub.connectors.chat.spi.InboundTranslator;
 
-@ApplicationScoped
 public class SignalInboundTranslator implements InboundTranslator {
 
     @Override

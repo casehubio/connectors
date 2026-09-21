@@ -87,7 +87,6 @@
         <module name="casehub-platform-signing" />
         <module name="casehub-connectors-bank-spi" />
         <module name="casehub-platform-simulation-testing" />
-        <module name="casehub-chat-app" />
         <module name="casehub-platform-notification-settings-jpa-common" />
         <module name="casehub-platform-notifications-jpa-common" />
         <module name="casehub-platform-agent-openai-core" />
@@ -325,6 +324,26 @@
         </processorPath>
         <module name="casehub-platform-platform-simulation-core" />
       </profile>
+      <profile name="Annotation profile for CaseHub Chat App" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <option name="domainFilter" value="chat/messages,chat/presence" />
+        <option name="generateGraphQL" value="false" />
+        <processorPath useClasspath="false">
+          <entry name="$PROJECT_DIR$/../platform/graphql-generator/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/smallrye/jandex/3.6.0/jandex-3.6.0.jar" />
+          <entry name="$PROJECT_DIR$/../platform/graphql-generator/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/smallrye/jandex/3.6.0/jandex-3.6.0.jar" />
+        </processorPath>
+        <module name="casehub-chat-app" />
+      </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="casehub-connectors" target="21" />
@@ -333,7 +352,7 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="casehub-chat-app" options="-parameters" />
+      <module name="casehub-chat-app" options="-parameters -AdomainFilter=chat/messages,chat/presence -AgenerateGraphQL=false" />
       <module name="casehub-connectors-api" options="-parameters" />
       <module name="casehub-connectors-bank-spi" options="-parameters" />
       <module name="casehub-connectors-calendar-google" options="-parameters" />
@@ -350,7 +369,7 @@
       <module name="casehub-connectors-email" options="-parameters" />
       <module name="casehub-connectors-email-inbound" options="-parameters" />
       <module name="casehub-connectors-email-spi" options="-parameters" />
-      <module name="casehub-connectors-graphql" options="-parameters" />
+      <module name="casehub-connectors-graphql" options="-parameters -AdomainFilter=connectors,connectors/messaging,connectors/chat,connectors/calendar,connectors/bank-feed,connectors/email -AgenerateGraphQL=false" />
       <module name="casehub-connectors-mcp" options="-parameters" />
       <module name="casehub-connectors-notification-bridge" options="-parameters" />
       <module name="casehub-connectors-signal-cli" options="-parameters" />
@@ -426,7 +445,7 @@
       <module name="casehub-platform-endpoints-config-core" options="-parameters" />
       <module name="casehub-platform-endpoints-memory" options="-parameters" />
       <module name="casehub-platform-endpoints-memory-core" options="-parameters" />
-      <module name="casehub-platform-event-simulation" options="-parameters" />
+      <module name="casehub-platform-event-simulation" options="-parameters -AgenerateGraphQL=false -AdomainFilter=temporal-drivers" />
       <module name="casehub-platform-event-simulation-core" options="-parameters" />
       <module name="casehub-platform-expression" options="-parameters" />
       <module name="casehub-platform-expression-core" options="-parameters" />

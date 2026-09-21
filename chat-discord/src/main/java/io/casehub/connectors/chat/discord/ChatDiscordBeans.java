@@ -26,4 +26,10 @@ public class ChatDiscordBeans {
             @ConfigProperty(name = "casehub.discord.token", defaultValue = "") String token) {
         return new DiscordInboundConnector(client, presenceCache, token);
     }
+
+    @Produces
+    @ApplicationScoped
+    public DiscordInboundTranslator discordInboundTranslator() {
+        return new DiscordInboundTranslator();
+    }
 }

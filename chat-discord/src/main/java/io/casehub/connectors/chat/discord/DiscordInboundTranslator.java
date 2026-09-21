@@ -7,14 +7,11 @@ import java.util.logging.Logger;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import jakarta.enterprise.context.ApplicationScoped;
-
 import io.casehub.connectors.InboundConnectorTypes;
 import io.casehub.connectors.InboundMessage;
 import io.casehub.connectors.chat.model.*;
 import io.casehub.connectors.chat.spi.InboundTranslator;
 
-@ApplicationScoped
 public class DiscordInboundTranslator implements InboundTranslator {
 
     private static final Logger LOG = Logger.getLogger(DiscordInboundTranslator.class.getName());

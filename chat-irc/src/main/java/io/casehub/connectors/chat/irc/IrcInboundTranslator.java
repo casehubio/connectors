@@ -3,8 +3,6 @@ package io.casehub.connectors.chat.irc;
 import java.util.List;
 import java.util.UUID;
 
-import jakarta.enterprise.context.ApplicationScoped;
-
 import io.casehub.connectors.InboundConnectorTypes;
 import io.casehub.connectors.InboundMessage;
 import io.casehub.connectors.chat.model.ChatChannelRef;
@@ -14,7 +12,6 @@ import io.casehub.connectors.chat.model.MemberRef;
 import io.casehub.connectors.chat.model.ReceivedMessage;
 import io.casehub.connectors.chat.spi.InboundTranslator;
 
-@ApplicationScoped
 public class IrcInboundTranslator implements InboundTranslator {
 
     @Override

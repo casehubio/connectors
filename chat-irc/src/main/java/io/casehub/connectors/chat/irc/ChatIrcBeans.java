@@ -23,4 +23,10 @@ public class ChatIrcBeans {
             @ConfigProperty(name = "casehub.connectors.chat-irc.channels") Optional<List<String>> channels) {
         return new IrcInboundConnector(client, channels);
     }
+
+    @Produces
+    @ApplicationScoped
+    public IrcInboundTranslator ircInboundTranslator() {
+        return new IrcInboundTranslator();
+    }
 }

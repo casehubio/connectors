@@ -11,4 +11,10 @@ public class ChatRefBeans {
     public RefChatPlatform refChatPlatform(ChatBackend backend) {
         return new RefChatPlatform(backend);
     }
+
+    @Produces
+    @ApplicationScoped
+    public RefInboundTranslator refInboundTranslator() {
+        return new RefInboundTranslator();
+    }
 }
