@@ -1,8 +1,5 @@
 package io.casehub.connectors.graphql;
 
-import io.casehub.pages.scenario.HierarchicalParser;
-import io.casehub.pages.scenario.HierarchicalScenario;
-import io.casehub.pages.scenario.HierarchicalStep;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -12,26 +9,31 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class HouseholdFinanceScenarioTest {
 
+    private static final com.fasterxml.jackson.databind.ObjectMapper YAML =
+            new com.fasterxml.jackson.databind.ObjectMapper(
+                    new com.fasterxml.jackson.dataformat.yaml.YAMLFactory());
+
     @Test
     void scenarioParsesWithCorrectName() throws IOException {
-        var scenario = loadScenario();
-        assertThat(scenario.scenario()).isEqualTo("household-finance");
+        var root = loadScenario();
+        assertThat(root.path("scenario").asText()).isEqualTo("household-finance");
     }
 
     @Test
     void hasTwoSections() throws IOException {
-        var scenario = loadScenario();
-        assertThat(scenario.sections()).hasSize(2);
-        assertThat(scenario.sections().get(0).label()).isEqualTo("Bank Accounts");
-        assertThat(scenario.sections().get(1).label()).isEqualTo("Email Inbox");
+        var root     = loadScenario();
+        var sections = root.get("sections");
+        assertThat(sections).hasSize(2);
+        assertThat(sections.get(0).path("label").asText()).isEqualTo("Bank Accounts");
+        assertThat(sections.get(1).path("label").asText()).isEqualTo("Email Inbox");
     }
 
     @Test
     void bankAccountsSectionHasFourSteps() throws IOException {
-        var scenario = loadScenario();
-        var bankSteps = scenario.sections().get(0).steps();
+        var root      = loadScenario();
+        var bankSteps = root.get("sections").get(0).get("steps");
         assertThat(bankSteps).hasSize(4);
-        assertThat(bankSteps.stream().map(HierarchicalStep::label))
+        assertThat(stepLabels(bankSteps))
                 .containsExactly(
                         "View accounts",
                         "Check current account balance",
@@ -41,10 +43,10 @@ class HouseholdFinanceScenarioTest {
 
     @Test
     void emailInboxSectionHasFourSteps() throws IOException {
-        var scenario = loadScenario();
-        var emailSteps = scenario.sections().get(1).steps();
+        var root       = loadScenario();
+        var emailSteps = root.get("sections").get(1).get("steps");
         assertThat(emailSteps).hasSize(4);
-        assertThat(emailSteps.stream().map(HierarchicalStep::label))
+        assertThat(stepLabels(emailSteps))
                 .containsExactly(
                         "View mailboxes",
                         "View inbox messages",
@@ -54,19 +56,31 @@ class HouseholdFinanceScenarioTest {
 
     @Test
     void totalStepCountIsEight() throws IOException {
-        var scenario = loadScenario();
-        assertThat(scenario.allSteps().count()).isEqualTo(8);
+        var root  = loadScenario();
+        int total = 0;
+        for (var section : root.get("sections")) {
+            total += section.get("steps").size();
+        }
+        assertThat(total).isEqualTo(8);
     }
 
-    private HierarchicalScenario loadScenario() throws IOException {
+    private com.fasterxml.jackson.databind.JsonNode loadScenario() throws IOException {
         String yaml = loadResource("scenarios/household-finance/scenario.yaml");
-        return HierarchicalParser.parse(yaml);
+        return YAML.readTree(yaml);
+    }
+
+    private static java.util.List<String> stepLabels(com.fasterxml.jackson.databind.JsonNode steps) {
+        var labels = new java.util.ArrayList<String>();
+        for (var step : steps) {
+            labels.add(step.path("label").asText());
+        }
+        return labels;
     }
 
     private static String loadResource(String path) throws IOException {
         try (var is = HouseholdFinanceScenarioTest.class.getClassLoader()
-                .getResourceAsStream(path)) {
-            if (is == null) throw new IOException("Resource not found: " + path);
+                                                        .getResourceAsStream(path)) {
+            if (is == null) {throw new IOException("Resource not found: " + path);}
             return new String(is.readAllBytes(), StandardCharsets.UTF_8);
         }
     }
