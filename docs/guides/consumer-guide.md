@@ -300,6 +300,15 @@ Capability accessors are user-scoped -- each user has their own consent under PS
 
 **TrueLayer consent:** Consent is provider-internal (not on the SPI). Inject `TrueLayerConsentService` to check consent status or initiate the consent flow. The consent flow is a browser redirect (OAuth2 + PSD2 SCA). The consent callback endpoint is at `/auth/truelayer/callback`.
 
+**Consent persistence:** Consent tokens are persisted via the `ConsentTokenStore` SPI. Two implementations ship with `bank-truelayer`:
+
+| Implementation | CDI Tier | When to use |
+|---|---|---|
+| `JpaConsentTokenStore` | Tier 1 (`@ApplicationScoped`) | Production — requires a datasource. Tokens survive JVM restarts. |
+| `InMemoryConsentTokenStore` | Tier 3 (`@Alternative @Priority(100)`) | Dev/test — wins when on classpath. Tokens lost on restart. |
+
+**Migration from in-memory to database:** Add `quarkus-hibernate-orm` and a JDBC driver to your app. Configure a datasource. `JpaConsentTokenStore` activates automatically at Tier 1. Remove `InMemoryConsentTokenStore` from the classpath (or leave it — Tier 3 only wins when explicitly selected via `@Alternative`). No code changes required — the `ConsentTokenStore` SPI handles the switch. Expired consents are cleaned up daily by a scheduled job.
+
 **Simulation:** Annotated with `@SimulationEligible` -- the platform simulation framework generates CDI decorators at build time, including recursive wrappers for capability sub-interfaces. Qualified names: `bank-platform.accountInformation.listAccounts`, `bank-platform.accountInformation.balance`, `bank-platform.accountInformation.listTransactions`, `bank-platform.accountInformation.getTransaction`, `bank-platform.paymentInitiation.initiatePayment`, `bank-platform.paymentInitiation.paymentStatus`.
 
 **Shipped corpus data:** The module includes example corpus YAML files on the classpath under `simulation/bank-feed/`:
