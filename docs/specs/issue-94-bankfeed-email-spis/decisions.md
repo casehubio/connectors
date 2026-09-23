@@ -98,7 +98,7 @@
 
 ## D9: Multi-provider routing via platform service pattern
 
-**Choice:** `BankFeedPlatformService` and `EmailPlatformService` follow the established pattern: discover CDI beans via `@All List<T>`, route by `id()`. Cross-provider aggregation is a consumer concern.
+**Choice:** `BankPlatformService` and `EmailPlatformService` follow the established pattern: discover CDI beans via `@All List<T>`, route by `id()`. Cross-provider aggregation is a consumer concern.
 **Alternatives:**
 - Single aggregating impl — god-class with cross-provider concerns
 **Rationale:** Follows `ChatPlatformService` and `CalendarPlatformService` exactly.

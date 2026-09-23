@@ -41,7 +41,7 @@ There are 21 active modules in the build (pom.xml `<modules>`):
 | `calendar-spi` | `CalendarPlatform` SPI with `@SimulationEligible`, `CalendarPlatformService` routing, `NoOpCalendarPlatform` `@DefaultBean` fallback, model records (`CalendarEvent`, `CalendarInfo`, `EventDetails`), sealed `EventTiming` (Timed/AllDay with Jackson `@JsonTypeInfo`) |
 | `calendar-ref` | In-memory reference `CalendarPlatform` for testing (`RefCalendarPlatform`) |
 | `calendar-google` | Google Calendar API provider with OAuth2 refresh token auth, paginated `listEvents` |
-| `bank-spi` | `BankFeedPlatform` SPI with `@SimulationEligible`, model records (`AccountInfo`, `AccountBalance`, `Transaction`), `BankFeedPlatformService` routing, `NoOpBankFeedPlatform` `@DefaultBean` fallback |
+| `bank-spi` | `BankPlatform` SPI with `@SimulationEligible`, model records (`AccountInfo`, `AccountBalance`, `Transaction`), `BankPlatformService` routing, `NoOpBankPlatform` `@DefaultBean` fallback |
 | `email-spi` | `EmailPlatform` SPI with `@SimulationEligible`, model records (`Mailbox`, `EmailSummary`, `EmailMessage`, `EmailAttachment`), `EmailPlatformService` routing. Complements `email` (outbound) and `email-inbound` (push) |
 | `graphql` | `ConnectorOperations` `@McpDomain("connectors")` SPI — GraphQL/MCP surface with 4 operations: `injectChat` (constructs `InboundMessage`, fires via `InboundConnectorService`), `sendNotification` (delegates to `ConnectorService.send()`), `connectorStatus` (aggregates outbound + chat + inbound connectors), `sentMessages` (queries `SentMessageCapture`, profile-gated). `ConnectorsModelEnricher` provides domain summary/state for MCP. `SentMessageCapture` (`@UnlessBuildProfile("prod")`) CDI observer for test/dev message capture. |
 
@@ -257,33 +257,50 @@ public interface CalendarPlatform {
 | `RefCalendarPlatform` | `ref` | In-memory reference for testing |
 | `GoogleCalendarPlatform` | `google` | Google Calendar API with OAuth2 refresh token auth, paginated listEvents (max 20 pages) |
 
-### BankFeedPlatform SPI
+### BankPlatform SPI
 
-Financial data integration -- account listing, balance queries, paginated transaction history.
+Financial integration with capability sub-interfaces for account information (AISP) and payment initiation (PISP).
 
 ```java
-@SimulationEligible(name = "bank-feed-platform")
-public interface BankFeedPlatform {
+@SimulationEligible(name = "bank-platform",
+    capabilities = {"accountInformation", "paymentInitiation"})
+public interface BankPlatform {
     String id();
-    List<AccountInfo> listAccounts();
-    AccountBalance balance(String accountId);
-    Page<Transaction> listTransactions(String accountId, Instant from, Instant to, PageRequest pagination);
-    Transaction getTransaction(String accountId, String transactionId);
+    AccountInformation accountInformation(String userId);
+    PaymentInitiation paymentInitiation(String userId);
+    boolean supports(Class<?> capability);
 }
 ```
 
-**BankFeedPlatformService** -- inject for routing. Same pattern as `CalendarPlatformService`.
+Capability accessors are user-scoped -- each user has their own consent under PSD2. The `userId` parameter lets the provider resolve per-user state (consent tokens, scope checks).
+
+**AccountInformation** -- `listAccounts()`, `balance(accountId)`, `listTransactions(accountId, from, to, pagination)`, `getTransaction(accountId, transactionId)`.
+
+**PaymentInitiation** -- `initiatePayment(PaymentRequest)` returns `InitiatedPayment` with a hosted payment page URL for SCA; `paymentStatus(paymentId)` polls the result. `PaymentRequest` includes `idempotencyKey` (caller-generated UUID) and `PaymentDestination` sealed hierarchy (`UkAccount`, `IbanAccount`).
+
+**BankPlatformService** -- inject for routing. Same pattern as `CalendarPlatformService`.
 
 **Model records:**
 - `AccountInfo(id, name, type, currency)` -- `type` is `AccountType` enum (CURRENT, SAVINGS, CREDIT_CARD, LOAN, MORTGAGE, OTHER)
 - `AccountBalance(accountId, available, current, currency, asOf)` -- `BigDecimal` amounts; `available` = spendable, `current` = ledger balance
 - `Transaction(id, accountId, amount, direction, currency, description, merchantName, category, date, status)` -- `amount` always positive, `direction` is DEBIT/CREDIT; `merchantName` and `category` nullable
+- `PaymentRequest(idempotencyKey, amount, currency, beneficiaryName, destination, reference)`
+- `InitiatedPayment(paymentId, hostedPaymentPageLink, status)`
+- `PaymentDestination.UkAccount(sortCode, accountNumber)` / `PaymentDestination.IbanAccount(iban, bic)`
 
 **Pagination:** Uses `Page<T>` and `PageRequest` from `connectors-api`. Call `PageRequest.first(25)` for the first page, then use `page.nextCursor()` for subsequent pages.
 
 **Error contract:** `balance()` and `getTransaction()` throw `NoSuchElementException` on not-found. List operations return empty collections.
 
-**Simulation:** Annotated with `@SimulationEligible` -- the platform simulation framework generates a CDI decorator at build time. Configure strategies and corpus data via `Simulation.forTest()` or scenario YAML. Qualified names: `bank-feed-platform.listAccounts`, `bank-feed-platform.balance`, `bank-feed-platform.listTransactions`, `bank-feed-platform.getTransaction`.
+**Providers:**
+
+| Implementation | `id()` | Capabilities |
+|---|---|---|
+| `TrueLayerBankPlatform` | `truelayer` | AccountInformation + PaymentInitiation (TrueLayer Open Banking API) |
+
+**TrueLayer consent:** Consent is provider-internal (not on the SPI). Inject `TrueLayerConsentService` to check consent status or initiate the consent flow. The consent flow is a browser redirect (OAuth2 + PSD2 SCA). The consent callback endpoint is at `/auth/truelayer/callback`.
+
+**Simulation:** Annotated with `@SimulationEligible` -- the platform simulation framework generates CDI decorators at build time, including recursive wrappers for capability sub-interfaces. Qualified names: `bank-platform.accountInformation.listAccounts`, `bank-platform.accountInformation.balance`, `bank-platform.accountInformation.listTransactions`, `bank-platform.accountInformation.getTransaction`, `bank-platform.paymentInitiation.initiatePayment`, `bank-platform.paymentInitiation.paymentStatus`.
 
 **Shipped corpus data:** The module includes example corpus YAML files on the classpath under `simulation/bank-feed/`:
 - `accounts-corpus.yaml` -- 3 accounts (current, savings, credit card) with balances

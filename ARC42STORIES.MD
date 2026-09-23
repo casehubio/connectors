@@ -188,6 +188,7 @@ C4Context
 | `calendar-ref` | `casehub-connectors-calendar-ref` | `calendar-spi`, `quarkus-arc` |
 | `calendar-google` | `casehub-connectors-calendar-google` | `calendar-spi`, `google-api-services-calendar` |
 | `bank-spi` | `casehub-connectors-bank-spi` | `connectors-api`, `simulation-api`, `quarkus-arc` |
+| `bank-truelayer` | `casehub-connectors-bank-truelayer` | `bank-spi`, `connectors-api`, `quarkus-oidc-client`, `quarkus-rest` |
 | `email-spi` | `casehub-connectors-email-spi` | `connectors-api`, `simulation-api`, `quarkus-arc` |
 
 `email` and `email-inbound` are separate because `quarkus-mailer` (SMTP) and `angus-mail` (IMAP) share no infrastructure. `webhook` is separate because `quarkus-rest` is unnecessary for outbound-only deployments. `mcp` is separate because `quarkus-mcp-server-core` is not in the Quarkus BOM. `discord` (HTTP client + Gateway) is separate from `chat-discord` (ChatPlatform) because the client can be consumed independently. `chat-slack` depends on `slack-bot` (existing HTTP client) rather than duplicating Slack API calls.
@@ -239,10 +240,18 @@ C4Container
     Container(chat_mcp, "ChatPlatformMcpTool", "Quarkus MCP, @Blocking", "send_chat · list_chat_channels")
     Container(disc_mcp, "ChannelDiscoveryMcpTool", "Quarkus MCP, @Blocking", "list_channels")
   }
-  Container_Boundary(b12, "Layer L12 — Bank Feed Platform SPI") {
-    Container(bank_spi, "BankFeedPlatform SPI", "Java interface, @SimulationEligible", "id() + listAccounts() + balance()\nlistTransactions() + getTransaction()")
-    Container(bank_model, "Model", "Java records", "AccountInfo · AccountBalance\nTransaction · Page<T>")
-    Container(bank_service, "BankFeedPlatformService", "CDI", "Platform lookup by id")
+  Container_Boundary(b12, "Layer L12 — Bank Platform SPI") {
+    Container(bank_spi, "BankPlatform SPI", "Java interface, @SimulationEligible\ncapabilities={accountInformation, paymentInitiation}", "id() + accountInformation(userId)\npaymentInitiation(userId) + supports()")
+    Container(bank_acct, "AccountInformation", "Capability interface", "listAccounts() + balance()\nlistTransactions() + getTransaction()")
+    Container(bank_pay, "PaymentInitiation", "Capability interface", "initiatePayment() + paymentStatus()")
+    Container(bank_model, "Model", "Java records", "AccountInfo · AccountBalance · Transaction\nPaymentRequest · InitiatedPayment\nPaymentDestination (sealed)")
+    Container(bank_service, "BankPlatformService", "CDI", "Platform lookup by id")
+  }
+  Container_Boundary(b14, "Layer L14 — TrueLayer Bank Provider") {
+    Container(tl_platform, "TrueLayerBankPlatform", "CDI, BankPlatform", "AISP + PISP via TrueLayer API")
+    Container(tl_client, "TrueLayerClient", "HttpHelper.CLIENT", "Data API + Payments API\njakarta.json parsing")
+    Container(tl_consent, "TrueLayerConsentService", "CDI", "PSD2 consent lifecycle\nstate-based CSRF · token refresh")
+    Container(tl_callback, "TrueLayerAuthCallback", "JAX-RS", "GET /auth/truelayer/callback\n302 redirect after consent")
   }
   Container_Boundary(b13, "Layer L13 — Email Platform SPI") {
     Container(email_spi, "EmailPlatform SPI", "Java interface, @SimulationEligible", "id() + listMailboxes()\nlistMessages() + getMessage()\ngetAttachmentContent()")

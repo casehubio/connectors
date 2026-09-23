@@ -96,13 +96,13 @@ public interface InboundTranslator {
 
 ### Bank Feed Platform Architecture
 
-**`BankFeedPlatform` SPI** (`bank-spi`) -- 5 methods: `id()`, `listAccounts()`, `balance(accountId)`, `listTransactions(accountId, from, to, pagination)`, `getTransaction(accountId, transactionId)`. Annotated with `@SimulationEligible(name = "bank-feed-platform")` -- first connector SPI to use the platform simulation framework for decorator generation.
+**`BankPlatform` SPI** (`bank-spi`) -- 5 methods: `id()`, `listAccounts()`, `balance(accountId)`, `listTransactions(accountId, from, to, pagination)`, `getTransaction(accountId, transactionId)`. Annotated with `@SimulationEligible(name = "bank-feed-platform")` -- first connector SPI to use the platform simulation framework for decorator generation.
 
-**`BankFeedPlatformService`** (`bank-spi`) -- routing service, same `@All List<BankFeedPlatform>` pattern.
+**`BankPlatformService`** (`bank-spi`) -- routing service, same `@All List<BankFeedPlatform>` pattern.
 
 **Pagination:** `listTransactions` returns `Page<Transaction>` with cursor-based pagination via `PageRequest` (shared types in `connectors-api`). Financial data volumes require explicit pagination -- unlike CalendarPlatform's bounded list returns.
 
-**Error contract:** `balance()` and `getTransaction()` throw `NoSuchElementException` on not-found. `NoOpBankFeedPlatform` (`@DefaultBean`) throws `UnsupportedOperationException` -- semantically different (no provider vs entity not found).
+**Error contract:** `balance()` and `getTransaction()` throw `NoSuchElementException` on not-found. `NoOpBankPlatform` (`@DefaultBean`) throws `UnsupportedOperationException` -- semantically different (no provider vs entity not found).
 
 **Model:** `AccountInfo`, `AccountBalance` (`BigDecimal` amounts -- available vs current), `Transaction` (amount always positive, `TransactionDirection` DEBIT/CREDIT), `AccountType`, `TransactionStatus`.
 
@@ -317,11 +317,11 @@ Sealed `EventTiming`: `Timed(Instant, Instant, ZoneId)` | `AllDay(LocalDate, Loc
 
 ### bank-spi
 
-`BankFeedPlatform` SPI with `@SimulationEligible`, `BankFeedPlatformService` routing.
+`BankPlatform` SPI with `@SimulationEligible`, `BankPlatformService` routing.
 
 Model records: `AccountInfo`, `AccountBalance`, `Transaction`. Enums: `AccountType`, `TransactionDirection`, `TransactionStatus`.
 
-`NoOpBankFeedPlatform` (`@DefaultBean`) -- empty lists for list ops, throws `UnsupportedOperationException` for lookups.
+`NoOpBankPlatform` (`@DefaultBean`) -- empty lists for list ops, throws `UnsupportedOperationException` for lookups.
 
 Depends on: `connectors-api` (Page, PageRequest), `simulation-api` (@SimulationEligible).
 

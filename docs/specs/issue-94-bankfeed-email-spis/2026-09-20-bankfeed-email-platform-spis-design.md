@@ -149,7 +149,7 @@ public record Page<T>(List<T> items, String nextCursor, boolean hasMore) {
 
 `Page` and `PageRequest` live in `connectors-api`
 (`io.casehub.connectors`) alongside `InboundMessage`, `Attachment`, and
-other shared connector primitives. Both `BankFeedPlatform` and
+other shared connector primitives. Both `BankPlatform` and
 `EmailPlatform` use them — placing them in a domain-specific package
 would create a cross-SPI dependency.
 
@@ -311,11 +311,11 @@ images like `image001.png`).
 
 ### EmailPlatformService
 
-Same pattern as `BankFeedPlatformService` and `CalendarPlatformService`.
+Same pattern as `BankPlatformService` and `CalendarPlatformService`.
 
 ### DefaultBean fallback
 
-Same pattern as `NoOpBankFeedPlatform` — empty lists for list operations,
+Same pattern as `NoOpBankPlatform` — empty lists for list operations,
 throws for single-item lookups.
 
 ## Simulation integration
