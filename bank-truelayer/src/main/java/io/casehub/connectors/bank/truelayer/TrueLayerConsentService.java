@@ -2,7 +2,6 @@ package io.casehub.connectors.bank.truelayer;
 
 import io.casehub.connectors.http.HttpHelper;
 import io.quarkus.oidc.client.OidcClient;
-import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import org.jboss.logging.Logger;
@@ -33,17 +32,19 @@ public class TrueLayerConsentService {
     private final OidcClient oidcClient;
 
     private final Map<String, PendingConsent> pendingStates = new ConcurrentHashMap<>();
-    private final Map<String, StoredConsent> consents = new ConcurrentHashMap<>();
+    private final ConsentTokenStore store;
     private final Map<String, Object> refreshLocks = new ConcurrentHashMap<>();
 
     record PendingConsent(String userId, List<ConsentScope> scopes, Instant expiry) {}
 
     public TrueLayerConsentService(String clientId, String clientSecret,
-                                    String authBaseUrl, OidcClient oidcClient) {
+                                    String authBaseUrl, OidcClient oidcClient,
+                                    ConsentTokenStore store) {
         this.clientId = clientId;
         this.clientSecret = clientSecret;
         this.authBaseUrl = authBaseUrl;
         this.oidcClient = oidcClient;
+        this.store = store;
     }
 
     public AuthLink generateAuthLink(String userId, List<ConsentScope> scopes,
@@ -113,7 +114,7 @@ public class TrueLayerConsentService {
                     now.plusSeconds(expiresIn),
                     now.plusSeconds(86400L * 90),
                     scopes, now);
-            consents.put(userId, consent);
+            store.store(userId, consent);
 
             return new ConsentInfo(userId, ConsentStatus.ACTIVE,
                     now, consent.consentExpiry(), scopes);
@@ -126,7 +127,7 @@ public class TrueLayerConsentService {
     }
 
     public ConsentInfo consentStatus(String userId) {
-        StoredConsent consent = consents.get(userId);
+        StoredConsent consent = store.find(userId);
         if (consent == null) return null;
 
         ConsentStatus status;
@@ -141,12 +142,12 @@ public class TrueLayerConsentService {
     }
 
     public void revokeConsent(String userId) {
-        consents.remove(userId);
+        store.remove(userId);
         LOG.infof("Consent revoked for user '%s'", userId);
     }
 
     public String getUserToken(String userId) {
-        StoredConsent consent = consents.get(userId);
+        StoredConsent consent = store.find(userId);
         if (consent == null) return null;
 
         if (Instant.now().isBefore(consent.accessTokenExpiry())) {
@@ -161,13 +162,13 @@ public class TrueLayerConsentService {
     }
 
     void storeConsent(String userId, StoredConsent consent) {
-        consents.put(userId, consent);
+        store.store(userId, consent);
     }
 
     private String refreshToken(String userId, StoredConsent current) {
         Object lock = refreshLocks.computeIfAbsent(userId, k -> new Object());
         synchronized (lock) {
-            StoredConsent latest = consents.get(userId);
+            StoredConsent latest = store.find(userId);
             if (latest != null && latest != current
                     && Instant.now().isBefore(latest.accessTokenExpiry())) {
                 return latest.accessToken();
@@ -190,7 +191,7 @@ public class TrueLayerConsentService {
 
                 if (response.statusCode() == 401 || response.statusCode() == 400) {
                     LOG.warnf("Refresh token revoked for user '%s' — re-consent required", userId);
-                    consents.remove(userId);
+                    store.remove(userId);
                     return null;
                 }
 
@@ -214,7 +215,7 @@ public class TrueLayerConsentService {
                         current.consentExpiry(),
                         current.scopes(),
                         current.grantedAt());
-                consents.put(userId, refreshed);
+                store.store(userId, refreshed);
 
                 LOG.debugf("Token refreshed for user '%s'", userId);
                 return newAccessToken;

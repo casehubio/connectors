@@ -17,7 +17,8 @@ class TrueLayerConsentServiceTest {
     void setUp() {
         service = new TrueLayerConsentService(
                 "test-client-id", "test-client-secret",
-                "https://auth.truelayer-sandbox.com", null);
+                "https://auth.truelayer-sandbox.com", null,
+                new InMemoryConsentTokenStore());
     }
 
     @Test

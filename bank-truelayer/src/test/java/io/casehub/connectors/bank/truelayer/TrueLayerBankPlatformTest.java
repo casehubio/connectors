@@ -32,14 +32,14 @@ class TrueLayerBankPlatformTest {
 
     @Test
     void accountInformation_returnsNonNull() {
-        var consentService = new TrueLayerConsentService("", "", "", null);
+        var consentService = new TrueLayerConsentService("", "", "", null, new InMemoryConsentTokenStore());
         var p = new TrueLayerBankPlatform(null, consentService);
         assertThat(p.accountInformation("user-1")).isNotNull();
     }
 
     @Test
     void paymentInitiation_returnsNonNull() {
-        var consentService = new TrueLayerConsentService("", "", "", null);
+        var consentService = new TrueLayerConsentService("", "", "", null, new InMemoryConsentTokenStore());
         var p = new TrueLayerBankPlatform(null, consentService);
         assertThat(p.paymentInitiation("user-1")).isNotNull();
     }

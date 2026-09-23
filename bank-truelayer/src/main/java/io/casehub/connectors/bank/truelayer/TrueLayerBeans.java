@@ -22,12 +22,14 @@ public class TrueLayerBeans {
     @ApplicationScoped
     public TrueLayerConsentService trueLayerConsentService(
             OidcClient oidcClient,
+            ConsentTokenStore consentTokenStore,
             @ConfigProperty(name = "casehub.connectors.bank.truelayer.client-id",
                             defaultValue = "") String clientId,
             @ConfigProperty(name = "casehub.connectors.bank.truelayer.client-secret",
                             defaultValue = "") String clientSecret,
             @ConfigProperty(name = "casehub.connectors.bank.truelayer.auth-url",
                             defaultValue = "https://auth.truelayer.com") String authUrl) {
-        return new TrueLayerConsentService(clientId, clientSecret, authUrl, oidcClient);
+        return new TrueLayerConsentService(clientId, clientSecret, authUrl,
+                oidcClient, consentTokenStore);
     }
 }
