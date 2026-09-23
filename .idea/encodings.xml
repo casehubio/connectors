@@ -5,6 +5,8 @@
     <file url="file://$PROJECT_DIR$/../chat-app/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/bank-spi/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/bank-spi/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/bank-truelayer/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/bank-truelayer/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/calendar-google/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/calendar-google/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/calendar-ref/src/main/java" charset="UTF-8" />
@@ -73,44 +75,64 @@
     <file url="file://$PROJECT_DIR$/../platform/agent-api/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/agent-claude-core/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/agent-claude-core/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/agent-claude-spring/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/agent-claude-spring/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/agent-claude/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/agent-claude/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/agent-codex-core/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/agent-codex-core/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/agent-codex-spring/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/agent-codex-spring/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/agent-codex/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/agent-codex/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/agent-config-core/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/agent-config-core/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/agent-config-spring/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/agent-config-spring/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/agent-config/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/agent-config/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/agent-gate-core/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/agent-gate-core/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/agent-gate-spring/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/agent-gate-spring/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/agent-gate/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/agent-gate/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/agent-gemini-cli-core/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/agent-gemini-cli-core/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/agent-gemini-cli-spring/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/agent-gemini-cli-spring/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/agent-gemini-cli/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/agent-gemini-cli/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/agent-gemini-core/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/agent-gemini-core/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/agent-gemini-spring/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/agent-gemini-spring/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/agent-gemini/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/agent-gemini/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/agent-langchain4j-core/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/agent-langchain4j-core/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/agent-langchain4j-spring/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/agent-langchain4j-spring/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/agent-langchain4j/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/agent-langchain4j/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/agent-ollama/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/agent-ollama/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/agent-openai-core/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/agent-openai-core/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/agent-openai-spring/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/agent-openai-spring/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/agent-openai/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/agent-openai/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/agent-router-core/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/agent-router-core/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/agent-router-spring/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/agent-router-spring/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/agent-router/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/agent-router/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/agent-runtime-core/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/agent-runtime-core/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/agent-runtime-spring/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/agent-runtime-spring/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/agent-runtime/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/agent-runtime/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/agent-simulation-core/src/main/java" charset="UTF-8" />
@@ -139,6 +161,8 @@
     <file url="file://$PROJECT_DIR$/../platform/config/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/credentials-quarkus/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/credentials-quarkus/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/credentials-spring/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/credentials-spring/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/datasource-alpha/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/datasource-alpha/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/datasource-inmem-core/src/main/java" charset="UTF-8" />
@@ -191,12 +215,16 @@
     <file url="file://$PROJECT_DIR$/../platform/event-simulation/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/expression-core/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/expression-core/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/expression-spring/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/expression-spring/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/expression/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/expression/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/generator-common/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/generator-common/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/governance-core/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/governance-core/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/governance-spring/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/governance-spring/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/governance/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/governance/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/graphql-client/src/main/java" charset="UTF-8" />
@@ -209,6 +237,8 @@
     <file url="file://$PROJECT_DIR$/../platform/graphql/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/identity-core/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/identity-core/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/identity-spring/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/identity-spring/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/identity/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/identity/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/llm-config-bedrock/src/main/java" charset="UTF-8" />
@@ -259,6 +289,8 @@
     <file url="file://$PROJECT_DIR$/../platform/notifications-spring-jpa/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/notifications/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/notifications/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/oidc-spring/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/oidc-spring/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/oidc/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/oidc/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/persistence-jpa-common/src/main/java" charset="UTF-8" />
@@ -307,6 +339,10 @@
     <file url="file://$PROJECT_DIR$/../platform/rest-spring-generator/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/schema-generator/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/schema-generator/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/scim-core/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/scim-core/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/scim-spring/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/scim-spring/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/scim/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/scim/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/simulation-api/src/main/java" charset="UTF-8" />
@@ -329,16 +365,36 @@
     <file url="file://$PROJECT_DIR$/../platform/spring-boot-starter/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/spring-generator/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/spring-generator/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/spring-integration-test/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/spring-integration-test/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/spring-testing/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/spring-testing/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/streams-amqp-core/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/streams-amqp-core/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/streams-amqp-spring/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/streams-amqp-spring/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/streams-amqp/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/streams-amqp/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/streams-camel-core/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/streams-camel-core/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/streams-camel-spring/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/streams-camel-spring/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/streams-camel/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/streams-camel/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/streams-core/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/streams-core/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/streams-kafka-core/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/streams-kafka-core/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/streams-kafka-spring/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/streams-kafka-spring/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/streams-kafka/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/streams-kafka/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/streams-poll-core/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/streams-poll-core/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/streams-poll-spring/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/streams-poll-spring/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/streams-poll/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/streams-poll/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/streams-webhook-core/src/main/java" charset="UTF-8" />
