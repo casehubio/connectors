@@ -8,12 +8,8 @@ import io.casehub.connectors.PageRequest;
 import io.casehub.connectors.bank.model.AccountBalance;
 import io.casehub.connectors.bank.model.AccountInfo;
 import io.casehub.connectors.bank.model.Transaction;
-import io.casehub.platform.simulation.SimulationEligible;
 
-@SimulationEligible(name = "bank-feed-platform")
-public interface BankFeedPlatform {
-
-    String id();
+public interface AccountInformation {
 
     List<AccountInfo> listAccounts();
 

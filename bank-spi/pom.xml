@@ -11,9 +11,9 @@
   </parent>
 
   <artifactId>casehub-connectors-bank-spi</artifactId>
-  <name>CaseHub Connectors — Bank Feed SPI</name>
-  <description>Bank Feed Platform SPI: BankFeedPlatform interface, model types,
-and BankFeedPlatformService routing.</description>
+  <name>CaseHub Connectors — Bank SPI</name>
+  <description>Bank Platform SPI: BankPlatform interface with AccountInformation and
+PaymentInitiation capabilities, model types, and BankPlatformService routing.</description>
 
   <dependencies>
     <dependency>

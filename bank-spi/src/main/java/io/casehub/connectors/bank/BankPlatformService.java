@@ -6,28 +6,28 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import io.casehub.connectors.bank.spi.BankFeedPlatform;
+import io.casehub.connectors.bank.spi.BankPlatform;
 
-public class BankFeedPlatformService {
+public class BankPlatformService {
 
-    private final Map<String, BankFeedPlatform> registry;
+    private final Map<String, BankPlatform> registry;
 
-    public BankFeedPlatformService(final List<BankFeedPlatform> platforms) {
+    public BankPlatformService(final List<BankPlatform> platforms) {
         this.registry = platforms.stream()
                 .collect(Collectors.toMap(
-                        BankFeedPlatform::id,
+                        BankPlatform::id,
                         Function.identity(),
                         (a, b) -> {
                             throw new IllegalStateException(
-                                    "Duplicate bank feed platform id: '" + a.id() + "'");
+                                    "Duplicate bank platform id: '" + a.id() + "'");
                         }));
     }
 
-    public BankFeedPlatform platform(final String id) {
-        final BankFeedPlatform platform = registry.get(id);
+    public BankPlatform platform(final String id) {
+        final BankPlatform platform = registry.get(id);
         if (platform == null) {
             throw new IllegalArgumentException(
-                    "No bank feed platform registered for id '" + id
+                    "No bank platform registered for id '" + id
                     + "'. Available: " + registry.keySet());
         }
         return platform;
