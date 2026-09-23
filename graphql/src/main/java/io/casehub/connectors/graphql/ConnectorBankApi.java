@@ -23,7 +23,7 @@ import jakarta.ws.rs.QueryParam;
 import java.time.Instant;
 import java.util.List;
 
-@McpDomain(value = "connectors/bank", basePath = "/api/connectors/bank")
+@McpDomain(value = "connectors/bank", app = "connectors", basePath = "/api/connectors/bank")
 @ApplicationScoped
 public class ConnectorBankApi {
 

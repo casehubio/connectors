@@ -22,7 +22,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
-@McpDomain(value = "connectors/chat", basePath = "/api/connectors/chat")
+@McpDomain(value = "connectors/chat", app = "connectors", basePath = "/api/connectors/chat")
 @ApplicationScoped
 public class ConnectorChatApi {
 

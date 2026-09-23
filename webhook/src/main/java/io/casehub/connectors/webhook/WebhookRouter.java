@@ -27,7 +27,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-@McpDomain(value = "connectors/webhooks", basePath = "/connectors")
+@McpDomain(value = "connectors/webhooks", app = "connectors", basePath = "/connectors")
 @ApplicationScoped
 public class WebhookRouter {
 

@@ -24,7 +24,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-@McpDomain(value = "connectors/calendar", basePath = "/api/connectors/calendar")
+@McpDomain(value = "connectors/calendar", app = "connectors", basePath = "/api/connectors/calendar")
 @ApplicationScoped
 public class ConnectorCalendarApi {
 
