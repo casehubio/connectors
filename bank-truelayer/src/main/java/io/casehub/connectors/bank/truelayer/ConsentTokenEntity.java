@@ -15,10 +15,10 @@ public class ConsentTokenEntity {
     @Column(name = "user_id")
     private String userId;
 
-    @Column(name = "access_token", nullable = false)
+    @Column(name = "access_token", nullable = false, length = 2048)
     private String accessToken;
 
-    @Column(name = "refresh_token")
+    @Column(name = "refresh_token", length = 2048)
     private String refreshToken;
 
     @Column(name = "access_token_expiry", nullable = false)

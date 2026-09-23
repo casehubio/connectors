@@ -2,12 +2,17 @@ package io.casehub.connectors.bank.truelayer;
 
 import io.quarkus.oidc.client.NamedOidcClient;
 import io.quarkus.oidc.client.OidcClient;
+import io.quarkus.scheduler.Scheduled;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Produces;
+import jakarta.inject.Inject;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 @ApplicationScoped
 public class TrueLayerBeans {
+
+    @Inject
+    ConsentTokenStore consentTokenStore;
 
     @Produces
     @ApplicationScoped
@@ -30,6 +35,11 @@ public class TrueLayerBeans {
             @ConfigProperty(name = "casehub.connectors.bank.truelayer.auth-url",
                             defaultValue = "https://auth.truelayer.com") String authUrl) {
         return new TrueLayerConsentService(clientId, clientSecret, authUrl,
-                oidcClient, consentTokenStore);
+                                           oidcClient, consentTokenStore);
+    }
+
+    @Scheduled(every = "24h")
+    void cleanupExpiredConsents() {
+        new ConsentCleanupJob(consentTokenStore).run();
     }
 }

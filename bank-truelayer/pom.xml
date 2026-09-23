@@ -43,6 +43,10 @@ AISP (account information) and PISP (payment initiation) with PSD2 consent manag
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-hibernate-orm</artifactId>
     </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-scheduler</artifactId>
+    </dependency>
 
     <!-- Testing -->
     <dependency>
