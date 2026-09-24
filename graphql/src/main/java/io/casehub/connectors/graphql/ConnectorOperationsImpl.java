@@ -35,7 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-@McpDomain(value = "connectors", app = "connectors")
+@McpDomain(value = "connectors/operations", app = "connectors")
 public class ConnectorOperationsImpl {
 
     private final InboundConnectorService inboundService;
