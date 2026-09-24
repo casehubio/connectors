@@ -13,7 +13,7 @@ import jakarta.inject.Inject;
 import java.util.List;
 import java.util.Map;
 
-@McpDomain(value = "connectors/operations", app = "connectors")
+@McpDomain(value = "connectors/operations", app = "connectors", summary = "Connector operational status and management")
 @ApplicationScoped
 public class ConnectorsModelEnricher implements ModelEnricher {
 

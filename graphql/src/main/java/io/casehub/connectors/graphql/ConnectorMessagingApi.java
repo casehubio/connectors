@@ -10,7 +10,7 @@ import io.casehub.platform.api.mcp.RestPath;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
-@McpDomain(value = "connectors/messaging", app = "connectors", basePath = "/api/connectors/messaging")
+@McpDomain(value = "connectors/messaging", app = "connectors", basePath = "/api/connectors/messaging", summary = "Connector messaging — dispatch and receive via external channels")
 @ApplicationScoped
 public class ConnectorMessagingApi {
 

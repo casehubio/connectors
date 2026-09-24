@@ -19,7 +19,7 @@ import java.time.Instant;
 import java.util.Base64;
 import java.util.List;
 
-@McpDomain(value = "connectors/email", app = "connectors", basePath = "/api/connectors/email")
+@McpDomain(value = "connectors/email", app = "connectors", basePath = "/api/connectors/email", summary = "Email connector — send, receive, search messages")
 @ApplicationScoped
 public class ConnectorEmailApi {
 
