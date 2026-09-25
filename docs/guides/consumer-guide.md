@@ -326,7 +326,8 @@ Capability accessors are user-scoped -- each user has their own consent under PS
 **Shipped corpus data:** The module includes example corpus YAML files on the classpath under `simulation/bank-feed/`:
 - `accounts-corpus.yaml` -- 3 accounts (current, savings, credit card) with balances
 - `transactions-corpus.yaml` -- 12 transactions with UK merchants, categories, pending/booked status
-- `simulation.yaml` -- ready-to-use simulation config with strategies and key extractors
+- `payments-corpus.yaml` -- 3 payment scenarios (success/settled, SCA-required/executed, failed)
+- `simulation.yaml` -- ready-to-use simulation config with strategies and key extractors for both AccountInformation and PaymentInitiation
 
 To use in your app: add `bank-spi` as a dependency -- the corpus files are on the classpath automatically. Point your simulation config's `corpus-files` at `classpath:simulation/bank-feed/accounts-corpus.yaml` etc., or copy `simulation/bank-feed/simulation.yaml` as a starting point. A combined config for both SPIs is available at `docs/examples/simulation/household-finance/simulation.yaml`.
 

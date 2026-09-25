@@ -1,4 +1,4 @@
-bank-feed-platform.listTransactions:
+bank-platform.accountInformation.listTransactions:
   - tenancy-id: household
     input: null
     output:
@@ -126,7 +126,7 @@ bank-feed-platform.listTransactions:
       nextCursor: null
       hasMore: false
 
-bank-feed-platform.getTransaction:
+bank-platform.accountInformation.getTransaction:
   - tenancy-id: household
     key: txn-001
     input: txn-001

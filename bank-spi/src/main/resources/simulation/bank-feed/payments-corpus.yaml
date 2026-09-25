@@ -1,0 +1,64 @@
+bank-platform.paymentInitiation.initiatePayment:
+  - tenancy-id: household
+    key: success
+    input:
+      idempotencyKey: "sim-pay-001"
+      amount: 250.00
+      currency: GBP
+      beneficiaryName: "Jane Smith"
+      destination:
+        sortCode: "20-00-00"
+        accountNumber: "31926819"
+      reference: "Rent contribution"
+    output:
+      paymentId: "pay-sim-001"
+      hostedPaymentPageLink: "https://sim.bank.example/pay/pay-sim-001"
+      status: AUTHORIZATION_REQUIRED
+
+  - tenancy-id: household
+    key: sca-required
+    input:
+      idempotencyKey: "sim-pay-002"
+      amount: 5000.00
+      currency: GBP
+      beneficiaryName: "HMRC"
+      destination:
+        sortCode: "08-32-10"
+        accountNumber: "12001039"
+      reference: "Self Assessment 2025-26"
+    output:
+      paymentId: "pay-sim-002"
+      hostedPaymentPageLink: "https://sim.bank.example/pay/pay-sim-002"
+      status: AUTHORIZATION_REQUIRED
+
+  - tenancy-id: household
+    key: failed
+    input:
+      idempotencyKey: "sim-pay-003"
+      amount: 100.00
+      currency: GBP
+      beneficiaryName: "Invalid Payee"
+      destination:
+        sortCode: "00-00-00"
+        accountNumber: "00000000"
+      reference: "Test failed payment"
+    output:
+      paymentId: "pay-sim-003"
+      hostedPaymentPageLink: "https://sim.bank.example/pay/pay-sim-003"
+      status: AUTHORIZATION_REQUIRED
+
+bank-platform.paymentInitiation.paymentStatus:
+  - tenancy-id: household
+    key: pay-sim-001
+    input: "pay-sim-001"
+    output: SETTLED
+
+  - tenancy-id: household
+    key: pay-sim-002
+    input: "pay-sim-002"
+    output: EXECUTED
+
+  - tenancy-id: household
+    key: pay-sim-003
+    input: "pay-sim-003"
+    output: FAILED

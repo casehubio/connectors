@@ -38,11 +38,11 @@ class SimulationIntegrationTest {
         var mailbox = new Mailbox("inbox", "Inbox", 3);
 
         sim = Simulation.forTest("household")
-                .seed("bank-feed-platform.listAccounts", null, List.of(account))
-                .stub("bank-feed-platform.balance", "acc-001", balance)
-                .seed("bank-feed-platform.listTransactions", null,
+                .seed("bank-platform.accountInformation.listAccounts", null, List.of(account))
+                .stub("bank-platform.accountInformation.balance", "acc-001", balance)
+                .seed("bank-platform.accountInformation.listTransactions", null,
                         Page.of(List.of(transaction)))
-                .stub("bank-feed-platform.getTransaction", "txn-001", transaction)
+                .stub("bank-platform.accountInformation.getTransaction", "txn-001", transaction)
                 .seed("email-platform.listMailboxes", null, List.of(mailbox))
                 .build();
     }
@@ -51,7 +51,7 @@ class SimulationIntegrationTest {
     @SuppressWarnings("unchecked")
     void bankFeed_listAccounts_resolvesFromCorpus() {
         List<AccountInfo> accounts = sim.resolve(
-                "bank-feed-platform.listAccounts", null);
+                "bank-platform.accountInformation.listAccounts", null);
         assertThat(accounts).hasSize(1);
         assertThat(accounts.get(0).id()).isEqualTo("acc-001");
         assertThat(accounts.get(0).currency()).isEqualTo("GBP");
@@ -60,7 +60,7 @@ class SimulationIntegrationTest {
     @Test
     void bankFeed_balance_resolvesViaKeyLookup() {
         AccountBalance balance = sim.resolve(
-                "bank-feed-platform.balance", "acc-001");
+                "bank-platform.accountInformation.balance", "acc-001");
         assertThat(balance.accountId()).isEqualTo("acc-001");
         assertThat(balance.available()).isEqualByComparingTo("2847.63");
         assertThat(balance.current()).isEqualByComparingTo("3147.63");
@@ -70,7 +70,7 @@ class SimulationIntegrationTest {
     @SuppressWarnings("unchecked")
     void bankFeed_listTransactions_resolvesSequentially() {
         Page<Transaction> page = sim.resolve(
-                "bank-feed-platform.listTransactions", null);
+                "bank-platform.accountInformation.listTransactions", null);
         assertThat(page.items()).hasSize(1);
         assertThat(page.items().get(0).merchantName()).isEqualTo("Tesco");
         assertThat(page.hasMore()).isFalse();
@@ -79,7 +79,7 @@ class SimulationIntegrationTest {
     @Test
     void bankFeed_getTransaction_resolvesViaKeyLookup() {
         Transaction txn = sim.resolve(
-                "bank-feed-platform.getTransaction", "txn-001");
+                "bank-platform.accountInformation.getTransaction", "txn-001");
         assertThat(txn.id()).isEqualTo("txn-001");
         assertThat(txn.amount()).isEqualByComparingTo("45.80");
         assertThat(txn.direction()).isEqualTo(DEBIT);
@@ -99,20 +99,20 @@ class SimulationIntegrationTest {
     void journalRecordsAllInvocations() {
         var overlay = sim.overlay();
 
-        sim.resolve("bank-feed-platform.listAccounts", null);
-        sim.resolve("bank-feed-platform.balance", "acc-001");
+        sim.resolve("bank-platform.accountInformation.listAccounts", null);
+        sim.resolve("bank-platform.accountInformation.balance", "acc-001");
         sim.resolve("email-platform.listMailboxes", null);
 
         var verifier = sim.verifier();
-        verifier.method("bank-feed-platform.listAccounts")
+        verifier.method("bank-platform.accountInformation.listAccounts")
                 .wasCalled(1);
-        verifier.method("bank-feed-platform.balance")
+        verifier.method("bank-platform.accountInformation.balance")
                 .wasCalled(1);
         verifier.method("email-platform.listMailboxes")
                 .wasCalled(1);
         verifier.inOrder(
-                "bank-feed-platform.listAccounts",
-                "bank-feed-platform.balance",
+                "bank-platform.accountInformation.listAccounts",
+                "bank-platform.accountInformation.balance",
                 "email-platform.listMailboxes");
 
         sim.popOverlay(overlay);

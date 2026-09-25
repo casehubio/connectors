@@ -1,4 +1,4 @@
-bank-feed-platform.listAccounts:
+bank-platform.accountInformation.listAccounts:
   - tenancy-id: household
     input: null
     output:
@@ -15,7 +15,7 @@ bank-feed-platform.listAccounts:
         type: CREDIT_CARD
         currency: GBP
 
-bank-feed-platform.balance:
+bank-platform.accountInformation.balance:
   - tenancy-id: household
     key: acc-current-001
     input: acc-current-001

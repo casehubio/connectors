@@ -3,30 +3,31 @@ speed: 1.0
 
 simulation:
   strategies:
-    bank-feed-platform.id: constant
-    bank-feed-platform.listAccounts: seq
-    bank-feed-platform.balance: key
-    bank-feed-platform.listTransactions: seq
-    bank-feed-platform.getTransaction: key
+    bank-platform.id: constant
+    bank-platform.accountInformation.listAccounts: seq
+    bank-platform.accountInformation.balance: key
+    bank-platform.accountInformation.listTransactions: seq
+    bank-platform.accountInformation.getTransaction: key
     email-platform.id: constant
     email-platform.listMailboxes: seq
     email-platform.listMessages: seq
     email-platform.getMessage: key
     email-platform.getAttachmentContent: key
   key-extractor:
-    bank-feed-platform.balance: "field:accountId"
-    bank-feed-platform.getTransaction: "field:transactionId"
+    bank-platform.accountInformation.balance: "field:accountId"
+    bank-platform.accountInformation.getTransaction: "field:transactionId"
     email-platform.getMessage: "field:messageId"
     email-platform.getAttachmentContent: "field:attachmentId"
   exhaustion-policy:
-    bank-feed-platform.listTransactions: WRAP
+    bank-platform.accountInformation.listTransactions: WRAP
     email-platform.listMessages: WRAP
   constants:
-    bank-feed-platform.id: "sim"
+    bank-platform.id: "sim"
     email-platform.id: "sim"
   corpus:
     - classpath:simulation/bank-feed/accounts-corpus.yaml
     - classpath:simulation/bank-feed/transactions-corpus.yaml
+    - classpath:simulation/bank-feed/payments-corpus.yaml
     - classpath:simulation/email/mailbox-corpus.yaml
     - classpath:simulation/email/messages-corpus.yaml
 
@@ -38,7 +39,7 @@ sections:
         target: app
         commands:
           - action: graphql
-            domain: connectors/bank-feed
+            domain: connectors/bank
             data:
               operation: listAccounts
               params:
@@ -49,7 +50,7 @@ sections:
         target: app
         commands:
           - action: graphql
-            domain: connectors/bank-feed
+            domain: connectors/bank
             data:
               operation: balance
               params:
@@ -61,7 +62,7 @@ sections:
         target: app
         commands:
           - action: graphql
-            domain: connectors/bank-feed
+            domain: connectors/bank
             data:
               operation: listTransactions
               params:
@@ -74,7 +75,7 @@ sections:
         target: app
         commands:
           - action: graphql
-            domain: connectors/bank-feed
+            domain: connectors/bank
             data:
               operation: getTransaction
               params:
