@@ -96,7 +96,7 @@ public interface InboundTranslator {
 
 ### Bank Feed Platform Architecture
 
-**`BankPlatform` SPI** (`bank-spi`) -- 5 methods: `id()`, `listAccounts()`, `balance(accountId)`, `listTransactions(accountId, from, to, pagination)`, `getTransaction(accountId, transactionId)`. Annotated with `@SimulationEligible(name = "bank-feed-platform")` -- first connector SPI to use the platform simulation framework for decorator generation.
+**`BankPlatform` SPI** (`bank-spi`) -- 5 methods: `id()`, `listAccounts()`, `balance(accountId)`, `listTransactions(accountId, from, to, pagination)`, `getTransaction(accountId, transactionId)`. Annotated with `@SimulationEligible(name = "bank-platform")` -- first connector SPI to use the platform simulation framework for decorator generation.
 
 **`BankPlatformService`** (`bank-spi`) -- routing service, same `@All List<BankFeedPlatform>` pattern.
 
@@ -324,6 +324,16 @@ Model records: `AccountInfo`, `AccountBalance`, `Transaction`. Enums: `AccountTy
 `NoOpBankPlatform` (`@DefaultBean`) -- empty lists for list ops, throws `UnsupportedOperationException` for lookups.
 
 Depends on: `connectors-api` (Page, PageRequest), `simulation-api` (@SimulationEligible).
+
+### bank-ref
+
+`RefBankPlatform` (ID `"ref"`) -- in-memory reference implementation. Both capabilities (`AccountInformation`, `PaymentInitiation`) backed by `InMemoryBankBackend`.
+
+`BankBackend` / `InMemoryBankBackend` -- storage abstraction for the reference implementation. Pre-loaded with 3 UK bank accounts and 12 transactions. Payment lifecycle auto-advances on `paymentStatus()` poll (AUTHORIZATION_REQUIRED → EXECUTED → SETTLED).
+
+`BankRefBeans` -- CDI producer. `InMemoryBankBackend` is `@DefaultBean`; `RefBankPlatform` is a normal bean (overrides `NoOpBankPlatform` when on classpath).
+
+Depends on: `bank-spi`, `quarkus-arc`.
 
 ### email-spi
 

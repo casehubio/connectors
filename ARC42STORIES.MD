@@ -188,6 +188,7 @@ C4Context
 | `calendar-ref` | `casehub-connectors-calendar-ref` | `calendar-spi`, `quarkus-arc` |
 | `calendar-google` | `casehub-connectors-calendar-google` | `calendar-spi`, `google-api-services-calendar` |
 | `bank-spi` | `casehub-connectors-bank-spi` | `connectors-api`, `simulation-api`, `quarkus-arc` |
+| `bank-ref` | `casehub-connectors-bank-ref` | `bank-spi`, `quarkus-arc` |
 | `bank-truelayer` | `casehub-connectors-bank-truelayer` | `bank-spi`, `connectors-api`, `quarkus-oidc-client`, `quarkus-rest` |
 | `email-spi` | `casehub-connectors-email-spi` | `connectors-api`, `simulation-api`, `quarkus-arc` |
 
@@ -246,6 +247,7 @@ C4Container
     Container(bank_pay, "PaymentInitiation", "Capability interface", "initiatePayment() + paymentStatus()")
     Container(bank_model, "Model", "Java records", "AccountInfo · AccountBalance · Transaction\nPaymentRequest · InitiatedPayment\nPaymentDestination (sealed)")
     Container(bank_service, "BankPlatformService", "CDI", "Platform lookup by id")
+    Container(bank_ref, "RefBankPlatform", "In-memory, @DefaultBean backend", "Pre-loaded UK test data\npayment lifecycle simulation")
   }
   Container_Boundary(b14, "Layer L14 — TrueLayer Bank Provider") {
     Container(tl_platform, "TrueLayerBankPlatform", "CDI, BankPlatform", "AISP + PISP via TrueLayer API")

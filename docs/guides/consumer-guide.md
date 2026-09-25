@@ -42,6 +42,7 @@ There are 21 active modules in the build (pom.xml `<modules>`):
 | `calendar-ref` | In-memory reference `CalendarPlatform` for testing (`RefCalendarPlatform`) |
 | `calendar-google` | Google Calendar API provider with OAuth2 refresh token auth, paginated `listEvents` |
 | `bank-spi` | `BankPlatform` SPI with `@SimulationEligible`, model records (`AccountInfo`, `AccountBalance`, `Transaction`), `BankPlatformService` routing, `NoOpBankPlatform` `@DefaultBean` fallback |
+| `bank-ref` | In-memory reference `BankPlatform` for testing (`RefBankPlatform`) — 3 UK accounts, 12 transactions, payment lifecycle simulation |
 | `email-spi` | `EmailPlatform` SPI with `@SimulationEligible`, model records (`Mailbox`, `EmailSummary`, `EmailMessage`, `EmailAttachment`), `EmailPlatformService` routing. Complements `email` (outbound) and `email-inbound` (push) |
 | `graphql` | `ConnectorOperations` `@McpDomain("connectors")` SPI — GraphQL/MCP surface with 4 operations: `injectChat` (constructs `InboundMessage`, fires via `InboundConnectorService`), `sendNotification` (delegates to `ConnectorService.send()`), `connectorStatus` (aggregates outbound + chat + inbound connectors), `sentMessages` (queries `SentMessageCapture`, profile-gated). `ConnectorsModelEnricher` provides domain summary/state for MCP. `SentMessageCapture` (`@UnlessBuildProfile("prod")`) CDI observer for test/dev message capture. |
 
@@ -296,7 +297,18 @@ Capability accessors are user-scoped -- each user has their own consent under PS
 
 | Implementation | `id()` | Capabilities |
 |---|---|---|
+| `RefBankPlatform` | `ref` | AccountInformation + PaymentInitiation (in-memory, pre-loaded UK test data) |
 | `TrueLayerBankPlatform` | `truelayer` | AccountInformation + PaymentInitiation (TrueLayer Open Banking API) |
+
+**bank-ref — Reference Implementation:** Add `casehub-connectors-bank-ref` for an in-memory BankPlatform that works out of the box with zero configuration. Pre-loaded with 3 UK bank accounts (current, savings, credit card) and 12 realistic transactions. Payment initiation simulates the full lifecycle: AUTHORIZATION_REQUIRED → EXECUTED → SETTLED (auto-advances on each `paymentStatus()` poll). When a real provider (e.g., `bank-truelayer`) is also on the classpath, both coexist — `BankPlatformService` routes by platform id.
+
+```xml
+<dependency>
+    <groupId>io.casehub</groupId>
+    <artifactId>casehub-connectors-bank-ref</artifactId>
+    <version>${casehub.version}</version>
+</dependency>
+```
 
 **TrueLayer consent:** Consent is provider-internal (not on the SPI). Inject `TrueLayerConsentService` to check consent status or initiate the consent flow. The consent flow is a browser redirect (OAuth2 + PSD2 SCA). The consent callback endpoint is at `/auth/truelayer/callback`.
 

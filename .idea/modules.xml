@@ -4,7 +4,24 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/cloud-events/casehub-connectors-cloud-events.iml" filepath="$PROJECT_DIR$/cloud-events/casehub-connectors-cloud-events.iml" />
       <module fileurl="file://$PROJECT_DIR$/mcp/casehub-connectors-mcp.iml" filepath="$PROJECT_DIR$/mcp/casehub-connectors-mcp.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../platform/agent-claude-spring/casehub-platform-agent-claude-spring.iml" filepath="$PROJECT_DIR$/../platform/agent-claude-spring/casehub-platform-agent-claude-spring.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../platform/agent-codex-spring/casehub-platform-agent-codex-spring.iml" filepath="$PROJECT_DIR$/../platform/agent-codex-spring/casehub-platform-agent-codex-spring.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../platform/agent-config-spring/casehub-platform-agent-config-spring.iml" filepath="$PROJECT_DIR$/../platform/agent-config-spring/casehub-platform-agent-config-spring.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../platform/agent-gate-spring/casehub-platform-agent-gate-spring.iml" filepath="$PROJECT_DIR$/../platform/agent-gate-spring/casehub-platform-agent-gate-spring.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../platform/agent-gemini-cli-spring/casehub-platform-agent-gemini-cli-spring.iml" filepath="$PROJECT_DIR$/../platform/agent-gemini-cli-spring/casehub-platform-agent-gemini-cli-spring.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../platform/agent-gemini-spring/casehub-platform-agent-gemini-spring.iml" filepath="$PROJECT_DIR$/../platform/agent-gemini-spring/casehub-platform-agent-gemini-spring.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../platform/agent-langchain4j-spring/casehub-platform-agent-langchain4j-spring.iml" filepath="$PROJECT_DIR$/../platform/agent-langchain4j-spring/casehub-platform-agent-langchain4j-spring.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../platform/agent-openai-spring/casehub-platform-agent-openai-spring.iml" filepath="$PROJECT_DIR$/../platform/agent-openai-spring/casehub-platform-agent-openai-spring.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../platform/agent-router-spring/casehub-platform-agent-router-spring.iml" filepath="$PROJECT_DIR$/../platform/agent-router-spring/casehub-platform-agent-router-spring.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../platform/agent-runtime-spring/casehub-platform-agent-runtime-spring.iml" filepath="$PROJECT_DIR$/../platform/agent-runtime-spring/casehub-platform-agent-runtime-spring.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../platform/expression-spring/casehub-platform-expression-spring.iml" filepath="$PROJECT_DIR$/../platform/expression-spring/casehub-platform-expression-spring.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../platform/governance-spring/casehub-platform-governance-spring.iml" filepath="$PROJECT_DIR$/../platform/governance-spring/casehub-platform-governance-spring.iml" />
       <module fileurl="file://$PROJECT_DIR$/../platform/memory-inmem/casehub-platform-memory-inmem.iml" filepath="$PROJECT_DIR$/../platform/memory-inmem/casehub-platform-memory-inmem.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../platform/streams-amqp-spring/casehub-platform-streams-amqp-spring.iml" filepath="$PROJECT_DIR$/../platform/streams-amqp-spring/casehub-platform-streams-amqp-spring.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../platform/streams-camel-spring/casehub-platform-streams-camel-spring.iml" filepath="$PROJECT_DIR$/../platform/streams-camel-spring/casehub-platform-streams-camel-spring.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../platform/streams-kafka-spring/casehub-platform-streams-kafka-spring.iml" filepath="$PROJECT_DIR$/../platform/streams-kafka-spring/casehub-platform-streams-kafka-spring.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../platform/streams-poll-spring/casehub-platform-streams-poll-spring.iml" filepath="$PROJECT_DIR$/../platform/streams-poll-spring/casehub-platform-streams-poll-spring.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../platform/platform-view-spring/casehub-platform-view-spring.iml" filepath="$PROJECT_DIR$/../platform/platform-view-spring/casehub-platform-view-spring.iml" />
     </modules>
   </component>
 </project>

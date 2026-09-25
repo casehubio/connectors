@@ -19,17 +19,15 @@
         <module name="casehub-platform-acl-worker" />
         <module name="casehub-platform-scim" />
         <module name="casehub-platform-datasource-inmem-core" />
+        <module name="casehub-platform-yaml-plugin-api" />
         <module name="casehub-platform-agent-config-core" />
-        <module name="casehub-platform-agent-claude-spring" />
         <module name="casehub-platform-endpoints-memory" />
         <module name="casehub-connectors-signal-cli" />
         <module name="casehub-platform-yaml-core" />
-        <module name="casehub-platform-callback-client" />
         <module name="casehub-platform-mcp" />
         <module name="casehub-platform-streams-poll" />
         <module name="casehub-platform-notification-settings-inmem-core" />
         <module name="casehub-platform-persistence-jpa" />
-        <module name="casehub-platform-agent-gemini-cli-spring" />
         <module name="casehub-platform-config-core" />
         <module name="casehub-platform-rest-spring-generator" />
         <module name="casehub-platform-notifications-inmem" />
@@ -41,7 +39,6 @@
         <module name="casehub-platform-datasource-jpa" />
         <module name="casehub-platform-streams-amqp-core" />
         <module name="casehub-connectors-bank-truelayer" />
-        <module name="casehub-platform-agent-gemini-spring" />
         <module name="casehub-platform-callback-inmem" />
         <module name="casehub-platform-core" />
         <module name="casehub-platform-notifications-spring-jpa" />
@@ -49,17 +46,16 @@
         <module name="casehub-platform-notification-settings-spring-jpa" />
         <module name="casehub-platform-digest-jpa-common" />
         <module name="casehub-platform-persistence-jpa-common" />
+        <module name="casehub-platform-agent-spring" />
         <module name="casehub-platform-view" />
         <module name="casehub-platform-testing" />
-        <module name="casehub-platform-view-spring" />
         <module name="casehub-platform-acl-jpa-common" />
         <module name="casehub-platform-callback-api" />
-        <module name="casehub-platform-streams-kafka-spring" />
-        <module name="casehub-platform-streams-poll-spring" />
         <module name="casehub-platform-agent-router" />
         <module name="casehub-platform-agent-claude-core" />
         <module name="casehub-platform-subscriptions-core" />
         <module name="casehub-platform-governance" />
+        <module name="casehub-platform-observability" />
         <module name="casehub-platform-datasource-spring-jpa" />
         <module name="casehub-platform-credentials-quarkus" />
         <module name="casehub-platform-delivery-tracking-inmem" />
@@ -67,7 +63,6 @@
         <module name="casehub-platform-credentials-spring" />
         <module name="casehub-platform-graphql-spring-generator" />
         <module name="casehub-connectors-mcp" />
-        <module name="casehub-platform-agent-config-spring" />
         <module name="casehub-platform-digest-inmem" />
         <module name="casehub-platform-endpoints-config" />
         <module name="casehub-platform-notification-dispatch-core" />
@@ -83,12 +78,12 @@
         <module name="casehub-platform-simulation-config-core" />
         <module name="casehub-platform-config" />
         <module name="casehub-platform-oidc" />
-        <module name="casehub-platform-agent-langchain4j-spring" />
         <module name="casehub-platform-streams-webhook" />
         <module name="casehub-platform-streams-kafka" />
-        <module name="casehub-platform-agent-openai-spring" />
+        <module name="casehub-platform-spring-actuator" />
         <module name="casehub-connectors-discord" />
         <module name="casehub-platform-notification-settings-jpa" />
+        <module name="casehub-platform-observability-core" />
         <module name="casehub-platform-agent-router-core" />
         <module name="casehub-connectors-core" />
         <module name="casehub-platform-platform-view-jpa-common" />
@@ -107,6 +102,7 @@
         <module name="casehub-platform-agent-runtime" />
         <module name="casehub-platform-delivery-tracking-spring-jpa" />
         <module name="casehub-platform-agent-langchain4j-core" />
+        <module name="casehub-platform-streams-spring" />
         <module name="casehub-platform-notifications-jpa" />
         <module name="casehub-platform-schema-generator" />
         <module name="casehub-platform-simulation-core" />
@@ -118,11 +114,9 @@
         <module name="casehub-platform-endpoints-memory-core" />
         <module name="casehub-platform-spring" />
         <module name="casehub-platform-generator-common" />
-        <module name="casehub-platform-agent-runtime-spring" />
         <module name="casehub-connectors-notification-bridge" />
         <module name="casehub-platform-spring-testing" />
         <module name="casehub-platform-expression-core" />
-        <module name="casehub-platform-agent-gate-spring" />
         <module name="casehub-platform-llm-config-bedrock" />
         <module name="casehub-platform-graphql" />
         <module name="casehub-platform-api" />
@@ -140,7 +134,6 @@
         <module name="casehub-platform-datasource-alpha" />
         <module name="casehub-platform-delivery-tracking-jpa-common" />
         <module name="casehub-platform-simulation-config" />
-        <module name="casehub-platform-streams-camel-spring" />
         <module name="casehub-platform-llm-config" />
         <module name="casehub-platform-acl-jpa" />
         <module name="casehub-connectors-email-inbound" />
@@ -159,10 +152,8 @@
         <module name="casehub-connectors-api" />
         <module name="casehub-platform-agent-ollama" />
         <module name="casehub-platform-simulation-api" />
-        <module name="casehub-platform-expression-spring" />
         <module name="casehub-platform-streams-poll-core" />
         <module name="casehub-platform-governance-core" />
-        <module name="casehub-platform-streams-amqp-spring" />
         <module name="casehub-platform-mcp-core" />
         <module name="casehub-connectors-slack-bot" />
         <module name="casehub-platform-acl-inmem" />
@@ -170,7 +161,6 @@
         <module name="casehub-platform-digest-inmem-core" />
         <module name="casehub-platform-view-spring-jpa" />
         <module name="casehub-platform-callback-core" />
-        <module name="casehub-platform-governance-spring" />
         <module name="casehub-platform-view-inmem" />
         <module name="casehub-platform-mcp-spring" />
         <module name="casehub-platform-identity" />
@@ -179,19 +169,15 @@
         <module name="casehub-platform-preferences-editor-core" />
         <module name="casehub-connectors-email" />
         <module name="casehub-platform-subscriptions" />
-        <module name="casehub-platform-notification-dispatch" />
         <module name="casehub-platform-callback-client-core" />
         <module name="casehub-platform-callback-spring" />
         <module name="casehub-platform-drift-detection" />
         <module name="casehub-platform-delivery-tracking-inmem-core" />
         <module name="casehub-platform-endpoints-config-core" />
-        <module name="casehub-platform-agent-router-spring" />
         <module name="casehub-platform-delivery-tracking-jpa" />
         <module name="casehub-platform-oidc-spring" />
         <module name="casehub-platform-scim-core" />
         <module name="casehub-platform-subscriptions-jpa-common" />
-        <module name="casehub-platform-agent-codex-spring" />
-        <module name="casehub-connectors-webhook" />
         <module name="casehub-connectors-chat-slack" />
         <module name="casehub-connectors-chat-ref" />
         <module name="casehub-platform-agent-gemini-cli-core" />
@@ -364,6 +350,54 @@
         </processorPath>
         <module name="casehub-chat-app" />
       </profile>
+      <profile name="Annotation profile for CaseHub Connectors — Parent" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <option name="domainFilter" value="connectors,connectors/messaging,connectors/chat,connectors/calendar,connectors/bank-feed,connectors/email" />
+        <option name="generateGraphQL" value="false" />
+        <processorPath useClasspath="false">
+          <entry name="$PROJECT_DIR$/../platform/graphql-generator/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/smallrye/jandex/3.6.0/jandex-3.6.0.jar" />
+          <entry name="$PROJECT_DIR$/connectors-api/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/graphql-generator/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/smallrye/jandex/3.6.0/jandex-3.6.0.jar" />
+          <entry name="$PROJECT_DIR$/connectors-api/target/classes" />
+        </processorPath>
+        <module name="casehub-connectors-graphql" />
+      </profile>
+      <profile name="Annotation profile for casehub-connectors-webhook" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <option name="domainFilter" value="connectors/webhooks" />
+        <option name="generateGraphQL" value="false" />
+        <processorPath useClasspath="false">
+          <entry name="$PROJECT_DIR$/../platform/graphql-generator/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/smallrye/jandex/3.6.0/jandex-3.6.0.jar" />
+          <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
+          <entry name="$PROJECT_DIR$/../platform/graphql-generator/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/smallrye/jandex/3.6.0/jandex-3.6.0.jar" />
+          <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
+        </processorPath>
+        <module name="casehub-connectors-webhook" />
+      </profile>
       <profile name="Annotation profile for casehub-platform-parent" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
@@ -390,11 +424,11 @@
         </processorPath>
         <module name="casehub-platform-acl-admin" />
       </profile>
-      <profile name="Annotation profile for CaseHub Connectors — Parent" enabled="true">
+      <profile name="Annotation profile for casehub-platform-callback-client" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <option name="domainFilter" value="connectors,connectors/messaging,connectors/chat,connectors/calendar,connectors/bank-feed,connectors/email" />
+        <option name="domainFilter" value="casehub/callbacks" />
         <option name="generateGraphQL" value="false" />
         <processorPath useClasspath="false">
           <entry name="$PROJECT_DIR$/../platform/graphql-generator/target/classes" />
@@ -402,20 +436,67 @@
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/smallrye/jandex/3.6.0/jandex-3.6.0.jar" />
-          <entry name="$PROJECT_DIR$/connectors-api/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
           <entry name="$PROJECT_DIR$/../platform/graphql-generator/target/classes" />
           <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/smallrye/jandex/3.6.0/jandex-3.6.0.jar" />
-          <entry name="$PROJECT_DIR$/connectors-api/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
         </processorPath>
-        <module name="casehub-connectors-graphql" />
+        <module name="casehub-platform-callback-client" />
+      </profile>
+      <profile name="Annotation profile for casehub-platform-notification-dispatch" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <option name="domainFilter" value="delivery/engagement" />
+        <option name="generateGraphQL" value="false" />
+        <processorPath useClasspath="false">
+          <entry name="$PROJECT_DIR$/../platform/graphql-generator/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/smallrye/jandex/3.6.0/jandex-3.6.0.jar" />
+          <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
+          <entry name="$PROJECT_DIR$/../platform/graphql-generator/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/smallrye/jandex/3.6.0/jandex-3.6.0.jar" />
+          <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
+        </processorPath>
+        <module name="casehub-platform-notification-dispatch" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="casehub-connectors" target="21" />
+      <module name="casehub-platform-agent-claude-spring" target="21" />
+      <module name="casehub-platform-agent-codex-spring" target="21" />
+      <module name="casehub-platform-agent-config-spring" target="21" />
+      <module name="casehub-platform-agent-gate-spring" target="21" />
+      <module name="casehub-platform-agent-gemini-cli-spring" target="21" />
+      <module name="casehub-platform-agent-gemini-spring" target="21" />
+      <module name="casehub-platform-agent-langchain4j-spring" target="21" />
+      <module name="casehub-platform-agent-openai-spring" target="21" />
+      <module name="casehub-platform-agent-router-spring" target="21" />
+      <module name="casehub-platform-agent-runtime-spring" target="21" />
+      <module name="casehub-platform-expression-spring" target="21" />
+      <module name="casehub-platform-governance-spring" target="21" />
       <module name="casehub-platform-memory-inmem" target="21" />
+      <module name="casehub-platform-streams-amqp-spring" target="21" />
+      <module name="casehub-platform-streams-camel-spring" target="21" />
+      <module name="casehub-platform-streams-kafka-spring" target="21" />
+      <module name="casehub-platform-streams-poll-spring" target="21" />
+      <module name="casehub-platform-view-spring" target="21" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
@@ -444,7 +525,7 @@
       <module name="casehub-connectors-signal-cli" options="-parameters" />
       <module name="casehub-connectors-slack-bot" options="-parameters" />
       <module name="casehub-connectors-spring" options="-parameters" />
-      <module name="casehub-connectors-webhook" options="-parameters" />
+      <module name="casehub-connectors-webhook" options="-parameters -AgenerateGraphQL=false -AdomainFilter=connectors/webhooks" />
       <module name="casehub-graphql-client" options="-parameters" />
       <module name="casehub-platform" options="-parameters" />
       <module name="casehub-platform-acl-admin" options="-parameters -AgenerateGraphQL=false -AdomainFilter=acl" />
@@ -487,10 +568,11 @@
       <module name="casehub-platform-agent-runtime-core" options="-parameters" />
       <module name="casehub-platform-agent-runtime-spring" options="-parameters" />
       <module name="casehub-platform-agent-simulation-core" options="-parameters" />
+      <module name="casehub-platform-agent-spring" options="-parameters" />
       <module name="casehub-platform-api" options="-parameters" />
       <module name="casehub-platform-callback" options="-parameters -AgenerateGraphQL=false -AdomainFilter=callbacks" />
       <module name="casehub-platform-callback-api" options="-parameters" />
-      <module name="casehub-platform-callback-client" options="-parameters" />
+      <module name="casehub-platform-callback-client" options="-parameters -AgenerateGraphQL=false -AdomainFilter=casehub/callbacks" />
       <module name="casehub-platform-callback-client-core" options="-parameters" />
       <module name="casehub-platform-callback-core" options="-parameters" />
       <module name="casehub-platform-callback-generator" options="-parameters" />
@@ -550,7 +632,7 @@
       <module name="casehub-platform-mcp-spring-generator" options="-parameters" />
       <module name="casehub-platform-memory-inmem" options="-parameters" />
       <module name="casehub-platform-memory-simulation-core" options="-parameters" />
-      <module name="casehub-platform-notification-dispatch" options="-parameters" />
+      <module name="casehub-platform-notification-dispatch" options="-parameters -AgenerateGraphQL=false -AdomainFilter=delivery/engagement" />
       <module name="casehub-platform-notification-dispatch-core" options="-parameters" />
       <module name="casehub-platform-notification-settings-inmem" options="-parameters" />
       <module name="casehub-platform-notification-settings-inmem-core" options="-parameters" />
@@ -564,6 +646,8 @@
       <module name="casehub-platform-notifications-jpa" options="-parameters" />
       <module name="casehub-platform-notifications-jpa-common" options="-parameters" />
       <module name="casehub-platform-notifications-spring-jpa" options="-parameters" />
+      <module name="casehub-platform-observability" options="-parameters" />
+      <module name="casehub-platform-observability-core" options="-parameters" />
       <module name="casehub-platform-oidc" options="-parameters" />
       <module name="casehub-platform-oidc-spring" options="-parameters" />
       <module name="casehub-platform-parent" options="-parameters" />
@@ -592,6 +676,7 @@
       <module name="casehub-platform-simulation-starter" options="-parameters" />
       <module name="casehub-platform-simulation-testing" options="-parameters" />
       <module name="casehub-platform-spring" options="-parameters" />
+      <module name="casehub-platform-spring-actuator" options="-parameters" />
       <module name="casehub-platform-spring-generator" options="-parameters" />
       <module name="casehub-platform-spring-integration-test" options="-parameters" />
       <module name="casehub-platform-spring-testing" options="-parameters" />
@@ -608,6 +693,7 @@
       <module name="casehub-platform-streams-poll" options="-parameters" />
       <module name="casehub-platform-streams-poll-core" options="-parameters" />
       <module name="casehub-platform-streams-poll-spring" options="-parameters" />
+      <module name="casehub-platform-streams-spring" options="-parameters" />
       <module name="casehub-platform-streams-webhook" options="-parameters" />
       <module name="casehub-platform-streams-webhook-core" options="-parameters" />
       <module name="casehub-platform-subscriptions" options="-parameters" />
@@ -627,7 +713,11 @@
       <module name="casehub-platform-yaml-codegen" options="-parameters" />
       <module name="casehub-platform-yaml-core" options="-parameters" />
       <module name="casehub-platform-yaml-jackson" options="-parameters" />
+      <module name="casehub-platform-yaml-plugin-api" options="-parameters" />
+      <module name="casehub-platform-yaml-plugin-processor" options="-parameters" />
       <module name="casehub-spring-boot-starter" options="-parameters" />
+      <module name="casehub-spring-boot-starter-agent" options="-parameters" />
+      <module name="casehub-spring-boot-starter-streams" options="-parameters" />
     </option>
   </component>
 </project>
