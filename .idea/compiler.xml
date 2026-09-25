@@ -84,6 +84,7 @@
         <module name="casehub-connectors-discord" />
         <module name="casehub-platform-notification-settings-jpa" />
         <module name="casehub-platform-observability-core" />
+        <module name="casehub-connectors-bank-ref" />
         <module name="casehub-platform-agent-router-core" />
         <module name="casehub-connectors-core" />
         <module name="casehub-platform-platform-view-jpa-common" />
@@ -128,6 +129,7 @@
         <module name="casehub-platform-streams-amqp" />
         <module name="casehub-platform-agent-config" />
         <module name="casehub-platform-view-jpa" />
+        <module name="casehub-platform-yaml-step-runtime" />
         <module name="casehub-platform-yaml-codegen" />
         <module name="casehub-platform-streams-camel" />
         <module name="casehub-platform-datasource-inmem" />
@@ -330,48 +332,6 @@
         </processorPath>
         <module name="casehub-platform-event-simulation" />
       </profile>
-      <profile name="Annotation profile for CaseHub Chat App" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
-        <outputRelativeToContentRoot value="true" />
-        <option name="domainFilter" value="chat/messages,chat/presence" />
-        <option name="generateGraphQL" value="false" />
-        <processorPath useClasspath="false">
-          <entry name="$PROJECT_DIR$/../platform/graphql-generator/target/classes" />
-          <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
-          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/smallrye/jandex/3.6.0/jandex-3.6.0.jar" />
-          <entry name="$PROJECT_DIR$/../platform/graphql-generator/target/classes" />
-          <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
-          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/smallrye/jandex/3.6.0/jandex-3.6.0.jar" />
-        </processorPath>
-        <module name="casehub-chat-app" />
-      </profile>
-      <profile name="Annotation profile for CaseHub Connectors — Parent" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
-        <outputRelativeToContentRoot value="true" />
-        <option name="domainFilter" value="connectors,connectors/messaging,connectors/chat,connectors/calendar,connectors/bank-feed,connectors/email" />
-        <option name="generateGraphQL" value="false" />
-        <processorPath useClasspath="false">
-          <entry name="$PROJECT_DIR$/../platform/graphql-generator/target/classes" />
-          <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
-          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/smallrye/jandex/3.6.0/jandex-3.6.0.jar" />
-          <entry name="$PROJECT_DIR$/connectors-api/target/classes" />
-          <entry name="$PROJECT_DIR$/../platform/graphql-generator/target/classes" />
-          <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
-          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/smallrye/jandex/3.6.0/jandex-3.6.0.jar" />
-          <entry name="$PROJECT_DIR$/connectors-api/target/classes" />
-        </processorPath>
-        <module name="casehub-connectors-graphql" />
-      </profile>
       <profile name="Annotation profile for casehub-connectors-webhook" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
@@ -397,32 +357,6 @@
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
         </processorPath>
         <module name="casehub-connectors-webhook" />
-      </profile>
-      <profile name="Annotation profile for casehub-platform-parent" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
-        <outputRelativeToContentRoot value="true" />
-        <option name="domainFilter" value="acl" />
-        <option name="generateGraphQL" value="false" />
-        <processorPath useClasspath="false">
-          <entry name="$PROJECT_DIR$/../platform/graphql-generator/target/classes" />
-          <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
-          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/smallrye/jandex/3.6.0/jandex-3.6.0.jar" />
-          <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
-          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
-          <entry name="$PROJECT_DIR$/../platform/graphql-generator/target/classes" />
-          <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
-          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/smallrye/jandex/3.6.0/jandex-3.6.0.jar" />
-          <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
-          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
-        </processorPath>
-        <module name="casehub-platform-acl-admin" />
       </profile>
       <profile name="Annotation profile for casehub-platform-callback-client" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
@@ -476,6 +410,74 @@
         </processorPath>
         <module name="casehub-platform-notification-dispatch" />
       </profile>
+      <profile name="Annotation profile for CaseHub Chat App" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <option name="domainFilter" value="chat/messages,chat/presence" />
+        <option name="generateGraphQL" value="false" />
+        <processorPath useClasspath="false">
+          <entry name="$PROJECT_DIR$/../platform/graphql-generator/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/smallrye/jandex/3.6.0/jandex-3.6.0.jar" />
+          <entry name="$PROJECT_DIR$/../platform/graphql-generator/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/smallrye/jandex/3.6.0/jandex-3.6.0.jar" />
+        </processorPath>
+        <module name="casehub-chat-app" />
+      </profile>
+      <profile name="Annotation profile for CaseHub Connectors — Parent" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <option name="domainFilter" value="connectors,connectors/messaging,connectors/chat,connectors/calendar,connectors/bank-feed,connectors/email" />
+        <option name="generateGraphQL" value="false" />
+        <processorPath useClasspath="false">
+          <entry name="$PROJECT_DIR$/../platform/graphql-generator/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/smallrye/jandex/3.6.0/jandex-3.6.0.jar" />
+          <entry name="$PROJECT_DIR$/connectors-api/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/graphql-generator/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/smallrye/jandex/3.6.0/jandex-3.6.0.jar" />
+          <entry name="$PROJECT_DIR$/connectors-api/target/classes" />
+        </processorPath>
+        <module name="casehub-connectors-graphql" />
+      </profile>
+      <profile name="Annotation profile for casehub-platform-parent" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <option name="domainFilter" value="acl" />
+        <option name="generateGraphQL" value="false" />
+        <processorPath useClasspath="false">
+          <entry name="$PROJECT_DIR$/../platform/graphql-generator/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/smallrye/jandex/3.6.0/jandex-3.6.0.jar" />
+          <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
+          <entry name="$PROJECT_DIR$/../platform/graphql-generator/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/smallrye/jandex/3.6.0/jandex-3.6.0.jar" />
+          <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
+        </processorPath>
+        <module name="casehub-platform-acl-admin" />
+      </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="casehub-connectors" target="21" />
@@ -503,6 +505,7 @@
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="casehub-chat-app" options="-parameters -AdomainFilter=chat/messages,chat/presence -AgenerateGraphQL=false" />
       <module name="casehub-connectors-api" options="-parameters" />
+      <module name="casehub-connectors-bank-ref" options="-parameters" />
       <module name="casehub-connectors-bank-spi" options="-parameters" />
       <module name="casehub-connectors-bank-truelayer" options="-parameters" />
       <module name="casehub-connectors-calendar-google" options="-parameters" />
@@ -715,6 +718,7 @@
       <module name="casehub-platform-yaml-jackson" options="-parameters" />
       <module name="casehub-platform-yaml-plugin-api" options="-parameters" />
       <module name="casehub-platform-yaml-plugin-processor" options="-parameters" />
+      <module name="casehub-platform-yaml-step-runtime" options="-parameters" />
       <module name="casehub-spring-boot-starter" options="-parameters" />
       <module name="casehub-spring-boot-starter-agent" options="-parameters" />
       <module name="casehub-spring-boot-starter-streams" options="-parameters" />

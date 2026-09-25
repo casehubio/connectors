@@ -310,6 +310,27 @@ Capability accessors are user-scoped -- each user has their own consent under PS
 </dependency>
 ```
 
+**Testing with TrueLayer:** The module ships a reusable `TrueLayerTestProfile` that pre-configures all OIDC client, consent, and devservice properties for tests. Add the test-jar dependency and annotate your test:
+
+```xml
+<dependency>
+    <groupId>io.casehub</groupId>
+    <artifactId>casehub-connectors-bank-truelayer</artifactId>
+    <version>${casehub.version}</version>
+    <type>test-jar</type>
+    <scope>test</scope>
+</dependency>
+```
+
+```java
+@QuarkusTest
+@TestProfile(TrueLayerTestProfile.class)
+class MyBankingTest {
+    @Inject BankPlatform bankPlatform;
+    // bankPlatform.id() == "truelayer" — ready to use
+}
+```
+
 **TrueLayer consent:** Consent is provider-internal (not on the SPI). Inject `TrueLayerConsentService` to check consent status or initiate the consent flow. The consent flow is a browser redirect (OAuth2 + PSD2 SCA). The consent callback endpoint is at `/auth/truelayer/callback`.
 
 **Consent persistence:** Consent tokens are persisted via the `ConsentTokenStore` SPI. Two implementations ship with `bank-truelayer`:
