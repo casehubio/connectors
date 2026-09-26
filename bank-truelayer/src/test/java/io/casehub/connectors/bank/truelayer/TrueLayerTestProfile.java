@@ -40,6 +40,8 @@ public class TrueLayerTestProfile implements QuarkusTestProfile {
                 Map.entry("casehub.connectors.bank.truelayer.auth-url",
                         "https://auth.truelayer-sandbox.com"),
                 Map.entry("casehub.connectors.bank.truelayer.base-url",
-                        "https://api.truelayer-sandbox.com"));
+                        "https://api.truelayer-sandbox.com"),
+                Map.entry("casehub.connectors.bank.truelayer.webhook-validation-disabled",
+                        "true"));
     }
 }

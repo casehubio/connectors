@@ -342,6 +342,16 @@ class MyBankingTest {
 
 **Migration from in-memory to database:** Add `quarkus-hibernate-orm` and a JDBC driver to your app. Configure a datasource. `JpaConsentTokenStore` activates automatically at Tier 1. Remove `InMemoryConsentTokenStore` from the classpath (or leave it — Tier 3 only wins when explicitly selected via `@Alternative`). No code changes required — the `ConsentTokenStore` SPI handles the switch. Expired consents are cleaned up daily by a scheduled job.
 
+**Payment webhooks:** Configure your TrueLayer dashboard to send payment events to `<your-app-url>/webhooks/truelayer/payments`. Observe payment status changes:
+
+    void onPaymentStatus(@ObservesAsync PaymentStatusChanged event) {
+        // event.paymentId(), event.status(), event.failureReason()
+    }
+
+Events are deduplicated by `event_id` (10-minute TTL). The webhook validates JWS (ES512) signatures against TrueLayer's public key. For local development, disable signature validation:
+
+    casehub.connectors.bank.truelayer.webhook-validation-disabled=true
+
 **Simulation:** Annotated with `@SimulationEligible` -- the platform simulation framework generates CDI decorators at build time, including recursive wrappers for capability sub-interfaces. Qualified names: `bank-platform.accountInformation.listAccounts`, `bank-platform.accountInformation.balance`, `bank-platform.accountInformation.listTransactions`, `bank-platform.accountInformation.getTransaction`, `bank-platform.paymentInitiation.initiatePayment`, `bank-platform.paymentInitiation.paymentStatus`.
 
 **Shipped corpus data:** The module includes example corpus YAML files on the classpath under `simulation/bank-feed/`:

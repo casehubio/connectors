@@ -254,6 +254,7 @@ C4Container
     Container(tl_client, "TrueLayerClient", "HttpHelper.CLIENT", "Data API + Payments API\njakarta.json parsing")
     Container(tl_consent, "TrueLayerConsentService", "CDI", "PSD2 consent lifecycle\nstate-based CSRF · token refresh")
     Container(tl_callback, "TrueLayerAuthCallback", "JAX-RS", "GET /auth/truelayer/callback\n302 redirect after consent")
+    Container(tl_webhook, "TrueLayerPaymentWebhook", "JAX-RS, JWS", "POST /webhooks/truelayer/payments\nEvent deduplication · CDI event firing")
   }
   Container_Boundary(b13, "Layer L13 — Email Platform SPI") {
     Container(email_spi, "EmailPlatform SPI", "Java interface, @SimulationEligible", "id() + listMailboxes()\nlistMessages() + getMessage()\ngetAttachmentContent()")

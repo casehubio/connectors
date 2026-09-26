@@ -47,6 +47,11 @@ AISP (account information) and PISP (payment initiation) with PSD2 consent manag
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-scheduler</artifactId>
     </dependency>
+    <dependency>
+      <groupId>com.truelayer</groupId>
+      <artifactId>truelayer-signing</artifactId>
+      <version>0.3.0</version>
+    </dependency>
 
     <!-- Testing -->
     <dependency>
@@ -72,6 +77,16 @@ AISP (account information) and PISP (payment initiation) with PSD2 consent manag
     <dependency>
       <groupId>org.wiremock</groupId>
       <artifactId>wiremock-standalone</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.rest-assured</groupId>
+      <artifactId>rest-assured</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.awaitility</groupId>
+      <artifactId>awaitility</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
