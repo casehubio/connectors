@@ -1,5 +1,7 @@
 package io.casehub.connectors.chat;
 
+import io.casehub.connectors.chat.command.CommandHandler;
+import io.casehub.connectors.chat.command.CommandService;
 import io.casehub.connectors.chat.spi.ChatPlatform;
 import io.quarkus.arc.All;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -15,4 +17,14 @@ public class ChatBeans {
     public ChatPlatformService chatPlatformService(@All List<ChatPlatform> platforms) {
         return new ChatPlatformService(platforms);
     }
+
+    @Produces
+    @ApplicationScoped
+    @io.quarkus.runtime.Startup
+    public CommandService commandService(
+            @All List<CommandHandler> handlers,
+            @All List<ChatPlatform> platforms) {
+        return new CommandService(handlers, platforms);
+    }
+
 }

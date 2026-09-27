@@ -5,12 +5,14 @@ import io.casehub.connectors.chat.degraded.EmptyDiscovery;
 import io.casehub.connectors.chat.degraded.EmptyMembers;
 import io.casehub.connectors.chat.degraded.EmptyMessageHistory;
 import io.casehub.connectors.chat.degraded.NoOpChannelManagement;
+import io.casehub.connectors.chat.degraded.NoOpCommands;
 import io.casehub.connectors.chat.degraded.NoOpMemberManagement;
 import io.casehub.connectors.chat.degraded.NoOpReactions;
 import io.casehub.connectors.chat.degraded.UnknownPresence;
 import io.casehub.connectors.chat.model.SendResult;
 import io.casehub.connectors.chat.spi.ChannelManagement;
 import io.casehub.connectors.chat.spi.ChatPlatform;
+import io.casehub.connectors.chat.spi.Commands;
 import io.casehub.connectors.chat.spi.Discovery;
 import io.casehub.connectors.chat.spi.MemberManagement;
 import io.casehub.connectors.chat.spi.Members;
@@ -75,6 +77,12 @@ public class NoOpChatPlatform implements ChatPlatform {
     public MessageHistory messageHistory() {
         return new EmptyMessageHistory();
     }
+
+    @Override
+    public Commands commands() {
+        return new NoOpCommands();
+    }
+
 
     @Override
     public boolean supports(final Class<?> capability) {

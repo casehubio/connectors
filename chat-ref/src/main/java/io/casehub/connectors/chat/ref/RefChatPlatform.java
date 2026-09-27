@@ -1,8 +1,5 @@
 package io.casehub.connectors.chat.ref;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 
 import io.casehub.connectors.chat.model.Channel;
 import io.casehub.connectors.chat.model.ChatChannelRef;
@@ -13,6 +10,7 @@ import io.casehub.connectors.chat.model.PresenceStatus;
 import io.casehub.connectors.chat.model.SendResult;
 import io.casehub.connectors.chat.spi.ChannelManagement;
 import io.casehub.connectors.chat.spi.ChatPlatform;
+import io.casehub.connectors.chat.spi.Commands;
 import io.casehub.connectors.chat.spi.Discovery;
 import io.casehub.connectors.chat.spi.MemberManagement;
 import io.casehub.connectors.chat.spi.Members;
@@ -22,14 +20,21 @@ import io.casehub.connectors.chat.spi.Presence;
 import io.casehub.connectors.chat.spi.Reactions;
 import io.casehub.connectors.chat.spi.Threading;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
 public class RefChatPlatform implements ChatPlatform {
 
     private static final Set<Class<?>> ALL_CAPABILITIES = Set.of(
             Messaging.class, Threading.class, Discovery.class,
             Reactions.class, Presence.class, Members.class,
-            ChannelManagement.class, MemberManagement.class, MessageHistory.class);
+            ChannelManagement.class, MemberManagement.class,
+            MessageHistory.class, Commands.class);
 
     private final ChatBackend backend;
+    private final RefCommands commands = new RefCommands();
+
 
     public RefChatPlatform(final ChatBackend backend) {
         this.backend = backend;
@@ -122,6 +127,12 @@ public class RefChatPlatform implements ChatPlatform {
     public MessageHistory messageHistory() {
         return backend::messages;
     }
+
+    @Override
+    public Commands commands() {
+        return commands;
+    }
+
 
     @Override
     public boolean supports(final Class<?> capability) {
