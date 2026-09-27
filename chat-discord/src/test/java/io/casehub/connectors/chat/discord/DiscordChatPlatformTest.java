@@ -74,7 +74,7 @@ class DiscordChatPlatformTest {
                 .willReturn(okJson("{\"id\":\"test-guild-123\",\"name\":\"Test Guild\",\"approximate_member_count\":42}")));
 
         presenceCache = new DiscordGatewayPresenceCache();
-        platform = new DiscordChatPlatform(client, presenceCache, "test-token");
+        platform = new DiscordChatPlatform(client, presenceCache, "test-token", "");
         platform.init();
     }
 
@@ -459,7 +459,7 @@ class DiscordChatPlatformTest {
 
     @Test
     void messaging_blankTokenReturnsFailure() throws Exception {
-        DiscordChatPlatform blankPlatform = new DiscordChatPlatform(client, presenceCache, "");
+        DiscordChatPlatform blankPlatform = new DiscordChatPlatform(client, presenceCache, "", "");
         blankPlatform.init();
 
         ChatChannelRef channel = new ChatChannelRef("chan-123");
@@ -477,7 +477,7 @@ class DiscordChatPlatformTest {
         wireMock.stubFor(get(urlEqualTo("/users/@me/guilds?limit=200"))
                 .willReturn(aResponse().withStatus(401)));
 
-        final var failPlatform = new DiscordChatPlatform(client, presenceCache, "test-token");
+        final var failPlatform = new DiscordChatPlatform(client, presenceCache, "test-token", "");
         failPlatform.init();
 
         assertThat(failPlatform.supports(Messaging.class)).isFalse();
@@ -490,7 +490,7 @@ class DiscordChatPlatformTest {
         wireMock.stubFor(get(urlEqualTo("/users/@me/guilds?limit=200"))
                 .willReturn(okJson("[]")));
 
-        final var emptyPlatform = new DiscordChatPlatform(client, presenceCache, "test-token");
+        final var emptyPlatform = new DiscordChatPlatform(client, presenceCache, "test-token", "");
         emptyPlatform.init();
 
         assertThat(emptyPlatform.supports(Messaging.class)).isFalse();
@@ -508,7 +508,7 @@ class DiscordChatPlatformTest {
         wireMock.stubFor(get(urlEqualTo("/guilds/g2?with_counts=true"))
                 .willReturn(okJson("{\"id\":\"g2\",\"name\":\"G2\",\"approximate_member_count\":3}")));
 
-        final var multiPlatform = new DiscordChatPlatform(client, presenceCache, "test-token");
+        final var multiPlatform = new DiscordChatPlatform(client, presenceCache, "test-token", "");
         multiPlatform.init();
 
         assertThatThrownBy(() ->
@@ -533,7 +533,7 @@ class DiscordChatPlatformTest {
         wireMock.stubFor(get(urlEqualTo("/guilds/g2/channels"))
                 .willReturn(okJson("[{\"id\":\"ch-g2\",\"name\":\"lobby\",\"type\":0}]")));
 
-        final var multiPlatform = new DiscordChatPlatform(client, presenceCache, "test-token");
+        final var multiPlatform = new DiscordChatPlatform(client, presenceCache, "test-token", "");
         multiPlatform.init();
 
         List<Channel> channels = multiPlatform.discovery().listChannels();

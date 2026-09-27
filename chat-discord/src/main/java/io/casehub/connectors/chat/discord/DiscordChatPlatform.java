@@ -1,21 +1,53 @@
 package io.casehub.connectors.chat.discord;
 
+import io.casehub.connectors.Attachment;
+import io.casehub.connectors.InboundConnectorTypes;
+import io.casehub.connectors.chat.degraded.ChannelFallbackThreading;
+import io.casehub.connectors.chat.degraded.EmptyDiscovery;
+import io.casehub.connectors.chat.degraded.EmptyMembers;
+import io.casehub.connectors.chat.degraded.EmptyMessageHistory;
+import io.casehub.connectors.chat.degraded.NoOpChannelManagement;
+import io.casehub.connectors.chat.degraded.NoOpCommands;
+import io.casehub.connectors.chat.degraded.NoOpMemberManagement;
+import io.casehub.connectors.chat.degraded.NoOpReactions;
+import io.casehub.connectors.chat.degraded.UnknownPresence;
+import io.casehub.connectors.chat.model.Channel;
+import io.casehub.connectors.chat.model.ChatChannelRef;
+import io.casehub.connectors.chat.model.ChatContent;
+import io.casehub.connectors.chat.model.ChatMessageRef;
+import io.casehub.connectors.chat.model.Member;
+import io.casehub.connectors.chat.model.MemberRef;
+import io.casehub.connectors.chat.model.PresenceStatus;
+import io.casehub.connectors.chat.model.ReceivedMessage;
+import io.casehub.connectors.chat.model.RichCard;
+import io.casehub.connectors.chat.model.SendResult;
+import io.casehub.connectors.chat.spi.ChannelManagement;
+import io.casehub.connectors.chat.spi.ChatPlatform;
+import io.casehub.connectors.chat.spi.Commands;
+import io.casehub.connectors.chat.spi.Discovery;
+import io.casehub.connectors.chat.spi.MemberManagement;
+import io.casehub.connectors.chat.spi.Members;
+import io.casehub.connectors.chat.spi.MessageHistory;
+import io.casehub.connectors.chat.spi.Messaging;
+import io.casehub.connectors.chat.spi.Presence;
+import io.casehub.connectors.chat.spi.Reactions;
+import io.casehub.connectors.chat.spi.Threading;
+import io.casehub.connectors.discord.DiscordClient;
+import io.casehub.connectors.discord.DiscordGatewayPresenceCache;
+import io.casehub.connectors.discord.model.DiscordAttachment;
+import io.casehub.connectors.discord.model.DiscordChannel;
+import io.casehub.connectors.discord.model.DiscordEmbed;
+import io.casehub.connectors.discord.model.DiscordGuild;
+import io.casehub.connectors.discord.model.DiscordMember;
+import io.casehub.connectors.discord.model.DiscordMessage;
+import io.casehub.connectors.discord.model.PostResult;
+
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Logger;
-
-import io.casehub.connectors.Attachment;
-import io.casehub.connectors.InboundConnectorTypes;
-import io.casehub.connectors.chat.degraded.*;
-import io.casehub.connectors.chat.degraded.NoOpMemberManagement;
-import io.casehub.connectors.chat.model.*;
-import io.casehub.connectors.chat.spi.*;
-import io.casehub.connectors.discord.DiscordClient;
-import io.casehub.connectors.discord.DiscordGatewayPresenceCache;
-import io.casehub.connectors.discord.model.*;
 
 public class DiscordChatPlatform implements ChatPlatform {
 
@@ -37,6 +69,9 @@ public class DiscordChatPlatform implements ChatPlatform {
     private final DiscordClient client;
     private final DiscordGatewayPresenceCache presenceCache;
     private final String token;
+    private final String applicationId;
+    private       Commands commands;
+
 
     private List<DiscordGuild> guilds = List.of();
     private java.util.Map<String, DiscordGuild> guildDetails = java.util.Map.of();
@@ -56,10 +91,12 @@ public class DiscordChatPlatform implements ChatPlatform {
     public DiscordChatPlatform(
             final DiscordClient client,
             final DiscordGatewayPresenceCache presenceCache,
-            final String token) {
-        this.client = client;
+            final String token,
+            final String applicationId) {
+        this.client        = client;
         this.presenceCache = presenceCache;
-        this.token = token;
+        this.token         = token;
+        this.applicationId = applicationId;
         init();
     }
 
@@ -82,34 +119,44 @@ public class DiscordChatPlatform implements ChatPlatform {
             return;
         }
 
-        this.guilds = discovered;
+        this.guilds       = discovered;
         this.guildDetails = new java.util.HashMap<>();
         for (final DiscordGuild g : guilds) {
             final DiscordGuild details = client.getGuild(token, g.id(), true);
             guildDetails.put(g.id(), details != null ? details : g);
         }
-        this.activeCapabilities = NATIVE_CAPABILITIES;
 
-        this.messaging = this::sendMessage;
-        this.threading = this::sendReply;
-        this.discovery = this::listChannels;
-        this.reactions = new DiscordReactions();
-        this.presence = new DiscordPresence();
-        this.members = this::listMembers;
+        if (applicationId != null && !applicationId.isBlank()) {
+            this.commands = new DiscordCommands(client, token, applicationId);
+            var caps = new java.util.HashSet<>(NATIVE_CAPABILITIES);
+            caps.add(Commands.class);
+            this.activeCapabilities = Set.copyOf(caps);
+        } else {
+            this.commands           = new NoOpCommands();
+            this.activeCapabilities = NATIVE_CAPABILITIES;
+        }
+
+        this.messaging         = this::sendMessage;
+        this.threading         = this::sendReply;
+        this.discovery         = this::listChannels;
+        this.reactions         = new DiscordReactions();
+        this.presence          = new DiscordPresence();
+        this.members           = this::listMembers;
         this.channelManagement = new DiscordChannelManagement();
-        this.messageHistory = this::getMessageHistory;
+        this.messageHistory    = this::getMessageHistory;
     }
 
     private void initDegraded() {
         this.activeCapabilities = Set.of();
-        this.messaging = (channel, content) -> SendResult.failure("Discord not configured");
-        this.threading = new ChannelFallbackThreading(this.messaging);
-        this.discovery = new EmptyDiscovery();
-        this.reactions = new NoOpReactions();
-        this.presence = new UnknownPresence();
-        this.members = new EmptyMembers();
-        this.channelManagement = new NoOpChannelManagement();
-        this.messageHistory = new EmptyMessageHistory();
+        this.messaging          = (channel, content) -> SendResult.failure("Discord not configured");
+        this.threading          = new ChannelFallbackThreading(this.messaging);
+        this.discovery          = new EmptyDiscovery();
+        this.reactions          = new NoOpReactions();
+        this.presence           = new UnknownPresence();
+        this.members            = new EmptyMembers();
+        this.channelManagement  = new NoOpChannelManagement();
+        this.messageHistory     = new EmptyMessageHistory();
+        this.commands           = new NoOpCommands();
     }
 
     @Override
@@ -161,6 +208,12 @@ public class DiscordChatPlatform implements ChatPlatform {
     public MessageHistory messageHistory() {
         return messageHistory;
     }
+
+    @Override
+    public Commands commands() {
+        return commands;
+    }
+
 
     @Override
     public boolean supports(final Class<?> capability) {

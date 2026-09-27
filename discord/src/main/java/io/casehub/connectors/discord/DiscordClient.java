@@ -738,6 +738,68 @@ public class DiscordClient {
         return List.copyOf(accumulated);
     }
 
+    public void bulkOverwriteGlobalCommands(
+            final String token,
+            final String applicationId,
+            final com.fasterxml.jackson.databind.node.ArrayNode commands) {
+        final HttpRequest request = HttpRequest.newBuilder()
+                                               .uri(URI.create(apiBaseUrl + "/applications/" + applicationId + "/commands"))
+                                               .header("Authorization", "Bot " + token)
+                                               .header("Content-Type", "application/json")
+                                               .PUT(HttpRequest.BodyPublishers.ofString(commands.toString()))
+                                               .timeout(REQUEST_TIMEOUT)
+                                               .build();
+        sendWithRetry(request);
+    }
+
+    public void respondToInteraction(
+            final String interactionId,
+            final String interactionToken,
+            final int responseType,
+            final String content,
+            final boolean ephemeral) {
+        try {
+            final ObjectNode data = mapper.createObjectNode();
+            data.put("content", content);
+            if (ephemeral) {data.put("flags", 64);}
+            final ObjectNode body = mapper.createObjectNode();
+            body.put("type", responseType);
+            body.set("data", data);
+            final HttpRequest request = HttpRequest.newBuilder()
+                                                   .uri(URI.create(apiBaseUrl + "/interactions/" + interactionId
+                                                                   + "/" + interactionToken + "/callback"))
+                                                   .header("Content-Type", "application/json")
+                                                   .POST(HttpRequest.BodyPublishers.ofString(mapper.writeValueAsString(body)))
+                                                   .timeout(REQUEST_TIMEOUT)
+                                                   .build();
+            sendWithRetry(request);
+        } catch (final Exception e) {
+            LOG.warning("DiscordClient: respondToInteraction error — " + e.getMessage());
+        }
+    }
+
+    public void sendFollowupMessage(
+            final String applicationId,
+            final String interactionToken,
+            final String content,
+            final boolean ephemeral) {
+        try {
+            final ObjectNode body = mapper.createObjectNode();
+            body.put("content", content);
+            if (ephemeral) {body.put("flags", 64);}
+            final HttpRequest request = HttpRequest.newBuilder()
+                                                   .uri(URI.create(apiBaseUrl + "/webhooks/" + applicationId
+                                                                   + "/" + interactionToken))
+                                                   .header("Content-Type", "application/json")
+                                                   .POST(HttpRequest.BodyPublishers.ofString(mapper.writeValueAsString(body)))
+                                                   .timeout(REQUEST_TIMEOUT)
+                                                   .build();
+            sendWithRetry(request);
+        } catch (final Exception e) {
+            LOG.warning("DiscordClient: sendFollowupMessage error — " + e.getMessage());
+        }
+    }
+
 
     private ObjectNode buildMessageBody(final String content,
                                         final List<DiscordEmbed> embeds) {
