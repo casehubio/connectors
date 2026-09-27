@@ -59,7 +59,7 @@ Two transport patterns converge into a single CDI event bus:
 
 ### Chat Platform Architecture
 
-**`ChatPlatform` SPI** (`chat-spi`) -- composed of 9 capability interfaces. Only `Messaging` is required; all others degrade gracefully via provided fallback implementations in `io.casehub.connectors.chat.degraded`:
+**`ChatPlatform` SPI** (`chat-spi`) -- composed of 10 capability interfaces. Only `Messaging` is required; all others degrade gracefully via provided fallback implementations in `io.casehub.connectors.chat.degraded`:
 
 | Degraded Implementation | What it does |
 |------------------------|-------------|
@@ -71,6 +71,7 @@ Two transport patterns converge into a single CDI event bus:
 | `NoOpChannelManagement` | No-ops on create/delete, returns empty on find |
 | `NoOpMemberManagement` | No-ops on add/remove |
 | `EmptyMessageHistory` | Returns empty message list |
+| `NoOpCommands` | Logs warning on registerAll, does not register commands |
 
 **`ChatPlatformService`** (`chat-spi`) -- routing service, same pattern as `ConnectorService`. Constructor receives `@All List<ChatPlatform>`, indexes by `id()`. Duplicate ids cause startup failure.
 
@@ -83,6 +84,14 @@ public interface InboundTranslator {
     ReceivedMessage translate(InboundMessage msg);
 }
 ```
+
+**Commands Architecture** (`chat-spi` + platform modules):
+
+`CommandHandler` SPI -- consumers implement `definition()` (command name, description, typed parameters) and `handle(CommandInvocation)` (returns `CommandResponse`). `CommandService` discovers all `CommandHandler` CDI beans at startup, registers their definitions with platforms supporting `Commands`, and dispatches invocations by command name.
+
+Platform-specific interaction endpoints (`DiscordInteractionEndpoint`, `SlackCommandEndpoint`) receive HTTP requests, verify signatures (Ed25519 for Discord, HMAC-SHA256 for Slack), deserialize to `CommandInvocation`, call `CommandService.dispatch()`, and serialize the `CommandResponse` back to the platform. `CommandResponse` is sealed: `Immediate` (synchronous reply within 3s) or `Deferred` (acknowledge immediately, send follow-up via webhook/response_url).
+
+To add Commands support to a new `ChatPlatform`: (1) implement `Commands` for registration, (2) create a JAX-RS endpoint for receiving invocations, (3) wire into `ChatPlatform.commands()`.
 
 ### Calendar Platform Architecture
 

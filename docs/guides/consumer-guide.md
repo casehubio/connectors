@@ -183,7 +183,7 @@ Contract: should not throw (caller catches per-discovery); return empty list on 
 
 ### ChatPlatform SPI
 
-Structured interface for chat-system interactions beyond simple message delivery. Nine capability interfaces compose the platform:
+Structured interface for chat-system interactions beyond simple message delivery. Ten capability interfaces compose the platform:
 
 | Capability | Interface | Methods |
 |-----------|-----------|---------|
@@ -196,6 +196,7 @@ Structured interface for chat-system interactions beyond simple message delivery
 | Channel Management | `ChannelManagement` | `create(name, topic, description, isPrivate) -> Channel`, `delete(channelId)`, `find(channelId) -> Optional<Channel>` |
 | Member Management | `MemberManagement` | `add(ChatChannelRef, Member)`, `remove(ChatChannelRef, MemberRef)` |
 | Message History | `MessageHistory` | `messages(ChatChannelRef, since) -> List<ReceivedMessage>` |
+| Commands | `Commands` | `registerAll(List<CommandDefinition>)` |
 
 **Builder pattern with auto-degradation.** Only `Messaging` is required. All other capabilities fill with graceful degraded implementations if not provided:
 
@@ -223,10 +224,35 @@ ChatPlatform.builder("my-platform")
 
 | Implementation | Platform ID | Native capabilities |
 |----------------|------------|-------------------|
-| `RefChatPlatform` | `ref` | All 9 (in-memory reference for testing) |
+**Slash Commands (Commands capability).** Implement `CommandHandler` to register slash commands:
+
+```java
+@ApplicationScoped
+public class StatusCommandHandler implements CommandHandler {
+    @Override
+    public CommandDefinition definition() {
+        return new CommandDefinition("status", "Check system status", List.of());
+    }
+    @Override
+    public CommandResponse handle(CommandInvocation invocation) {
+        return new CommandResponse.Immediate("All systems operational");
+    }
+}
+```
+
+`CommandService` discovers all `CommandHandler` beans at startup and registers their definitions with each platform that supports `Commands`. Invocations arrive via platform-specific endpoints:
+
+- **Discord:** `/interactions/discord` — requires `casehub.discord.application-id` and `casehub.discord.public-key` config properties. Set the Interactions Endpoint URL in the Discord developer portal.
+- **Slack:** `/interactions/slack` — requires `casehub.slack.signing-secret` config property. Set the Request URL in the Slack app manifest.
+
+Supports `CommandResponse.Immediate` (synchronous) and `CommandResponse.Deferred` (acknowledge immediately, send response later via callback) for commands that need database or API calls.
+
+| Implementation | Platform ID | Native capabilities |
+|----------------|------------|-------------------|
+| `RefChatPlatform` | `ref` | All 10 (in-memory reference for testing) |
 | `IrcChatPlatform` | `irc` | 3 (Messaging, Discovery, Members) |
-| `DiscordChatPlatform` | `discord` | 8 (all except MemberManagement, which is degraded) |
-| `SlackChatPlatform` | `slack` | 9 (most complete) |
+| `DiscordChatPlatform` | `discord` | 9 (all except MemberManagement; Commands conditional on `application-id` config) |
+| `SlackChatPlatform` | `slack` | 10 (most complete; Commands via manifest, endpoint receives slash commands) |
 | `SignalChatPlatform` | `signal` | 6 (Messaging, Discovery, Members, Reactions, ChannelManagement, MemberManagement) |
 
 ### CalendarPlatform SPI
