@@ -14,8 +14,9 @@ public class ChatDiscordBeans {
     public DiscordChatPlatform discordChatPlatform(
             DiscordClient client,
             DiscordGatewayPresenceCache presenceCache,
-            @ConfigProperty(name = "casehub.discord.token", defaultValue = "") String token) {
-        return new DiscordChatPlatform(client, presenceCache, token);
+            @ConfigProperty(name = "casehub.discord.token", defaultValue = "") String token,
+            @ConfigProperty(name = "casehub.discord.application-id", defaultValue = "") String applicationId) {
+        return new DiscordChatPlatform(client, presenceCache, token, applicationId);
     }
 
     @Produces
