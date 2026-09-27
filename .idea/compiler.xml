@@ -129,7 +129,6 @@
         <module name="casehub-platform-streams-amqp" />
         <module name="casehub-platform-agent-config" />
         <module name="casehub-platform-view-jpa" />
-        <module name="casehub-platform-yaml-step-runtime" />
         <module name="casehub-platform-yaml-codegen" />
         <module name="casehub-platform-streams-camel" />
         <module name="casehub-platform-datasource-inmem" />
@@ -430,28 +429,6 @@
         </processorPath>
         <module name="casehub-chat-app" />
       </profile>
-      <profile name="Annotation profile for CaseHub Connectors — Parent" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
-        <outputRelativeToContentRoot value="true" />
-        <option name="domainFilter" value="connectors,connectors/messaging,connectors/chat,connectors/calendar,connectors/bank-feed,connectors/email" />
-        <option name="generateGraphQL" value="false" />
-        <processorPath useClasspath="false">
-          <entry name="$PROJECT_DIR$/../platform/graphql-generator/target/classes" />
-          <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
-          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/smallrye/jandex/3.6.0/jandex-3.6.0.jar" />
-          <entry name="$PROJECT_DIR$/connectors-api/target/classes" />
-          <entry name="$PROJECT_DIR$/../platform/graphql-generator/target/classes" />
-          <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
-          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/smallrye/jandex/3.6.0/jandex-3.6.0.jar" />
-          <entry name="$PROJECT_DIR$/connectors-api/target/classes" />
-        </processorPath>
-        <module name="casehub-connectors-graphql" />
-      </profile>
       <profile name="Annotation profile for casehub-platform-parent" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
@@ -477,6 +454,82 @@
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
         </processorPath>
         <module name="casehub-platform-acl-admin" />
+      </profile>
+      <profile name="Annotation profile for casehub-platform-yaml-step-runtime" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$PROJECT_DIR$/../platform/yaml-plugin-processor/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/yaml-plugin-api/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/schema-generator/target/classes" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/victools/jsonschema-generator/4.36.0/jsonschema-generator-4.36.0.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/classmate/1.7.1/classmate-1.7.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-core/2.22.2/jackson-core-2.22.2.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/slf4j/slf4j-api/2.0.18/slf4j-api-2.0.18.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/victools/jsonschema-module-jackson/4.36.0/jsonschema-module-jackson-4.36.0.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/victools/jsonschema-module-jakarta-validation/4.36.0/jsonschema-module-jakarta-validation-4.36.0.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-databind/2.22.2/jackson-databind-2.22.2.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-annotations/2.22/jackson-annotations-2.22.jar" />
+          <entry name="$MAVEN_REPOSITORY$/jakarta/validation/jakarta.validation-api/3.1.1/jakarta.validation-api-3.1.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/smallrye/jandex/3.6.0/jandex-3.6.0.jar" />
+          <entry name="$PROJECT_DIR$/../platform/schema-generator/target/classes" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/victools/jsonschema-generator/4.36.0/jsonschema-generator-4.36.0.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/classmate/1.7.1/classmate-1.7.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-core/2.22.2/jackson-core-2.22.2.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/slf4j/slf4j-api/2.0.18/slf4j-api-2.0.18.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/victools/jsonschema-module-jackson/4.36.0/jsonschema-module-jackson-4.36.0.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/victools/jsonschema-module-jakarta-validation/4.36.0/jsonschema-module-jakarta-validation-4.36.0.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-databind/2.22.2/jackson-databind-2.22.2.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-annotations/2.22/jackson-annotations-2.22.jar" />
+          <entry name="$MAVEN_REPOSITORY$/jakarta/validation/jakarta.validation-api/3.1.1/jakarta.validation-api-3.1.1.jar" />
+          <entry name="$PROJECT_DIR$/../platform/yaml-plugin-processor/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/yaml-plugin-api/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/schema-generator/target/classes" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/victools/jsonschema-generator/4.36.0/jsonschema-generator-4.36.0.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/classmate/1.7.1/classmate-1.7.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-core/2.22.2/jackson-core-2.22.2.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/slf4j/slf4j-api/2.0.18/slf4j-api-2.0.18.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/victools/jsonschema-module-jackson/4.36.0/jsonschema-module-jackson-4.36.0.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/victools/jsonschema-module-jakarta-validation/4.36.0/jsonschema-module-jakarta-validation-4.36.0.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-databind/2.22.2/jackson-databind-2.22.2.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-annotations/2.22/jackson-annotations-2.22.jar" />
+          <entry name="$MAVEN_REPOSITORY$/jakarta/validation/jakarta.validation-api/3.1.1/jakarta.validation-api-3.1.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/smallrye/jandex/3.6.0/jandex-3.6.0.jar" />
+          <entry name="$PROJECT_DIR$/../platform/schema-generator/target/classes" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/victools/jsonschema-generator/4.36.0/jsonschema-generator-4.36.0.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/classmate/1.7.1/classmate-1.7.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-core/2.22.2/jackson-core-2.22.2.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/slf4j/slf4j-api/2.0.18/slf4j-api-2.0.18.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/victools/jsonschema-module-jackson/4.36.0/jsonschema-module-jackson-4.36.0.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/victools/jsonschema-module-jakarta-validation/4.36.0/jsonschema-module-jakarta-validation-4.36.0.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-databind/2.22.2/jackson-databind-2.22.2.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-annotations/2.22/jackson-annotations-2.22.jar" />
+          <entry name="$MAVEN_REPOSITORY$/jakarta/validation/jakarta.validation-api/3.1.1/jakarta.validation-api-3.1.1.jar" />
+        </processorPath>
+        <module name="casehub-platform-yaml-step-runtime" />
+      </profile>
+      <profile name="Annotation profile for CaseHub Connectors — Parent" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <option name="domainFilter" value="connectors,connectors/messaging,connectors/chat,connectors/calendar,connectors/bank-feed,connectors/email" />
+        <option name="generateGraphQL" value="false" />
+        <processorPath useClasspath="false">
+          <entry name="$PROJECT_DIR$/../platform/graphql-generator/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/smallrye/jandex/3.6.0/jandex-3.6.0.jar" />
+          <entry name="$PROJECT_DIR$/connectors-api/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/graphql-generator/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/smallrye/jandex/3.6.0/jandex-3.6.0.jar" />
+          <entry name="$PROJECT_DIR$/connectors-api/target/classes" />
+        </processorPath>
+        <module name="casehub-connectors-graphql" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
