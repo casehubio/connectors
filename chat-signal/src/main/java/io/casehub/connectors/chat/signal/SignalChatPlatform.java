@@ -1,24 +1,11 @@
 package io.casehub.connectors.chat.signal;
 
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.logging.Logger;
-
-import jakarta.annotation.PostConstruct;
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
-
-import org.eclipse.microprofile.config.inject.ConfigProperty;
-
 import io.casehub.connectors.chat.degraded.ChannelFallbackThreading;
 import io.casehub.connectors.chat.degraded.EmptyDiscovery;
 import io.casehub.connectors.chat.degraded.EmptyMembers;
 import io.casehub.connectors.chat.degraded.EmptyMessageHistory;
 import io.casehub.connectors.chat.degraded.NoOpChannelManagement;
+import io.casehub.connectors.chat.degraded.NoOpCommands;
 import io.casehub.connectors.chat.degraded.NoOpMemberManagement;
 import io.casehub.connectors.chat.degraded.NoOpReactions;
 import io.casehub.connectors.chat.degraded.UnknownPresence;
@@ -31,6 +18,7 @@ import io.casehub.connectors.chat.model.MemberRef;
 import io.casehub.connectors.chat.model.SendResult;
 import io.casehub.connectors.chat.spi.ChannelManagement;
 import io.casehub.connectors.chat.spi.ChatPlatform;
+import io.casehub.connectors.chat.spi.Commands;
 import io.casehub.connectors.chat.spi.Discovery;
 import io.casehub.connectors.chat.spi.MemberManagement;
 import io.casehub.connectors.chat.spi.Members;
@@ -43,6 +31,18 @@ import io.casehub.connectors.signal.cli.SignalClient;
 import io.casehub.connectors.signal.cli.model.SendResponse;
 import io.casehub.connectors.signal.cli.model.SignalContact;
 import io.casehub.connectors.signal.cli.model.SignalGroup;
+import jakarta.annotation.PostConstruct;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.logging.Logger;
 
 @ApplicationScoped
 public class SignalChatPlatform implements ChatPlatform {
@@ -126,6 +126,12 @@ public class SignalChatPlatform implements ChatPlatform {
     @Override public ChannelManagement channelManagement() { return channelManagement; }
     @Override public MemberManagement memberManagement() { return memberManagement; }
     @Override public MessageHistory messageHistory() { return messageHistory; }
+
+    @Override
+    public Commands commands() {
+        return new NoOpCommands();
+    }
+
 
     @Override
     public boolean supports(final Class<?> capability) {

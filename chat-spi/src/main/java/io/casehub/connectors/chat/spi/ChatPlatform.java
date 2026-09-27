@@ -1,10 +1,7 @@
 package io.casehub.connectors.chat.spi;
 
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
-
 import io.casehub.connectors.chat.degraded.ChannelFallbackThreading;
+import io.casehub.connectors.chat.degraded.NoOpCommands;
 import io.casehub.connectors.chat.degraded.EmptyDiscovery;
 import io.casehub.connectors.chat.degraded.EmptyMembers;
 import io.casehub.connectors.chat.degraded.EmptyMessageHistory;
@@ -13,6 +10,10 @@ import io.casehub.connectors.chat.degraded.NoOpMemberManagement;
 import io.casehub.connectors.chat.degraded.NoOpReactions;
 import io.casehub.connectors.chat.degraded.UnknownPresence;
 import io.casehub.platform.simulation.SimulationEligible;
+
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * SPI for chat platform integration.
@@ -43,7 +44,7 @@ import io.casehub.platform.simulation.SimulationEligible;
 @SimulationEligible(name = "chat-platform",
     capabilities = {"messaging", "threading", "discovery", "reactions",
                     "presence", "members", "channelManagement",
-                    "memberManagement", "messageHistory"})
+                    "memberManagement", "messageHistory", "commands"})
 public interface ChatPlatform {
 
     /**
@@ -118,6 +119,14 @@ public interface ChatPlatform {
     MessageHistory messageHistory();
 
     /**
+     * Returns the commands capability for slash command registration.
+     *
+     * @return the commands implementation; never null (may be degraded)
+     */
+    Commands commands();
+
+
+    /**
      * Returns {@code true} if this platform natively supports the given capability.
      * Returns {@code false} if the capability is degraded or emulated.
      *
@@ -141,6 +150,8 @@ public interface ChatPlatform {
         private ChannelManagement channelManagement;
         private MemberManagement memberManagement;
         private MessageHistory messageHistory;
+        private Commands       commands;
+
         private final Set<Class<?>> nativeCapabilities = new HashSet<>();
 
         Builder(final String id) {
@@ -157,6 +168,9 @@ public interface ChatPlatform {
         public Builder memberManagement(final MemberManagement mm) { this.memberManagement = mm; nativeCapabilities.add(MemberManagement.class); return this; }
         public Builder messageHistory(final MessageHistory mh) { this.messageHistory = mh; nativeCapabilities.add(MessageHistory.class); return this; }
 
+        public Builder commands(final Commands c) { this.commands = c; nativeCapabilities.add(Commands.class); return this; }
+
+
         public ChatPlatform build() {
             Objects.requireNonNull(messaging, "messaging is required");
             return new DefaultChatPlatform(
@@ -170,6 +184,7 @@ public interface ChatPlatform {
                     channelManagement != null ? channelManagement : new NoOpChannelManagement(),
                     memberManagement != null ? memberManagement : new NoOpMemberManagement(),
                     messageHistory != null ? messageHistory : new EmptyMessageHistory(),
+                    commands != null ? commands : new NoOpCommands(),
                     Set.copyOf(nativeCapabilities));
         }
     }

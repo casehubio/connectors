@@ -1,13 +1,9 @@
 package io.casehub.connectors.chat.irc;
 
-import java.time.Instant;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-
 import io.casehub.connectors.chat.degraded.ChannelFallbackThreading;
 import io.casehub.connectors.chat.degraded.EmptyMessageHistory;
 import io.casehub.connectors.chat.degraded.NoOpChannelManagement;
+import io.casehub.connectors.chat.degraded.NoOpCommands;
 import io.casehub.connectors.chat.degraded.NoOpMemberManagement;
 import io.casehub.connectors.chat.degraded.NoOpReactions;
 import io.casehub.connectors.chat.degraded.UnknownPresence;
@@ -18,6 +14,7 @@ import io.casehub.connectors.chat.model.Member;
 import io.casehub.connectors.chat.model.MemberRef;
 import io.casehub.connectors.chat.model.SendResult;
 import io.casehub.connectors.chat.spi.ChannelManagement;
+import io.casehub.connectors.chat.spi.Commands;
 import io.casehub.connectors.chat.spi.ChatPlatform;
 import io.casehub.connectors.chat.spi.Discovery;
 import io.casehub.connectors.chat.spi.MemberManagement;
@@ -27,6 +24,10 @@ import io.casehub.connectors.chat.spi.Messaging;
 import io.casehub.connectors.chat.spi.Presence;
 import io.casehub.connectors.chat.spi.Reactions;
 import io.casehub.connectors.chat.spi.Threading;
+
+import java.time.Instant;
+import java.util.Set;
+import java.util.UUID;
 
 public class IrcChatPlatform implements ChatPlatform {
 
@@ -78,6 +79,12 @@ public class IrcChatPlatform implements ChatPlatform {
     @Override public ChannelManagement channelManagement() { return channelManagement; }
     @Override public MemberManagement memberManagement() { return memberManagement; }
     @Override public MessageHistory messageHistory() { return messageHistory; }
+
+    @Override
+    public Commands commands() {
+        return new NoOpCommands();
+    }
+
 
     @Override
     public boolean supports(final Class<?> capability) {

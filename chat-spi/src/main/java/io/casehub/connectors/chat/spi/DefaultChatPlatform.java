@@ -13,6 +13,7 @@ record DefaultChatPlatform(
         ChannelManagement channelManagement,
         MemberManagement memberManagement,
         MessageHistory messageHistory,
+        Commands commands,
         Set<Class<?>> nativeCapabilities) implements ChatPlatform {
 
     @Override

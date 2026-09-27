@@ -1,12 +1,5 @@
 package io.casehub.connectors.chat.spi;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
-import java.time.Instant;
-
-import org.junit.jupiter.api.Test;
-
 import io.casehub.connectors.chat.degraded.ChannelFallbackThreading;
 import io.casehub.connectors.chat.degraded.EmptyDiscovery;
 import io.casehub.connectors.chat.degraded.EmptyMembers;
@@ -15,12 +8,18 @@ import io.casehub.connectors.chat.degraded.NoOpChannelManagement;
 import io.casehub.connectors.chat.degraded.NoOpMemberManagement;
 import io.casehub.connectors.chat.degraded.NoOpReactions;
 import io.casehub.connectors.chat.degraded.UnknownPresence;
-import io.casehub.connectors.chat.model.MemberRef;
-import io.casehub.connectors.chat.model.PresenceStatus;
 import io.casehub.connectors.chat.model.ChatChannelRef;
 import io.casehub.connectors.chat.model.ChatContent;
 import io.casehub.connectors.chat.model.ChatMessageRef;
+import io.casehub.connectors.chat.model.MemberRef;
+import io.casehub.connectors.chat.model.PresenceStatus;
 import io.casehub.connectors.chat.model.SendResult;
+import org.junit.jupiter.api.Test;
+
+import java.time.Instant;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class ChatPlatformBuilderTest {
 
@@ -110,5 +109,27 @@ class ChatPlatformBuilderTest {
         SendResult result = platform.threading().reply(parent, content);
         assertThat(result.ok()).isTrue();
         assertThat(result.messageRef().channel()).isEqualTo(channel);
+    }
+
+    @Test
+    void builderAutoDegradesCommands() {
+        ChatPlatform platform = ChatPlatform.builder("test")
+                                            .messaging(STUB_MESSAGING)
+                                            .build();
+
+        assertThat(platform.commands()).isInstanceOf(io.casehub.connectors.chat.degraded.NoOpCommands.class);
+        assertThat(platform.supports(Commands.class)).isFalse();
+    }
+
+    @Test
+    void builderWithExplicitCommandsSupportsCommands() {
+        Commands stubCommands = commands -> {};
+        ChatPlatform platform = ChatPlatform.builder("test")
+                                            .messaging(STUB_MESSAGING)
+                                            .commands(stubCommands)
+                                            .build();
+
+        assertThat(platform.commands()).isEqualTo(stubCommands);
+        assertThat(platform.supports(Commands.class)).isTrue();
     }
 }
