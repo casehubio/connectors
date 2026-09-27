@@ -1,20 +1,35 @@
 package io.casehub.connectors.chat.slack;
 
-import java.time.Instant;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
-
-import jakarta.json.Json;
-
 import io.casehub.connectors.InboundConnectorTypes;
-import io.casehub.connectors.chat.degraded.*;
-import io.casehub.connectors.chat.model.*;
-import io.casehub.connectors.chat.spi.*;
+import io.casehub.connectors.chat.degraded.ChannelFallbackThreading;
+import io.casehub.connectors.chat.degraded.EmptyDiscovery;
+import io.casehub.connectors.chat.degraded.EmptyMembers;
+import io.casehub.connectors.chat.degraded.EmptyMessageHistory;
+import io.casehub.connectors.chat.degraded.NoOpChannelManagement;
+import io.casehub.connectors.chat.degraded.NoOpMemberManagement;
+import io.casehub.connectors.chat.degraded.NoOpReactions;
+import io.casehub.connectors.chat.degraded.UnknownPresence;
+import io.casehub.connectors.chat.model.Channel;
+import io.casehub.connectors.chat.model.ChatChannelRef;
+import io.casehub.connectors.chat.model.ChatContent;
+import io.casehub.connectors.chat.model.ChatMessageRef;
+import io.casehub.connectors.chat.model.Member;
+import io.casehub.connectors.chat.model.MemberRef;
+import io.casehub.connectors.chat.model.PresenceStatus;
+import io.casehub.connectors.chat.model.ReceivedMessage;
+import io.casehub.connectors.chat.model.RichCard;
+import io.casehub.connectors.chat.model.SendResult;
+import io.casehub.connectors.chat.spi.ChannelManagement;
+import io.casehub.connectors.chat.spi.ChatPlatform;
+import io.casehub.connectors.chat.spi.Commands;
+import io.casehub.connectors.chat.spi.Discovery;
+import io.casehub.connectors.chat.spi.MemberManagement;
+import io.casehub.connectors.chat.spi.Members;
+import io.casehub.connectors.chat.spi.MessageHistory;
+import io.casehub.connectors.chat.spi.Messaging;
+import io.casehub.connectors.chat.spi.Presence;
+import io.casehub.connectors.chat.spi.Reactions;
+import io.casehub.connectors.chat.spi.Threading;
 import io.casehub.connectors.slack.bot.SlackBotClient;
 import io.casehub.connectors.slack.bot.SlackBotClient.ConversationInfo;
 import io.casehub.connectors.slack.bot.SlackBotClient.ConversationResult;
@@ -24,6 +39,16 @@ import io.casehub.connectors.slack.bot.SlackBotClient.PostResult;
 import io.casehub.connectors.slack.bot.SlackBotClient.PresenceResult;
 import io.casehub.connectors.slack.bot.SlackBotClient.ReactionListResult;
 import io.casehub.connectors.slack.bot.SlackBotClient.UserInfo;
+import jakarta.json.Json;
+
+import java.time.Instant;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 public class SlackChatPlatform implements ChatPlatform {
 
@@ -38,7 +63,8 @@ public class SlackChatPlatform implements ChatPlatform {
             Members.class,
             ChannelManagement.class,
             MemberManagement.class,
-            MessageHistory.class);
+            MessageHistory.class,
+            Commands.class);
 
     private final SlackBotClient client;
     private final String token;
@@ -138,6 +164,14 @@ public class SlackChatPlatform implements ChatPlatform {
     public MessageHistory messageHistory() {
         return messageHistory;
     }
+
+    private final Commands commands = new SlackCommands();
+
+    @Override
+    public Commands commands() {
+        return commands;
+    }
+
 
     @Override
     public boolean supports(final Class<?> capability) {
