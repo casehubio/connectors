@@ -10,6 +10,7 @@
         <module name="casehub-platform-notifications-inmem-core" />
         <module name="casehub-platform-agent-gemini-core" />
         <module name="casehub-platform-view-core" />
+        <module name="casehub-connectors-document-spi" />
         <module name="casehub-platform-delivery-channel-inmem-core" />
         <module name="casehub-platform-subscriptions-inmem-core" />
         <module name="casehub-platform" />
@@ -27,6 +28,7 @@
         <module name="casehub-platform-mcp" />
         <module name="casehub-platform-streams-poll" />
         <module name="casehub-platform-notification-settings-inmem-core" />
+        <module name="casehub-connectors-document-ref" />
         <module name="casehub-platform-persistence-jpa" />
         <module name="casehub-platform-config-core" />
         <module name="casehub-platform-rest-spring-generator" />
@@ -37,6 +39,7 @@
         <module name="casehub-platform-agent-claude" />
         <module name="casehub-platform-llm-config-vertex" />
         <module name="casehub-platform-datasource-jpa" />
+        <module name="casehub-connectors-email-ref" />
         <module name="casehub-platform-streams-amqp-core" />
         <module name="casehub-connectors-bank-truelayer" />
         <module name="casehub-platform-callback-inmem" />
@@ -61,6 +64,7 @@
         <module name="casehub-platform-delivery-tracking-inmem" />
         <module name="casehub-connectors-calendar-ref" />
         <module name="casehub-platform-credentials-spring" />
+        <module name="casehub-connectors-email-google" />
         <module name="casehub-platform-graphql-spring-generator" />
         <module name="casehub-connectors-mcp" />
         <module name="casehub-platform-digest-inmem" />
@@ -129,6 +133,7 @@
         <module name="casehub-platform-streams-amqp" />
         <module name="casehub-platform-agent-config" />
         <module name="casehub-platform-view-jpa" />
+        <module name="casehub-connectors-document-google" />
         <module name="casehub-platform-yaml-codegen" />
         <module name="casehub-platform-streams-camel" />
         <module name="casehub-platform-datasource-inmem" />
@@ -429,32 +434,6 @@
         </processorPath>
         <module name="casehub-chat-app" />
       </profile>
-      <profile name="Annotation profile for casehub-platform-parent" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
-        <outputRelativeToContentRoot value="true" />
-        <option name="domainFilter" value="acl" />
-        <option name="generateGraphQL" value="false" />
-        <processorPath useClasspath="false">
-          <entry name="$PROJECT_DIR$/../platform/graphql-generator/target/classes" />
-          <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
-          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/smallrye/jandex/3.6.0/jandex-3.6.0.jar" />
-          <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
-          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
-          <entry name="$PROJECT_DIR$/../platform/graphql-generator/target/classes" />
-          <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
-          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/smallrye/jandex/3.6.0/jandex-3.6.0.jar" />
-          <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
-          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
-        </processorPath>
-        <module name="casehub-platform-acl-admin" />
-      </profile>
       <profile name="Annotation profile for casehub-platform-yaml-step-runtime" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
@@ -531,6 +510,32 @@
         </processorPath>
         <module name="casehub-connectors-graphql" />
       </profile>
+      <profile name="Annotation profile for casehub-platform-parent" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <option name="domainFilter" value="acl" />
+        <option name="generateGraphQL" value="false" />
+        <processorPath useClasspath="false">
+          <entry name="$PROJECT_DIR$/../platform/graphql-generator/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/smallrye/jandex/3.6.0/jandex-3.6.0.jar" />
+          <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
+          <entry name="$PROJECT_DIR$/../platform/graphql-generator/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/smallrye/jandex/3.6.0/jandex-3.6.0.jar" />
+          <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
+        </processorPath>
+        <module name="casehub-platform-acl-admin" />
+      </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="casehub-connectors" target="21" />
@@ -572,8 +577,13 @@
       <module name="casehub-connectors-chat-spi" options="-parameters" />
       <module name="casehub-connectors-core" options="-parameters" />
       <module name="casehub-connectors-discord" options="-parameters" />
+      <module name="casehub-connectors-document-google" options="-parameters" />
+      <module name="casehub-connectors-document-ref" options="-parameters" />
+      <module name="casehub-connectors-document-spi" options="-parameters" />
       <module name="casehub-connectors-email" options="-parameters" />
+      <module name="casehub-connectors-email-google" options="-parameters" />
       <module name="casehub-connectors-email-inbound" options="-parameters" />
+      <module name="casehub-connectors-email-ref" options="-parameters" />
       <module name="casehub-connectors-email-spi" options="-parameters" />
       <module name="casehub-connectors-graphql" options="-parameters -AdomainFilter=connectors,connectors/messaging,connectors/chat,connectors/calendar,connectors/bank-feed,connectors/email -AgenerateGraphQL=false" />
       <module name="casehub-connectors-mcp" options="-parameters" />

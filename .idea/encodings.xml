@@ -39,8 +39,18 @@
     <file url="file://$PROJECT_DIR$/core/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/discord/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/discord/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/document-google/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/document-google/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/document-ref/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/document-ref/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/document-spi/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/document-spi/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/email-google/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/email-google/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/email-inbound/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/email-inbound/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/email-ref/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/email-ref/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/email-spi/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/email-spi/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/email/src/main/java" charset="UTF-8" />
