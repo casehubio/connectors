@@ -44,6 +44,7 @@ Zero heavy dependencies — HTTP-based connectors use java.net.http only.</descr
     <module>bank-ref</module>
     <module>bank-truelayer</module>
     <module>email-spi</module>
+    <module>email-ref</module>
     <module>graphql</module>
     <module>connectors-spring</module>
   </modules>

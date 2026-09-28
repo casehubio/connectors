@@ -19,7 +19,7 @@ No Camel, no vendor SDKs -- pure `java.net.http.HttpClient` for HTTP-based conne
 
 ## Module Structure
 
-There are 21 active modules in the build (pom.xml `<modules>`):
+There are 23 active modules in the build (pom.xml `<modules>`):
 
 | Module (artifactId prefix: `casehub-connectors-`) | What consumers need to know |
 |----------------------------------------------------|-----------------------------|
@@ -44,6 +44,8 @@ There are 21 active modules in the build (pom.xml `<modules>`):
 | `bank-spi` | `BankPlatform` SPI with `@SimulationEligible`, model records (`AccountInfo`, `AccountBalance`, `Transaction`), `BankPlatformService` routing, `NoOpBankPlatform` `@DefaultBean` fallback |
 | `bank-ref` | In-memory reference `BankPlatform` for testing (`RefBankPlatform`) — 3 UK accounts, 12 transactions, payment lifecycle simulation |
 | `email-spi` | `EmailPlatform` SPI with `@SimulationEligible`, model records (`Mailbox`, `EmailSummary`, `EmailMessage`, `EmailAttachment`), `EmailPlatformService` routing. Complements `email` (outbound) and `email-inbound` (push) |
+| `email-ref` | In-memory reference `EmailPlatform` for testing (`RefEmailPlatform`) — 3 mailboxes (Inbox/Sent/Archive), 9 messages with attachments, cursor-based pagination |
+| `email-google` | Gmail `EmailPlatform` provider (`GoogleEmailPlatform`) — OAuth2 refresh token auth, label→mailbox mapping, paginated message listing, MIME body parsing, attachment download. Config: `casehub.connectors.email.google.{client-id,client-secret,refresh-token}` |
 | `graphql` | `ConnectorOperations` `@McpDomain("connectors")` SPI — GraphQL/MCP surface with 4 operations: `injectChat` (constructs `InboundMessage`, fires via `InboundConnectorService`), `sendNotification` (delegates to `ConnectorService.send()`), `connectorStatus` (aggregates outbound + chat + inbound connectors), `sentMessages` (queries `SentMessageCapture`, profile-gated). `ConnectorsModelEnricher` provides domain summary/state for MCP. `SentMessageCapture` (`@UnlessBuildProfile("prod")`) CDI observer for test/dev message capture. |
 
 **CDI events:** `ConnectorService.send()` fires `Event<SentMessage>` on every outbound delivery. `SentMessage` record carries the connector ID, recipient, message content, and timestamp. Observe with `@ObservesAsync SentMessage` for delivery tracking.

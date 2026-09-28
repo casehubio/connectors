@@ -356,6 +356,24 @@ Package note: service/beans in `io.casehub.connectors.email.spi` to avoid split-
 
 Depends on: `connectors-api` (Page, PageRequest), `simulation-api` (@SimulationEligible).
 
+### email-ref
+
+In-memory `EmailPlatform` reference implementation. `EmailBackend` interface with `InMemoryEmailBackend` (pre-loaded: 3 mailboxes, 9 messages, 2 attachments, cursor-based pagination). `RefEmailPlatform` is a thin delegation layer. `EmailRefBeans` CDI producer.
+
+Package: `io.casehub.connectors.email.ref`.
+
+Depends on: `email-spi`, `quarkus-arc`.
+
+### email-google
+
+Gmail `EmailPlatform` provider. `GoogleEmailPlatform` uses Gmail API with OAuth2 `UserCredentials` (same pattern as `GoogleCalendarPlatform`). `GmailMessageMapper` handles Gmail→SPI model mapping (headers, MIME body parsing, attachment metadata). `EmailGoogleBeans` CDI producer with `@ConfigProperty` for credentials.
+
+Package: `io.casehub.connectors.email.google`.
+
+Label→mailbox mapping: system labels (INBOX, SENT, DRAFT) get friendly names; category labels excluded; user labels included as-is. Message listing is N+1 (list IDs, then fetch metadata per ID) — paginated via Gmail's `pageToken`.
+
+Depends on: `email-spi`, `google-api-services-gmail`, `quarkus-arc`.
+
 ---
 
 ## Cross-Repo Integration
