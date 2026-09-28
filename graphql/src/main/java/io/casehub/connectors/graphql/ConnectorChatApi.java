@@ -35,10 +35,11 @@ public class ConnectorChatApi {
     public OperationResult sendChat(String platform, String channel, String text) {
         if (!chatPlatformService.supports(platform)) {
             return new OperationResult(false, platform, channel,
-                "Unknown platform. Available: " + chatPlatformService.ids());
+                                       "Unknown platform. Available: " + chatPlatformService.ids());
         }
+        var p = chatPlatformService.platform(platform);
+        requireCapability(p, io.casehub.connectors.chat.spi.Messaging.class, "sendChat");
         try {
-            var p = chatPlatformService.platform(platform);
             p.messaging().send(new ChatChannelRef(channel), new ChatContent(text));
             meshBridge.notifyDelivered(platform, channel, sanitize(text));
             return new OperationResult(true, platform, channel, "Sent");
@@ -53,12 +54,13 @@ public class ConnectorChatApi {
         if (!chatPlatformService.supports(platform)) {
             return List.of();
         }
+        var p = chatPlatformService.platform(platform);
+        requireCapability(p, io.casehub.connectors.chat.spi.Discovery.class, "listChatChannels");
         try {
-            var p = chatPlatformService.platform(platform);
             return p.discovery().listChannels().stream()
-                .map(ch -> new ChannelInfo(platform, ch.ref().id(), ch.name(),
-                    ch.topic() != null ? ch.topic() : ""))
-                .toList();
+                    .map(ch -> new ChannelInfo(platform, ch.ref().id(), ch.name(),
+                                               ch.topic() != null ? ch.topic() : ""))
+                    .toList();
         } catch (Exception e) {
             return List.of();
         }
@@ -85,12 +87,14 @@ public class ConnectorChatApi {
     @RestPath("/reply")
     public io.casehub.connectors.chat.model.SendResult replyToMessage(
             String platform, String channel, String parentMessageId, String text) {
-        if (!chatPlatformService.supports(platform))
+        if (!chatPlatformService.supports(platform)) {
             return new io.casehub.connectors.chat.model.SendResult(false, null, null, "Unknown platform");
+        }
+        var p = chatPlatformService.platform(platform);
+        requireCapability(p, io.casehub.connectors.chat.spi.Threading.class, "replyToMessage");
         try {
-            var p = chatPlatformService.platform(platform);
             var parent = new io.casehub.connectors.chat.model.ChatMessageRef(
-                new ChatChannelRef(channel), parentMessageId);
+                    new ChatChannelRef(channel), parentMessageId);
             return p.threading().reply(parent, new ChatContent(text));
         } catch (Exception e) {
             return new io.casehub.connectors.chat.model.SendResult(false, null, null, e.getMessage());
@@ -100,12 +104,14 @@ public class ConnectorChatApi {
     @PlatformMutation("Add an emoji reaction to a message")
     @RestPath("/reactions/add")
     public OperationResult addReaction(String platform, String channel, String messageId, String emoji) {
-        if (!chatPlatformService.supports(platform))
+        if (!chatPlatformService.supports(platform)) {
             return new OperationResult(false, platform, channel, "Unknown platform");
+        }
+        var p = chatPlatformService.platform(platform);
+        requireCapability(p, io.casehub.connectors.chat.spi.Reactions.class, "addReaction");
         try {
-            var p = chatPlatformService.platform(platform);
             var ref = new io.casehub.connectors.chat.model.ChatMessageRef(
-                new ChatChannelRef(channel), messageId);
+                    new ChatChannelRef(channel), messageId);
             p.reactions().add(ref, emoji);
             return new OperationResult(true, platform, channel, "Reaction added");
         } catch (Exception e) {
@@ -116,12 +122,14 @@ public class ConnectorChatApi {
     @PlatformMutation("Remove an emoji reaction from a message")
     @RestPath("/reactions/remove")
     public OperationResult removeReaction(String platform, String channel, String messageId, String emoji) {
-        if (!chatPlatformService.supports(platform))
+        if (!chatPlatformService.supports(platform)) {
             return new OperationResult(false, platform, channel, "Unknown platform");
+        }
+        var p = chatPlatformService.platform(platform);
+        requireCapability(p, io.casehub.connectors.chat.spi.Reactions.class, "removeReaction");
         try {
-            var p = chatPlatformService.platform(platform);
             var ref = new io.casehub.connectors.chat.model.ChatMessageRef(
-                new ChatChannelRef(channel), messageId);
+                    new ChatChannelRef(channel), messageId);
             p.reactions().remove(ref, emoji);
             return new OperationResult(true, platform, channel, "Reaction removed");
         } catch (Exception e) {
@@ -132,56 +140,62 @@ public class ConnectorChatApi {
     @PlatformQuery("List reactions on a message")
     @RestPath("/reactions")
     public List<String> listReactions(String platform, String channel, String messageId) {
-        if (!chatPlatformService.supports(platform)) return List.of();
+        if (!chatPlatformService.supports(platform)) {return List.of();}
+        var p = chatPlatformService.platform(platform);
+        requireCapability(p, io.casehub.connectors.chat.spi.Reactions.class, "listReactions");
         try {
-            var p = chatPlatformService.platform(platform);
             var ref = new io.casehub.connectors.chat.model.ChatMessageRef(
-                new ChatChannelRef(channel), messageId);
+                    new ChatChannelRef(channel), messageId);
             return p.reactions().list(ref);
-        } catch (Exception e) { return List.of(); }
+        } catch (Exception e) {return List.of();}
     }
 
     @PlatformQuery("Get presence status of a member")
     @RestPath("/presence")
     public String getPresence(String platform, String memberId) {
-        if (!chatPlatformService.supports(platform)) return "UNKNOWN";
+        if (!chatPlatformService.supports(platform)) {return "UNKNOWN";}
+        var p = chatPlatformService.platform(platform);
+        requireCapability(p, io.casehub.connectors.chat.spi.Presence.class, "getPresence");
         try {
-            var p = chatPlatformService.platform(platform);
             return p.presence().of(new io.casehub.connectors.chat.model.MemberRef(memberId)).name();
-        } catch (Exception e) { return "UNKNOWN"; }
+        } catch (Exception e) {return "UNKNOWN";}
     }
 
     @PlatformQuery("List members of a channel")
     @RestPath("/members")
     public List<io.casehub.connectors.chat.model.Member> listMembers(String platform, String channel) {
-        if (!chatPlatformService.supports(platform)) return List.of();
+        if (!chatPlatformService.supports(platform)) {return List.of();}
+        var p = chatPlatformService.platform(platform);
+        requireCapability(p, io.casehub.connectors.chat.spi.Members.class, "listMembers");
         try {
-            var p = chatPlatformService.platform(platform);
             return p.members().list(new ChatChannelRef(channel));
-        } catch (Exception e) { return List.of(); }
+        } catch (Exception e) {return List.of();}
     }
 
     @PlatformMutation("Create a channel on a chat platform")
     @RestPath("/channels/create")
     public ChannelInfo createChannel(String platform, String name, String topic,
-                                      String description, Boolean isPrivate) {
-        if (!chatPlatformService.supports(platform)) return null;
+                                     String description, Boolean isPrivate) {
+        if (!chatPlatformService.supports(platform)) {return null;}
+        var p = chatPlatformService.platform(platform);
+        requireCapability(p, io.casehub.connectors.chat.spi.ChannelManagement.class, "createChannel");
         try {
-            var p = chatPlatformService.platform(platform);
             var ch = p.channelManagement().create(name, topic, description,
-                isPrivate != null && isPrivate);
+                                                  isPrivate != null && isPrivate);
             return new ChannelInfo(platform, ch.ref().id(), ch.name(),
-                ch.topic() != null ? ch.topic() : "");
-        } catch (Exception e) { return null; }
+                                   ch.topic() != null ? ch.topic() : "");
+        } catch (Exception e) {return null;}
     }
 
     @PlatformMutation("Delete a channel on a chat platform")
     @RestPath("/channels/delete")
     public OperationResult deleteChannel(String platform, String channelId) {
-        if (!chatPlatformService.supports(platform))
+        if (!chatPlatformService.supports(platform)) {
             return new OperationResult(false, platform, channelId, "Unknown platform");
+        }
+        var p = chatPlatformService.platform(platform);
+        requireCapability(p, io.casehub.connectors.chat.spi.ChannelManagement.class, "deleteChannel");
         try {
-            var p = chatPlatformService.platform(platform);
             p.channelManagement().delete(channelId);
             return new OperationResult(true, platform, channelId, "Deleted");
         } catch (Exception e) {
@@ -193,12 +207,39 @@ public class ConnectorChatApi {
     @RestPath("/history")
     public List<io.casehub.connectors.chat.model.ReceivedMessage> messageHistory(
             String platform, String channel, @QueryParam("since") Instant since) {
-        if (!chatPlatformService.supports(platform)) return List.of();
+        if (!chatPlatformService.supports(platform)) {return List.of();}
+        var p = chatPlatformService.platform(platform);
+        requireCapability(p, io.casehub.connectors.chat.spi.MessageHistory.class, "messageHistory");
         try {
-            var p = chatPlatformService.platform(platform);
             Instant effectiveSince = since != null ? since : Instant.now().minusSeconds(86400);
             return p.messageHistory().messages(new ChatChannelRef(channel), effectiveSince);
-        } catch (Exception e) { return List.of(); }
+        } catch (Exception e) {return List.of();}
+    }
+
+
+    private static void requireCapability(io.casehub.connectors.chat.spi.ChatPlatform platform,
+                                          Class<?> capability, String operation) {
+        if (!platform.supports(capability)) {
+            var supported = new java.util.ArrayList<String>();
+            if (platform.supports(io.casehub.connectors.chat.spi.Messaging.class)) {supported.add("Messaging");}
+            if (platform.supports(io.casehub.connectors.chat.spi.Threading.class)) {supported.add("Threading");}
+            if (platform.supports(io.casehub.connectors.chat.spi.Discovery.class)) {supported.add("Discovery");}
+            if (platform.supports(io.casehub.connectors.chat.spi.Reactions.class)) {supported.add("Reactions");}
+            if (platform.supports(io.casehub.connectors.chat.spi.Presence.class)) {supported.add("Presence");}
+            if (platform.supports(io.casehub.connectors.chat.spi.Members.class)) {supported.add("Members");}
+            if (platform.supports(io.casehub.connectors.chat.spi.ChannelManagement.class)) {
+                supported.add("ChannelManagement");
+            }
+            if (platform.supports(io.casehub.connectors.chat.spi.MemberManagement.class)) {
+                supported.add("MemberManagement");
+            }
+            if (platform.supports(io.casehub.connectors.chat.spi.MessageHistory.class)) {
+                supported.add("MessageHistory");
+            }
+            if (platform.supports(io.casehub.connectors.chat.spi.Commands.class)) {supported.add("Commands");}
+            throw new io.casehub.connectors.UnsupportedCapabilityException(
+                    operation, capability.getSimpleName(), platform.id(), supported);
+        }
     }
 
     private static String sanitize(String text) {
