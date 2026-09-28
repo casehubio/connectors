@@ -4,7 +4,11 @@ import io.casehub.connectors.Connector;
 import io.casehub.connectors.ConnectorService;
 import io.casehub.connectors.InboundConnectorService;
 import io.casehub.connectors.WebhookInboundConnector;
+import io.casehub.connectors.bank.BankPlatformService;
+import io.casehub.connectors.calendar.CalendarPlatformService;
 import io.casehub.connectors.chat.ChatPlatformService;
+import io.casehub.connectors.document.spi.DocumentPlatformService;
+import io.casehub.connectors.email.spi.EmailPlatformService;
 import io.casehub.platform.api.identity.CurrentPrincipal;
 import io.quarkus.arc.All;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -23,19 +27,22 @@ public class GraphqlBeans {
             InboundConnectorService inboundService,
             ConnectorService connectorService,
             ChatPlatformService chatPlatformService,
+            CalendarPlatformService calendarPlatformService,
+            BankPlatformService bankPlatformService,
+            EmailPlatformService emailPlatformService,
+            DocumentPlatformService documentPlatformService,
             @All List<Connector> connectors,
             @All List<WebhookInboundConnector> webhookConnectors,
             Instance<SentMessageCapture> sentMessageCapture,
             CurrentPrincipal currentPrincipal) {
         return new ConnectorOperationsImpl(
-                inboundService,
-                connectorService,
-                chatPlatformService,
-                connectors,
-                webhookConnectors,
+                inboundService, connectorService, chatPlatformService,
+                calendarPlatformService, bankPlatformService,
+                emailPlatformService, documentPlatformService,
+                connectors, webhookConnectors,
                 sentMessageCapture.isResolvable()
-                        ? Optional.of(sentMessageCapture.get())
-                        : Optional.empty(),
+                ? Optional.of(sentMessageCapture.get())
+                : Optional.empty(),
                 currentPrincipal);
     }
 }

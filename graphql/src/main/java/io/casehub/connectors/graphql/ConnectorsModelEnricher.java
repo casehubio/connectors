@@ -3,7 +3,11 @@ package io.casehub.connectors.graphql;
 import io.casehub.connectors.ConnectorService;
 import io.casehub.connectors.InboundConnectorService;
 import io.casehub.connectors.WebhookInboundConnector;
+import io.casehub.connectors.bank.BankPlatformService;
+import io.casehub.connectors.calendar.CalendarPlatformService;
 import io.casehub.connectors.chat.ChatPlatformService;
+import io.casehub.connectors.document.spi.DocumentPlatformService;
+import io.casehub.connectors.email.spi.EmailPlatformService;
 import io.casehub.platform.api.mcp.McpDomain;
 import io.casehub.platform.api.mcp.ModelEnricher;
 import io.quarkus.arc.All;
@@ -19,6 +23,16 @@ public class ConnectorsModelEnricher implements ModelEnricher {
 
     @Inject ConnectorService connectorService;
     @Inject ChatPlatformService chatPlatformService;
+    @Inject
+            CalendarPlatformService calendarPlatformService;
+    @Inject
+    BankPlatformService bankPlatformService;
+    @Inject
+    EmailPlatformService emailPlatformService;
+    @Inject
+    DocumentPlatformService documentPlatformService;
+
+
     @Inject InboundConnectorService inboundConnectorService;
     @Inject @All List<WebhookInboundConnector> webhookConnectors;
 
@@ -34,7 +48,11 @@ public class ConnectorsModelEnricher implements ModelEnricher {
         return Map.of(
                 "outboundConnectors", connectorService.ids().size(),
                 "chatPlatforms", chatPlatformService.ids().size(),
+                "calendarPlatforms", calendarPlatformService.ids().size(),
+                "bankPlatforms", bankPlatformService.ids().size(),
+                "emailPlatforms", emailPlatformService.ids().size(),
+                "documentPlatforms", documentPlatformService.ids().size(),
                 "inboundConnectors", inboundConnectorService.pullIds().size()
-                        + webhookConnectors.size());
+                                     + webhookConnectors.size());
     }
 }

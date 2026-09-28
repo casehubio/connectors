@@ -49,6 +49,11 @@ sendNotification, connectorStatus, sentMessages.</description>
     </dependency>
     <dependency>
       <groupId>io.casehub</groupId>
+      <artifactId>casehub-connectors-document-spi</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.casehub</groupId>
       <artifactId>casehub-platform-graphql</artifactId>
       <version>${project.version}</version>
     </dependency>

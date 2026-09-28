@@ -1,15 +1,17 @@
 package io.casehub.connectors.graphql;
 
+import io.casehub.connectors.Page;
+import io.casehub.connectors.PageRequest;
 import io.casehub.connectors.bank.BankPlatformService;
 import io.casehub.connectors.bank.model.AccountBalance;
 import io.casehub.connectors.bank.model.AccountInfo;
 import io.casehub.connectors.bank.model.InitiatedPayment;
 import io.casehub.connectors.bank.model.PaymentRequest;
 import io.casehub.connectors.bank.model.PaymentStatus;
-import io.casehub.connectors.Page;
-import io.casehub.connectors.PageRequest;
 import io.casehub.connectors.bank.model.Transaction;
+import io.casehub.connectors.bank.spi.AccountInformation;
 import io.casehub.connectors.bank.spi.BankPlatform;
+import io.casehub.connectors.bank.spi.PaymentInitiation;
 import io.casehub.platform.api.mcp.McpDomain;
 import io.casehub.platform.api.mcp.PathParam;
 import io.casehub.platform.api.mcp.PlatformMutation;
@@ -38,6 +40,7 @@ public class ConnectorBankApi {
     @RestPath("/accounts")
     public List<AccountInfo> listAccounts(@QueryParam("platform") String platform) {
         BankPlatform p = bankService.platform(platform);
+        requireCapability(p, AccountInformation.class, "listAccounts");
         return p.accountInformation(userId()).listAccounts();
     }
 
@@ -47,6 +50,7 @@ public class ConnectorBankApi {
             @QueryParam("platform") String platform,
             @PathParam String accountId) {
         BankPlatform p = bankService.platform(platform);
+        requireCapability(p, AccountInformation.class, "balance");
         return p.accountInformation(userId()).balance(accountId);
     }
 
@@ -60,9 +64,10 @@ public class ConnectorBankApi {
             @QueryParam("cursor") String cursor,
             @QueryParam("pageSize") Integer pageSize) {
         BankPlatform p = bankService.platform(platform);
+        requireCapability(p, AccountInformation.class, "listTransactions");
         Instant effectiveFrom = from != null ? from : Instant.now().minusSeconds(2592000);
-        Instant effectiveTo = to != null ? to : Instant.now();
-        int size = pageSize != null ? pageSize : 50;
+        Instant effectiveTo   = to != null ? to : Instant.now();
+        int     size          = pageSize != null ? pageSize : 50;
         return p.accountInformation(userId()).listTransactions(
                 accountId, effectiveFrom, effectiveTo, new PageRequest(cursor, size));
     }
@@ -74,6 +79,7 @@ public class ConnectorBankApi {
             @PathParam String accountId,
             @PathParam String transactionId) {
         BankPlatform p = bankService.platform(platform);
+        requireCapability(p, AccountInformation.class, "getTransaction");
         return p.accountInformation(userId()).getTransaction(accountId, transactionId);
     }
 
@@ -83,6 +89,7 @@ public class ConnectorBankApi {
             @QueryParam("platform") String platform,
             PaymentRequest payment) {
         BankPlatform p = bankService.platform(platform);
+        requireCapability(p, PaymentInitiation.class, "initiatePayment");
         return p.paymentInitiation(userId()).initiatePayment(payment);
     }
 
@@ -92,6 +99,17 @@ public class ConnectorBankApi {
             @QueryParam("platform") String platform,
             @PathParam String paymentId) {
         BankPlatform p = bankService.platform(platform);
+        requireCapability(p, PaymentInitiation.class, "paymentStatus");
         return p.paymentInitiation(userId()).paymentStatus(paymentId);
+    }
+
+    private static void requireCapability(BankPlatform platform, Class<?> capability, String operation) {
+        if (!platform.supports(capability)) {
+            var supported = new java.util.ArrayList<String>();
+            if (platform.supports(AccountInformation.class)) {supported.add("AccountInformation");}
+            if (platform.supports(PaymentInitiation.class)) {supported.add("PaymentInitiation");}
+            throw new io.casehub.connectors.UnsupportedCapabilityException(
+                    operation, capability.getSimpleName(), platform.id(), supported);
+        }
     }
 }
