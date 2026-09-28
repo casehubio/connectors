@@ -19,7 +19,7 @@ No Camel, no vendor SDKs -- pure `java.net.http.HttpClient` for HTTP-based conne
 
 ## Module Structure
 
-There are 23 active modules in the build (pom.xml `<modules>`):
+There are 26 active modules in the build (pom.xml `<modules>`):
 
 | Module (artifactId prefix: `casehub-connectors-`) | What consumers need to know |
 |----------------------------------------------------|-----------------------------|
@@ -46,6 +46,9 @@ There are 23 active modules in the build (pom.xml `<modules>`):
 | `email-spi` | `EmailPlatform` SPI with `@SimulationEligible`, model records (`Mailbox`, `EmailSummary`, `EmailMessage`, `EmailAttachment`), `EmailPlatformService` routing. Complements `email` (outbound) and `email-inbound` (push) |
 | `email-ref` | In-memory reference `EmailPlatform` for testing (`RefEmailPlatform`) — 3 mailboxes (Inbox/Sent/Archive), 9 messages with attachments, cursor-based pagination |
 | `email-google` | Gmail `EmailPlatform` provider (`GoogleEmailPlatform`) — OAuth2 refresh token auth, label→mailbox mapping, paginated message listing, MIME body parsing, attachment download. Config: `casehub.connectors.email.google.{client-id,client-secret,refresh-token}` |
+| `document-spi` | `DocumentPlatform` SPI with `@SimulationEligible` and capability sub-interfaces (`FileOperations`, `FolderOperations`, `SearchOperations`, `SharingOperations`), `supports(Class<?>)` introspection, `DocumentPlatformService` routing |
+| `document-ref` | In-memory reference `DocumentPlatform` for testing (`RefDocumentPlatform`) — 3 folders, 7 files, all 4 capabilities including upload/download round-trip, search, sharing |
+| `document-google` | Google Drive `DocumentPlatform` provider (`GoogleDocumentPlatform`) — OAuth2 refresh token auth, file CRUD with direct upload, folder management, full-text search, share links. Config: `casehub.connectors.document.google.{client-id,client-secret,refresh-token}` |
 | `graphql` | `ConnectorOperations` `@McpDomain("connectors")` SPI — GraphQL/MCP surface with 4 operations: `injectChat` (constructs `InboundMessage`, fires via `InboundConnectorService`), `sendNotification` (delegates to `ConnectorService.send()`), `connectorStatus` (aggregates outbound + chat + inbound connectors), `sentMessages` (queries `SentMessageCapture`, profile-gated). `ConnectorsModelEnricher` provides domain summary/state for MCP. `SentMessageCapture` (`@UnlessBuildProfile("prod")`) CDI observer for test/dev message capture. |
 
 **CDI events:** `ConnectorService.send()` fires `Event<SentMessage>` on every outbound delivery. `SentMessage` record carries the connector ID, recipient, message content, and timestamp. Observe with `@ObservesAsync SentMessage` for delivery tracking.

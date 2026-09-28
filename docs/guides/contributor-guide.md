@@ -374,6 +374,34 @@ Label→mailbox mapping: system labels (INBOX, SENT, DRAFT) get friendly names; 
 
 Depends on: `email-spi`, `google-api-services-gmail`, `quarkus-arc`.
 
+### document-spi
+
+`DocumentPlatform` SPI with `@SimulationEligible` and capability sub-interfaces following the `BankPlatform` pattern: `FileOperations` (list, get, download, upload, delete), `FolderOperations` (list, create, move), `SearchOperations` (full-text search), `SharingOperations` (share links). `supports(Class<?>)` for runtime capability introspection. `DocumentPlatformService` routing, `NoOpDocumentPlatform` `@DefaultBean` fallback with enum singleton capability implementations.
+
+Model records: `Folder`, `DocumentSummary`, `DocumentMetadata`.
+
+Package: `io.casehub.connectors.document.spi` (interface, service, no-op), `io.casehub.connectors.document.model` (records).
+
+Depends on: `connectors-api` (Page, PageRequest), `simulation-api` (@SimulationEligible).
+
+### document-ref
+
+In-memory `DocumentPlatform` reference implementation. `DocumentBackend` interface with `InMemoryDocumentBackend` (pre-loaded: 3 folders, 7 files). `RefDocumentPlatform` delegates to backend via record-based capability implementations. `DocumentRefBeans` CDI producer. Supports all 4 capabilities — file CRUD with upload/download round-trip, folder hierarchy, name-based search, share links.
+
+Package: `io.casehub.connectors.document.ref`.
+
+Depends on: `document-spi`, `quarkus-arc`.
+
+### document-google
+
+Google Drive `DocumentPlatform` provider. `GoogleDocumentPlatform` uses Drive API v3 with OAuth2 `UserCredentials` (same auth pattern as `GoogleCalendarPlatform`, `GoogleEmailPlatform`). Inner classes implement each capability sub-interface. Supports all 4 capabilities. `DocumentGoogleBeans` CDI producer with `@ConfigProperty` for credentials.
+
+Package: `io.casehub.connectors.document.google`.
+
+Drive API mappings: `files.list` with parent/MIME/trash filters for file+folder listing, `files.get` for metadata, `executeMediaAndDownloadTo` for content download, `files.create` with direct upload for upload, `files.delete` for delete, `files.update` with addParents/removeParents for move, `fullText contains` query for search, `permissions.create` + `webViewLink` for sharing.
+
+Depends on: `document-spi`, `google-api-services-drive`, `quarkus-arc`.
+
 ---
 
 ## Cross-Repo Integration
