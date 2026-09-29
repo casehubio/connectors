@@ -10,6 +10,7 @@ import io.casehub.connectors.bank.BankPlatformService;
 import io.casehub.connectors.calendar.CalendarPlatformService;
 import io.casehub.connectors.chat.ChatPlatformService;
 import io.casehub.connectors.chat.spi.ChatPlatform;
+import io.casehub.connectors.contacts.spi.ContactsPlatformService;
 import io.casehub.connectors.document.spi.DocumentPlatformService;
 import io.casehub.connectors.email.spi.EmailPlatformService;
 import org.junit.jupiter.api.BeforeEach;
@@ -46,11 +47,13 @@ class ConnectorOperationsImplTest {
         var bankPlatformService     = new BankPlatformService(List.of());
         var emailPlatformService    = new EmailPlatformService(List.of());
         var documentPlatformService = new DocumentPlatformService(List.of());
+        var contactsPlatformService = new ContactsPlatformService(List.of());
 
         ops = new ConnectorOperationsImpl(
                 inboundService, connectorService, chatPlatformService,
                 calendarPlatformService, bankPlatformService,
                 emailPlatformService, documentPlatformService,
+                contactsPlatformService,
                 List.of(connector), List.of(), java.util.Optional.empty(), null);
     }
 
@@ -165,6 +168,7 @@ class ConnectorOperationsImplTest {
                 inboundService, connectorService, chatPlatformService,
                 new CalendarPlatformService(List.of()), bankService,
                 new EmailPlatformService(List.of()), new DocumentPlatformService(List.of()),
+                new ContactsPlatformService(List.of()),
                 List.of(), List.of(), java.util.Optional.empty(), null);
 
         var result = ops.connectorsReport("bank");
@@ -188,6 +192,7 @@ class ConnectorOperationsImplTest {
                 inboundService, connectorService, chatPlatformService,
                 new CalendarPlatformService(List.of()), bankService,
                 new EmailPlatformService(List.of()), new DocumentPlatformService(List.of()),
+                new ContactsPlatformService(List.of()),
                 List.of(), List.of(), java.util.Optional.empty(), null);
 
         var result = ops.connectorsReport("bank");
@@ -219,6 +224,7 @@ class ConnectorOperationsImplTest {
                 inboundService, connectorService, chatPlatformService,
                 new CalendarPlatformService(List.of()), new BankPlatformService(List.of()),
                 new EmailPlatformService(List.of()), docService,
+                new ContactsPlatformService(List.of()),
                 List.of(), List.of(), java.util.Optional.empty(), null);
 
         var result = ops.connectorsReport("document");
