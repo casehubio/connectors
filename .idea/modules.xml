@@ -14,7 +14,6 @@
       <module fileurl="file://$PROJECT_DIR$/../platform/agent-openai-spring/casehub-platform-agent-openai-spring.iml" filepath="$PROJECT_DIR$/../platform/agent-openai-spring/casehub-platform-agent-openai-spring.iml" />
       <module fileurl="file://$PROJECT_DIR$/../platform/agent-router-spring/casehub-platform-agent-router-spring.iml" filepath="$PROJECT_DIR$/../platform/agent-router-spring/casehub-platform-agent-router-spring.iml" />
       <module fileurl="file://$PROJECT_DIR$/../platform/agent-runtime-spring/casehub-platform-agent-runtime-spring.iml" filepath="$PROJECT_DIR$/../platform/agent-runtime-spring/casehub-platform-agent-runtime-spring.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../platform/expression-spring/casehub-platform-expression-spring.iml" filepath="$PROJECT_DIR$/../platform/expression-spring/casehub-platform-expression-spring.iml" />
       <module fileurl="file://$PROJECT_DIR$/../platform/governance-spring/casehub-platform-governance-spring.iml" filepath="$PROJECT_DIR$/../platform/governance-spring/casehub-platform-governance-spring.iml" />
       <module fileurl="file://$PROJECT_DIR$/../platform/memory-inmem/casehub-platform-memory-inmem.iml" filepath="$PROJECT_DIR$/../platform/memory-inmem/casehub-platform-memory-inmem.iml" />
       <module fileurl="file://$PROJECT_DIR$/../platform/streams-amqp-spring/casehub-platform-streams-amqp-spring.iml" filepath="$PROJECT_DIR$/../platform/streams-amqp-spring/casehub-platform-streams-amqp-spring.iml" />
