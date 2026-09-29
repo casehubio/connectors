@@ -50,6 +50,7 @@ Zero heavy dependencies — HTTP-based connectors use java.net.http only.</descr
     <module>document-ref</module>
     <module>document-google</module>
     <module>contacts-spi</module>
+    <module>contacts-ref</module>
     <module>graphql</module>
     <module>connectors-spring</module>
   </modules>
