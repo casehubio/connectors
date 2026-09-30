@@ -2,11 +2,11 @@ package io.casehub.connectors.webhook;
 
 import io.casehub.connectors.HttpMethod;
 import io.casehub.connectors.InboundConnectorService;
+import io.casehub.connectors.InboundMessage;
 import io.casehub.connectors.WebhookInboundConnector;
 import io.casehub.connectors.WebhookRequest;
 import io.casehub.connectors.WebhookResult;
 import io.casehub.platform.api.mcp.ContextParam;
-import io.casehub.platform.api.mcp.McpDomain;
 import io.casehub.platform.api.mcp.PathParam;
 import io.casehub.platform.api.mcp.PlatformQuery;
 import io.casehub.platform.api.mcp.PlatformWebhook;
@@ -27,7 +27,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-@McpDomain(value = "connectors/webhooks", app = "connectors", basePath = "/connectors", summary = "Webhook management — register, route, verify inbound hooks")
 @ApplicationScoped
 public class WebhookRouter {
 
@@ -92,13 +91,12 @@ public class WebhookRouter {
         }
         try {
             return switch (connector.handle(request)) {
-                case WebhookResult.Delivered(final List<io.casehub.connectors.InboundMessage> msgs) -> {
+                case WebhookResult.Delivered(var msgs) -> {
                     msgs.forEach(service::receive);
                     yield Response.ok().build();
                 }
-                case WebhookResult.Challenged(
-                        final String responseBody, final String contentType
-                ) -> Response.ok(responseBody).type(contentType).build();
+                case WebhookResult.Challenged(var responseBody, var contentType) ->
+                    Response.ok(responseBody).type(contentType).build();
                 case WebhookResult.Ignored() -> Response.ok().build();
                 case WebhookResult.Unauthorized() -> {
                     final String rawXff = request.header("x-forwarded-for");
