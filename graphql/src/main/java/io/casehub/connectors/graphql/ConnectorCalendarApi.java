@@ -1,5 +1,7 @@
 package io.casehub.connectors.graphql;
 
+import io.casehub.connectors.SyncRequest;
+import io.casehub.connectors.SyncResult;
 import io.casehub.connectors.calendar.CalendarPlatformService;
 import io.casehub.connectors.calendar.model.CalendarEvent;
 import io.casehub.connectors.calendar.model.EventDetails;
@@ -20,8 +22,6 @@ import jakarta.ws.rs.QueryParam;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @McpDomain(value = "connectors/calendar", app = "connectors", basePath = "/api/connectors/calendar", summary = "Calendar connector — events, scheduling, availability")
@@ -114,6 +114,25 @@ public class ConnectorCalendarApi {
             return new OperationResult(false, platform, calendarId, e.getMessage());
         }
     }
+
+    @PlatformQuery("Incremental sync of calendar events")
+    @RestPath("/events/sync")
+    public SyncResult<CalendarEventInfo> syncEvents(
+            @QueryParam("platform") String platform,
+            @QueryParam("calendarId") String calendarId,
+            @QueryParam("syncToken") String syncToken,
+            @QueryParam("pageSize") Integer pageSize) {
+        CalendarPlatform p = calendarService.platform(platform);
+        if (p == null) {return new SyncResult<>(List.of(), List.of(), null, false);}
+        int size = pageSize != null ? pageSize : 100;
+        var request = syncToken != null
+                      ? new SyncRequest(syncToken, size)
+                      : SyncRequest.initial(size);
+        var result = p.listEventsSync(calendarId, request);
+        var events = result.items().stream().map(this::toEventInfo).toList();
+        return new SyncResult<>(events, result.deletedIds(), result.syncToken(), result.hasMore());
+    }
+
 
     private CalendarEventInfo toEventInfo(CalendarEvent e) {
         Instant start = null, end = null;
