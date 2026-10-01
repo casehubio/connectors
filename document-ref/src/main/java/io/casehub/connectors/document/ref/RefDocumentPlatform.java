@@ -1,6 +1,8 @@
 package io.casehub.connectors.document.ref;
 
 import io.casehub.connectors.Page;
+import io.casehub.connectors.SyncRequest;
+import io.casehub.connectors.SyncResult;
 import io.casehub.connectors.PageRequest;
 import io.casehub.connectors.document.model.DocumentMetadata;
 import io.casehub.connectors.document.model.DocumentSummary;
@@ -86,13 +88,13 @@ public class RefDocumentPlatform implements DocumentPlatform {
         }
 
         @Override
-        public io.casehub.connectors.SyncResult<io.casehub.connectors.document.model.DocumentSummary> listSync(io.casehub.connectors.SyncRequest request) {
+        public SyncResult<DocumentSummary> listSync(SyncRequest request) {
             long sinceVersion = request.syncToken() != null
                                 ? Long.parseLong(request.syncToken()) : 0;
             var changed = backend.changedSince(sinceVersion);
             var deleted = backend.deletedSince(sinceVersion);
-            return new io.casehub.connectors.SyncResult<>(changed, deleted,
-                                                          String.valueOf(backend.currentVersion()), false);
+            return new SyncResult<>(changed, deleted,
+                    String.valueOf(backend.currentVersion()), false);
         }
 
     }

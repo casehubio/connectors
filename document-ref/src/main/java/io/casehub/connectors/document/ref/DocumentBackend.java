@@ -33,7 +33,7 @@ public interface DocumentBackend {
 
     long currentVersion();
 
-    List<io.casehub.connectors.document.model.DocumentSummary> changedSince(long version);
+    List<DocumentSummary> changedSince(long version);
 
     List<String> deletedSince(long version);
 
