@@ -1,24 +1,26 @@
 package io.casehub.connectors.calendar.ref;
 
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-
-import jakarta.enterprise.context.ApplicationScoped;
-
 import io.casehub.connectors.calendar.model.CalendarEvent;
 import io.casehub.connectors.calendar.model.CalendarInfo;
 import io.casehub.connectors.calendar.model.EventDetails;
 import io.casehub.connectors.calendar.spi.EventTiming;
+import jakarta.enterprise.context.ApplicationScoped;
+
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 @ApplicationScoped
 public class InMemoryCalendarBackend implements CalendarBackend {
 
-    private final ConcurrentHashMap<String, List<CalendarEvent>> events = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, List<VersionedEvent>> events          = new ConcurrentHashMap<>();
+    private final AtomicLong                                      version         = new AtomicLong(0);
+    private final ConcurrentHashMap<String, Long>                 deletedVersions = new ConcurrentHashMap<>();
 
     @Override
     public List<CalendarInfo> listCalendars() {
@@ -28,17 +30,19 @@ public class InMemoryCalendarBackend implements CalendarBackend {
     @Override
     public List<CalendarEvent> listEvents(String calendarId, Instant from, Instant to) {
         return events.getOrDefault(calendarId, List.of()).stream()
-                .filter(e -> overlaps(e.timing(), from, to))
-                .toList();
+                     .map(VersionedEvent::event)
+                     .filter(e -> overlaps(e.timing(), from, to))
+                     .toList();
     }
 
     @Override
     public CalendarEvent getEvent(String calendarId, String eventId) {
         return events.getOrDefault(calendarId, List.of()).stream()
-                .filter(e -> e.id().equals(eventId))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "Event '" + eventId + "' not found in calendar '" + calendarId + "'"));
+                     .map(VersionedEvent::event)
+                     .filter(e -> e.id().equals(eventId))
+                     .findFirst()
+                     .orElseThrow(() -> new IllegalArgumentException(
+                             "Event '" + eventId + "' not found in calendar '" + calendarId + "'"));
     }
 
     @Override
@@ -47,7 +51,8 @@ public class InMemoryCalendarBackend implements CalendarBackend {
                 UUID.randomUUID().toString(), calendarId,
                 details.summary(), details.description(), details.location(),
                 details.timing(), details.attendees(), null);
-        events.computeIfAbsent(calendarId, k -> new ArrayList<>()).add(event);
+        events.computeIfAbsent(calendarId, k -> new ArrayList<>())
+              .add(new VersionedEvent(event, version.incrementAndGet()));
         return event;
     }
 
@@ -59,13 +64,13 @@ public class InMemoryCalendarBackend implements CalendarBackend {
                     "Event '" + eventId + "' not found in calendar '" + calendarId + "'");
         }
         for (int i = 0; i < list.size(); i++) {
-            if (list.get(i).id().equals(eventId)) {
-                var old = list.get(i);
+            if (list.get(i).event().id().equals(eventId)) {
+                var old = list.get(i).event();
                 var updated = new CalendarEvent(
                         eventId, calendarId,
                         details.summary(), details.description(), details.location(),
                         details.timing(), details.attendees(), old.recurringEventId());
-                list.set(i, updated);
+                list.set(i, new VersionedEvent(updated, version.incrementAndGet()));
                 return updated;
             }
         }
@@ -76,10 +81,42 @@ public class InMemoryCalendarBackend implements CalendarBackend {
     @Override
     public void deleteEvent(String calendarId, String eventId) {
         var list = events.get(calendarId);
-        if (list == null || !list.removeIf(e -> e.id().equals(eventId))) {
+        if (list == null) {
             throw new IllegalArgumentException(
                     "Event '" + eventId + "' not found in calendar '" + calendarId + "'");
         }
+        boolean removed = list.removeIf(ve -> {
+            if (ve.event().id().equals(eventId)) {
+                deletedVersions.put(eventId, version.incrementAndGet());
+                return true;
+            }
+            return false;
+        });
+        if (!removed) {
+            throw new IllegalArgumentException(
+                    "Event '" + eventId + "' not found in calendar '" + calendarId + "'");
+        }
+    }
+
+    @Override
+    public long currentVersion() {
+        return version.get();
+    }
+
+    @Override
+    public List<CalendarEvent> changedSince(String calendarId, long sinceVersion) {
+        return events.getOrDefault(calendarId, List.of()).stream()
+                     .filter(ve -> ve.version() > sinceVersion)
+                     .map(VersionedEvent::event)
+                     .toList();
+    }
+
+    @Override
+    public List<String> deletedSince(String calendarId, long sinceVersion) {
+        return deletedVersions.entrySet().stream()
+                              .filter(e -> e.getValue() > sinceVersion)
+                              .map(Map.Entry::getKey)
+                              .toList();
     }
 
     private static boolean overlaps(EventTiming timing, Instant from, Instant to) {
@@ -87,9 +124,11 @@ public class InMemoryCalendarBackend implements CalendarBackend {
             case EventTiming.Timed t -> t.start().isBefore(to) && t.end().isAfter(from);
             case EventTiming.AllDay a -> {
                 Instant aStart = a.start().atStartOfDay(ZoneOffset.UTC).toInstant();
-                Instant aEnd = a.end().atStartOfDay(ZoneOffset.UTC).toInstant();
+                Instant aEnd   = a.end().atStartOfDay(ZoneOffset.UTC).toInstant();
                 yield aStart.isBefore(to) && aEnd.isAfter(from);
             }
         };
     }
+
+    private record VersionedEvent(CalendarEvent event, long version) {}
 }

@@ -18,6 +18,11 @@ and CalendarPlatformService routing.</description>
   <dependencies>
     <dependency>
       <groupId>io.casehub</groupId>
+      <artifactId>casehub-connectors-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.casehub</groupId>
       <artifactId>casehub-platform-simulation-api</artifactId>
       <version>${project.version}</version>
     </dependency>

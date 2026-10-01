@@ -1,11 +1,11 @@
 package io.casehub.connectors.calendar.ref;
 
-import java.time.Instant;
-import java.util.List;
-
 import io.casehub.connectors.calendar.model.CalendarEvent;
 import io.casehub.connectors.calendar.model.CalendarInfo;
 import io.casehub.connectors.calendar.model.EventDetails;
+
+import java.time.Instant;
+import java.util.List;
 
 public interface CalendarBackend {
 
@@ -20,4 +20,11 @@ public interface CalendarBackend {
     CalendarEvent updateEvent(String calendarId, String eventId, EventDetails details);
 
     void deleteEvent(String calendarId, String eventId);
+
+    long currentVersion();
+
+    List<CalendarEvent> changedSince(String calendarId, long version);
+
+    List<String> deletedSince(String calendarId, long version);
+
 }

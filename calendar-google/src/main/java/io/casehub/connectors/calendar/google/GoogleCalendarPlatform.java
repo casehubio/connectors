@@ -8,6 +8,8 @@ import com.google.api.services.calendar.model.CalendarList;
 import com.google.api.services.calendar.model.Events;
 import com.google.auth.http.HttpCredentialsAdapter;
 import com.google.auth.oauth2.UserCredentials;
+import io.casehub.connectors.SyncRequest;
+import io.casehub.connectors.SyncResult;
 import io.casehub.connectors.calendar.model.CalendarEvent;
 import io.casehub.connectors.calendar.model.CalendarInfo;
 import io.casehub.connectors.calendar.model.EventDetails;
@@ -165,6 +167,12 @@ public class GoogleCalendarPlatform implements CalendarPlatform {
             throw new RuntimeException("Failed to delete event " + eventId, e);
         }
     }
+
+    @Override
+    public SyncResult<CalendarEvent> listEventsSync(String calendarId, SyncRequest request) {
+        throw new UnsupportedOperationException("Google Calendar sync not yet implemented");
+    }
+
 
     boolean isActive() {
         return calendarService != null;

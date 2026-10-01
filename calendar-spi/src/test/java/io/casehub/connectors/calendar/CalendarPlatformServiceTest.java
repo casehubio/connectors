@@ -1,14 +1,13 @@
 package io.casehub.connectors.calendar;
 
-import java.time.Instant;
-import java.util.List;
-
-import org.junit.jupiter.api.Test;
-
 import io.casehub.connectors.calendar.model.CalendarEvent;
 import io.casehub.connectors.calendar.model.CalendarInfo;
 import io.casehub.connectors.calendar.model.EventDetails;
 import io.casehub.connectors.calendar.spi.CalendarPlatform;
+import org.junit.jupiter.api.Test;
+
+import java.time.Instant;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -25,6 +24,10 @@ class CalendarPlatformServiceTest {
         @Override public CalendarEvent createEvent(String c, EventDetails d) { return null; }
         @Override public CalendarEvent updateEvent(String c, String e, EventDetails d) { return null; }
         @Override public void deleteEvent(String c, String e) {}
+
+        @Override
+        public io.casehub.connectors.SyncResult<CalendarEvent> listEventsSync(String c, io.casehub.connectors.SyncRequest r) {return null;}
+
     }
 
     @Test

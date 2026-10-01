@@ -47,4 +47,11 @@ class NoOpCalendarPlatformTest {
         assertThatThrownBy(() -> noop.deleteEvent("cal-1", "evt-1"))
                 .isInstanceOf(UnsupportedOperationException.class);
     }
+
+    @Test
+    void listEventsSync_throwsUnsupported() {
+        assertThatThrownBy(() -> noop.listEventsSync("cal-1", io.casehub.connectors.SyncRequest.initial(100)))
+                .isInstanceOf(UnsupportedOperationException.class);
+    }
+
 }
