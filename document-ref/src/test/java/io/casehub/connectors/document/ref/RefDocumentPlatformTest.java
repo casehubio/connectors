@@ -1,12 +1,11 @@
 package io.casehub.connectors.document.ref;
 
-import java.util.NoSuchElementException;
-
+import io.casehub.connectors.PageRequest;
+import io.casehub.connectors.document.spi.DocumentPlatform;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import io.casehub.connectors.PageRequest;
-import io.casehub.connectors.document.spi.DocumentPlatform;
+import java.util.NoSuchElementException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -307,4 +306,53 @@ class RefDocumentPlatformTest {
         var secondIds = secondFiles.items().stream().map(s -> s.id()).toList();
         assertThat(firstIds).doesNotContainAnyElementsOf(secondIds);
     }
+// --- Sync ---
+
+    @Test
+    void listSync_initialSync_returnsAllFilesWithToken() {
+        var result = platform.files().listSync(io.casehub.connectors.SyncRequest.initial(100));
+
+        assertThat(result.items()).hasSize(7);
+        assertThat(result.syncToken()).isNotNull();
+        assertThat(result.deletedIds()).isEmpty();
+        assertThat(result.hasMore()).isFalse();
+    }
+
+    @Test
+    void listSync_incrementalSync_detectsUploads() {
+        var fullSync = platform.files().listSync(io.casehub.connectors.SyncRequest.initial(100));
+        var token    = fullSync.syncToken();
+
+        platform.files().upload("folder-docs", "new-file.txt", "text/plain",
+                                "hello".getBytes());
+
+        var incrementalSync = platform.files().listSync(
+                new io.casehub.connectors.SyncRequest(token, 100));
+        assertThat(incrementalSync.items()).hasSize(1);
+        assertThat(incrementalSync.items().getFirst().name()).isEqualTo("new-file.txt");
+    }
+
+    @Test
+    void listSync_incrementalSync_detectsDeletes() {
+        var fullSync = platform.files().listSync(io.casehub.connectors.SyncRequest.initial(100));
+        var token    = fullSync.syncToken();
+
+        platform.files().delete("doc-001");
+
+        var incrementalSync = platform.files().listSync(
+                new io.casehub.connectors.SyncRequest(token, 100));
+        assertThat(incrementalSync.deletedIds()).contains("doc-001");
+    }
+
+    @Test
+    void listSync_noChanges_returnsEmpty() {
+        var fullSync = platform.files().listSync(io.casehub.connectors.SyncRequest.initial(100));
+        var token    = fullSync.syncToken();
+
+        var incrementalSync = platform.files().listSync(
+                new io.casehub.connectors.SyncRequest(token, 100));
+        assertThat(incrementalSync.items()).isEmpty();
+        assertThat(incrementalSync.deletedIds()).isEmpty();
+    }
+
 }

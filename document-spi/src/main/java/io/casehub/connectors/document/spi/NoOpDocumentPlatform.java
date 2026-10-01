@@ -1,14 +1,16 @@
 package io.casehub.connectors.document.spi;
 
-import java.util.List;
-
 import io.casehub.connectors.Page;
+import io.casehub.connectors.SyncRequest;
+import io.casehub.connectors.SyncResult;
 import io.casehub.connectors.PageRequest;
 import io.casehub.connectors.document.model.DocumentMetadata;
 import io.casehub.connectors.document.model.DocumentSummary;
 import io.casehub.connectors.document.model.Folder;
 import io.quarkus.arc.DefaultBean;
 import jakarta.enterprise.context.ApplicationScoped;
+
+import java.util.List;
 
 @DefaultBean
 @ApplicationScoped
@@ -74,6 +76,12 @@ public class NoOpDocumentPlatform implements DocumentPlatform {
         public void delete(String fileId) {
             throw new UnsupportedOperationException(NOT_CONFIGURED);
         }
+
+        @Override
+        public SyncResult<DocumentSummary> listSync(SyncRequest request) {
+            throw new UnsupportedOperationException(NOT_CONFIGURED);
+        }
+
     }
 
     enum NoOpFolderOperations implements FolderOperations {
