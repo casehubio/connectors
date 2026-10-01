@@ -1,20 +1,18 @@
 package io.casehub.connectors.document.google;
 
-import java.util.NoSuchElementException;
-
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.drive.Drive;
-
+import io.casehub.connectors.PageRequest;
+import io.casehub.connectors.document.spi.DocumentPlatform;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import io.casehub.connectors.PageRequest;
-import io.casehub.connectors.document.spi.DocumentPlatform;
+import java.util.NoSuchElementException;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.delete;
@@ -338,4 +336,92 @@ class GoogleDocumentPlatformTest {
         assertThatThrownBy(() -> platform.sharing().getShareLink("nonexistent"))
                 .isInstanceOf(NoSuchElementException.class);
     }
+// --- Sync ---
+
+    @Test
+    void listSync_initialSync_returnsFilesWithToken() {
+        wireMock.stubFor(get(urlPathEqualTo("/drive/v3/changes/startPageToken"))
+                                 .willReturn(aResponse()
+                                                     .withHeader("Content-Type", "application/json")
+                                                     .withBody("""
+                                                               {"startPageToken": "page-token-1"}
+                                                               """)));
+
+        wireMock.stubFor(get(urlPathEqualTo("/drive/v3/files"))
+                                 .willReturn(aResponse()
+                                                     .withHeader("Content-Type", "application/json")
+                                                     .withBody("""
+                                                               {
+                                                                 "files": [
+                                                                   {
+                                                                     "id": "f-1", "name": "Doc.txt",
+                                                                     "mimeType": "text/plain", "size": "100",
+                                                                     "parents": ["folder-1"],
+                                                                     "createdTime": "2026-09-15T10:00:00.000Z",
+                                                                     "modifiedTime": "2026-09-15T10:00:00.000Z"
+                                                                   }
+                                                                 ]
+                                                               }
+                                                               """)));
+
+        var result = platform.files().listSync(io.casehub.connectors.SyncRequest.initial(100));
+
+        assertThat(result.items()).hasSize(1);
+        assertThat(result.items().getFirst().name()).isEqualTo("Doc.txt");
+        assertThat(result.syncToken()).isEqualTo("page-token-1");
+        assertThat(result.deletedIds()).isEmpty();
+    }
+
+    @Test
+    void listSync_incrementalSync_returnsChangesAndDeletes() {
+        wireMock.stubFor(get(urlPathEqualTo("/drive/v3/changes"))
+                                 .withQueryParam("pageToken", WireMock.equalTo("page-token-1"))
+                                 .willReturn(aResponse()
+                                                     .withHeader("Content-Type", "application/json")
+                                                     .withBody("""
+                                                               {
+                                                                 "changes": [
+                                                                   {
+                                                                     "fileId": "f-2",
+                                                                     "removed": false,
+                                                                     "file": {
+                                                                       "id": "f-2", "name": "NewDoc.txt",
+                                                                       "mimeType": "text/plain", "size": "200",
+                                                                       "parents": ["folder-1"],
+                                                                       "createdTime": "2026-09-16T10:00:00.000Z",
+                                                                       "modifiedTime": "2026-09-16T10:00:00.000Z"
+                                                                     }
+                                                                   },
+                                                                   {
+                                                                     "fileId": "f-old",
+                                                                     "removed": true
+                                                                   }
+                                                                 ],
+                                                                 "newStartPageToken": "page-token-2"
+                                                               }
+                                                               """)));
+
+        var result = platform.files().listSync(new io.casehub.connectors.SyncRequest("page-token-1", 100));
+
+        assertThat(result.items()).hasSize(1);
+        assertThat(result.items().getFirst().name()).isEqualTo("NewDoc.txt");
+        assertThat(result.deletedIds()).containsExactly("f-old");
+        assertThat(result.syncToken()).isEqualTo("page-token-2");
+    }
+
+    @Test
+    void listSync_expiredToken_throwsSyncTokenExpired() {
+        wireMock.stubFor(get(urlPathEqualTo("/drive/v3/changes"))
+                                 .withQueryParam("pageToken", WireMock.equalTo("expired"))
+                                 .willReturn(aResponse().withStatus(404)
+                                                        .withHeader("Content-Type", "application/json")
+                                                        .withBody("""
+                                                                  {"error": {"code": 404, "message": "Page token expired"}}
+                                                                  """)));
+
+        assertThatThrownBy(() -> platform.files().listSync(
+                new io.casehub.connectors.SyncRequest("expired", 100)))
+                .isInstanceOf(io.casehub.connectors.SyncTokenExpiredException.class);
+    }
+
 }

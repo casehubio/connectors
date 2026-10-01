@@ -10,6 +10,9 @@ import com.google.api.services.drive.model.Permission;
 import com.google.auth.http.HttpCredentialsAdapter;
 import com.google.auth.oauth2.UserCredentials;
 import io.casehub.connectors.Page;
+import io.casehub.connectors.SyncRequest;
+import io.casehub.connectors.SyncResult;
+import io.casehub.connectors.SyncTokenExpiredException;
 import io.casehub.connectors.PageRequest;
 import io.casehub.connectors.document.model.DocumentMetadata;
 import io.casehub.connectors.document.model.DocumentSummary;
@@ -21,6 +24,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -29,6 +34,8 @@ public class GoogleDocumentPlatform implements DocumentPlatform {
     private static final Logger LOG = Logger.getLogger(GoogleDocumentPlatform.class);
     private static final String FOLDER_MIME = "application/vnd.google-apps.folder";
     private static final String FILE_FIELDS = "id,name,mimeType,size,parents,owners,webViewLink,createdTime,modifiedTime";
+    private static final int    MAX_PAGES   = 20;
+
 
     private final String clientId;
     private final String clientSecret;
@@ -230,9 +237,103 @@ public class GoogleDocumentPlatform implements DocumentPlatform {
         }
 
         @Override
-        public io.casehub.connectors.SyncResult<DocumentSummary> listSync(io.casehub.connectors.SyncRequest request) {
-            throw new UnsupportedOperationException("Google Drive sync not yet implemented");
+        public SyncResult<DocumentSummary> listSync(SyncRequest request) {
+            requireClient();
+            if (request.syncToken() == null) {
+                return initialSync(request);
+            }
+            return incrementalSync(request);
         }
+
+        private SyncResult<DocumentSummary> initialSync(SyncRequest request) {
+            try {
+                var    startToken = driveService.changes().getStartPageToken().execute();
+                String token      = startToken.getStartPageToken();
+
+                List<DocumentSummary> items     = new ArrayList<>();
+                String                pageToken = null;
+                int                   page      = 0;
+                while (page < MAX_PAGES) {
+                    var req = driveService.files().list()
+                                          .setQ("trashed = false and mimeType != '" + FOLDER_MIME + "'")
+                                          .setFields("nextPageToken,files(" + FILE_FIELDS + ")")
+                                          .setPageSize(request.pageSize() > 0 ? request.pageSize() : 100);
+                    if (pageToken != null) {
+                        req.setPageToken(pageToken);
+                    }
+                    var response = req.execute();
+                    if (response.getFiles() != null) {
+                        response.getFiles().stream()
+                                .map(GoogleDocumentPlatform::toSummary)
+                                .forEach(items::add);
+                    }
+                    pageToken = response.getNextPageToken();
+                    if (pageToken == null) {break;}
+                    page++;
+                }
+                if (page >= MAX_PAGES) {
+                    LOG.warnf("listSync initial hit MAX_PAGES (%d) — %d items accumulated", MAX_PAGES, items.size());
+                }
+                return new SyncResult<>(Collections.unmodifiableList(items), List.of(), token, false);
+            } catch (IOException e) {
+                throw new RuntimeException("Google Drive initial sync failed", e);
+            }
+        }
+
+        private SyncResult<DocumentSummary> incrementalSync(SyncRequest request) {
+            List<DocumentSummary> items      = new ArrayList<>();
+            List<String>          deletedIds = new ArrayList<>();
+            String                newToken   = null;
+            try {
+                String pageToken = request.syncToken();
+                int    page      = 0;
+                while (page < MAX_PAGES) {
+                    var req = driveService.changes().list(pageToken)
+                                          .setFields("nextPageToken,newStartPageToken,changes(fileId,removed,file(" + FILE_FIELDS + "))")
+                                          .setPageSize(request.pageSize() > 0 ? request.pageSize() : 100);
+                    var response = req.execute();
+                    if (response.getChanges() != null) {
+                        for (var change : response.getChanges()) {
+                            if (Boolean.TRUE.equals(change.getRemoved()) || change.getFile() == null) {
+                                deletedIds.add(change.getFileId());
+                            } else if (!FOLDER_MIME.equals(change.getFile().getMimeType())) {
+                                items.add(toSummary(change.getFile()));
+                            }
+                        }
+                    }
+                    if (response.getNewStartPageToken() != null) {
+                        newToken = response.getNewStartPageToken();
+                    }
+                    pageToken = response.getNextPageToken();
+                    if (pageToken == null) {break;}
+                    page++;
+                }
+                if (page >= MAX_PAGES) {
+                    LOG.warnf("listSync incremental hit MAX_PAGES (%d) — %d items, %d deletes accumulated",
+                              MAX_PAGES, items.size(), deletedIds.size());
+                }
+            } catch (GoogleJsonResponseException e) {
+                if (e.getStatusCode() == 404) {
+                    throw new SyncTokenExpiredException(request.syncToken());
+                }
+                if (!items.isEmpty()) {
+                    LOG.warnf(e, "listSync failed mid-pagination — returning %d partial items", items.size());
+                    return new SyncResult<>(Collections.unmodifiableList(items),
+                                            Collections.unmodifiableList(deletedIds), newToken, false);
+                }
+                throw new RuntimeException("Google Drive sync failed", e);
+            } catch (IOException e) {
+                if (!items.isEmpty()) {
+                    LOG.warnf(e, "listSync failed mid-pagination — returning %d partial items", items.size());
+                    return new SyncResult<>(Collections.unmodifiableList(items),
+                                            Collections.unmodifiableList(deletedIds), newToken, false);
+                }
+                throw new RuntimeException("Google Drive sync failed", e);
+            }
+            return new SyncResult<>(Collections.unmodifiableList(items),
+                                    Collections.unmodifiableList(deletedIds), newToken, false);
+        }
+
 
     }
 
