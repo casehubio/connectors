@@ -1,23 +1,21 @@
 package io.casehub.connectors.calendar.google;
 
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.List;
-
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.calendar.Calendar;
-
+import io.casehub.connectors.calendar.model.EventDetails;
+import io.casehub.connectors.calendar.spi.EventTiming;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import io.casehub.connectors.calendar.model.EventDetails;
-import io.casehub.connectors.calendar.spi.EventTiming;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.List;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.delete;
@@ -25,7 +23,6 @@ import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.put;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -342,6 +339,131 @@ class GoogleCalendarPlatformTest {
         var unconfigured = new GoogleCalendarPlatform("", "", "");
         assertThat(unconfigured.isActive()).isFalse();
     }
+
+    @Test
+    void listEventsSync_initialSync_returnsEventsWithToken() {
+        wireMock.stubFor(get(urlPathEqualTo("/calendar/v3/calendars/primary/events"))
+                                 .willReturn(aResponse()
+                                                     .withHeader("Content-Type", "application/json")
+                                                     .withBody("""
+                                                               {
+                                                                 "kind": "calendar#events",
+                                                                 "items": [
+                                                                   {
+                                                                     "id": "evt-1",
+                                                                     "summary": "Standup",
+                                                                     "start": {"dateTime": "2026-07-26T10:00:00Z", "timeZone": "UTC"},
+                                                                     "end": {"dateTime": "2026-07-26T10:30:00Z", "timeZone": "UTC"}
+                                                                   }
+                                                                 ],
+                                                                 "nextSyncToken": "sync-token-1"
+                                                               }
+                                                               """)));
+
+        var result = platform.listEventsSync("primary", io.casehub.connectors.SyncRequest.initial(100));
+
+        assertThat(result.items()).hasSize(1);
+        assertThat(result.items().getFirst().summary()).isEqualTo("Standup");
+        assertThat(result.syncToken()).isEqualTo("sync-token-1");
+        assertThat(result.deletedIds()).isEmpty();
+    }
+
+    @Test
+    void listEventsSync_incrementalSync_returnsCancelledAsDeletes() {
+        wireMock.stubFor(get(urlPathEqualTo("/calendar/v3/calendars/primary/events"))
+                                 .withQueryParam("syncToken", WireMock.equalTo("sync-token-1"))
+                                 .willReturn(aResponse()
+                                                     .withHeader("Content-Type", "application/json")
+                                                     .withBody("""
+                                                               {
+                                                                 "kind": "calendar#events",
+                                                                 "items": [
+                                                                   {
+                                                                     "id": "evt-2",
+                                                                     "summary": "New event",
+                                                                     "start": {"dateTime": "2026-07-27T10:00:00Z", "timeZone": "UTC"},
+                                                                     "end": {"dateTime": "2026-07-27T11:00:00Z", "timeZone": "UTC"}
+                                                                   },
+                                                                   {
+                                                                     "id": "evt-old",
+                                                                     "status": "cancelled"
+                                                                   }
+                                                                 ],
+                                                                 "nextSyncToken": "sync-token-2"
+                                                               }
+                                                               """)));
+
+        var result = platform.listEventsSync("primary",
+                                             new io.casehub.connectors.SyncRequest("sync-token-1", 100));
+
+        assertThat(result.items()).hasSize(1);
+        assertThat(result.items().getFirst().summary()).isEqualTo("New event");
+        assertThat(result.deletedIds()).containsExactly("evt-old");
+        assertThat(result.syncToken()).isEqualTo("sync-token-2");
+    }
+
+    @Test
+    void listEventsSync_tokenExpired_throwsSyncTokenExpired() {
+        wireMock.stubFor(get(urlPathEqualTo("/calendar/v3/calendars/primary/events"))
+                                 .withQueryParam("syncToken", WireMock.equalTo("expired-token"))
+                                 .willReturn(aResponse().withStatus(410)
+                                                        .withHeader("Content-Type", "application/json")
+                                                        .withBody("""
+                                                                  {"error": {"code": 410, "message": "Sync token expired"}}
+                                                                  """)));
+
+        assertThatThrownBy(() -> platform.listEventsSync("primary",
+                                                         new io.casehub.connectors.SyncRequest("expired-token", 100)))
+                .isInstanceOf(io.casehub.connectors.SyncTokenExpiredException.class);
+    }
+
+    @Test
+    void listEventsSync_pagination_collectsAllPages() {
+        wireMock.stubFor(get(urlPathEqualTo("/calendar/v3/calendars/primary/events"))
+                                 .withQueryParam("pageToken", WireMock.absent())
+                                 .withQueryParam("syncToken", WireMock.absent())
+                                 .willReturn(aResponse()
+                                                     .withHeader("Content-Type", "application/json")
+                                                     .withBody("""
+                                                               {
+                                                                 "kind": "calendar#events",
+                                                                 "items": [
+                                                                   {
+                                                                     "id": "evt-1",
+                                                                     "summary": "Page 1",
+                                                                     "start": {"dateTime": "2026-07-26T10:00:00Z", "timeZone": "UTC"},
+                                                                     "end": {"dateTime": "2026-07-26T11:00:00Z", "timeZone": "UTC"}
+                                                                   }
+                                                                 ],
+                                                                 "nextPageToken": "page2"
+                                                               }
+                                                               """)));
+
+        wireMock.stubFor(get(urlPathEqualTo("/calendar/v3/calendars/primary/events"))
+                                 .withQueryParam("pageToken", WireMock.equalTo("page2"))
+                                 .willReturn(aResponse()
+                                                     .withHeader("Content-Type", "application/json")
+                                                     .withBody("""
+                                                               {
+                                                                 "kind": "calendar#events",
+                                                                 "items": [
+                                                                   {
+                                                                     "id": "evt-2",
+                                                                     "summary": "Page 2",
+                                                                     "start": {"dateTime": "2026-07-27T10:00:00Z", "timeZone": "UTC"},
+                                                                     "end": {"dateTime": "2026-07-27T11:00:00Z", "timeZone": "UTC"}
+                                                                   }
+                                                                 ],
+                                                                 "nextSyncToken": "sync-token-final"
+                                                               }
+                                                               """)));
+
+        var result = platform.listEventsSync("primary", io.casehub.connectors.SyncRequest.initial(100));
+
+        assertThat(result.items()).hasSize(2);
+        assertThat(result.syncToken()).isEqualTo("sync-token-final");
+    }
+
 
     @Test
     void listEvents_recurringInstance_preservesRecurringEventId() {
