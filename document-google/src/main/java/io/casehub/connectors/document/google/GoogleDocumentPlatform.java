@@ -1,12 +1,5 @@
 package io.casehub.connectors.document.google;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.security.GeneralSecurityException;
-import java.time.Instant;
-import java.util.List;
-import java.util.NoSuchElementException;
-
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.client.http.ByteArrayContent;
@@ -16,15 +9,20 @@ import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.Permission;
 import com.google.auth.http.HttpCredentialsAdapter;
 import com.google.auth.oauth2.UserCredentials;
-
-import org.jboss.logging.Logger;
-
 import io.casehub.connectors.Page;
 import io.casehub.connectors.PageRequest;
 import io.casehub.connectors.document.model.DocumentMetadata;
 import io.casehub.connectors.document.model.DocumentSummary;
 import io.casehub.connectors.document.model.Folder;
 import io.casehub.connectors.document.spi.DocumentPlatform;
+import org.jboss.logging.Logger;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.time.Instant;
+import java.util.List;
+import java.util.NoSuchElementException;
 
 public class GoogleDocumentPlatform implements DocumentPlatform {
 
@@ -230,6 +228,12 @@ public class GoogleDocumentPlatform implements DocumentPlatform {
                 throw new RuntimeException("Failed to delete file " + fileId, e);
             }
         }
+
+        @Override
+        public io.casehub.connectors.SyncResult<DocumentSummary> listSync(io.casehub.connectors.SyncRequest request) {
+            throw new UnsupportedOperationException("Google Drive sync not yet implemented");
+        }
+
     }
 
     private class GoogleFolderOperations implements FolderOperations {

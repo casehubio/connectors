@@ -1,13 +1,13 @@
 package io.casehub.connectors.document.ref;
 
-import java.util.List;
-
 import io.casehub.connectors.Page;
 import io.casehub.connectors.PageRequest;
 import io.casehub.connectors.document.model.DocumentMetadata;
 import io.casehub.connectors.document.model.DocumentSummary;
 import io.casehub.connectors.document.model.Folder;
 import io.casehub.connectors.document.spi.DocumentPlatform;
+
+import java.util.List;
 
 public class RefDocumentPlatform implements DocumentPlatform {
 
@@ -84,6 +84,17 @@ public class RefDocumentPlatform implements DocumentPlatform {
         public void delete(String fileId) {
             backend.deleteFile(fileId);
         }
+
+        @Override
+        public io.casehub.connectors.SyncResult<io.casehub.connectors.document.model.DocumentSummary> listSync(io.casehub.connectors.SyncRequest request) {
+            long sinceVersion = request.syncToken() != null
+                                ? Long.parseLong(request.syncToken()) : 0;
+            var changed = backend.changedSince(sinceVersion);
+            var deleted = backend.deletedSince(sinceVersion);
+            return new io.casehub.connectors.SyncResult<>(changed, deleted,
+                                                          String.valueOf(backend.currentVersion()), false);
+        }
+
     }
 
     private record RefFolderOperations(DocumentBackend backend) implements FolderOperations {

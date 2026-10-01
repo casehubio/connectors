@@ -1,13 +1,15 @@
 package io.casehub.connectors.document.spi;
 
-import java.util.List;
-
 import io.casehub.connectors.Page;
+import io.casehub.connectors.SyncRequest;
+import io.casehub.connectors.SyncResult;
 import io.casehub.connectors.PageRequest;
 import io.casehub.connectors.document.model.DocumentMetadata;
 import io.casehub.connectors.document.model.DocumentSummary;
 import io.casehub.connectors.document.model.Folder;
 import io.casehub.platform.simulation.SimulationEligible;
+
+import java.util.List;
 
 @SimulationEligible(name = "document-platform")
 public interface DocumentPlatform {
@@ -36,6 +38,9 @@ public interface DocumentPlatform {
                                 String contentType, byte[] content);
 
         void delete(String fileId);
+
+        SyncResult<DocumentSummary> listSync(SyncRequest request);
+
     }
 
     interface FolderOperations {
