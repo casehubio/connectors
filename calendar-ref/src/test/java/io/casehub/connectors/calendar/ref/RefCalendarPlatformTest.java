@@ -1,15 +1,15 @@
 package io.casehub.connectors.calendar.ref;
 
+import io.casehub.connectors.SyncRequest;
+import io.casehub.connectors.calendar.model.EventDetails;
+import io.casehub.connectors.calendar.spi.EventTiming;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import io.casehub.connectors.calendar.model.EventDetails;
-import io.casehub.connectors.calendar.spi.EventTiming;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -190,4 +190,84 @@ class RefCalendarPlatformTest {
                 Instant.parse("2026-07-27T00:00:00Z"));
         assertThat(events).isEmpty();
     }
+
+    @Test
+    void listEventsSync_initialSync_returnsAllEventsWithToken() {
+        var details = new EventDetails("Sync me", null, null,
+                                       new EventTiming.Timed(
+                                               Instant.parse("2026-07-26T10:00:00Z"),
+                                               Instant.parse("2026-07-26T11:00:00Z"),
+                                               ZoneId.of("UTC")),
+                                       List.of());
+        platform.createEvent("primary", details);
+
+        var result = platform.listEventsSync("primary", SyncRequest.initial(100));
+
+        assertThat(result.items()).hasSize(1);
+        assertThat(result.items().getFirst().summary()).isEqualTo("Sync me");
+        assertThat(result.syncToken()).isNotNull();
+        assertThat(result.deletedIds()).isEmpty();
+        assertThat(result.hasMore()).isFalse();
+    }
+
+    @Test
+    void listEventsSync_incrementalSync_detectsNewEvents() {
+        platform.createEvent("primary", new EventDetails("Initial", null, null,
+                                                         new EventTiming.Timed(
+                                                                 Instant.parse("2026-07-26T10:00:00Z"),
+                                                                 Instant.parse("2026-07-26T11:00:00Z"),
+                                                                 ZoneId.of("UTC")),
+                                                         List.of()));
+
+        var fullSync = platform.listEventsSync("primary", SyncRequest.initial(100));
+        var token    = fullSync.syncToken();
+
+        platform.createEvent("primary", new EventDetails("New event", null, null,
+                                                         new EventTiming.Timed(
+                                                                 Instant.parse("2026-07-27T10:00:00Z"),
+                                                                 Instant.parse("2026-07-27T11:00:00Z"),
+                                                                 ZoneId.of("UTC")),
+                                                         List.of()));
+
+        var incrementalSync = platform.listEventsSync("primary", new SyncRequest(token, 100));
+        assertThat(incrementalSync.items()).hasSize(1);
+        assertThat(incrementalSync.items().getFirst().summary()).isEqualTo("New event");
+    }
+
+    @Test
+    void listEventsSync_incrementalSync_detectsDeletes() {
+        var created = platform.createEvent("primary", new EventDetails("Delete me", null, null,
+                                                                       new EventTiming.Timed(
+                                                                               Instant.parse("2026-07-26T10:00:00Z"),
+                                                                               Instant.parse("2026-07-26T11:00:00Z"),
+                                                                               ZoneId.of("UTC")),
+                                                                       List.of()));
+
+        var fullSync = platform.listEventsSync("primary", SyncRequest.initial(100));
+        var token    = fullSync.syncToken();
+
+        platform.deleteEvent("primary", created.id());
+
+        var incrementalSync = platform.listEventsSync("primary", new SyncRequest(token, 100));
+        assertThat(incrementalSync.deletedIds()).contains(created.id());
+    }
+
+    @Test
+    void listEventsSync_noChanges_returnsEmpty() {
+        platform.createEvent("primary", new EventDetails("Stable", null, null,
+                                                         new EventTiming.Timed(
+                                                                 Instant.parse("2026-07-26T10:00:00Z"),
+                                                                 Instant.parse("2026-07-26T11:00:00Z"),
+                                                                 ZoneId.of("UTC")),
+                                                         List.of()));
+
+        var fullSync = platform.listEventsSync("primary", SyncRequest.initial(100));
+        var token    = fullSync.syncToken();
+
+        var incrementalSync = platform.listEventsSync("primary", new SyncRequest(token, 100));
+        assertThat(incrementalSync.items()).isEmpty();
+        assertThat(incrementalSync.deletedIds()).isEmpty();
+    }
+
+
 }

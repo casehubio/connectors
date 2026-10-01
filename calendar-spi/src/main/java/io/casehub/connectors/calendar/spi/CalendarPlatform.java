@@ -1,12 +1,14 @@
 package io.casehub.connectors.calendar.spi;
 
-import java.time.Instant;
-import java.util.List;
-
+import io.casehub.connectors.SyncRequest;
+import io.casehub.connectors.SyncResult;
 import io.casehub.connectors.calendar.model.CalendarEvent;
 import io.casehub.connectors.calendar.model.CalendarInfo;
 import io.casehub.connectors.calendar.model.EventDetails;
 import io.casehub.platform.simulation.SimulationEligible;
+
+import java.time.Instant;
+import java.util.List;
 
 @SimulationEligible(name = "calendar-platform")
 public interface CalendarPlatform {
@@ -24,4 +26,7 @@ public interface CalendarPlatform {
     CalendarEvent updateEvent(String calendarId, String eventId, EventDetails details);
 
     void deleteEvent(String calendarId, String eventId);
+
+    SyncResult<CalendarEvent> listEventsSync(String calendarId, SyncRequest request);
+
 }

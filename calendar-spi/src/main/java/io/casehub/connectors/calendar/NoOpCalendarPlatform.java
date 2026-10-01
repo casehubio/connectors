@@ -1,14 +1,16 @@
 package io.casehub.connectors.calendar;
 
-import java.time.Instant;
-import java.util.List;
-
+import io.casehub.connectors.SyncRequest;
+import io.casehub.connectors.SyncResult;
 import io.casehub.connectors.calendar.model.CalendarEvent;
 import io.casehub.connectors.calendar.model.CalendarInfo;
 import io.casehub.connectors.calendar.model.EventDetails;
 import io.casehub.connectors.calendar.spi.CalendarPlatform;
 import io.quarkus.arc.DefaultBean;
 import jakarta.enterprise.context.ApplicationScoped;
+
+import java.time.Instant;
+import java.util.List;
 
 @DefaultBean
 @ApplicationScoped
@@ -50,4 +52,11 @@ public class NoOpCalendarPlatform implements CalendarPlatform {
     public void deleteEvent(final String calendarId, final String eventId) {
         throw new UnsupportedOperationException("No calendar provider configured");
     }
+
+    @Override
+    public SyncResult<CalendarEvent> listEventsSync(final String calendarId,
+                                                    final SyncRequest request) {
+        throw new UnsupportedOperationException("No calendar provider configured");
+    }
+
 }
