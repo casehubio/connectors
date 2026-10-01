@@ -95,13 +95,13 @@ To add Commands support to a new `ChatPlatform`: (1) implement `Commands` for re
 
 ### Calendar Platform Architecture
 
-**`CalendarPlatform` SPI** (`calendar-spi`) -- 7 methods: `id()`, `listCalendars()`, `listEvents(calendarId, from, to)`, `getEvent(calendarId, eventId)`, `createEvent(calendarId, EventDetails)`, `updateEvent(calendarId, eventId, EventDetails)`, `deleteEvent(calendarId, eventId)`.
+**`CalendarPlatform` SPI** (`calendar-spi`) -- 8 methods: `id()`, `listCalendars()`, `listEvents(calendarId, from, to)`, `getEvent(calendarId, eventId)`, `createEvent(calendarId, EventDetails)`, `updateEvent(calendarId, eventId, EventDetails)`, `deleteEvent(calendarId, eventId)`, `listEventsSync(calendarId, SyncRequest)`. Incremental sync uses the same `SyncResult<T>`/`SyncRequest`/`SyncTokenExpiredException` primitives as `ContactsPlatform`.
 
 **`CalendarPlatformService`** (`calendar-spi`) -- routing service, same `@All List<CalendarPlatform>` pattern.
 
 **`EventTiming`** -- sealed interface with two permitted records: `Timed(Instant start, Instant end, ZoneId timeZone)` and `AllDay(LocalDate start, LocalDate end)`. All fields are non-null (enforced by compact constructors).
 
-**`GoogleCalendarPlatform`** (`calendar-google`) -- uses `google-api-services-calendar` with OAuth2 refresh token auth via `UserCredentials`. `listEvents` paginates up to 20 pages. `GoogleEventMapper` handles bidirectional mapping between Google Calendar model and `CalendarEvent`/`EventDetails`. Inactive when credentials are blank.
+**`GoogleCalendarPlatform`** (`calendar-google`) -- uses `google-api-services-calendar` with per-user OAuth2 credential resolution via `GoogleCredentialResolver` CDI SPI (`GoogleOAuthConfig` record). Legacy constructor accepts raw `clientId`/`clientSecret`/`refreshToken`. `listEvents` paginates up to 20 pages. `listEventsSync` uses Google's `syncToken`/`nextSyncToken` mechanism; HTTP 410 → `SyncTokenExpiredException`. `GoogleEventMapper` handles bidirectional mapping between Google Calendar model and `CalendarEvent`/`EventDetails`. `buildService(userId)` creates a `Calendar` service per user from the resolver.
 
 ### Bank Feed Platform Architecture
 
@@ -316,7 +316,7 @@ Sealed `EventTiming`: `Timed(Instant, Instant, ZoneId)` | `AllDay(LocalDate, Loc
 
 `RefCalendarPlatform` (ID `"ref"`) -- in-memory reference backed by `InMemoryCalendarBackend`.
 
-`CalendarBackend` / `InMemoryCalendarBackend` -- storage abstraction.
+`CalendarBackend` / `InMemoryCalendarBackend` -- storage abstraction with monotonic version tracking (`AtomicLong` + `VersionedEvent` record + `deletedVersions` map) for incremental sync support.
 
 ### calendar-google
 
@@ -376,7 +376,7 @@ Depends on: `email-spi`, `google-api-services-gmail`, `quarkus-arc`.
 
 ### document-spi
 
-`DocumentPlatform` SPI with `@SimulationEligible` and capability sub-interfaces following the `BankPlatform` pattern: `FileOperations` (list, get, download, upload, delete), `FolderOperations` (list, create, move), `SearchOperations` (full-text search), `SharingOperations` (share links). `supports(Class<?>)` for runtime capability introspection. `DocumentPlatformService` routing, `NoOpDocumentPlatform` `@DefaultBean` fallback with enum singleton capability implementations.
+`DocumentPlatform` SPI with `@SimulationEligible` and capability sub-interfaces following the `BankPlatform` pattern: `FileOperations` (list, get, download, upload, delete, incremental sync via `listSync(SyncRequest)`), `FolderOperations` (list, create, move), `SearchOperations` (full-text search), `SharingOperations` (share links). `supports(Class<?>)` for runtime capability introspection. `DocumentPlatformService` routing, `NoOpDocumentPlatform` `@DefaultBean` fallback with enum singleton capability implementations.
 
 Model records: `Folder`, `DocumentSummary`, `DocumentMetadata`.
 
@@ -386,7 +386,7 @@ Depends on: `connectors-api` (Page, PageRequest), `simulation-api` (@SimulationE
 
 ### document-ref
 
-In-memory `DocumentPlatform` reference implementation. `DocumentBackend` interface with `InMemoryDocumentBackend` (pre-loaded: 3 folders, 7 files). `RefDocumentPlatform` delegates to backend via record-based capability implementations. `DocumentRefBeans` CDI producer. Supports all 4 capabilities — file CRUD with upload/download round-trip, folder hierarchy, name-based search, share links.
+In-memory `DocumentPlatform` reference implementation. `DocumentBackend` interface with `InMemoryDocumentBackend` (pre-loaded: 3 folders, 7 files, monotonic version tracking for sync). `RefDocumentPlatform` delegates to backend via record-based capability implementations. `DocumentRefBeans` CDI producer. Supports all 4 capabilities — file CRUD with upload/download round-trip, folder hierarchy, name-based search, share links, incremental sync.
 
 Package: `io.casehub.connectors.document.ref`.
 
@@ -394,7 +394,7 @@ Depends on: `document-spi`, `quarkus-arc`.
 
 ### document-google
 
-Google Drive `DocumentPlatform` provider. `GoogleDocumentPlatform` uses Drive API v3 with OAuth2 `UserCredentials` (same auth pattern as `GoogleCalendarPlatform`, `GoogleEmailPlatform`). Inner classes implement each capability sub-interface. Supports all 4 capabilities. `DocumentGoogleBeans` CDI producer with `@ConfigProperty` for credentials.
+Google Drive `DocumentPlatform` provider. `GoogleDocumentPlatform` uses Drive API v3 with OAuth2 `UserCredentials` (same auth pattern as `GoogleCalendarPlatform`, `GoogleEmailPlatform`). Inner classes implement each capability sub-interface. Supports all 4 capabilities plus incremental sync via `changes.list` with `startPageToken`/`newStartPageToken` (HTTP 404 → `SyncTokenExpiredException`). `DocumentGoogleBeans` CDI producer with `@ConfigProperty` for credentials.
 
 Package: `io.casehub.connectors.document.google`.
 

@@ -27,7 +27,7 @@ There are 26 active modules in the build (pom.xml `<modules>`):
 | `email` | Email outbound via `quarkus-mailer` (`EmailConnector`) |
 | `email-inbound` | IMAP polling inbound (`EmailInboundConnector`), `EmailInboundAccountProvider` SPI |
 | `webhook` | JAX-RS `WebhookRouter` + webhook-based inbound connectors (Slack, Teams, WhatsApp, Twilio SMS), `SigHelper` HMAC utilities |
-| `mcp` | MCP tool surface for LLM agents: `send_slack`, `send_teams`, `send_sms`, `send_whatsapp`, `send_email`, `send_chat`, `list_channels`, `list_chat_channels`, plus 6 calendar tools |
+| `mcp` | MCP tool surface for LLM agents: `send_slack`, `send_teams`, `send_sms`, `send_whatsapp`, `send_email`, `send_chat`, `list_channels`, `list_chat_channels`, plus 6 calendar tools, `calendar_sync_events`, `sync_documents` |
 | `slack-bot` | `SlackBotClient` -- pure `java.net.http` client for the Slack Web API (16 methods including 2 `postMessage` overloads). Pagination via generic `paginateGet<T>` with fail-soft partial results |
 | `discord` | `DiscordClient` (REST API v10), `DiscordGateway` (Gateway v10 WebSocket via Vert.x), `DiscordGatewayPresenceCache`, `DiscordDiscovery` |
 | `chat-spi` | `ChatPlatform` SPI with `@SimulationEligible` (capability-based), 9 capability interfaces, `ChatPlatformService` routing, `ChatInboundAdapter`, `InboundTranslator` SPI, `NoOpChatPlatform` `@DefaultBean` fallback, model records (`RichCard`, `Channel`, `ChatContent`, `ReceivedMessage`, `SendResult`, `Member`, `PresenceStatus`) |
@@ -38,17 +38,17 @@ There are 26 active modules in the build (pom.xml `<modules>`):
 | `signal-cli` | `SignalClient` HTTP client + `SignalWebSocket` WebSocket client for `signal-cli-rest-api`. Pure `java.net.http` -- no AGPL dependencies |
 | `chat-signal` | Signal `ChatPlatform` (6 native capabilities: Messaging, Discovery, Members, Reactions, ChannelManagement, MemberManagement), `SignalInboundConnector` (WebSocket-based), `SignalInboundTranslator` |
 | `notification-bridge` | Bridges platform notification delivery system to connector SPI. `NotificationBridgeStartup`, `ConnectorNotificationDeliverer`, `DigestFormatter` SPI, `ConfigDestinationResolver` |
-| `calendar-spi` | `CalendarPlatform` SPI with `@SimulationEligible`, `CalendarPlatformService` routing, `NoOpCalendarPlatform` `@DefaultBean` fallback, model records (`CalendarEvent`, `CalendarInfo`, `EventDetails`), sealed `EventTiming` (Timed/AllDay with Jackson `@JsonTypeInfo`) |
+| `calendar-spi` | `CalendarPlatform` SPI with `@SimulationEligible`, `CalendarPlatformService` routing, `NoOpCalendarPlatform` `@DefaultBean` fallback, model records (`CalendarEvent`, `CalendarInfo`, `EventDetails`), sealed `EventTiming` (Timed/AllDay with Jackson `@JsonTypeInfo`), incremental sync via `SyncResult`/`SyncRequest` |
 | `calendar-ref` | In-memory reference `CalendarPlatform` for testing (`RefCalendarPlatform`) |
-| `calendar-google` | Google Calendar API provider with OAuth2 refresh token auth, paginated `listEvents` |
+| `calendar-google` | Google Calendar API provider with per-user OAuth2 credential resolution via `GoogleCredentialResolver`, paginated `listEvents`, incremental sync via syncToken |
 | `bank-spi` | `BankPlatform` SPI with `@SimulationEligible`, model records (`AccountInfo`, `AccountBalance`, `Transaction`), `BankPlatformService` routing, `NoOpBankPlatform` `@DefaultBean` fallback |
 | `bank-ref` | In-memory reference `BankPlatform` for testing (`RefBankPlatform`) — 3 UK accounts, 12 transactions, payment lifecycle simulation |
 | `email-spi` | `EmailPlatform` SPI with `@SimulationEligible`, model records (`Mailbox`, `EmailSummary`, `EmailMessage`, `EmailAttachment`), `EmailPlatformService` routing. Complements `email` (outbound) and `email-inbound` (push) |
 | `email-ref` | In-memory reference `EmailPlatform` for testing (`RefEmailPlatform`) — 3 mailboxes (Inbox/Sent/Archive), 9 messages with attachments, cursor-based pagination |
 | `email-google` | Gmail `EmailPlatform` provider (`GoogleEmailPlatform`) — OAuth2 refresh token auth, label→mailbox mapping, paginated message listing, MIME body parsing, attachment download. Config: `casehub.connectors.email.google.{client-id,client-secret,refresh-token}` |
-| `document-spi` | `DocumentPlatform` SPI with `@SimulationEligible` and capability sub-interfaces (`FileOperations`, `FolderOperations`, `SearchOperations`, `SharingOperations`), `supports(Class<?>)` introspection, `DocumentPlatformService` routing |
-| `document-ref` | In-memory reference `DocumentPlatform` for testing (`RefDocumentPlatform`) — 3 folders, 7 files, all 4 capabilities including upload/download round-trip, search, sharing |
-| `document-google` | Google Drive `DocumentPlatform` provider (`GoogleDocumentPlatform`) — OAuth2 refresh token auth, file CRUD with direct upload, folder management, full-text search, share links. Config: `casehub.connectors.document.google.{client-id,client-secret,refresh-token}` |
+| `document-spi` | `DocumentPlatform` SPI with `@SimulationEligible` and capability sub-interfaces (`FileOperations` incl. incremental sync, `FolderOperations`, `SearchOperations`, `SharingOperations`), `supports(Class<?>)` introspection, `DocumentPlatformService` routing |
+| `document-ref` | In-memory reference `DocumentPlatform` for testing (`RefDocumentPlatform`) — 3 folders, 7 files, all 4 capabilities including upload/download round-trip, search, sharing, monotonic version tracking for sync |
+| `document-google` | Google Drive `DocumentPlatform` provider (`GoogleDocumentPlatform`) — OAuth2 refresh token auth, file CRUD with direct upload, folder management, full-text search, share links, incremental sync via `changes.list`. Config: `casehub.connectors.document.google.{client-id,client-secret,refresh-token}` |
 | `graphql` | `ConnectorOperations` `@McpDomain("connectors")` SPI — GraphQL/MCP surface with 5 operations: `injectChat` (constructs `InboundMessage`, fires via `InboundConnectorService`), `sendNotification` (delegates to `ConnectorService.send()`), `connectorStatus` (aggregates outbound + chat + inbound connectors), `connectorsReport` (scope-filtered capability/status report across all 5 platforms with `scope` param: `"all"`, `null`, or comma-separated names), `sentMessages` (queries `SentMessageCapture`, profile-gated). `ConnectorsModelEnricher` provides domain summary/state for MCP. `SentMessageCapture` (`@UnlessBuildProfile("prod")`) CDI observer for test/dev message capture. Capability-gated API methods throw `UnsupportedCapabilityException` (in `connectors-api`) with structured metadata (operation, capability, provider, supportedCapabilities) for LLM self-correction. |
 
 **CDI events:** `ConnectorService.send()` fires `Event<SentMessage>` on every outbound delivery. `SentMessage` record carries the connector ID, recipient, message content, and timestamp. Observe with `@ObservesAsync SentMessage` for delivery tracking.
@@ -262,7 +262,7 @@ Supports `CommandResponse.Immediate` (synchronous) and `CommandResponse.Deferred
 
 ### CalendarPlatform SPI
 
-Calendar integration with full CRUD operations.
+Calendar integration with full CRUD operations and incremental sync.
 
 ```java
 public interface CalendarPlatform {
@@ -273,6 +273,7 @@ public interface CalendarPlatform {
     CalendarEvent createEvent(String calendarId, EventDetails details);
     CalendarEvent updateEvent(String calendarId, String eventId, EventDetails details);
     void deleteEvent(String calendarId, String eventId);
+    SyncResult<CalendarEvent> listEventsSync(String calendarId, SyncRequest request);
 }
 ```
 
@@ -286,8 +287,8 @@ public interface CalendarPlatform {
 
 | Implementation | Platform ID | Notes |
 |----------------|------------|-------|
-| `RefCalendarPlatform` | `ref` | In-memory reference for testing |
-| `GoogleCalendarPlatform` | `google` | Google Calendar API with OAuth2 refresh token auth, paginated listEvents (max 20 pages) |
+| `RefCalendarPlatform` | `ref` | In-memory reference for testing with monotonic version tracking for sync |
+| `GoogleCalendarPlatform` | `google` | Google Calendar API with per-user OAuth2 credential resolution via `GoogleCredentialResolver`, paginated listEvents (max 20 pages), incremental sync via syncToken |
 
 ### BankPlatform SPI
 
