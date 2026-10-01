@@ -1,6 +1,8 @@
 package io.casehub.connectors.calendar.google;
 
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.Calendar;
@@ -11,7 +13,6 @@ import com.google.auth.oauth2.UserCredentials;
 import io.casehub.connectors.SyncRequest;
 import io.casehub.connectors.SyncResult;
 import io.casehub.connectors.SyncTokenExpiredException;
-import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import io.casehub.connectors.calendar.model.CalendarEvent;
 import io.casehub.connectors.calendar.model.CalendarInfo;
 import io.casehub.connectors.calendar.model.EventDetails;
@@ -27,48 +28,66 @@ import java.util.List;
 
 public class GoogleCalendarPlatform implements CalendarPlatform {
 
-    private static final Logger LOG = Logger.getLogger(GoogleCalendarPlatform.class);
-    private static final int MAX_PAGES = 20;
+    private static final Logger LOG       = Logger.getLogger(GoogleCalendarPlatform.class);
+    private static final int    MAX_PAGES = 20;
 
-    private final String clientId;
-    private final String clientSecret;
-    private final String refreshToken;
-    private Calendar calendarService;
+    private final GoogleCredentialResolver resolver;
+    private       NetHttpTransport         transport;
+    private       Calendar                 calendarService;
+
+    public GoogleCalendarPlatform(GoogleCredentialResolver resolver) {
+        this.resolver = resolver;
+        try {
+            this.transport = GoogleNetHttpTransport.newTrustedTransport();
+        } catch (GeneralSecurityException | IOException e) {
+            throw new RuntimeException("Failed to initialize HTTP transport", e);
+        }
+    }
 
     public GoogleCalendarPlatform(String clientId, String clientSecret, String refreshToken) {
-        this.clientId = clientId;
-        this.clientSecret = clientSecret;
-        this.refreshToken = refreshToken;
-        init();
-    }
-
-    GoogleCalendarPlatform(Calendar calendarService) {
-        this.clientId = "";
-        this.clientSecret = "";
-        this.refreshToken = "";
-        this.calendarService = calendarService;
-    }
-
-    void init() {
+        this.resolver  = null;
+        this.transport = null;
         if (clientId.isBlank() || clientSecret.isBlank() || refreshToken.isBlank()) {
             LOG.warn("Google Calendar credentials not configured — platform inactive");
             return;
         }
         try {
             var credentials = UserCredentials.newBuilder()
-                    .setClientId(clientId)
-                    .setClientSecret(clientSecret)
-                    .setRefreshToken(refreshToken)
-                    .build();
+                                             .setClientId(clientId)
+                                             .setClientSecret(clientSecret)
+                                             .setRefreshToken(refreshToken)
+                                             .build();
             calendarService = new Calendar.Builder(
                     GoogleNetHttpTransport.newTrustedTransport(),
                     GsonFactory.getDefaultInstance(),
                     new HttpCredentialsAdapter(credentials))
-                    .setApplicationName("casehub-connectors")
-                    .build();
+                                      .setApplicationName("casehub-connectors")
+                                      .build();
         } catch (GeneralSecurityException | IOException e) {
             LOG.errorf(e, "Failed to initialize Google Calendar client");
         }
+    }
+
+    GoogleCalendarPlatform(Calendar calendarService) {
+        this.resolver        = null;
+        this.transport       = null;
+        this.calendarService = calendarService;
+    }
+
+    Calendar buildService(String userId) {
+        if (resolver == null) {
+            throw new IllegalStateException("No credential resolver configured");
+        }
+        var config = resolver.resolve(userId);
+        var credentials = UserCredentials.newBuilder()
+                                         .setClientId(config.clientId())
+                                         .setClientSecret(config.clientSecret())
+                                         .setRefreshToken(config.refreshToken())
+                                         .build();
+        return new Calendar.Builder(transport, GsonFactory.getDefaultInstance(),
+                                    new HttpCredentialsAdapter(credentials))
+                       .setApplicationName("casehub-connectors")
+                       .build();
     }
 
     @Override
@@ -81,11 +100,11 @@ public class GoogleCalendarPlatform implements CalendarPlatform {
         requireClient();
         try {
             CalendarList list = calendarService.calendarList().list().execute();
-            if (list.getItems() == null) return List.of();
+            if (list.getItems() == null) {return List.of();}
             return list.getItems().stream()
-                    .map(e -> new CalendarInfo(e.getId(), e.getSummary(),
-                            e.getDescription(), Boolean.TRUE.equals(e.getPrimary())))
-                    .toList();
+                       .map(e -> new CalendarInfo(e.getId(), e.getSummary(),
+                                                  e.getDescription(), Boolean.TRUE.equals(e.getPrimary())))
+                       .toList();
         } catch (IOException e) {
             throw new RuntimeException("Failed to list calendars", e);
         }
@@ -123,7 +142,8 @@ public class GoogleCalendarPlatform implements CalendarPlatform {
             LOG.warnf(e, "listEvents failed mid-pagination for calendar '%s' — returning %d partial results",
                       calendarId, result.size());
         }
-        return Collections.unmodifiableList(result);}
+        return Collections.unmodifiableList(result);
+    }
 
     @Override
     public CalendarEvent getEvent(String calendarId, String eventId) {
@@ -141,7 +161,7 @@ public class GoogleCalendarPlatform implements CalendarPlatform {
         requireClient();
         try {
             var googleEvent = GoogleEventMapper.toGoogleEvent(details);
-            var created = calendarService.events().insert(calendarId, googleEvent).execute();
+            var created     = calendarService.events().insert(calendarId, googleEvent).execute();
             return GoogleEventMapper.toCalendarEvent(created, calendarId);
         } catch (IOException e) {
             throw new RuntimeException("Failed to create event", e);
@@ -153,7 +173,7 @@ public class GoogleCalendarPlatform implements CalendarPlatform {
         requireClient();
         try {
             var googleEvent = GoogleEventMapper.toGoogleEvent(details);
-            var updated = calendarService.events().update(calendarId, eventId, googleEvent).execute();
+            var updated     = calendarService.events().update(calendarId, eventId, googleEvent).execute();
             return GoogleEventMapper.toCalendarEvent(updated, calendarId);
         } catch (IOException e) {
             throw new RuntimeException("Failed to update event " + eventId, e);
@@ -235,9 +255,8 @@ public class GoogleCalendarPlatform implements CalendarPlatform {
                                 Collections.unmodifiableList(deletedIds), syncToken, false);
     }
 
-
     boolean isActive() {
-        return calendarService != null;
+        return calendarService != null || resolver != null;
     }
 
     private void requireClient() {
