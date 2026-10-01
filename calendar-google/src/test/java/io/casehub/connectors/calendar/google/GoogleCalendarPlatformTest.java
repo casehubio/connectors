@@ -464,6 +464,19 @@ class GoogleCalendarPlatformTest {
         assertThat(result.syncToken()).isEqualTo("sync-token-final");
     }
 
+    @Test
+    void resolverConstructor_buildServiceUsesResolver() {
+        var resolver = new GoogleCredentialResolver() {
+            @Override
+            public GoogleOAuthConfig resolve(String userId) {
+                return new GoogleOAuthConfig("refresh", "client", "secret");
+            }
+        };
+        var resolverPlatform = new GoogleCalendarPlatform(resolver);
+        assertThat(resolverPlatform.isActive()).isTrue();
+        assertThat(resolverPlatform.id()).isEqualTo("google");
+    }
+
 
     @Test
     void listEvents_recurringInstance_preservesRecurringEventId() {
