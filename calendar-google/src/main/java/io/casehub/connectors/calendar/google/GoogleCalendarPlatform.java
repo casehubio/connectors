@@ -10,6 +10,8 @@ import com.google.auth.http.HttpCredentialsAdapter;
 import com.google.auth.oauth2.UserCredentials;
 import io.casehub.connectors.SyncRequest;
 import io.casehub.connectors.SyncResult;
+import io.casehub.connectors.SyncTokenExpiredException;
+import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import io.casehub.connectors.calendar.model.CalendarEvent;
 import io.casehub.connectors.calendar.model.CalendarInfo;
 import io.casehub.connectors.calendar.model.EventDetails;
@@ -170,7 +172,67 @@ public class GoogleCalendarPlatform implements CalendarPlatform {
 
     @Override
     public SyncResult<CalendarEvent> listEventsSync(String calendarId, SyncRequest request) {
-        throw new UnsupportedOperationException("Google Calendar sync not yet implemented");
+        requireClient();
+        List<CalendarEvent> items      = new ArrayList<>();
+        List<String>        deletedIds = new ArrayList<>();
+        String              syncToken  = null;
+        try {
+            String pageToken = null;
+            int    page      = 0;
+            while (page < MAX_PAGES) {
+                var req = calendarService.events().list(calendarId)
+                                         .setPageToken(pageToken);
+                if (request.syncToken() != null) {
+                    req.setSyncToken(request.syncToken());
+                } else {
+                    req.setSingleEvents(true);
+                }
+                if (request.pageSize() > 0) {
+                    req.setMaxResults(request.pageSize());
+                }
+                Events response = req.execute();
+                if (response.getItems() != null) {
+                    for (var event : response.getItems()) {
+                        if ("cancelled".equals(event.getStatus())) {
+                            deletedIds.add(event.getId());
+                        } else {
+                            items.add(GoogleEventMapper.toCalendarEvent(event, calendarId));
+                        }
+                    }
+                }
+                if (response.getNextSyncToken() != null) {
+                    syncToken = response.getNextSyncToken();
+                }
+                pageToken = response.getNextPageToken();
+                if (pageToken == null) {break;}
+                page++;
+            }
+            if (page >= MAX_PAGES) {
+                LOG.warnf("listEventsSync hit MAX_PAGES (%d) for calendar '%s' — %d items, %d deletes accumulated",
+                          MAX_PAGES, calendarId, items.size(), deletedIds.size());
+            }
+        } catch (GoogleJsonResponseException e) {
+            if (e.getStatusCode() == 410) {
+                throw new SyncTokenExpiredException(request.syncToken());
+            }
+            if (!items.isEmpty()) {
+                LOG.warnf(e, "listEventsSync failed mid-pagination for calendar '%s' — returning %d partial items",
+                          calendarId, items.size());
+                return new SyncResult<>(Collections.unmodifiableList(items),
+                                        Collections.unmodifiableList(deletedIds), syncToken, false);
+            }
+            throw new RuntimeException("Google Calendar sync failed for calendar " + calendarId, e);
+        } catch (IOException e) {
+            if (!items.isEmpty()) {
+                LOG.warnf(e, "listEventsSync failed mid-pagination for calendar '%s' — returning %d partial items",
+                          calendarId, items.size());
+                return new SyncResult<>(Collections.unmodifiableList(items),
+                                        Collections.unmodifiableList(deletedIds), syncToken, false);
+            }
+            throw new RuntimeException("Google Calendar sync failed for calendar " + calendarId, e);
+        }
+        return new SyncResult<>(Collections.unmodifiableList(items),
+                                Collections.unmodifiableList(deletedIds), syncToken, false);
     }
 
 
