@@ -191,6 +191,10 @@ C4Context
 | `bank-ref` | `casehub-connectors-bank-ref` | `bank-spi`, `quarkus-arc` |
 | `bank-truelayer` | `casehub-connectors-bank-truelayer` | `bank-spi`, `connectors-api`, `quarkus-oidc-client`, `quarkus-rest` |
 | `email-spi` | `casehub-connectors-email-spi` | `connectors-api`, `simulation-api`, `quarkus-arc` |
+| `project-spi` | `casehub-connectors-project-spi` | `connectors-api`, `simulation-api`, `quarkus-arc` |
+| `project-ref` | `casehub-connectors-project-ref` | `project-spi`, `quarkus-arc` |
+| `github-client` | `casehub-connectors-github-client` | `core`, `project-spi`, `jackson-databind` |
+| `project-github` | `casehub-connectors-project-github` | `project-spi`, `github-client`, `quarkus-arc` |
 
 `email` and `email-inbound` are separate because `quarkus-mailer` (SMTP) and `angus-mail` (IMAP) share no infrastructure. `webhook` is separate because `quarkus-rest` is unnecessary for outbound-only deployments. `mcp` is separate because `quarkus-mcp-server-core` is not in the Quarkus BOM. `discord` (HTTP client + Gateway) is separate from `chat-discord` (ChatPlatform) because the client can be consumed independently. `chat-slack` depends on `slack-bot` (existing HTTP client) rather than duplicating Slack API calls.
 
