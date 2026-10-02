@@ -10,6 +10,7 @@ import io.casehub.connectors.chat.ChatPlatformService;
 import io.casehub.connectors.contacts.spi.ContactsPlatformService;
 import io.casehub.connectors.document.spi.DocumentPlatformService;
 import io.casehub.connectors.email.spi.EmailPlatformService;
+import io.casehub.connectors.project.spi.ProjectPlatformService;
 import io.casehub.platform.api.identity.CurrentPrincipal;
 import io.quarkus.arc.All;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -33,6 +34,7 @@ public class GraphqlBeans {
             EmailPlatformService emailPlatformService,
             DocumentPlatformService documentPlatformService,
             ContactsPlatformService contactsPlatformService,
+            ProjectPlatformService projectPlatformService,
             @All List<Connector> connectors,
             @All List<WebhookInboundConnector> webhookConnectors,
             Instance<SentMessageCapture> sentMessageCapture,
@@ -41,7 +43,7 @@ public class GraphqlBeans {
                 inboundService, connectorService, chatPlatformService,
                 calendarPlatformService, bankPlatformService,
                 emailPlatformService, documentPlatformService,
-                contactsPlatformService,
+                contactsPlatformService, projectPlatformService,
                 connectors, webhookConnectors,
                 sentMessageCapture.isResolvable()
                 ? Optional.of(sentMessageCapture.get())
