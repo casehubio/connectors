@@ -61,12 +61,20 @@
     <file url="file://$PROJECT_DIR$/email-spi/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/email/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/email/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/github-client/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/github-client/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/graphql/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/graphql/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/mcp/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/mcp/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/notification-bridge/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/notification-bridge/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/project-github/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/project-github/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/project-ref/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/project-ref/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/project-spi/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/project-spi/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/signal-cli/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/signal-cli/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/slack-bot/src/main/java" charset="UTF-8" />
@@ -463,5 +471,7 @@
     <file url="file://$PROJECT_DIR$/../platform/yaml-plugin-processor/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/yaml-step-runtime/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/yaml-step-runtime/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/yaml-step-testing/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/yaml-step-testing/src/main/resources" charset="UTF-8" />
   </component>
 </project>
