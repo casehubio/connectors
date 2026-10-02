@@ -402,6 +402,38 @@ Drive API mappings: `files.list` with parent/MIME/trash filters for file+folder 
 
 Depends on: `document-spi`, `google-api-services-drive`, `quarkus-arc`.
 
+### project-spi
+
+`ProjectPlatform` SPI with `@SimulationEligible` and 5 capability sub-interfaces: `Issues` (create, get, list, update, close, reopen, search, addLabels, removeLabel), `Labels` (create, list, get, update, delete), `Milestones` (create, list, get, close), `Comments` (create, list, get), `Boards` (listProjects, listColumns, moveIssue). User-scoped capability accessors (`issues(userId)`), `OwnerRepo`-scoped methods, `supports(Class<?>)` introspection. `ProjectPlatformService` routing, `NoOpProjectPlatform` `@DefaultBean` fallback.
+
+Package: `io.casehub.connectors.project.spi`, model records in `io.casehub.connectors.project.model`.
+
+Depends on: `connectors-api`, `casehub-platform-simulation-api`, `quarkus-arc`.
+
+### project-ref
+
+In-memory `ProjectPlatform` reference implementation. `ProjectBackend` with pre-loaded test data (5 issues, 3 labels, 2 milestones, comments, 1 project board with 3 columns). `RefProjectPlatform` delegates to backend. `ProjectBeans` CDI producer. All 5 capabilities supported.
+
+Package: `io.casehub.connectors.project.ref`.
+
+Depends on: `project-spi`, `quarkus-arc`.
+
+### github-client
+
+Shared GitHub HTTP client (`GitHubClient`, `@ApplicationScoped`). REST API v3 for issues, labels, milestones, comments. GraphQL POST for Projects v2 boards. Uses `HttpHelper.CLIENT` for all HTTP calls. Tokens passed at call time per credential-config-ownership protocol. Fail-soft pagination (partial results + WARNING on mid-loop failure). JSON mapping via Jackson `ObjectMapper` with `JavaTimeModule`.
+
+Package: `io.casehub.connectors.github`.
+
+Depends on: `connectors-core`, `project-spi`, `jackson-databind`, `jackson-datatype-jsr310`, `quarkus-arc`.
+
+### project-github
+
+GitHub `ProjectPlatform` provider. `GitHubProjectPlatform` (`@ApplicationScoped`) delegates to `GitHubClient` for all API calls. `GitHubCredentialResolver` CDI SPI for per-user token resolution (same pattern as `GoogleCredentialResolver` in calendar/contacts modules). All 5 capabilities supported.
+
+Package: `io.casehub.connectors.project.github`.
+
+Depends on: `project-spi`, `github-client`, `quarkus-arc`.
+
 ---
 
 ## Cross-Repo Integration

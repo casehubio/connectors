@@ -26,6 +26,8 @@ import io.casehub.connectors.chat.spi.Reactions;
 import io.casehub.connectors.chat.spi.Threading;
 import io.casehub.connectors.contacts.spi.ContactsPlatform;
 import io.casehub.connectors.contacts.spi.ContactsPlatformService;
+import io.casehub.connectors.project.spi.ProjectPlatform;
+import io.casehub.connectors.project.spi.ProjectPlatformService;
 import io.casehub.connectors.document.spi.DocumentPlatform;
 import io.casehub.connectors.document.spi.DocumentPlatformService;
 import io.casehub.connectors.email.spi.EmailPlatformService;
@@ -63,13 +65,14 @@ public class ConnectorOperationsImpl {
     private final EmailPlatformService    emailPlatformService;
     private final DocumentPlatformService documentPlatformService;
     private final ContactsPlatformService contactsPlatformService;
+    private final ProjectPlatformService projectPlatformService;
 
 
     private final List<Connector> connectors;
     private final List<WebhookInboundConnector> webhookConnectors;
     private final Optional<SentMessageCapture> sentMessageCapture;
     private final CurrentPrincipal currentPrincipal;
-    private static final Set<String> ALL_SCOPES = Set.of("chat", "calendar", "bank", "email", "document", "contacts");
+    private static final Set<String> ALL_SCOPES = Set.of("chat", "calendar", "bank", "email", "document", "contacts", "project");
 
 
     public ConnectorOperationsImpl(
@@ -81,6 +84,7 @@ public class ConnectorOperationsImpl {
             final EmailPlatformService emailPlatformService,
             final DocumentPlatformService documentPlatformService,
             final ContactsPlatformService contactsPlatformService,
+            final ProjectPlatformService projectPlatformService,
             final List<Connector> connectors,
             final List<WebhookInboundConnector> webhookConnectors,
             final Optional<SentMessageCapture> sentMessageCapture,
@@ -93,6 +97,7 @@ public class ConnectorOperationsImpl {
         this.emailPlatformService    = emailPlatformService;
         this.documentPlatformService = documentPlatformService;
         this.contactsPlatformService = contactsPlatformService;
+        this.projectPlatformService  = projectPlatformService;
         this.connectors              = connectors;
         this.webhookConnectors       = webhookConnectors;
         this.sentMessageCapture      = sentMessageCapture;
@@ -242,6 +247,20 @@ public class ConnectorOperationsImpl {
                 if (cp.supports(ContactsPlatform.GroupRead.class)) {caps.add("GroupRead");}
                 if (cp.supports(ContactsPlatform.ContactWrite.class)) {caps.add("ContactWrite");}
                 platforms.put("contacts", new PlatformInfo(id, "CONNECTED", List.copyOf(caps)));
+                break;
+            }
+        }
+
+        if (scopes.contains("project")) {
+            for (String id : projectPlatformService.ids()) {
+                ProjectPlatform pp   = projectPlatformService.platform(id);
+                var              caps = new ArrayList<String>();
+                if (pp.supports(ProjectPlatform.Issues.class)) {caps.add("Issues");}
+                if (pp.supports(ProjectPlatform.Labels.class)) {caps.add("Labels");}
+                if (pp.supports(ProjectPlatform.Milestones.class)) {caps.add("Milestones");}
+                if (pp.supports(ProjectPlatform.Comments.class)) {caps.add("Comments");}
+                if (pp.supports(ProjectPlatform.Boards.class)) {caps.add("Boards");}
+                platforms.put("project", new PlatformInfo(id, "CONNECTED", List.copyOf(caps)));
                 break;
             }
         }
