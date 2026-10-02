@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/cloud-events/casehub-connectors-cloud-events.iml" filepath="$PROJECT_DIR$/cloud-events/casehub-connectors-cloud-events.iml" />
       <module fileurl="file://$PROJECT_DIR$/mcp/casehub-connectors-mcp.iml" filepath="$PROJECT_DIR$/mcp/casehub-connectors-mcp.iml" />
+      <module fileurl="file://$PROJECT_DIR$/casehub-connectors-parent.iml" filepath="$PROJECT_DIR$/casehub-connectors-parent.iml" />
       <module fileurl="file://$PROJECT_DIR$/../platform/agent-claude-spring/casehub-platform-agent-claude-spring.iml" filepath="$PROJECT_DIR$/../platform/agent-claude-spring/casehub-platform-agent-claude-spring.iml" />
       <module fileurl="file://$PROJECT_DIR$/../platform/agent-codex-spring/casehub-platform-agent-codex-spring.iml" filepath="$PROJECT_DIR$/../platform/agent-codex-spring/casehub-platform-agent-codex-spring.iml" />
       <module fileurl="file://$PROJECT_DIR$/../platform/agent-config-spring/casehub-platform-agent-config-spring.iml" filepath="$PROJECT_DIR$/../platform/agent-config-spring/casehub-platform-agent-config-spring.iml" />
