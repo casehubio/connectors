@@ -194,6 +194,8 @@ C4Context
 | `location-spi` | `casehub-connectors-location-spi` | `connectors-api`, `simulation-api`, `quarkus-arc` |
 | `location-ref` | `casehub-connectors-location-ref` | `location-spi`, `quarkus-arc` |
 | `location-google` | `casehub-connectors-location-google` | `location-spi`, `google-maps-services`, `quarkus-arc` |
+| `commerce-spi` | `casehub-connectors-commerce-spi` | `connectors-api`, `simulation-api`, `quarkus-arc` |
+| `commerce-ref` | `casehub-connectors-commerce-ref` | `commerce-spi`, `quarkus-arc` |
 | `project-spi` | `casehub-connectors-project-spi` | `connectors-api`, `simulation-api`, `quarkus-arc` |
 | `project-ref` | `casehub-connectors-project-ref` | `project-spi`, `quarkus-arc` |
 | `github-client` | `casehub-connectors-github-client` | `core`, `project-spi`, `jackson-databind` |

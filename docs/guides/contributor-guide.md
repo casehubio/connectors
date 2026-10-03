@@ -129,6 +129,14 @@ To add Commands support to a new `ChatPlatform`: (1) implement `Commands` for re
 
 **Correlation with EmailInboundConnector:** RFC 2822 `Message-ID` on `EmailMessage.messageId` / `EmailSummary.messageId` matches `InboundMessage.metadata["message-id"]`. Nullable -- messages with null `messageId` cannot be deduplicated across poll/push paths.
 
+**`LocationPlatform` SPI** (`location-spi`) -- nested capability sub-interfaces: `PlaceSearch` (text/nearby/category search with `Page<Place>`), `PlaceDetails` (full place info), `Geocoding` (address↔coordinates), `Directions` (routing with `TravelMode`). User-scoped accessors (`placeSearch(userId)`), `supports(Class<?>)` introspection. Annotated with `@SimulationEligible(name = "location-platform")`.
+
+**`LocationPlatformService`** (`location-spi`) -- routing service, same `@All List<LocationPlatform>` pattern.
+
+**`CommercePlatform` SPI** (`commerce-spi`) -- nested capability sub-interfaces: `ProductSearch` (text/category/brand search with `Page<Product>`), `ProductDetails` (full specs, reviews, images), `Cart` (user-scoped add/remove/view/clear returning `ShoppingCart`), `Checkout` (purchase initiation via `CheckoutRequest` → `CheckoutResult`), `OrderTracking` (order status and history). User-scoped accessors (`cart(userId)`, `checkout(userId)`, `orderTracking(userId)`), `supports(Class<?>)` introspection. Annotated with `@SimulationEligible(name = "commerce-platform")`. Model record `ShoppingCart` avoids name collision with the `Cart` capability interface.
+
+**`CommercePlatformService`** (`commerce-spi`) -- routing service, same `@All List<CommercePlatform>` pattern.
+
 ### Notification Bridge Architecture
 
 **`NotificationBridgeStartup`** (`notification-bridge`) -- `@Startup @ApplicationScoped`. At `@PostConstruct`:

@@ -55,6 +55,8 @@ Zero heavy dependencies — HTTP-based connectors use java.net.http only.</descr
     <module>location-spi</module>
     <module>location-ref</module>
     <module>location-google</module>
+    <module>commerce-spi</module>
+    <module>commerce-ref</module>
     <module>project-spi</module>
     <module>project-ref</module>
     <module>github-client</module>
