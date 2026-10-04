@@ -6,7 +6,12 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
-class InMemoryContactsBackend implements ContactsBackend {
+import io.quarkus.arc.DefaultBean;
+import jakarta.enterprise.context.ApplicationScoped;
+
+@DefaultBean
+@ApplicationScoped
+public class InMemoryContactsBackend implements ContactsBackend {
 
     private final Map<String, VersionedContact> contacts = new ConcurrentHashMap<>();
     private final Map<String, Group> groups = new ConcurrentHashMap<>();

@@ -7,7 +7,7 @@ public class CommerceRefBeans {
 
     @Produces
     @ApplicationScoped
-    RefCommercePlatform refCommercePlatform() {
-        return new RefCommercePlatform(new InMemoryCommerceBackend());
+    RefCommercePlatform refCommercePlatform(CommerceBackend backend) {
+        return new RefCommercePlatform(backend);
     }
 }

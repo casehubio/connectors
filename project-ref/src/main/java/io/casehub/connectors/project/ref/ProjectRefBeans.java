@@ -6,7 +6,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Instance;
 import jakarta.enterprise.inject.Produces;
 
-public class ProjectBeans {
+public class ProjectRefBeans {
 
     @Produces
     @ApplicationScoped

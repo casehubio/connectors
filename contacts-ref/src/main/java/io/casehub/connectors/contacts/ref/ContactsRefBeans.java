@@ -7,7 +7,7 @@ public class ContactsRefBeans {
 
     @Produces
     @ApplicationScoped
-    RefContactsPlatform refContactsPlatform() {
-        return new RefContactsPlatform(new InMemoryContactsBackend());
+    RefContactsPlatform refContactsPlatform(ContactsBackend backend) {
+        return new RefContactsPlatform(backend);
     }
 }

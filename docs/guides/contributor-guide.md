@@ -420,7 +420,7 @@ Depends on: `connectors-api`, `casehub-platform-simulation-api`, `quarkus-arc`.
 
 ### project-ref
 
-In-memory `ProjectPlatform` reference implementation. `ProjectBackend` with pre-loaded test data (5 issues, 3 labels, 2 milestones, comments, 1 project board with 3 columns). `RefProjectPlatform` delegates to backend. `ProjectBeans` CDI producer. All 5 capabilities supported.
+In-memory `ProjectPlatform` reference implementation. `ProjectBackend` with pre-loaded test data (5 issues, 3 labels, 2 milestones, comments, 1 project board with 3 columns). `RefProjectPlatform` delegates to backend. `ProjectRefBeans` CDI producer. All 5 capabilities supported.
 
 Package: `io.casehub.connectors.project.ref`.
 

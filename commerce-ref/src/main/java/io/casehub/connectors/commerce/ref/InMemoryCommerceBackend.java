@@ -23,7 +23,12 @@ import java.util.NoSuchElementException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-class InMemoryCommerceBackend implements CommerceBackend {
+import io.quarkus.arc.DefaultBean;
+import jakarta.enterprise.context.ApplicationScoped;
+
+@DefaultBean
+@ApplicationScoped
+public class InMemoryCommerceBackend implements CommerceBackend {
 
     private final Map<String, Product> products = new LinkedHashMap<>();
     private final Map<String, ProductDetail> details = new LinkedHashMap<>();
