@@ -1,6 +1,7 @@
 package io.casehub.connectors.project.ref;
 
 import io.casehub.connectors.Page;
+import io.casehub.connectors.PaginationHelper;
 import io.casehub.connectors.PageRequest;
 import io.casehub.connectors.project.model.Comment;
 import io.casehub.connectors.project.model.Issue;
@@ -74,7 +75,7 @@ public class RefProjectPlatform implements ProjectPlatform {
 
         @Override
         public Page<Issue> list(OwnerRepo repo, PageRequest page) {
-            return paginate(backend.allIssues(repo), page);
+            return PaginationHelper.paginate(backend.allIssues(repo), page);
         }
 
         @Override
@@ -94,7 +95,7 @@ public class RefProjectPlatform implements ProjectPlatform {
 
         @Override
         public Page<Issue> search(OwnerRepo repo, String query, PageRequest page) {
-            return paginate(backend.searchIssues(repo, query), page);
+            return PaginationHelper.paginate(backend.searchIssues(repo, query), page);
         }
 
         @Override
@@ -145,7 +146,7 @@ public class RefProjectPlatform implements ProjectPlatform {
 
         @Override
         public Page<Milestone> list(OwnerRepo repo, PageRequest page) {
-            return paginate(backend.allMilestones(repo), page);
+            return PaginationHelper.paginate(backend.allMilestones(repo), page);
         }
 
         @Override
@@ -168,7 +169,7 @@ public class RefProjectPlatform implements ProjectPlatform {
 
         @Override
         public Page<Comment> list(OwnerRepo repo, int issueNumber, PageRequest page) {
-            return paginate(backend.allComments(repo, issueNumber), page);
+            return PaginationHelper.paginate(backend.allComments(repo, issueNumber), page);
         }
 
         @Override
@@ -195,16 +196,4 @@ public class RefProjectPlatform implements ProjectPlatform {
         }
     }
 
-    private static <T> Page<T> paginate(List<T> all, PageRequest pagination) {
-        int start = 0;
-        if (pagination.cursor() != null) {
-            start = Integer.parseInt(pagination.cursor());
-        }
-        int size = pagination.pageSize() > 0 ? pagination.pageSize() : 20;
-        int end = Math.min(start + size, all.size());
-        var items = all.subList(start, end);
-        boolean hasMore = end < all.size();
-        String nextCursor = hasMore ? String.valueOf(end) : null;
-        return new Page<>(items, nextCursor, hasMore);
-    }
 }

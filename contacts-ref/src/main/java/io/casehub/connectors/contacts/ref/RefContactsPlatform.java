@@ -1,6 +1,7 @@
 package io.casehub.connectors.contacts.ref;
 
 import io.casehub.connectors.Page;
+import io.casehub.connectors.PaginationHelper;
 import io.casehub.connectors.PageRequest;
 import io.casehub.connectors.SyncRequest;
 import io.casehub.connectors.SyncResult;
@@ -49,7 +50,7 @@ public class RefContactsPlatform implements ContactsPlatform {
 
         @Override
         public Page<Contact> list(PageRequest pagination) {
-            return paginate(backend.allContacts(), pagination);
+            return PaginationHelper.paginate(backend.allContacts(), pagination);
         }
 
         @Override
@@ -69,7 +70,7 @@ public class RefContactsPlatform implements ContactsPlatform {
 
         @Override
         public Page<Contact> search(String query, PageRequest pagination) {
-            return paginate(backend.search(query), pagination);
+            return PaginationHelper.paginate(backend.search(query), pagination);
         }
     }
 
@@ -82,7 +83,7 @@ public class RefContactsPlatform implements ContactsPlatform {
 
         @Override
         public Page<Contact> listContacts(String groupId, PageRequest pagination) {
-            return paginate(backend.contactsInGroup(groupId), pagination);
+            return PaginationHelper.paginate(backend.contactsInGroup(groupId), pagination);
         }
     }
 
@@ -104,16 +105,4 @@ public class RefContactsPlatform implements ContactsPlatform {
         }
     }
 
-    private static <T> Page<T> paginate(List<T> all, PageRequest pagination) {
-        int start = 0;
-        if (pagination.cursor() != null) {
-            start = Integer.parseInt(pagination.cursor());
-        }
-        int size = pagination.pageSize() > 0 ? pagination.pageSize() : 20;
-        int end = Math.min(start + size, all.size());
-        var items = all.subList(start, end);
-        boolean hasMore = end < all.size();
-        String nextCursor = hasMore ? String.valueOf(end) : null;
-        return new Page<>(items, nextCursor, hasMore);
-    }
 }
