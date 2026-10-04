@@ -13,8 +13,14 @@ import io.casehub.connectors.commerce.model.ShoppingCart;
 import io.casehub.connectors.commerce.spi.CommercePlatform;
 
 import java.util.List;
+import java.util.Set;
 
 public class RefCommercePlatform implements CommercePlatform {
+
+    private static final Set<Class<?>> SUPPORTED = Set.of(
+        ProductSearch.class, ProductDetails.class,
+        Cart.class, Checkout.class, OrderTracking.class
+    );
 
     private final CommerceBackend backend;
 
@@ -29,11 +35,7 @@ public class RefCommercePlatform implements CommercePlatform {
 
     @Override
     public boolean supports(Class<?> capability) {
-        return capability == ProductSearch.class
-            || capability == ProductDetails.class
-            || capability == Cart.class
-            || capability == Checkout.class
-            || capability == OrderTracking.class;
+        return SUPPORTED.contains(capability);
     }
 
     @Override

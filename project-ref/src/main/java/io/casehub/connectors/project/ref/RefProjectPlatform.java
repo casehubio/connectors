@@ -13,6 +13,7 @@ import io.casehub.connectors.project.model.ProjectColumn;
 import io.casehub.connectors.project.spi.ProjectPlatform;
 
 import java.util.List;
+import java.util.Set;
 
 public class RefProjectPlatform implements ProjectPlatform {
 
@@ -27,13 +28,14 @@ public class RefProjectPlatform implements ProjectPlatform {
         return "ref";
     }
 
+    private static final Set<Class<?>> SUPPORTED = Set.of(
+        Issues.class, Labels.class, Milestones.class,
+        Comments.class, Boards.class
+    );
+
     @Override
     public boolean supports(Class<?> capability) {
-        return capability == Issues.class
-            || capability == Labels.class
-            || capability == Milestones.class
-            || capability == Comments.class
-            || capability == Boards.class;
+        return SUPPORTED.contains(capability);
     }
 
     @Override

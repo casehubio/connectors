@@ -4,6 +4,8 @@ import io.casehub.connectors.bank.spi.AccountInformation;
 import io.casehub.connectors.bank.spi.BankPlatform;
 import io.casehub.connectors.bank.spi.PaymentInitiation;
 
+import java.util.Set;
+
 public class RefBankPlatform implements BankPlatform {
 
     private final BankBackend backend;
@@ -27,9 +29,12 @@ public class RefBankPlatform implements BankPlatform {
         return new RefPaymentInitiation(backend);
     }
 
+    private static final Set<Class<?>> SUPPORTED = Set.of(
+        AccountInformation.class, PaymentInitiation.class
+    );
+
     @Override
     public boolean supports(Class<?> capability) {
-        return capability == AccountInformation.class
-            || capability == PaymentInitiation.class;
+        return SUPPORTED.contains(capability);
     }
 }
