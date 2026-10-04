@@ -7,6 +7,7 @@ import io.casehub.connectors.location.model.*;
 import io.casehub.connectors.location.spi.LocationPlatform;
 
 import java.util.List;
+import java.util.Set;
 
 public class RefLocationPlatform implements LocationPlatform {
 
@@ -21,12 +22,14 @@ public class RefLocationPlatform implements LocationPlatform {
         return "ref";
     }
 
+    private static final Set<Class<?>> SUPPORTED = Set.of(
+        PlaceSearch.class, PlaceDetails.class,
+        Geocoding.class, Directions.class
+    );
+
     @Override
     public boolean supports(Class<?> capability) {
-        return capability == PlaceSearch.class
-            || capability == PlaceDetails.class
-            || capability == Geocoding.class
-            || capability == Directions.class;
+        return SUPPORTED.contains(capability);
     }
 
     @Override

@@ -10,6 +10,7 @@ import io.casehub.connectors.contacts.model.Group;
 import io.casehub.connectors.contacts.spi.ContactsPlatform;
 
 import java.util.List;
+import java.util.Set;
 
 public class RefContactsPlatform implements ContactsPlatform {
 
@@ -24,11 +25,13 @@ public class RefContactsPlatform implements ContactsPlatform {
         return "ref";
     }
 
+    private static final Set<Class<?>> SUPPORTED = Set.of(
+        ContactRead.class, GroupRead.class, ContactWrite.class
+    );
+
     @Override
     public boolean supports(Class<?> capability) {
-        return capability == ContactRead.class
-            || capability == GroupRead.class
-            || capability == ContactWrite.class;
+        return SUPPORTED.contains(capability);
     }
 
     @Override

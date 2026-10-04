@@ -10,6 +10,7 @@ import io.casehub.connectors.document.model.Folder;
 import io.casehub.connectors.document.spi.DocumentPlatform;
 
 import java.util.List;
+import java.util.Set;
 
 public class RefDocumentPlatform implements DocumentPlatform {
 
@@ -32,12 +33,14 @@ public class RefDocumentPlatform implements DocumentPlatform {
         return "ref";
     }
 
+    private static final Set<Class<?>> SUPPORTED = Set.of(
+        FileOperations.class, FolderOperations.class,
+        SearchOperations.class, SharingOperations.class
+    );
+
     @Override
     public boolean supports(Class<?> capability) {
-        return capability == FileOperations.class
-            || capability == FolderOperations.class
-            || capability == SearchOperations.class
-            || capability == SharingOperations.class;
+        return SUPPORTED.contains(capability);
     }
 
     @Override
