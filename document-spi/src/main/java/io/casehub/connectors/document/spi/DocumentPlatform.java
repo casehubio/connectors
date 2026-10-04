@@ -11,7 +11,8 @@ import io.casehub.platform.simulation.SimulationEligible;
 
 import java.util.List;
 
-@SimulationEligible(name = "document-platform")
+@SimulationEligible(name = "document-platform",
+    capabilities = {"fileOperations", "folderOperations", "searchOperations", "sharingOperations"})
 public interface DocumentPlatform {
 
     String id();
