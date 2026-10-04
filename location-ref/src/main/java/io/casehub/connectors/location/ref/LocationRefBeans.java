@@ -7,7 +7,7 @@ public class LocationRefBeans {
 
     @Produces
     @ApplicationScoped
-    RefLocationPlatform refLocationPlatform() {
-        return new RefLocationPlatform(new InMemoryLocationBackend());
+    RefLocationPlatform refLocationPlatform(LocationBackend backend) {
+        return new RefLocationPlatform(backend);
     }
 }

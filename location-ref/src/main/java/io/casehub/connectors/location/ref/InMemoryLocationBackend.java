@@ -5,7 +5,12 @@ import io.casehub.connectors.location.model.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-class InMemoryLocationBackend implements LocationBackend {
+import io.quarkus.arc.DefaultBean;
+import jakarta.enterprise.context.ApplicationScoped;
+
+@DefaultBean
+@ApplicationScoped
+public class InMemoryLocationBackend implements LocationBackend {
 
     private final Map<String, Place> places = new ConcurrentHashMap<>();
     private final Map<String, PlaceDetail> details = new ConcurrentHashMap<>();
