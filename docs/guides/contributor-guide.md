@@ -139,7 +139,7 @@ To add Commands support to a new `ChatPlatform`: (1) implement `Commands` for re
 
 ### Ref Implementation Seed Data
 
-All ref implementations with pre-loaded data use YAML seed files under `<module>/src/main/resources/seed/`. Each module has a package-private `SeedLoader` class that reads the YAML via Jackson (`jackson-dataformat-yaml` + `jackson-datatype-jsr310`) and returns domain objects. The backend constructor calls `seed()` which delegates to the loader — this preserves non-CDI test usage (`new InMemory*Backend()` still works).
+All ref implementations with pre-loaded data use YAML seed files under `<module>/src/main/resources/seed/`. Each module has a package-private `SeedLoader` class that reads the YAML via Jackson (`jackson-dataformat-yaml` + `jackson-datatype-jsr310`) and returns domain objects. Seeding happens via field initializers or `@PostConstruct` — CDI invokes it automatically, while `withTestData()` static factories preserve non-CDI test usage.
 
 | Module | Seed files | Data |
 |--------|-----------|------|
