@@ -8,6 +8,10 @@ import io.casehub.connectors.project.model.OwnerRepo;
 import io.casehub.connectors.project.model.ProjectBoard;
 import io.casehub.connectors.project.model.ProjectColumn;
 
+import io.quarkus.arc.DefaultBean;
+import jakarta.annotation.PostConstruct;
+import jakarta.enterprise.context.ApplicationScoped;
+
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -17,6 +21,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
+@DefaultBean
+@ApplicationScoped
 public class ProjectBackend {
 
     private final ConcurrentHashMap<String, Issue> issues = new ConcurrentHashMap<>();
@@ -255,48 +261,52 @@ public class ProjectBackend {
         return boardColumns.getOrDefault(key, List.of());
     }
 
-    public static ProjectBackend withTestData() {
-        var backend = new ProjectBackend();
-        var seed    = SeedLoader.load();
-        var repo    = new OwnerRepo(seed.repo().owner(), seed.repo().name());
+    @PostConstruct
+    void seed() {
+        var data = SeedLoader.load();
+        var repo = new OwnerRepo(data.repo().owner(), data.repo().name());
 
-        seed.labels().forEach(l ->
-                                      backend.createLabel(repo, new Label(null, l.name(), l.color(), l.description())));
+        data.labels().forEach(l ->
+                createLabel(repo, new Label(null, l.name(), l.color(), l.description())));
 
         var createdMilestones = new java.util.LinkedHashMap<String, Milestone>();
-        seed.milestones().forEach(m -> {
-            var created = backend.createMilestone(repo,
-                                                  new Milestone(null, 0, m.title(), m.description(), null, null, 0, 0));
+        data.milestones().forEach(m -> {
+            var created = createMilestone(repo,
+                    new Milestone(null, 0, m.title(), m.description(), null, null, 0, 0));
             if ("closed".equals(m.state())) {
-                created = backend.closeMilestone(repo, created.number());
+                created = closeMilestone(repo, created.number());
             }
             createdMilestones.put(m.title(), created);
         });
 
         var createdIssues = new java.util.ArrayList<Issue>();
-        seed.issues().forEach(i -> {
+        data.issues().forEach(i -> {
             var issueLabels = i.labels().stream()
-                               .map(name -> backend.getLabel(repo, name))
-                               .toList();
+                    .map(name -> getLabel(repo, name))
+                    .toList();
             var milestone = i.milestone() != null ? createdMilestones.get(i.milestone()) : null;
-            var created = backend.createIssue(repo,
-                                              new Issue(null, 0, i.title(), i.body(), "open",
-                                                        issueLabels, milestone, List.of(), null, null));
+            var created = createIssue(repo,
+                    new Issue(null, 0, i.title(), i.body(), "open",
+                            issueLabels, milestone, List.of(), null, null));
             if ("closed".equals(i.state())) {
-                created = backend.closeIssue(repo, created.number());
+                created = closeIssue(repo, created.number());
             }
             createdIssues.add(created);
         });
 
-        seed.comments().forEach(c ->
-                                        backend.createComment(repo, createdIssues.get(c.issueIndex()).number(),
-                                                              new Comment(null, c.body(), c.author(), null, null)));
+        data.comments().forEach(c ->
+                createComment(repo, createdIssues.get(c.issueIndex()).number(),
+                        new Comment(null, c.body(), c.author(), null, null)));
 
-        seed.boards().forEach(b -> {
-            backend.boards.put(repoKey(repo) + "/" + b.id(), new ProjectBoard(b.id(), b.name()));
-            backend.boardColumns.put(repoKey(repo) + "/" + b.id(), b.columns());
+        data.boards().forEach(b -> {
+            boards.put(repoKey(repo) + "/" + b.id(), new ProjectBoard(b.id(), b.name()));
+            boardColumns.put(repoKey(repo) + "/" + b.id(), b.columns());
         });
+    }
 
+    public static ProjectBackend withTestData() {
+        var backend = new ProjectBackend();
+        backend.seed();
         return backend;
     }
 }

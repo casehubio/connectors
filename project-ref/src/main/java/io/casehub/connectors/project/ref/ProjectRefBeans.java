@@ -6,12 +6,13 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Instance;
 import jakarta.enterprise.inject.Produces;
 
+@ApplicationScoped
 public class ProjectRefBeans {
 
     @Produces
     @ApplicationScoped
-    ProjectBackend projectBackend() {
-        return ProjectBackend.withTestData();
+    RefProjectPlatform refProjectPlatform(ProjectBackend backend) {
+        return new RefProjectPlatform(backend);
     }
 
     @Produces
