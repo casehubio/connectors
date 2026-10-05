@@ -1,0 +1,9 @@
+location-platform.geocoding.geocode:
+  - tenancy-id: household
+    input:
+      address: "King's Cross"
+    output:
+      - formattedAddress: "King's Cross, London"
+        location: { lat: 51.5318, lng: -0.1239 }
+        placeId: "place-kx"
+        types: ["neighborhood", "political"]

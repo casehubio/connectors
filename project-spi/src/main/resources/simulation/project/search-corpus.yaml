@@ -1,0 +1,33 @@
+project-platform.issues.search:
+  - tenancy-id: household
+    input:
+      query: "bug"
+    output:
+      - id: null
+        number: 1
+        title: "Fix login bug"
+        body: "Login fails on Safari"
+        state: "open"
+        labels:
+          - id: null
+            name: "bug"
+            color: "d73a4a"
+            description: "Something isn't working"
+        milestone: null
+        assignees: []
+        createdAt: null
+        updatedAt: null
+      - id: null
+        number: 4
+        title: "Performance bug in dashboard"
+        body: "Slow load times"
+        state: "open"
+        labels:
+          - id: null
+            name: "bug"
+            color: "d73a4a"
+            description: "Something isn't working"
+        milestone: null
+        assignees: []
+        createdAt: null
+        updatedAt: null

@@ -1,0 +1,32 @@
+default-tenancy-id: household
+
+methods:
+  commerce-platform.id:
+    strategy: constant
+    corpus:
+      - input: null
+        output: "sim"
+
+  commerce-platform.productSearch.search:
+    strategy: seq
+    exhaustion-policy: WRAP
+    corpus-files:
+      - classpath:simulation/commerce/search-corpus.yaml
+
+  commerce-platform.productSearch.searchByCategory:
+    strategy: key
+    key-extractor: "field:category"
+    corpus-files:
+      - classpath:simulation/commerce/search-corpus.yaml
+
+  commerce-platform.productDetails.detail:
+    strategy: key
+    key-extractor: "field:productId"
+    corpus-files:
+      - classpath:simulation/commerce/details-corpus.yaml
+
+  commerce-platform.productDetails.reviews:
+    strategy: key
+    key-extractor: "field:productId"
+    corpus-files:
+      - classpath:simulation/commerce/details-corpus.yaml

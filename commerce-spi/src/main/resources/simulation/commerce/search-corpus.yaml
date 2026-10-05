@@ -1,0 +1,72 @@
+commerce-platform.productSearch.search:
+  - tenancy-id: household
+    input:
+      query: "headphones"
+      pagination: { cursor: null, pageSize: 10 }
+    output:
+      items:
+        - id: "prod-1"
+          name: "Sony WH-1000XM5 Headphones"
+          brand: "Sony"
+          category: "electronics"
+          price: { amount: 299.99, currency: "GBP" }
+          rating: 4.7
+          reviewCount: 2350
+          inStock: true
+          thumbnailUrl: "https://example.com/sony-xm5-1.jpg"
+      hasMore: false
+      nextCursor: null
+
+  - tenancy-id: household
+    input:
+      query: "books"
+      pagination: { cursor: null, pageSize: 10 }
+    output:
+      items:
+        - id: "prod-3"
+          name: "The Thursday Murder Club"
+          brand: "Richard Osman"
+          category: "books"
+          price: { amount: 8.99, currency: "GBP" }
+          rating: 4.3
+          reviewCount: 45000
+          inStock: true
+          thumbnailUrl: "https://example.com/tmc-1.jpg"
+        - id: "prod-7"
+          name: "Penguin Classics Box Set"
+          brand: "Various"
+          category: "books"
+          price: { amount: 79.99, currency: "GBP" }
+          rating: 4.9
+          reviewCount: 1200
+          inStock: true
+          thumbnailUrl: "https://example.com/penguin-box-1.jpg"
+      hasMore: false
+      nextCursor: null
+
+commerce-platform.productSearch.searchByCategory:
+  - tenancy-id: household
+    input:
+      category: "electronics"
+    output:
+      items:
+        - id: "prod-1"
+          name: "Sony WH-1000XM5 Headphones"
+          brand: "Sony"
+          category: "electronics"
+          price: { amount: 299.99, currency: "GBP" }
+          rating: 4.7
+          reviewCount: 2350
+          inStock: true
+          thumbnailUrl: "https://example.com/sony-xm5-1.jpg"
+        - id: "prod-2"
+          name: "Kindle Paperwhite"
+          brand: "Amazon"
+          category: "electronics"
+          price: { amount: 139.99, currency: "GBP" }
+          rating: 4.6
+          reviewCount: 18000
+          inStock: true
+          thumbnailUrl: "https://example.com/kindle-pw-1.jpg"
+      hasMore: false
+      nextCursor: null

@@ -1,0 +1,38 @@
+default-tenancy-id: household
+
+methods:
+  location-platform.id:
+    strategy: constant
+    corpus:
+      - input: null
+        output: "sim"
+
+  location-platform.placeSearch.searchByText:
+    strategy: seq
+    exhaustion-policy: WRAP
+    corpus-files:
+      - classpath:simulation/location/search-corpus.yaml
+
+  location-platform.placeSearch.searchNearby:
+    strategy: seq
+    exhaustion-policy: WRAP
+    corpus-files:
+      - classpath:simulation/location/search-corpus.yaml
+
+  location-platform.placeDetails.detail:
+    strategy: key
+    key-extractor: "field:placeId"
+    corpus-files:
+      - classpath:simulation/location/details-corpus.yaml
+
+  location-platform.geocoding.geocode:
+    strategy: key
+    key-extractor: "field:address"
+    corpus-files:
+      - classpath:simulation/location/geocoding-corpus.yaml
+
+  location-platform.directions.route:
+    strategy: seq
+    exhaustion-policy: WRAP
+    corpus-files:
+      - classpath:simulation/location/directions-corpus.yaml

@@ -1,0 +1,17 @@
+location-platform.directions.route:
+  - tenancy-id: household
+    input:
+      origin: { lat: 51.5318, lng: -0.1239 }
+      destination: { lat: 51.5194, lng: -0.1270 }
+      mode: "DRIVING"
+    output:
+      summary: "driving route"
+      distance: { meters: 1500, text: "1.5 km" }
+      duration: { seconds: 150, text: "3 min" }
+      legs:
+        - startAddress: "Origin"
+          endAddress: "Destination"
+          startLocation: { lat: 51.5318, lng: -0.1239 }
+          endLocation: { lat: 51.5194, lng: -0.1270 }
+          distance: { meters: 1500, text: "1.5 km" }
+          duration: { seconds: 150, text: "3 min" }

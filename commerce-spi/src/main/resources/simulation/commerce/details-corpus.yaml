@@ -1,0 +1,42 @@
+commerce-platform.productDetails.detail:
+  - tenancy-id: household
+    input:
+      productId: "prod-1"
+    output:
+      id: "prod-1"
+      name: "Sony WH-1000XM5 Headphones"
+      brand: "Sony"
+      sku: "prod-sony-xm5"
+      category: "electronics"
+      description: "Premium noise-cancelling wireless headphones with 30-hour battery life."
+      price: { amount: 299.99, currency: "GBP" }
+      rating: 4.7
+      reviewCount: 2350
+      inStock: true
+      stockQuantity: 45
+      images:
+        - url: "https://example.com/sony-xm5-1.jpg"
+          altText: "Sony WH-1000XM5"
+          width: 800
+          height: 600
+      reviews: []
+      specifications:
+        type: "Over-ear"
+        connectivity: "Bluetooth 5.2"
+        battery: "30 hours"
+        weight: "250g"
+      url: "https://shop.example.com/product/prod-1"
+
+commerce-platform.productDetails.reviews:
+  - tenancy-id: household
+    input:
+      productId: "prod-1"
+    output:
+      - author: "Alice S."
+        rating: 5.0
+        text: "Best noise cancelling I've ever used"
+        timestampMs: 1727900000000
+      - author: "Bob J."
+        rating: 4.0
+        text: "Great sound, slightly tight fit"
+        timestampMs: 1727800000000

@@ -1,0 +1,40 @@
+contacts-platform.contactRead.search:
+  - tenancy-id: household
+    input:
+      query: "Alice"
+    output:
+      - id: "c-1"
+        name: { displayName: "Alice Smith", givenName: "Alice", familyName: "Smith" }
+        emails: [{ label: "work", value: "alice@example.com", primary: true }]
+        phones: [{ label: "mobile", value: "+1234567001", primary: true }]
+        addresses: []
+        company: "Acme Corp"
+        jobTitle: "Engineer"
+        birthday: null
+        photoUrl: null
+        customFields: {}
+
+  - tenancy-id: household
+    input:
+      query: "Acme"
+    output:
+      - id: "c-1"
+        name: { displayName: "Alice Smith", givenName: "Alice", familyName: "Smith" }
+        emails: [{ label: "work", value: "alice@example.com", primary: true }]
+        phones: [{ label: "mobile", value: "+1234567001", primary: true }]
+        addresses: []
+        company: "Acme Corp"
+        jobTitle: "Engineer"
+        birthday: null
+        photoUrl: null
+        customFields: {}
+      - id: "c-2"
+        name: { displayName: "Bob Jones", givenName: "Bob", familyName: "Jones" }
+        emails: [{ label: "work", value: "bob@example.com", primary: true }]
+        phones: [{ label: "mobile", value: "+1234567002", primary: true }]
+        addresses: []
+        company: "Acme Corp"
+        jobTitle: "Manager"
+        birthday: null
+        photoUrl: null
+        customFields: {}

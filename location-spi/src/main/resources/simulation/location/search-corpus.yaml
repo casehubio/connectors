@@ -1,0 +1,49 @@
+location-platform.placeSearch.searchByText:
+  - tenancy-id: household
+    input:
+      query: "restaurant"
+      pagination: { cursor: null, pageSize: 10 }
+    output:
+      items:
+        - id: "p-1"
+          name: "The Italian Kitchen"
+          formattedAddress: "10 King's Cross Rd, London N1 9AA"
+          location: { lat: 51.5318, lng: -0.1239 }
+          types: ["restaurant", "italian"]
+          rating: 4.5
+          userRatingsTotal: 320
+          phoneNumber: "+442071234001"
+          website: "https://italiankitchen.example.com"
+          priceLevel: "MODERATE"
+        - id: "p-4"
+          name: "Dishoom King's Cross"
+          formattedAddress: "5 Stable St, London N1C 4AB"
+          location: { lat: 51.5355, lng: -0.1250 }
+          types: ["restaurant", "indian"]
+          rating: 4.6
+          userRatingsTotal: 12000
+          phoneNumber: "+442071234004"
+          website: "https://dishoom.com"
+          priceLevel: "MODERATE"
+      hasMore: false
+      nextCursor: null
+
+location-platform.placeSearch.searchNearby:
+  - tenancy-id: household
+    input:
+      location: { lat: 51.5318, lng: -0.1239 }
+      radiusMeters: 500
+    output:
+      items:
+        - id: "p-1"
+          name: "The Italian Kitchen"
+          formattedAddress: "10 King's Cross Rd, London N1 9AA"
+          location: { lat: 51.5318, lng: -0.1239 }
+          types: ["restaurant", "italian"]
+          rating: 4.5
+          userRatingsTotal: 320
+          phoneNumber: "+442071234001"
+          website: "https://italiankitchen.example.com"
+          priceLevel: "MODERATE"
+      hasMore: false
+      nextCursor: null

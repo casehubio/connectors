@@ -1,0 +1,14 @@
+default-tenancy-id: household
+
+methods:
+  document-platform.id:
+    strategy: constant
+    corpus:
+      - input: null
+        output: "sim"
+
+  document-platform.searchOperations.search:
+    strategy: seq
+    exhaustion-policy: WRAP
+    corpus-files:
+      - classpath:simulation/document/search-corpus.yaml

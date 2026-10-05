@@ -1,0 +1,16 @@
+email-platform.search:
+  - tenancy-id: default
+    input:
+      query: "invoice"
+    output:
+      items:
+        - id: "msg-002"
+          mailboxId: "inbox"
+          from: "bob@example.com"
+          subject: "Invoice #4821 attached"
+          snippet: "Please find the invoice attached."
+          receivedAt: "2026-09-16T14:15:00Z"
+          read: true
+          hasAttachments: true
+      hasMore: false
+      nextCursor: null

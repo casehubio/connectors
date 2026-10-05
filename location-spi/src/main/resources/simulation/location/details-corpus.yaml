@@ -1,0 +1,30 @@
+location-platform.placeDetails.detail:
+  - tenancy-id: household
+    input:
+      placeId: "p-1"
+    output:
+      id: "p-1"
+      name: "The Italian Kitchen"
+      formattedAddress: "10 King's Cross Rd, London N1 9AA"
+      location: { lat: 51.5318, lng: -0.1239 }
+      types: ["restaurant", "italian"]
+      rating: 4.5
+      userRatingsTotal: 320
+      phoneNumber: "+442071234001"
+      formattedPhoneNumber: "+442071234001"
+      website: "https://italiankitchen.example.com"
+      priceLevel: "MODERATE"
+      openingHours:
+        weekdayText: ["Mon: 11:00-22:00", "Tue: 11:00-22:00", "Wed: 11:00-22:00", "Thu: 11:00-23:00", "Fri: 11:00-23:00", "Sat: 10:00-23:00", "Sun: 10:00-21:00"]
+        openNow: true
+      reviews:
+        - author: "Alice S."
+          rating: 5.0
+          text: "Best pasta in the area"
+          timeMillis: 1727900000000
+      photos:
+        - reference: "photo-ik-1"
+          width: 800
+          height: 600
+          attributions: ["The Italian Kitchen"]
+      url: "https://maps.example.com/place/p-1"

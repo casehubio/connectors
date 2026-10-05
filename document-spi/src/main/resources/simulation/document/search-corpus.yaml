@@ -1,0 +1,45 @@
+document-platform.searchOperations.search:
+  - tenancy-id: household
+    input:
+      query: "architecture"
+      pagination: { cursor: null, pageSize: 10 }
+    output:
+      items:
+        - id: "doc-002"
+          name: "Architecture Overview.pdf"
+          folderId: "folder-docs"
+          contentType: "application/pdf"
+          size: 4096
+          owner: "alice@example.com"
+          webViewLink: "https://docs.example.com/view/doc-002"
+          createdAt: "2026-09-15T11:00:00Z"
+          modifiedAt: "2026-09-15T11:00:00Z"
+      hasMore: false
+      nextCursor: null
+
+  - tenancy-id: household
+    input:
+      query: "report"
+      pagination: { cursor: null, pageSize: 10 }
+    output:
+      items:
+        - id: "rpt-001"
+          name: "Monthly Revenue Report.xlsx"
+          folderId: "folder-reports"
+          contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+          size: 8192
+          owner: "carol@example.com"
+          webViewLink: "https://docs.example.com/view/rpt-001"
+          createdAt: "2026-09-15T10:00:00Z"
+          modifiedAt: "2026-09-15T10:00:00Z"
+        - id: "rpt-002"
+          name: "Quarterly Performance Review.pdf"
+          folderId: "folder-reports"
+          contentType: "application/pdf"
+          size: 3072
+          owner: "dave@example.com"
+          webViewLink: "https://docs.example.com/view/rpt-002"
+          createdAt: "2026-09-15T11:00:00Z"
+          modifiedAt: "2026-09-15T11:00:00Z"
+      hasMore: false
+      nextCursor: null

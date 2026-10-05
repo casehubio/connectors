@@ -22,7 +22,7 @@ final class SeedLoader {
     static List<AccountInfo> loadAccounts() {
         try (var is = SeedLoader.class.getResourceAsStream("/seed/accounts.yaml")) {
             if (is == null) throw new IllegalStateException("Missing /seed/accounts.yaml");
-            return YAML.readValue(is, new TypeReference<>() {});
+            return List.copyOf(YAML.readValue(is, new TypeReference<List<AccountInfo>>() {}));
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
