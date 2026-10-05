@@ -1,13 +1,19 @@
 package io.casehub.connectors.contacts.ref;
 
-import io.casehub.connectors.contacts.model.*;
-
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicLong;
-
+import io.casehub.connectors.contacts.model.Contact;
+import io.casehub.connectors.contacts.model.ContactName;
+import io.casehub.connectors.contacts.model.Group;
+import io.casehub.connectors.contacts.model.LabelledValue;
 import io.quarkus.arc.DefaultBean;
 import jakarta.enterprise.context.ApplicationScoped;
+
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 @DefaultBean
 @ApplicationScoped
@@ -25,24 +31,14 @@ public class InMemoryContactsBackend implements ContactsBackend {
     }
 
     private void seed() {
-        groups.put("g-mycontacts", new Group("g-mycontacts", "myContacts", GroupType.SYSTEM, 0));
-        groups.put("g-starred", new Group("g-starred", "Starred", GroupType.SYSTEM, 0));
-        groups.put("g-work", new Group("g-work", "Work", GroupType.USER_CREATED, 0));
-        groupMembers.put("g-mycontacts", ConcurrentHashMap.newKeySet());
-        groupMembers.put("g-starred", ConcurrentHashMap.newKeySet());
-        groupMembers.put("g-work", ConcurrentHashMap.newKeySet());
-
-        addSeed("Alice Smith", "Alice", "Smith", "alice@example.com", "+1234567001", "Acme Corp", "Engineer", "g-mycontacts", "g-work");
-        addSeed("Bob Jones", "Bob", "Jones", "bob@example.com", "+1234567002", "Acme Corp", "Manager", "g-mycontacts", "g-work");
-        addSeed("Carol Smith", "Carol", "Smith", "carol@example.com", "+1234567003", "Beta Inc", "Designer", "g-mycontacts", "g-starred");
-        addSeed("Dave Wilson", "Dave", "Wilson", "dave@example.com", "+1234567004", "Beta Inc", "CEO", "g-mycontacts");
-        addSeed("Eve Brown", "Eve", "Brown", "eve@example.com", "+1234567005", "Gamma LLC", "CTO", "g-mycontacts", "g-work");
-        addSeed("Frank Lee", "Frank", "Lee", "frank@example.com", "+1234567006", "Gamma LLC", "Intern", "g-mycontacts");
-        addSeed("Grace Chen", "Grace", "Chen", "grace@example.com", "+1234567007", "Delta Co", "VP", "g-mycontacts", "g-starred");
-        addSeed("Hank Miller", "Hank", "Miller", "hank@example.com", "+1234567008", "Acme Corp", "Analyst", "g-mycontacts", "g-work");
-        addSeed("Ivy Davis", "Ivy", "Davis", "ivy@example.com", "+1234567009", "Beta Inc", "PM", "g-mycontacts");
-        addSeed("Jack Taylor", "Jack", "Taylor", "jack@example.com", "+1234567010", "Delta Co", "Director", "g-mycontacts", "g-starred");
-
+        SeedLoader.loadGroups().forEach(g -> {
+            groups.put(g.id(), g);
+            groupMembers.put(g.id(), ConcurrentHashMap.newKeySet());
+        });
+        SeedLoader.loadContacts().forEach(c ->
+                                                  addSeed(c.displayName(), c.givenName(), c.familyName(),
+                                                          c.email(), c.phone(), c.company(), c.title(),
+                                                          c.groups().toArray(String[]::new)));
         updateGroupCounts();
     }
 

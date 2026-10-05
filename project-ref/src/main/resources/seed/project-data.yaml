@@ -1,0 +1,74 @@
+repo:
+  owner: "test-org"
+  name: "test-repo"
+
+labels:
+  - name: "bug"
+    color: "d73a4a"
+    description: "Something isn't working"
+  - name: "enhancement"
+    color: "0075ca"
+    description: "New feature or request"
+  - name: "documentation"
+    color: "0e8a16"
+    description: "Documentation improvements"
+
+milestones:
+  - title: "v1.0"
+    description: "First release"
+    state: "open"
+  - title: "v0.9"
+    description: "Beta release"
+    state: "closed"
+
+issues:
+  - title: "Fix login bug"
+    body: "Login fails on Safari"
+    state: "open"
+    labels: ["bug"]
+    milestone: "v1.0"
+  - title: "Add search feature"
+    body: "Full-text search needed"
+    state: "open"
+    labels: ["enhancement"]
+    milestone: "v1.0"
+  - title: "Update README"
+    body: "Add setup instructions"
+    state: "closed"
+    labels: ["documentation"]
+    milestone: null
+  - title: "Performance bug in dashboard"
+    body: "Slow load times"
+    state: "open"
+    labels: ["bug"]
+    milestone: null
+  - title: "Refactor auth module"
+    body: "Extract token validation"
+    state: "open"
+    labels: ["enhancement"]
+    milestone: null
+
+comments:
+  - issueIndex: 0
+    body: "Reproduced on Safari 17"
+    author: "dev1"
+  - issueIndex: 0
+    body: "Fix incoming in next PR"
+    author: "dev2"
+  - issueIndex: 1
+    body: "Should we use Elasticsearch?"
+    author: "dev1"
+
+boards:
+  - id: "board-1"
+    name: "Project Board"
+    columns:
+      - id: "col-1"
+        name: "To Do"
+        position: 0
+      - id: "col-2"
+        name: "In Progress"
+        position: 1
+      - id: "col-3"
+        name: "Done"
+        position: 2

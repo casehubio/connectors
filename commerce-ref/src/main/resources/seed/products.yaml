@@ -1,0 +1,245 @@
+- id: "prod-1"
+  name: "Sony WH-1000XM5 Headphones"
+  brand: "Sony"
+  sku: "prod-sony-xm5"
+  category: "electronics"
+  description: "Premium noise-cancelling wireless headphones with 30-hour battery life."
+  price:
+    amount: 299.99
+    currency: "GBP"
+  rating: 4.7
+  reviewCount: 2350
+  inStock: true
+  stockQuantity: 45
+  images:
+    - url: "https://example.com/sony-xm5-1.jpg"
+      altText: "Sony WH-1000XM5"
+      width: 800
+      height: 600
+  reviews:
+    - author: "Alice S."
+      rating: 5.0
+      text: "Best noise cancelling I've ever used"
+      timestampMs: 1727900000000
+    - author: "Bob J."
+      rating: 4.0
+      text: "Great sound, slightly tight fit"
+      timestampMs: 1727800000000
+  specifications:
+    type: "Over-ear"
+    connectivity: "Bluetooth 5.2"
+    battery: "30 hours"
+    weight: "250g"
+  url: "https://shop.example.com/product/prod-1"
+
+- id: "prod-2"
+  name: "Kindle Paperwhite"
+  brand: "Amazon"
+  sku: "prod-kindle-pw"
+  category: "electronics"
+  description: "6.8-inch display with adjustable warm light."
+  price:
+    amount: 139.99
+    currency: "GBP"
+  rating: 4.6
+  reviewCount: 18000
+  inStock: true
+  stockQuantity: 120
+  images:
+    - url: "https://example.com/kindle-pw-1.jpg"
+      altText: "Kindle Paperwhite"
+      width: 800
+      height: 600
+  reviews:
+    - author: "Carol S."
+      rating: 5.0
+      text: "Perfect for reading on the tube"
+      timestampMs: 1727700000000
+  specifications:
+    display: "6.8-inch glare-free"
+    storage: "16 GB"
+    battery: "Up to 10 weeks"
+    waterproof: "IPX8"
+  url: "https://shop.example.com/product/prod-2"
+
+- id: "prod-3"
+  name: "The Thursday Murder Club"
+  brand: "Richard Osman"
+  sku: "prod-tmc-book"
+  category: "books"
+  description: "A cosy mystery novel set in a Kent retirement village."
+  price:
+    amount: 8.99
+    currency: "GBP"
+  rating: 4.3
+  reviewCount: 45000
+  inStock: true
+  stockQuantity: 500
+  images:
+    - url: "https://example.com/tmc-1.jpg"
+      altText: "The Thursday Murder Club"
+      width: 400
+      height: 600
+  reviews:
+    - author: "Dave W."
+      rating: 4.0
+      text: "Charming and witty"
+      timestampMs: 1727600000000
+  specifications:
+    format: "Paperback"
+    pages: "400"
+    publisher: "Penguin"
+    isbn: "978-0241988268"
+  url: "https://shop.example.com/product/prod-3"
+
+- id: "prod-4"
+  name: "Le Creuset Dutch Oven"
+  brand: "Le Creuset"
+  sku: "prod-lc-oven"
+  category: "home"
+  description: "Classic 4.5 qt round Dutch oven in Marseille blue."
+  price:
+    amount: 259.00
+    currency: "GBP"
+  rating: 4.8
+  reviewCount: 8500
+  inStock: true
+  stockQuantity: 15
+  images:
+    - url: "https://example.com/lc-oven-1.jpg"
+      altText: "Le Creuset Dutch Oven"
+      width: 800
+      height: 800
+  reviews:
+    - author: "Eve B."
+      rating: 5.0
+      text: "Worth every penny, cooks beautifully"
+      timestampMs: 1727500000000
+    - author: "Frank L."
+      rating: 5.0
+      text: "A kitchen staple"
+      timestampMs: 1727400000000
+  specifications:
+    capacity: "4.5 qt"
+    material: "Enamelled cast iron"
+    colour: "Marseille"
+    dishwasher_safe: "Yes"
+  url: "https://shop.example.com/product/prod-4"
+
+- id: "prod-5"
+  name: "Barbour Bedale Jacket"
+  brand: "Barbour"
+  sku: "prod-barbour-bedale"
+  category: "clothing"
+  description: "Classic wax jacket, a British countryside essential."
+  price:
+    amount: 219.00
+    currency: "GBP"
+  rating: 4.5
+  reviewCount: 3200
+  inStock: true
+  stockQuantity: 30
+  images:
+    - url: "https://example.com/barbour-1.jpg"
+      altText: "Barbour Bedale"
+      width: 600
+      height: 800
+  reviews:
+    - author: "Grace C."
+      rating: 5.0
+      text: "Keeps me dry on dog walks"
+      timestampMs: 1727300000000
+  specifications:
+    material: "Waxed cotton"
+    lining: "Cotton"
+    closure: "Zip and press-stud"
+    country_of_origin: "England"
+  url: "https://shop.example.com/product/prod-5"
+
+- id: "prod-6"
+  name: "Dyson V15 Detect"
+  brand: "Dyson"
+  sku: "prod-dyson-v15"
+  category: "home"
+  description: "Cordless vacuum with laser dust detection."
+  price:
+    amount: 599.99
+    currency: "GBP"
+  rating: 4.4
+  reviewCount: 5600
+  inStock: true
+  stockQuantity: 22
+  images:
+    - url: "https://example.com/dyson-v15-1.jpg"
+      altText: "Dyson V15 Detect"
+      width: 800
+      height: 800
+  reviews:
+    - author: "Hank M."
+      rating: 4.0
+      text: "Impressive tech, heavy for stairs"
+      timestampMs: 1727200000000
+  specifications:
+    runtime: "60 minutes"
+    bin_capacity: "0.76L"
+    weight: "3.1 kg"
+    filtration: "Whole-machine HEPA"
+  url: "https://shop.example.com/product/prod-6"
+
+- id: "prod-7"
+  name: "Penguin Classics Box Set"
+  brand: "Various"
+  sku: "prod-penguin-box"
+  category: "books"
+  description: "20 essential Penguin Classics in a collector's box."
+  price:
+    amount: 79.99
+    currency: "GBP"
+  rating: 4.9
+  reviewCount: 1200
+  inStock: true
+  stockQuantity: 40
+  images:
+    - url: "https://example.com/penguin-box-1.jpg"
+      altText: "Penguin Classics Box Set"
+      width: 800
+      height: 600
+  reviews:
+    - author: "Ivy D."
+      rating: 5.0
+      text: "Beautiful editions, perfect gift"
+      timestampMs: 1727100000000
+  specifications:
+    format: "Paperback box set"
+    volumes: "20"
+    publisher: "Penguin Classics"
+  url: "https://shop.example.com/product/prod-7"
+
+- id: "prod-8"
+  name: "Marshall Stanmore III Speaker"
+  brand: "Marshall"
+  sku: "prod-marshall-iii"
+  category: "electronics"
+  description: "Bluetooth home speaker with iconic Marshall design."
+  price:
+    amount: 329.99
+    currency: "GBP"
+  rating: 4.6
+  reviewCount: 2100
+  inStock: false
+  stockQuantity: 0
+  images:
+    - url: "https://example.com/marshall-iii-1.jpg"
+      altText: "Marshall Stanmore III"
+      width: 800
+      height: 600
+  reviews:
+    - author: "Jack R."
+      rating: 5.0
+      text: "Looks and sounds incredible"
+      timestampMs: 1727000000000
+  specifications:
+    connectivity: "Bluetooth 5.2"
+    power: "80W"
+    dimensions: "350 x 195 x 185 mm"
+  url: "https://shop.example.com/product/prod-8"

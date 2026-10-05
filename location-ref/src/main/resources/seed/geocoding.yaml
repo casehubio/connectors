@@ -1,0 +1,20 @@
+- address: "King's Cross, London"
+  lat: 51.5318
+  lng: -0.1239
+  placeId: "place-kx"
+  types: ["neighborhood", "political"]
+- address: "10 King's Cross Rd, London N1 9AA"
+  lat: 51.5318
+  lng: -0.1239
+  placeId: "p-1"
+  types: ["street_address"]
+- address: "British Museum, Great Russell St, London WC1B 3DG"
+  lat: 51.5194
+  lng: -0.1270
+  placeId: "p-3"
+  types: ["establishment", "museum"]
+- address: "London Bridge, London SE1"
+  lat: 51.5055
+  lng: -0.0876
+  placeId: "place-lb"
+  types: ["neighborhood", "political"]

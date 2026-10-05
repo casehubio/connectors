@@ -1,12 +1,27 @@
 package io.casehub.connectors.location.ref;
 
-import io.casehub.connectors.location.model.*;
-
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-
+import io.casehub.connectors.location.model.Coordinates;
+import io.casehub.connectors.location.model.Distance;
+import io.casehub.connectors.location.model.Duration;
+import io.casehub.connectors.location.model.GeocodingResult;
+import io.casehub.connectors.location.model.OpeningHours;
+import io.casehub.connectors.location.model.Photo;
+import io.casehub.connectors.location.model.Place;
+import io.casehub.connectors.location.model.PlaceDetail;
+import io.casehub.connectors.location.model.PriceLevel;
+import io.casehub.connectors.location.model.Review;
+import io.casehub.connectors.location.model.Route;
+import io.casehub.connectors.location.model.RouteLeg;
+import io.casehub.connectors.location.model.TravelMode;
 import io.quarkus.arc.DefaultBean;
 import jakarta.enterprise.context.ApplicationScoped;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.concurrent.ConcurrentHashMap;
 
 @DefaultBean
 @ApplicationScoped
@@ -22,109 +37,14 @@ public class InMemoryLocationBackend implements LocationBackend {
     }
 
     private void seed() {
-        addPlace("The Italian Kitchen", "10 King's Cross Rd, London N1 9AA",
-            51.5318, -0.1239, List.of("restaurant", "italian"),
-            4.5, 320, "+442071234001", "https://italiankitchen.example.com",
-            PriceLevel.MODERATE,
-            new OpeningHours(List.of(
-                "Mon: 11:00-22:00", "Tue: 11:00-22:00", "Wed: 11:00-22:00",
-                "Thu: 11:00-23:00", "Fri: 11:00-23:00", "Sat: 10:00-23:00",
-                "Sun: 10:00-21:00"), true),
-            List.of(new Review("Alice S.", 5.0, "Best pasta in the area", 1727900000000L),
-                    new Review("Bob J.", 4.0, "Good food, slow service", 1727800000000L)),
-            List.of(new Photo("photo-ik-1", 800, 600, List.of("The Italian Kitchen"))));
-
-        addPlace("Costa Coffee King's Cross", "King's Cross Station, London N1C 4AH",
-            51.5320, -0.1240, List.of("cafe", "coffee_shop"),
-            4.0, 1500, "+442071234002", "https://costa.co.uk",
-            PriceLevel.INEXPENSIVE,
-            new OpeningHours(List.of(
-                "Mon: 06:00-21:00", "Tue: 06:00-21:00", "Wed: 06:00-21:00",
-                "Thu: 06:00-21:00", "Fri: 06:00-21:00", "Sat: 07:00-20:00",
-                "Sun: 08:00-19:00"), true),
-            List.of(new Review("Carol S.", 4.0, "Convenient location", 1727700000000L)),
-            List.of());
-
-        addPlace("British Museum", "Great Russell St, London WC1B 3DG",
-            51.5194, -0.1270, List.of("museum", "tourist_attraction"),
-            4.7, 85000, "+442073231234", "https://britishmuseum.org",
-            PriceLevel.FREE,
-            new OpeningHours(List.of(
-                "Mon: 10:00-17:00", "Tue: 10:00-17:00", "Wed: 10:00-17:00",
-                "Thu: 10:00-20:30", "Fri: 10:00-17:00", "Sat: 10:00-17:00",
-                "Sun: 10:00-17:00"), true),
-            List.of(new Review("Dave W.", 5.0, "World-class collection", 1727600000000L)),
-            List.of(new Photo("photo-bm-1", 1200, 800, List.of("British Museum"))));
-
-        addPlace("Dishoom King's Cross", "5 Stable St, London N1C 4AB",
-            51.5355, -0.1250, List.of("restaurant", "indian"),
-            4.6, 12000, "+442071234004", "https://dishoom.com",
-            PriceLevel.MODERATE,
-            new OpeningHours(List.of(
-                "Mon: 08:00-23:00", "Tue: 08:00-23:00", "Wed: 08:00-23:00",
-                "Thu: 08:00-23:00", "Fri: 08:00-00:00", "Sat: 08:00-00:00",
-                "Sun: 08:00-23:00"), true),
-            List.of(new Review("Eve B.", 5.0, "The bacon naan is legendary", 1727500000000L),
-                    new Review("Frank L.", 4.0, "Long queue but worth it", 1727400000000L)),
-            List.of(new Photo("photo-dk-1", 800, 600, List.of("Dishoom"))));
-
-        addPlace("Waterstones Piccadilly", "203-206 Piccadilly, London W1J 9HD",
-            51.5085, -0.1369, List.of("book_store", "shop"),
-            4.7, 4500, "+442071234005", "https://waterstones.com",
-            PriceLevel.MODERATE,
-            new OpeningHours(List.of(
-                "Mon: 09:00-22:00", "Tue: 09:00-22:00", "Wed: 09:00-22:00",
-                "Thu: 09:00-22:00", "Fri: 09:00-22:00", "Sat: 09:00-22:00",
-                "Sun: 12:00-18:30"), true),
-            List.of(new Review("Grace C.", 5.0, "Six floors of books!", 1727300000000L)),
-            List.of());
-
-        addPlace("The Shard", "32 London Bridge St, London SE1 9SG",
-            51.5045, -0.0865, List.of("tourist_attraction", "observation_deck"),
-            4.5, 35000, "+442071234006", "https://the-shard.com",
-            PriceLevel.EXPENSIVE,
-            new OpeningHours(List.of(
-                "Mon: 10:00-22:00", "Tue: 10:00-22:00", "Wed: 10:00-22:00",
-                "Thu: 10:00-22:00", "Fri: 10:00-22:00", "Sat: 10:00-22:00",
-                "Sun: 10:00-22:00"), true),
-            List.of(new Review("Hank M.", 4.0, "Amazing views, pricey entry", 1727200000000L)),
-            List.of(new Photo("photo-ts-1", 1200, 1600, List.of("The Shard"))));
-
-        addPlace("Borough Market", "8 Southwark St, London SE1 1TL",
-            51.5055, -0.0910, List.of("market", "food_market"),
-            4.6, 45000, "+442071234007", "https://boroughmarket.org.uk",
-            PriceLevel.MODERATE,
-            new OpeningHours(List.of(
-                "Mon: Closed", "Tue: 10:00-17:00", "Wed: 10:00-17:00",
-                "Thu: 10:00-17:00", "Fri: 10:00-18:00", "Sat: 08:00-17:00",
-                "Sun: Closed"), false),
-            List.of(new Review("Ivy D.", 5.0, "Foodie paradise", 1727100000000L)),
-            List.of(new Photo("photo-bm2-1", 800, 600, List.of("Borough Market"))));
-
-        addPlace("Tesco Express King's Cross", "1 Euston Rd, London N1 9AB",
-            51.5300, -0.1230, List.of("supermarket", "grocery"),
-            3.5, 200, "+442071234008", null,
-            PriceLevel.INEXPENSIVE,
-            new OpeningHours(List.of(
-                "Mon: 06:00-23:00", "Tue: 06:00-23:00", "Wed: 06:00-23:00",
-                "Thu: 06:00-23:00", "Fri: 06:00-23:00", "Sat: 07:00-22:00",
-                "Sun: 08:00-22:00"), true),
-            List.of(),
-            List.of());
-
-        geocodingEntries.add(new GeocodingEntry(
-            "King's Cross, London", new Coordinates(51.5318, -0.1239), "place-kx",
-            List.of("neighborhood", "political")));
-        geocodingEntries.add(new GeocodingEntry(
-            "10 King's Cross Rd, London N1 9AA", new Coordinates(51.5318, -0.1239), "p-1",
-            List.of("street_address")));
-        geocodingEntries.add(new GeocodingEntry(
-            "British Museum, Great Russell St, London WC1B 3DG",
-            new Coordinates(51.5194, -0.1270), "p-3",
-            List.of("establishment", "museum")));
-        geocodingEntries.add(new GeocodingEntry(
-            "London Bridge, London SE1", new Coordinates(51.5055, -0.0876), "place-lb",
-            List.of("neighborhood", "political")));
+        SeedLoader.loadPlaces().forEach(p ->
+                                                addPlace(p.name(), p.address(), p.lat(), p.lng(), p.types(),
+                                                         p.rating(), p.ratingsTotal(), p.phone(), p.website(),
+                                                         p.priceLevel(), p.openingHours(), p.reviews(), p.photos()));
+        SeedLoader.loadGeocoding().forEach(g ->
+                                                   geocodingEntries.add(new GeocodingEntry(
+                                                           g.address(), new Coordinates(g.lat(), g.lng()),
+                                                           g.placeId(), g.types())));
     }
 
     private void addPlace(String name, String address, double lat, double lng,

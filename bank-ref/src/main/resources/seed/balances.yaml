@@ -1,0 +1,15 @@
+- accountId: "acc-100"
+  available: 2450.00
+  current: 2450.00
+  currency: "GBP"
+  asOf: "2026-09-25T00:00:00Z"
+- accountId: "acc-200"
+  available: 15000.00
+  current: 15000.00
+  currency: "GBP"
+  asOf: "2026-09-25T00:00:00Z"
+- accountId: "acc-300"
+  available: 5000.00
+  current: 4750.00
+  currency: "GBP"
+  asOf: "2026-09-25T00:00:00Z"

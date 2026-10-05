@@ -1,8 +1,17 @@
 package io.casehub.connectors.bank.ref;
 
-import java.math.BigDecimal;
+import io.casehub.connectors.Page;
+import io.casehub.connectors.PageRequest;
+import io.casehub.connectors.bank.model.AccountBalance;
+import io.casehub.connectors.bank.model.AccountInfo;
+import io.casehub.connectors.bank.model.InitiatedPayment;
+import io.casehub.connectors.bank.model.PaymentRequest;
+import io.casehub.connectors.bank.model.PaymentStatus;
+import io.casehub.connectors.bank.model.Transaction;
+import io.quarkus.arc.DefaultBean;
+import jakarta.enterprise.context.ApplicationScoped;
+
 import java.time.Instant;
-import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Map;
@@ -10,101 +19,27 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-import io.casehub.connectors.Page;
-import io.casehub.connectors.PageRequest;
-import io.casehub.connectors.bank.model.AccountBalance;
-import io.casehub.connectors.bank.model.AccountInfo;
-import io.casehub.connectors.bank.model.AccountType;
-import io.casehub.connectors.bank.model.InitiatedPayment;
-import io.casehub.connectors.bank.model.PaymentRequest;
-import io.casehub.connectors.bank.model.PaymentStatus;
-import io.casehub.connectors.bank.model.Transaction;
-import io.casehub.connectors.bank.model.TransactionDirection;
-import io.casehub.connectors.bank.model.TransactionStatus;
-import io.quarkus.arc.DefaultBean;
-import jakarta.enterprise.context.ApplicationScoped;
-
 @DefaultBean
 @ApplicationScoped
 public class InMemoryBankBackend implements BankBackend {
 
-    private static final List<AccountInfo> ACCOUNTS = List.of(
-            new AccountInfo("acc-100", "Current Account", AccountType.CURRENT, "GBP"),
-            new AccountInfo("acc-200", "Savings Account", AccountType.SAVINGS, "GBP"),
-            new AccountInfo("acc-300", "Credit Card", AccountType.CREDIT_CARD, "GBP"));
+    private final List<AccountInfo> accounts = SeedLoader.loadAccounts();
 
-    private static final Map<String, AccountBalance> BALANCES = Map.of(
-            "acc-100", new AccountBalance("acc-100",
-                    new BigDecimal("2450.00"), new BigDecimal("2450.00"),
-                    "GBP", Instant.parse("2026-09-25T00:00:00Z")),
-            "acc-200", new AccountBalance("acc-200",
-                    new BigDecimal("15000.00"), new BigDecimal("15000.00"),
-                    "GBP", Instant.parse("2026-09-25T00:00:00Z")),
-            "acc-300", new AccountBalance("acc-300",
-                    new BigDecimal("4750.00"), new BigDecimal("5000.00"),
-                    "GBP", Instant.parse("2026-09-25T00:00:00Z")));
+    private final Map<String, AccountBalance> balances = SeedLoader.loadBalances();
 
-    private static final List<Transaction> TRANSACTIONS = List.of(
-            new Transaction("txn-001", "acc-100", new BigDecimal("3.50"),
-                    TransactionDirection.DEBIT, "GBP", "Grocery purchase",
-                    "Tesco Express", "Groceries",
-                    LocalDate.of(2026, 9, 1), TransactionStatus.BOOKED),
-            new Transaction("txn-002", "acc-100", new BigDecimal("45.00"),
-                    TransactionDirection.DEBIT, "GBP", "Fuel",
-                    "Shell Garage", "Transport",
-                    LocalDate.of(2026, 9, 2), TransactionStatus.BOOKED),
-            new Transaction("txn-003", "acc-100", new BigDecimal("2500.00"),
-                    TransactionDirection.CREDIT, "GBP", "Monthly salary",
-                    "ACME Corp", "Salary",
-                    LocalDate.of(2026, 9, 3), TransactionStatus.BOOKED),
-            new Transaction("txn-004", "acc-100", new BigDecimal("12.99"),
-                    TransactionDirection.DEBIT, "GBP", "Subscription",
-                    "Netflix", "Entertainment",
-                    LocalDate.of(2026, 9, 5), TransactionStatus.BOOKED),
-            new Transaction("txn-005", "acc-100", new BigDecimal("67.50"),
-                    TransactionDirection.DEBIT, "GBP", "Weekly shop",
-                    "Sainsburys", "Groceries",
-                    LocalDate.of(2026, 9, 7), TransactionStatus.BOOKED),
-            new Transaction("txn-006", "acc-100", new BigDecimal("150.00"),
-                    TransactionDirection.DEBIT, "GBP", "Energy bill",
-                    "British Gas", "Utilities",
-                    LocalDate.of(2026, 9, 10), TransactionStatus.BOOKED),
-            new Transaction("txn-007", "acc-100", new BigDecimal("8.90"),
-                    TransactionDirection.DEBIT, "GBP", "Coffee",
-                    "Costa Coffee", "Dining",
-                    LocalDate.of(2026, 9, 12), TransactionStatus.BOOKED),
-            new Transaction("txn-008", "acc-100", new BigDecimal("35.00"),
-                    TransactionDirection.DEBIT, "GBP", "Online order",
-                    "Amazon UK", "Shopping",
-                    LocalDate.of(2026, 9, 14), TransactionStatus.BOOKED),
-            new Transaction("txn-009", "acc-100", new BigDecimal("500.00"),
-                    TransactionDirection.DEBIT, "GBP", "Savings transfer",
-                    "Nationwide BS", "Transfers",
-                    LocalDate.of(2026, 9, 15), TransactionStatus.BOOKED),
-            new Transaction("txn-010", "acc-100", new BigDecimal("22.50"),
-                    TransactionDirection.DEBIT, "GBP", "Food delivery",
-                    "Deliveroo", "Dining",
-                    LocalDate.of(2026, 9, 18), TransactionStatus.BOOKED),
-            new Transaction("txn-011", "acc-100", new BigDecimal("9.99"),
-                    TransactionDirection.DEBIT, "GBP", "Music subscription",
-                    "Spotify", "Entertainment",
-                    LocalDate.of(2026, 9, 20), TransactionStatus.BOOKED),
-            new Transaction("txn-012", "acc-100", new BigDecimal("75.00"),
-                    TransactionDirection.DEBIT, "GBP", "Travel card",
-                    "TfL", "Transport",
-                    LocalDate.of(2026, 9, 22), TransactionStatus.PENDING));
+    private final List<Transaction> transactions = SeedLoader.loadTransactions();
 
     private final ConcurrentHashMap<String, PaymentState> payments = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, String> idempotencyIndex = new ConcurrentHashMap<>();
 
     @Override
     public List<AccountInfo> listAccounts() {
-        return ACCOUNTS;
+        return accounts;
     }
 
     @Override
     public AccountBalance balance(String accountId) {
-        AccountBalance bal = BALANCES.get(accountId);
+        AccountBalance bal = balances.get(accountId);
         if (bal == null) {
             throw new NoSuchElementException(
                     "No account with id '" + accountId + "'");
@@ -116,7 +51,7 @@ public class InMemoryBankBackend implements BankBackend {
     public Page<Transaction> listTransactions(String accountId,
                                                Instant from, Instant to,
                                                PageRequest pagination) {
-        List<Transaction> filtered = TRANSACTIONS.stream()
+        List<Transaction> filtered = transactions.stream()
                 .filter(t -> t.accountId().equals(accountId))
                 .filter(t -> {
                     Instant txnInstant = t.date().atStartOfDay(ZoneOffset.UTC).toInstant();
@@ -135,7 +70,7 @@ public class InMemoryBankBackend implements BankBackend {
 
     @Override
     public Transaction getTransaction(String accountId, String transactionId) {
-        return TRANSACTIONS.stream()
+        return transactions.stream()
                 .filter(t -> t.accountId().equals(accountId)
                         && t.id().equals(transactionId))
                 .findFirst()

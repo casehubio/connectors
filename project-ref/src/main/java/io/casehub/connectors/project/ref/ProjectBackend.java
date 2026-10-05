@@ -257,42 +257,45 @@ public class ProjectBackend {
 
     public static ProjectBackend withTestData() {
         var backend = new ProjectBackend();
-        var repo = new OwnerRepo("test-org", "test-repo");
+        var seed    = SeedLoader.load();
+        var repo    = new OwnerRepo(seed.repo().owner(), seed.repo().name());
 
-        backend.createLabel(repo, new Label(null, "bug", "d73a4a", "Something isn't working"));
-        backend.createLabel(repo, new Label(null, "enhancement", "0075ca", "New feature or request"));
-        backend.createLabel(repo, new Label(null, "documentation", "0e8a16", "Documentation improvements"));
+        seed.labels().forEach(l ->
+                                      backend.createLabel(repo, new Label(null, l.name(), l.color(), l.description())));
 
-        var m1 = backend.createMilestone(repo, new Milestone(null, 0, "v1.0", "First release", null, null, 0, 0));
-        var m2 = backend.createMilestone(repo, new Milestone(null, 0, "v0.9", "Beta release", null, null, 0, 0));
-        backend.closeMilestone(repo, m2.number());
+        var createdMilestones = new java.util.LinkedHashMap<String, Milestone>();
+        seed.milestones().forEach(m -> {
+            var created = backend.createMilestone(repo,
+                                                  new Milestone(null, 0, m.title(), m.description(), null, null, 0, 0));
+            if ("closed".equals(m.state())) {
+                created = backend.closeMilestone(repo, created.number());
+            }
+            createdMilestones.put(m.title(), created);
+        });
 
-        var bugLabel = backend.getLabel(repo, "bug");
-        var enhLabel = backend.getLabel(repo, "enhancement");
-        var docLabel = backend.getLabel(repo, "documentation");
+        var createdIssues = new java.util.ArrayList<Issue>();
+        seed.issues().forEach(i -> {
+            var issueLabels = i.labels().stream()
+                               .map(name -> backend.getLabel(repo, name))
+                               .toList();
+            var milestone = i.milestone() != null ? createdMilestones.get(i.milestone()) : null;
+            var created = backend.createIssue(repo,
+                                              new Issue(null, 0, i.title(), i.body(), "open",
+                                                        issueLabels, milestone, List.of(), null, null));
+            if ("closed".equals(i.state())) {
+                created = backend.closeIssue(repo, created.number());
+            }
+            createdIssues.add(created);
+        });
 
-        backend.createIssue(repo, new Issue(null, 0, "Fix login bug", "Login fails on Safari",
-            "open", List.of(bugLabel), m1, List.of(), null, null));
-        backend.createIssue(repo, new Issue(null, 0, "Add search feature", "Full-text search needed",
-            "open", List.of(enhLabel), m1, List.of(), null, null));
-        var i3 = backend.createIssue(repo, new Issue(null, 0, "Update README", "Add setup instructions",
-            "open", List.of(docLabel), null, List.of(), null, null));
-        backend.closeIssue(repo, i3.number());
-        backend.createIssue(repo, new Issue(null, 0, "Performance bug in dashboard", "Slow load times",
-            "open", List.of(bugLabel), null, List.of(), null, null));
-        backend.createIssue(repo, new Issue(null, 0, "Refactor auth module", "Extract token validation",
-            "open", List.of(enhLabel), null, List.of(), null, null));
+        seed.comments().forEach(c ->
+                                        backend.createComment(repo, createdIssues.get(c.issueIndex()).number(),
+                                                              new Comment(null, c.body(), c.author(), null, null)));
 
-        backend.createComment(repo, 1, new Comment(null, "Reproduced on Safari 17", "dev1", null, null));
-        backend.createComment(repo, 1, new Comment(null, "Fix incoming in next PR", "dev2", null, null));
-        backend.createComment(repo, 2, new Comment(null, "Should we use Elasticsearch?", "dev1", null, null));
-
-        String boardId = "board-1";
-        backend.boards.put(repoKey(repo) + "/" + boardId, new ProjectBoard(boardId, "Project Board"));
-        backend.boardColumns.put(repoKey(repo) + "/" + boardId, List.of(
-            new ProjectColumn("col-1", "To Do", 0),
-            new ProjectColumn("col-2", "In Progress", 1),
-            new ProjectColumn("col-3", "Done", 2)));
+        seed.boards().forEach(b -> {
+            backend.boards.put(repoKey(repo) + "/" + b.id(), new ProjectBoard(b.id(), b.name()));
+            backend.boardColumns.put(repoKey(repo) + "/" + b.id(), b.columns());
+        });
 
         return backend;
     }

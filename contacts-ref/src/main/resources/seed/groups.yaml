@@ -1,0 +1,12 @@
+- id: "g-mycontacts"
+  name: "myContacts"
+  groupType: "SYSTEM"
+  memberCount: 0
+- id: "g-starred"
+  name: "Starred"
+  groupType: "SYSTEM"
+  memberCount: 0
+- id: "g-work"
+  name: "Work"
+  groupType: "USER_CREATED"
+  memberCount: 0

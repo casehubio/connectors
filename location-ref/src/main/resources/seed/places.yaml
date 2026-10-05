@@ -1,0 +1,239 @@
+- name: "The Italian Kitchen"
+  address: "10 King's Cross Rd, London N1 9AA"
+  lat: 51.5318
+  lng: -0.1239
+  types: ["restaurant", "italian"]
+  rating: 4.5
+  ratingsTotal: 320
+  phone: "+442071234001"
+  website: "https://italiankitchen.example.com"
+  priceLevel: "MODERATE"
+  openingHours:
+    weekdayText:
+      - "Mon: 11:00-22:00"
+      - "Tue: 11:00-22:00"
+      - "Wed: 11:00-22:00"
+      - "Thu: 11:00-23:00"
+      - "Fri: 11:00-23:00"
+      - "Sat: 10:00-23:00"
+      - "Sun: 10:00-21:00"
+    openNow: true
+  reviews:
+    - author: "Alice S."
+      rating: 5.0
+      text: "Best pasta in the area"
+      timeMillis: 1727900000000
+    - author: "Bob J."
+      rating: 4.0
+      text: "Good food, slow service"
+      timeMillis: 1727800000000
+  photos:
+    - reference: "photo-ik-1"
+      width: 800
+      height: 600
+      attributions: ["The Italian Kitchen"]
+
+- name: "Costa Coffee King's Cross"
+  address: "King's Cross Station, London N1C 4AH"
+  lat: 51.5320
+  lng: -0.1240
+  types: ["cafe", "coffee_shop"]
+  rating: 4.0
+  ratingsTotal: 1500
+  phone: "+442071234002"
+  website: "https://costa.co.uk"
+  priceLevel: "INEXPENSIVE"
+  openingHours:
+    weekdayText:
+      - "Mon: 06:00-21:00"
+      - "Tue: 06:00-21:00"
+      - "Wed: 06:00-21:00"
+      - "Thu: 06:00-21:00"
+      - "Fri: 06:00-21:00"
+      - "Sat: 07:00-20:00"
+      - "Sun: 08:00-19:00"
+    openNow: true
+  reviews:
+    - author: "Carol S."
+      rating: 4.0
+      text: "Convenient location"
+      timeMillis: 1727700000000
+  photos: []
+
+- name: "British Museum"
+  address: "Great Russell St, London WC1B 3DG"
+  lat: 51.5194
+  lng: -0.1270
+  types: ["museum", "tourist_attraction"]
+  rating: 4.7
+  ratingsTotal: 85000
+  phone: "+442073231234"
+  website: "https://britishmuseum.org"
+  priceLevel: "FREE"
+  openingHours:
+    weekdayText:
+      - "Mon: 10:00-17:00"
+      - "Tue: 10:00-17:00"
+      - "Wed: 10:00-17:00"
+      - "Thu: 10:00-20:30"
+      - "Fri: 10:00-17:00"
+      - "Sat: 10:00-17:00"
+      - "Sun: 10:00-17:00"
+    openNow: true
+  reviews:
+    - author: "Dave W."
+      rating: 5.0
+      text: "World-class collection"
+      timeMillis: 1727600000000
+  photos:
+    - reference: "photo-bm-1"
+      width: 1200
+      height: 800
+      attributions: ["British Museum"]
+
+- name: "Dishoom King's Cross"
+  address: "5 Stable St, London N1C 4AB"
+  lat: 51.5355
+  lng: -0.1250
+  types: ["restaurant", "indian"]
+  rating: 4.6
+  ratingsTotal: 12000
+  phone: "+442071234004"
+  website: "https://dishoom.com"
+  priceLevel: "MODERATE"
+  openingHours:
+    weekdayText:
+      - "Mon: 08:00-23:00"
+      - "Tue: 08:00-23:00"
+      - "Wed: 08:00-23:00"
+      - "Thu: 08:00-23:00"
+      - "Fri: 08:00-00:00"
+      - "Sat: 08:00-00:00"
+      - "Sun: 08:00-23:00"
+    openNow: true
+  reviews:
+    - author: "Eve B."
+      rating: 5.0
+      text: "The bacon naan is legendary"
+      timeMillis: 1727500000000
+    - author: "Frank L."
+      rating: 4.0
+      text: "Long queue but worth it"
+      timeMillis: 1727400000000
+  photos:
+    - reference: "photo-dk-1"
+      width: 800
+      height: 600
+      attributions: ["Dishoom"]
+
+- name: "Waterstones Piccadilly"
+  address: "203-206 Piccadilly, London W1J 9HD"
+  lat: 51.5085
+  lng: -0.1369
+  types: ["book_store", "shop"]
+  rating: 4.7
+  ratingsTotal: 4500
+  phone: "+442071234005"
+  website: "https://waterstones.com"
+  priceLevel: "MODERATE"
+  openingHours:
+    weekdayText:
+      - "Mon: 09:00-22:00"
+      - "Tue: 09:00-22:00"
+      - "Wed: 09:00-22:00"
+      - "Thu: 09:00-22:00"
+      - "Fri: 09:00-22:00"
+      - "Sat: 09:00-22:00"
+      - "Sun: 12:00-18:30"
+    openNow: true
+  reviews:
+    - author: "Grace C."
+      rating: 5.0
+      text: "Six floors of books!"
+      timeMillis: 1727300000000
+  photos: []
+
+- name: "The Shard"
+  address: "32 London Bridge St, London SE1 9SG"
+  lat: 51.5045
+  lng: -0.0865
+  types: ["tourist_attraction", "observation_deck"]
+  rating: 4.5
+  ratingsTotal: 35000
+  phone: "+442071234006"
+  website: "https://the-shard.com"
+  priceLevel: "EXPENSIVE"
+  openingHours:
+    weekdayText:
+      - "Mon: 10:00-22:00"
+      - "Tue: 10:00-22:00"
+      - "Wed: 10:00-22:00"
+      - "Thu: 10:00-22:00"
+      - "Fri: 10:00-22:00"
+      - "Sat: 10:00-22:00"
+      - "Sun: 10:00-22:00"
+    openNow: true
+  reviews:
+    - author: "Hank M."
+      rating: 4.0
+      text: "Amazing views, pricey entry"
+      timeMillis: 1727200000000
+  photos:
+    - reference: "photo-ts-1"
+      width: 1200
+      height: 1600
+      attributions: ["The Shard"]
+
+- name: "Borough Market"
+  address: "8 Southwark St, London SE1 1TL"
+  lat: 51.5055
+  lng: -0.0910
+  types: ["market", "food_market"]
+  rating: 4.6
+  ratingsTotal: 45000
+  phone: "+442071234007"
+  website: "https://boroughmarket.org.uk"
+  priceLevel: "MODERATE"
+  openingHours:
+    weekdayText:
+      - "Mon: Closed"
+      - "Tue: 10:00-17:00"
+      - "Wed: 10:00-17:00"
+      - "Thu: 10:00-17:00"
+      - "Fri: 10:00-18:00"
+      - "Sat: 08:00-17:00"
+      - "Sun: Closed"
+    openNow: false
+  reviews:
+    - author: "Ivy D."
+      rating: 5.0
+      text: "Foodie paradise"
+      timeMillis: 1727100000000
+  photos:
+    - reference: "photo-bm2-1"
+      width: 800
+      height: 600
+      attributions: ["Borough Market"]
+
+- name: "Tesco Express King's Cross"
+  address: "1 Euston Rd, London N1 9AB"
+  lat: 51.5300
+  lng: -0.1230
+  types: ["supermarket", "grocery"]
+  rating: 3.5
+  ratingsTotal: 200
+  phone: "+442071234008"
+  website: null
+  priceLevel: "INEXPENSIVE"
+  openingHours:
+    weekdayText:
+      - "Mon: 06:00-23:00"
+      - "Tue: 06:00-23:00"
+      - "Wed: 06:00-23:00"
+      - "Thu: 06:00-23:00"
+      - "Fri: 06:00-23:00"
+      - "Sat: 07:00-22:00"
+      - "Sun: 08:00-22:00"
+    openNow: true
+  reviews: []
+  photos: []

@@ -1,0 +1,89 @@
+- displayName: "Alice Smith"
+  givenName: "Alice"
+  familyName: "Smith"
+  email: "alice@example.com"
+  phone: "+1234567001"
+  company: "Acme Corp"
+  title: "Engineer"
+  groups: ["g-mycontacts", "g-work"]
+
+- displayName: "Bob Jones"
+  givenName: "Bob"
+  familyName: "Jones"
+  email: "bob@example.com"
+  phone: "+1234567002"
+  company: "Acme Corp"
+  title: "Manager"
+  groups: ["g-mycontacts", "g-work"]
+
+- displayName: "Carol Smith"
+  givenName: "Carol"
+  familyName: "Smith"
+  email: "carol@example.com"
+  phone: "+1234567003"
+  company: "Beta Inc"
+  title: "Designer"
+  groups: ["g-mycontacts", "g-starred"]
+
+- displayName: "Dave Wilson"
+  givenName: "Dave"
+  familyName: "Wilson"
+  email: "dave@example.com"
+  phone: "+1234567004"
+  company: "Beta Inc"
+  title: "CEO"
+  groups: ["g-mycontacts"]
+
+- displayName: "Eve Brown"
+  givenName: "Eve"
+  familyName: "Brown"
+  email: "eve@example.com"
+  phone: "+1234567005"
+  company: "Gamma LLC"
+  title: "CTO"
+  groups: ["g-mycontacts", "g-work"]
+
+- displayName: "Frank Lee"
+  givenName: "Frank"
+  familyName: "Lee"
+  email: "frank@example.com"
+  phone: "+1234567006"
+  company: "Gamma LLC"
+  title: "Intern"
+  groups: ["g-mycontacts"]
+
+- displayName: "Grace Chen"
+  givenName: "Grace"
+  familyName: "Chen"
+  email: "grace@example.com"
+  phone: "+1234567007"
+  company: "Delta Co"
+  title: "VP"
+  groups: ["g-mycontacts", "g-starred"]
+
+- displayName: "Hank Miller"
+  givenName: "Hank"
+  familyName: "Miller"
+  email: "hank@example.com"
+  phone: "+1234567008"
+  company: "Acme Corp"
+  title: "Analyst"
+  groups: ["g-mycontacts", "g-work"]
+
+- displayName: "Ivy Davis"
+  givenName: "Ivy"
+  familyName: "Davis"
+  email: "ivy@example.com"
+  phone: "+1234567009"
+  company: "Beta Inc"
+  title: "PM"
+  groups: ["g-mycontacts"]
+
+- displayName: "Jack Taylor"
+  givenName: "Jack"
+  familyName: "Taylor"
+  email: "jack@example.com"
+  phone: "+1234567010"
+  company: "Delta Co"
+  title: "Director"
+  groups: ["g-mycontacts", "g-starred"]

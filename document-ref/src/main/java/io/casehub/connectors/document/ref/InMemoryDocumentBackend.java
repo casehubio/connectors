@@ -32,38 +32,10 @@ public class InMemoryDocumentBackend implements DocumentBackend {
     }
 
     private void loadData() {
-        var now           = Instant.parse("2026-09-15T10:00:00Z");
-        var docsFolder    = new Folder("folder-docs", "Documents", "root", now);
-        var reportsFolder = new Folder("folder-reports", "Reports", "root", now);
-        var archiveFolder = new Folder("folder-archive", "Archive", "root",
-                                       now.minusSeconds(86400 * 30));
-        folders.add(docsFolder);
-        folders.add(reportsFolder);
-        folders.add(archiveFolder);
-
-        addFile("folder-docs", "doc-001", "Q3 Quarterly Plan.docx",
-                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                2048, "user@example.com", now);
-        addFile("folder-docs", "doc-002", "Architecture Overview.pdf",
-                "application/pdf", 4096, "alice@example.com",
-                now.plusSeconds(3600));
-        addFile("folder-docs", "doc-003", "Meeting Notes 2026-09-10.md",
-                "text/markdown", 512, "user@example.com",
-                now.plusSeconds(7200));
-        addFile("folder-docs", "doc-004", "API Design Guidelines.md",
-                "text/markdown", 1024, "bob@example.com",
-                now.plusSeconds(10800));
-
-        addFile("folder-reports", "rpt-001", "Monthly Revenue Report.xlsx",
-                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                8192, "carol@example.com", now);
-        addFile("folder-reports", "rpt-002", "Quarterly Performance Review.pdf",
-                "application/pdf", 3072, "dave@example.com",
-                now.plusSeconds(3600));
-
-        addFile("folder-archive", "arc-001", "Old Project Spec.pdf",
-                "application/pdf", 1536, "user@example.com",
-                now.minusSeconds(86400 * 60));
+        SeedLoader.loadFolders().forEach(folders::add);
+        SeedLoader.loadFiles().forEach(f ->
+                                               addFile(f.folderId(), f.id(), f.name(), f.contentType(),
+                                                       f.size(), f.owner(), f.createdAt()));
     }
 
     private void addFile(String folderId, String id, String name,

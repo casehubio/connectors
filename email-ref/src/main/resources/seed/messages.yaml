@@ -1,0 +1,124 @@
+- id: "msg-001"
+  mailboxId: "inbox"
+  messageId: "<msg-001@mail.example.com>"
+  from: "alice@example.com"
+  to: ["user@example.com"]
+  cc: []
+  subject: "Q3 Planning Session"
+  bodyText: "Hi, let's schedule the Q3 planning session for next week."
+  bodyHtml: null
+  receivedAt: "2026-09-15T09:30:00Z"
+  read: true
+  attachments: []
+
+- id: "msg-002"
+  mailboxId: "inbox"
+  messageId: "<msg-002@mail.example.com>"
+  from: "bob@example.com"
+  to: ["user@example.com"]
+  cc: ["carol@example.com"]
+  subject: "Invoice #4821 attached"
+  bodyText: "Please find the invoice attached."
+  bodyHtml: "<html><body><p>Please find the invoice attached.</p></body></html>"
+  receivedAt: "2026-09-16T14:15:00Z"
+  read: true
+  attachments:
+    - id: "att-001"
+      filename: "invoice-4821.pdf"
+      contentType: "application/pdf"
+      size: 24576
+
+- id: "msg-003"
+  mailboxId: "inbox"
+  messageId: "<msg-003@mail.example.com>"
+  from: "noreply@github.com"
+  to: ["user@example.com"]
+  cc: []
+  subject: "[connectors] PR #112 merged"
+  bodyText: "Your pull request #112 has been merged into main."
+  bodyHtml: "<html><body><p>Your pull request #112 has been merged into main.</p></body></html>"
+  receivedAt: "2026-09-17T08:00:00Z"
+  read: false
+  attachments: []
+
+- id: "msg-004"
+  mailboxId: "inbox"
+  messageId: "<msg-004@mail.example.com>"
+  from: "carol@example.com"
+  to: ["user@example.com", "dave@example.com"]
+  cc: []
+  subject: "Architecture review notes"
+  bodyText: "Attached are the notes from today's architecture review."
+  bodyHtml: null
+  receivedAt: "2026-09-18T16:45:00Z"
+  read: false
+  attachments:
+    - id: "att-002"
+      filename: "arch-review-notes.docx"
+      contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+      size: 18432
+
+- id: "msg-005"
+  mailboxId: "inbox"
+  messageId: "<msg-005@mail.example.com>"
+  from: "dave@example.com"
+  to: ["user@example.com"]
+  cc: []
+  subject: "Re: Architecture review notes"
+  bodyText: "Thanks for sharing. I have a few comments inline."
+  bodyHtml: null
+  receivedAt: "2026-09-19T10:20:00Z"
+  read: false
+  attachments: []
+
+- id: "msg-006"
+  mailboxId: "inbox"
+  messageId: null
+  from: "newsletter@techweekly.com"
+  to: ["user@example.com"]
+  cc: []
+  subject: "This week in tech — September 2026"
+  bodyText: "Your weekly tech roundup is here."
+  bodyHtml: "<html><body><h1>Tech Weekly</h1><p>Your weekly tech roundup.</p></body></html>"
+  receivedAt: "2026-09-20T06:00:00Z"
+  read: true
+  attachments: []
+
+- id: "msg-101"
+  mailboxId: "sent"
+  messageId: "<msg-101@mail.example.com>"
+  from: "user@example.com"
+  to: ["alice@example.com"]
+  cc: []
+  subject: "Re: Q3 Planning Session"
+  bodyText: "Thursday 2pm works for me."
+  bodyHtml: null
+  receivedAt: "2026-09-15T10:05:00Z"
+  read: true
+  attachments: []
+
+- id: "msg-102"
+  mailboxId: "sent"
+  messageId: "<msg-102@mail.example.com>"
+  from: "user@example.com"
+  to: ["bob@example.com"]
+  cc: ["carol@example.com"]
+  subject: "Re: Invoice #4821 attached"
+  bodyText: "Received, I'll process it today."
+  bodyHtml: null
+  receivedAt: "2026-09-16T15:30:00Z"
+  read: true
+  attachments: []
+
+- id: "msg-201"
+  mailboxId: "archive"
+  messageId: "<msg-201@mail.example.com>"
+  from: "hr@example.com"
+  to: ["user@example.com"]
+  cc: []
+  subject: "Holiday policy update"
+  bodyText: "Please review the updated holiday policy."
+  bodyHtml: "<html><body><p>Please review the updated holiday policy.</p></body></html>"
+  receivedAt: "2026-08-01T09:00:00Z"
+  read: true
+  attachments: []
