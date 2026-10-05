@@ -137,6 +137,24 @@ To add Commands support to a new `ChatPlatform`: (1) implement `Commands` for re
 
 **`CommercePlatformService`** (`commerce-spi`) -- routing service, same `@All List<CommercePlatform>` pattern.
 
+### Ref Implementation Seed Data
+
+All ref implementations with pre-loaded data use YAML seed files under `<module>/src/main/resources/seed/`. Each module has a package-private `SeedLoader` class that reads the YAML via Jackson (`jackson-dataformat-yaml` + `jackson-datatype-jsr310`) and returns domain objects. The backend constructor calls `seed()` which delegates to the loader — this preserves non-CDI test usage (`new InMemory*Backend()` still works).
+
+| Module | Seed files | Data |
+|--------|-----------|------|
+| `commerce-ref` | `products.yaml` | 8 products with reviews, images, specs |
+| `contacts-ref` | `contacts.yaml`, `groups.yaml` | 10 contacts, 3 groups |
+| `document-ref` | `folders.yaml`, `files.yaml` | 3 folders, 7 files |
+| `email-ref` | `messages.yaml` | 9 messages across 3 mailboxes |
+| `bank-ref` | `accounts.yaml`, `balances.yaml`, `transactions.yaml` | 3 accounts, 12 transactions |
+| `location-ref` | `places.yaml`, `geocoding.yaml` | 8 London places, 4 geocoding entries |
+| `project-ref` | `project-data.yaml` | Labels, milestones, issues, comments, board |
+
+`chat-ref` and `calendar-ref` start empty — no seed files.
+
+**Simulation corpus files** for interpretive capabilities (search, relevance ranking) live in the SPI modules under `<spi>/src/main/resources/simulation/<domain>/`. These follow the InvocationRecord format established by `chat-spi` and `bank-spi`.
+
 ### Notification Bridge Architecture
 
 **`NotificationBridgeStartup`** (`notification-bridge`) -- `@Startup @ApplicationScoped`. At `@PostConstruct`:
