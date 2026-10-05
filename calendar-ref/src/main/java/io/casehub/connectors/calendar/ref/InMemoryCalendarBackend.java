@@ -4,6 +4,7 @@ import io.casehub.connectors.calendar.model.CalendarEvent;
 import io.casehub.connectors.calendar.model.CalendarInfo;
 import io.casehub.connectors.calendar.model.EventDetails;
 import io.casehub.connectors.calendar.spi.EventTiming;
+import io.quarkus.arc.DefaultBean;
 import jakarta.enterprise.context.ApplicationScoped;
 
 import java.time.Instant;
@@ -15,6 +16,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
+@DefaultBean
 @ApplicationScoped
 public class InMemoryCalendarBackend implements CalendarBackend {
 
