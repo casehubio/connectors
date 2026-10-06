@@ -137,6 +137,10 @@ To add Commands support to a new `ChatPlatform`: (1) implement `Commands` for re
 
 **`CommercePlatformService`** (`commerce-spi`) -- routing service, same `@All List<CommercePlatform>` pattern.
 
+**`TravelPlatform` SPI** (`travel-spi`) -- nested capability sub-interfaces: `TransportSearch` (route/schedule search by origin, destination, date, and mode with `Page<TransportOption>`), `TransportBooking` (user-scoped book/get/list/cancel returning `TransportBookingConfirmation`), `AccommodationSearch` (availability search by location, dates, guests with `Page<Accommodation>`, detail lookup returning `AccommodationDetail`), `AccommodationBooking` (user-scoped book/get/list/cancel returning `AccommodationBookingConfirmation`). Search capabilities are unauthenticated (no userId -- app-level auth); booking capabilities are user-scoped (`transportBooking(userId)`, `accommodationBooking(userId)`). `supports(Class<?>)` introspection. Annotated with `@SimulationEligible(name = "travel-platform")`.
+
+**`TravelPlatformService`** (`travel-spi`) -- routing service, same `@All List<TravelPlatform>` pattern.
+
 ### Ref Implementation Seed Data
 
 All ref implementations with pre-loaded data use YAML seed files under `<module>/src/main/resources/seed/`. Each module has a package-private `SeedLoader` class that reads the YAML via Jackson (`jackson-dataformat-yaml` + `jackson-datatype-jsr310`) and returns domain objects. Seeding happens via field initializers or `@PostConstruct` — CDI invokes it automatically, while `withTestData()` static factories preserve non-CDI test usage.
@@ -149,6 +153,7 @@ All ref implementations with pre-loaded data use YAML seed files under `<module>
 | `email-ref` | `messages.yaml` | 9 messages across 3 mailboxes |
 | `bank-ref` | `accounts.yaml`, `balances.yaml`, `transactions.yaml` | 3 accounts, 12 transactions |
 | `location-ref` | `places.yaml`, `geocoding.yaml` | 8 London places, 4 geocoding entries |
+| `travel-ref` | `transport.yaml`, `accommodation.yaml` | 8 UK transport options, 8 UK accommodations |
 | `project-ref` | `project-data.yaml` | Labels, milestones, issues, comments, board |
 
 `chat-ref` and `calendar-ref` start empty — no seed files.

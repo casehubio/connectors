@@ -1,0 +1,231 @@
+- id: "acc-001"
+  name: "The Strand Palace Hotel"
+  type: "HOTEL"
+  location: "London, Strand"
+  description: "A grand hotel on the Strand, minutes from Covent Garden and the Thames."
+  rating: 4.2
+  pricePerNight:
+    amount: 145.00
+    currency: "GBP"
+  amenities:
+    - "Free Wi-Fi"
+    - "Restaurant"
+    - "Bar"
+    - "Fitness Centre"
+    - "24-Hour Reception"
+  images:
+    - "strand-palace-exterior.jpg"
+    - "strand-palace-lobby.jpg"
+  roomTypes:
+    - name: "Standard Double"
+      capacity: 2
+      pricePerNight:
+        amount: 145.00
+        currency: "GBP"
+    - name: "Superior King"
+      capacity: 2
+      pricePerNight:
+        amount: 195.00
+        currency: "GBP"
+    - name: "Family Room"
+      capacity: 4
+      pricePerNight:
+        amount: 245.00
+        currency: "GBP"
+
+- id: "acc-002"
+  name: "The Hoxton Southwark"
+  type: "HOTEL"
+  location: "London, Southwark"
+  description: "A design-led hotel in Southwark, near the Tate Modern and Borough Market."
+  rating: 4.5
+  pricePerNight:
+    amount: 175.00
+    currency: "GBP"
+  amenities:
+    - "Free Wi-Fi"
+    - "Restaurant"
+    - "Rooftop Bar"
+    - "Co-Working Space"
+  images:
+    - "hoxton-southwark-exterior.jpg"
+    - "hoxton-southwark-room.jpg"
+  roomTypes:
+    - name: "Shoebox"
+      capacity: 1
+      pricePerNight:
+        amount: 129.00
+        currency: "GBP"
+    - name: "Cosy"
+      capacity: 2
+      pricePerNight:
+        amount: 175.00
+        currency: "GBP"
+    - name: "Roomy"
+      capacity: 2
+      pricePerNight:
+        amount: 225.00
+        currency: "GBP"
+
+- id: "acc-003"
+  name: "Safestay London Elephant & Castle"
+  type: "HOSTEL"
+  location: "London, Elephant and Castle"
+  description: "A modern hostel in a converted Victorian courthouse, near central London."
+  rating: 3.8
+  pricePerNight:
+    amount: 28.00
+    currency: "GBP"
+  amenities:
+    - "Free Wi-Fi"
+    - "Shared Kitchen"
+    - "Luggage Storage"
+    - "Bar"
+  images:
+    - "safestay-exterior.jpg"
+  roomTypes:
+    - name: "Dorm Bed"
+      capacity: 1
+      pricePerNight:
+        amount: 28.00
+        currency: "GBP"
+    - name: "Private Double"
+      capacity: 2
+      pricePerNight:
+        amount: 72.00
+        currency: "GBP"
+
+- id: "acc-004"
+  name: "Edinburgh Old Town Apartment"
+  type: "APARTMENT"
+  location: "Edinburgh, Royal Mile"
+  description: "A self-catering apartment on the Royal Mile, walking distance to Edinburgh Castle."
+  rating: 4.6
+  pricePerNight:
+    amount: 110.00
+    currency: "GBP"
+  amenities:
+    - "Free Wi-Fi"
+    - "Full Kitchen"
+    - "Washing Machine"
+    - "City Views"
+  images:
+    - "edinburgh-apartment-lounge.jpg"
+    - "edinburgh-apartment-kitchen.jpg"
+  roomTypes:
+    - name: "One Bedroom"
+      capacity: 2
+      pricePerNight:
+        amount: 110.00
+        currency: "GBP"
+    - name: "Two Bedroom"
+      capacity: 4
+      pricePerNight:
+        amount: 160.00
+        currency: "GBP"
+
+- id: "acc-005"
+  name: "The Pig near Bath"
+  type: "HOTEL"
+  location: "Bath, Hunstrete"
+  description: "A country house hotel set in the Mendip Hills, known for its kitchen garden dining."
+  rating: 4.7
+  pricePerNight:
+    amount: 220.00
+    currency: "GBP"
+  amenities:
+    - "Free Wi-Fi"
+    - "Restaurant"
+    - "Kitchen Garden"
+    - "Potting Shed Spa"
+    - "Grounds"
+  images:
+    - "pig-bath-exterior.jpg"
+    - "pig-bath-garden.jpg"
+  roomTypes:
+    - name: "Snug"
+      capacity: 2
+      pricePerNight:
+        amount: 220.00
+        currency: "GBP"
+    - name: "Luxurious"
+      capacity: 2
+      pricePerNight:
+        amount: 320.00
+        currency: "GBP"
+
+- id: "acc-006"
+  name: "Cotswolds Cottage"
+  type: "HOLIDAY_HOME"
+  location: "Cotswolds, Bourton-on-the-Water"
+  description: "A honey-stone cottage in the Venice of the Cotswolds."
+  rating: 4.4
+  pricePerNight:
+    amount: 165.00
+    currency: "GBP"
+  amenities:
+    - "Free Wi-Fi"
+    - "Full Kitchen"
+    - "Garden"
+    - "Parking"
+    - "Log Burner"
+  images:
+    - "cotswolds-cottage-exterior.jpg"
+    - "cotswolds-cottage-interior.jpg"
+  roomTypes:
+    - name: "Whole Cottage"
+      capacity: 6
+      pricePerNight:
+        amount: 165.00
+        currency: "GBP"
+
+- id: "acc-007"
+  name: "York B&B"
+  type: "BED_AND_BREAKFAST"
+  location: "York, Bootham"
+  description: "A Georgian townhouse B&B near York Minster with full English breakfast."
+  rating: 4.3
+  pricePerNight:
+    amount: 85.00
+    currency: "GBP"
+  amenities:
+    - "Free Wi-Fi"
+    - "Full English Breakfast"
+    - "Garden"
+    - "Parking"
+  images:
+    - "york-bb-exterior.jpg"
+  roomTypes:
+    - name: "Double En-Suite"
+      capacity: 2
+      pricePerNight:
+        amount: 85.00
+        currency: "GBP"
+    - name: "Twin En-Suite"
+      capacity: 2
+      pricePerNight:
+        amount: 85.00
+        currency: "GBP"
+
+- id: "acc-008"
+  name: "Shoreditch Studios"
+  type: "APARTMENT"
+  location: "London, Shoreditch"
+  description: "Modern studio apartments in the heart of East London's creative quarter."
+  rating: 4.1
+  pricePerNight:
+    amount: 95.00
+    currency: "GBP"
+  amenities:
+    - "Free Wi-Fi"
+    - "Kitchenette"
+    - "Smart TV"
+    - "Self Check-In"
+  images:
+    - "shoreditch-studio-room.jpg"
+  roomTypes:
+    - name: "Studio"
+      capacity: 2
+      pricePerNight:
+        amount: 95.00
+        currency: "GBP"

@@ -1,0 +1,103 @@
+- id: "tr-001"
+  origin: "London St Pancras"
+  destination: "Paris Gare du Nord"
+  mode: "TRAIN"
+  operator: "Eurostar"
+  departure: "2026-12-01T06:30:00"
+  arrival: "2026-12-01T09:47:00"
+  durationMinutes: 197
+  price:
+    amount: 89.00
+    currency: "GBP"
+  availableSeats: 42
+
+- id: "tr-002"
+  origin: "London St Pancras"
+  destination: "Paris Gare du Nord"
+  mode: "TRAIN"
+  operator: "Eurostar"
+  departure: "2026-12-01T10:00:00"
+  arrival: "2026-12-01T13:17:00"
+  durationMinutes: 197
+  price:
+    amount: 119.00
+    currency: "GBP"
+  availableSeats: 18
+
+- id: "tr-003"
+  origin: "London Heathrow"
+  destination: "Paris CDG"
+  mode: "FLIGHT"
+  operator: "British Airways"
+  departure: "2026-12-01T07:15:00"
+  arrival: "2026-12-01T09:30:00"
+  durationMinutes: 75
+  price:
+    amount: 145.00
+    currency: "GBP"
+  availableSeats: 56
+
+- id: "tr-004"
+  origin: "London Victoria"
+  destination: "Paris Bercy"
+  mode: "BUS"
+  operator: "FlixBus"
+  departure: "2026-12-01T22:00:00"
+  arrival: "2026-12-02T06:30:00"
+  durationMinutes: 510
+  price:
+    amount: 29.00
+    currency: "GBP"
+  availableSeats: 33
+
+- id: "tr-005"
+  origin: "London Kings Cross"
+  destination: "Edinburgh Waverley"
+  mode: "TRAIN"
+  operator: "LNER"
+  departure: "2026-12-01T08:00:00"
+  arrival: "2026-12-01T12:22:00"
+  durationMinutes: 262
+  price:
+    amount: 72.50
+    currency: "GBP"
+  availableSeats: 85
+
+- id: "tr-006"
+  origin: "London Paddington"
+  destination: "Bristol Temple Meads"
+  mode: "TRAIN"
+  operator: "GWR"
+  departure: "2026-12-01T09:00:00"
+  arrival: "2026-12-01T10:42:00"
+  durationMinutes: 102
+  price:
+    amount: 38.00
+    currency: "GBP"
+  availableSeats: 120
+
+- id: "tr-007"
+  origin: "Dover"
+  destination: "Calais"
+  mode: "FERRY"
+  operator: "P&O Ferries"
+  departure: "2026-12-01T11:00:00"
+  arrival: "2026-12-01T13:30:00"
+  durationMinutes: 90
+  price:
+    amount: 35.00
+    currency: "GBP"
+  availableSeats: 200
+
+- id: "tr-008"
+  origin: "London Victoria"
+  destination: "Edinburgh Bus Station"
+  mode: "COACH"
+  operator: "National Express"
+  departure: "2026-12-01T23:00:00"
+  arrival: "2026-12-02T07:30:00"
+  durationMinutes: 510
+  price:
+    amount: 25.00
+    currency: "GBP"
+  availableSeats: 40

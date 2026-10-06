@@ -146,6 +146,18 @@
     </dependency>
     <dependency>
       <groupId>io.casehub</groupId>
+      <artifactId>casehub-connectors-travel-spi</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.casehub</groupId>
+      <artifactId>casehub-connectors-travel-ref</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.casehub</groupId>
       <artifactId>casehub-connectors-project-spi</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope>
@@ -190,6 +202,7 @@
                 <quarkusModule>${project.basedir}/../document-ref</quarkusModule>
                 <quarkusModule>${project.basedir}/../email-ref</quarkusModule>
                 <quarkusModule>${project.basedir}/../location-ref</quarkusModule>
+                <quarkusModule>${project.basedir}/../travel-ref</quarkusModule>
                 <quarkusModule>${project.basedir}/../project-ref</quarkusModule>
               </quarkusModules>
             </configuration>
@@ -208,6 +221,7 @@
                 <quarkusModule>${project.basedir}/../document-ref</quarkusModule>
                 <quarkusModule>${project.basedir}/../email-ref</quarkusModule>
                 <quarkusModule>${project.basedir}/../location-ref</quarkusModule>
+                <quarkusModule>${project.basedir}/../travel-ref</quarkusModule>
                 <quarkusModule>${project.basedir}/../project-ref</quarkusModule>
               </quarkusModules>
             </configuration>
