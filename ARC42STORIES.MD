@@ -266,7 +266,7 @@ C4Container
     Container(tl_webhook, "TrueLayerPaymentWebhook", "JAX-RS, JWS", "POST /webhooks/truelayer/payments\nEvent deduplication · CDI event firing")
   }
   Container_Boundary(b13, "Layer L13 — Email Platform SPI") {
-    Container(email_spi, "EmailPlatform SPI", "Java interface, @SimulationEligible", "id() + listMailboxes()\nlistMessages() + getMessage()\ngetAttachmentContent()")
+    Container(email_spi, "EmailPlatform SPI", "Java interface, @SimulationEligible", "id() + listMailboxes()\nlistMessages() + getMessage()\ngetAttachmentContent() + search()")
     Container(email_model, "Model", "Java records", "Mailbox · EmailSummary\nEmailMessage · EmailAttachment")
     Container(email_service, "EmailPlatformService", "CDI", "Platform lookup by id")
   }
