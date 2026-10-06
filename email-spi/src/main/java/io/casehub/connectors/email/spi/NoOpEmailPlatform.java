@@ -42,4 +42,11 @@ public class NoOpEmailPlatform implements EmailPlatform {
             final String messageId, final String attachmentId) {
         throw new UnsupportedOperationException("No email provider configured");
     }
+
+    @Override
+    public Page<EmailSummary> search(final String query, final PageRequest pagination) {
+        return Page.of(List.of());
+    }
+
+
 }

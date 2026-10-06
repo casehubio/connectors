@@ -183,6 +183,45 @@ public class GoogleEmailPlatform implements EmailPlatform {
         }
     }
 
+    @Override
+    public Page<EmailSummary> search(String query, PageRequest pagination) {
+        requireClient();
+        try {
+            var request = gmailService.users().messages().list(USER_ID)
+                                      .setQ(query)
+                                      .setMaxResults((long) pagination.pageSize());
+            if (pagination.cursor() != null) {
+                request.setPageToken(pagination.cursor());
+            }
+
+            var response = request.execute();
+            if (response.getMessages() == null) {
+                return Page.of(List.of());
+            }
+
+            List<EmailSummary> summaries = new ArrayList<>();
+            for (var msgRef : response.getMessages()) {
+                try {
+                    var full = gmailService.users().messages().get(USER_ID, msgRef.getId())
+                                           .setFormat("metadata")
+                                           .setMetadataHeaders(List.of("From", "Subject", "Date", "Message-ID"))
+                                           .execute();
+                    String mailboxId = GmailMessageMapper.primaryLabel(full);
+                    summaries.add(GmailMessageMapper.toEmailSummary(full, mailboxId));
+                } catch (IOException e) {
+                    LOG.warnf(e, "Failed to fetch metadata for message '%s' — skipping", msgRef.getId());
+                }
+            }
+
+            String  nextPageToken = response.getNextPageToken();
+            boolean hasMore       = nextPageToken != null;
+            return new Page<>(summaries, nextPageToken, hasMore);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to search messages", e);
+        }
+    }
+
+
     boolean isActive() {
         return gmailService != null;
     }

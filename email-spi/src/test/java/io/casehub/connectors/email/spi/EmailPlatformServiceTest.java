@@ -1,15 +1,14 @@
 package io.casehub.connectors.email.spi;
 
-import java.time.Instant;
-import java.util.List;
-
-import org.junit.jupiter.api.Test;
-
 import io.casehub.connectors.Page;
 import io.casehub.connectors.PageRequest;
 import io.casehub.connectors.email.model.EmailMessage;
 import io.casehub.connectors.email.model.EmailSummary;
 import io.casehub.connectors.email.model.Mailbox;
+import org.junit.jupiter.api.Test;
+
+import java.time.Instant;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -26,6 +25,10 @@ class EmailPlatformServiceTest {
         @Override public EmailMessage getMessage(String m, String id) { return null; }
         @Override public byte[] getAttachmentContent(String m, String mid,
                 String aid) { return new byte[0]; }
+
+        @Override
+        public Page<EmailSummary> search(String q, PageRequest p) {return Page.of(List.of());}
+
     }
 
     @Test

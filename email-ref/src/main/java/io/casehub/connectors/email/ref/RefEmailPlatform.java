@@ -34,4 +34,8 @@ public class RefEmailPlatform implements EmailPlatform {
     @Override
     public byte[] getAttachmentContent(String mailboxId, String messageId,
                                        String attachmentId) {return backend.getAttachmentContent(mailboxId, messageId, attachmentId);}
+
+    @Override
+    public Page<EmailSummary> search(String query, PageRequest pagination) {return backend.search(query, pagination);}
+
 }

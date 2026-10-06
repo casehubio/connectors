@@ -20,4 +20,7 @@ public interface EmailBackend {
 
     byte[] getAttachmentContent(String mailboxId, String messageId,
                                 String attachmentId);
+
+    Page<EmailSummary> search(String query, PageRequest pagination);
+
 }

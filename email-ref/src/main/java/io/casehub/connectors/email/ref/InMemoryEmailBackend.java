@@ -9,8 +9,10 @@ import jakarta.enterprise.context.ApplicationScoped;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
@@ -112,4 +114,42 @@ public class InMemoryEmailBackend implements EmailBackend {
         }
         return content;
     }
+
+    @Override
+    public Page<EmailSummary> search(String query, PageRequest pagination) {
+        String lowerQuery = query.toLowerCase(Locale.ROOT);
+        var matched = messages.values().stream()
+                              .flatMap(Collection::stream)
+                              .filter(m -> matches(m, lowerQuery))
+                              .map(m -> new EmailSummary(m.id(), m.mailboxId(), m.messageId(),
+                                                         m.from(), m.subject(), m.receivedAt(), m.read()))
+                              .toList();
+
+        int startIndex = 0;
+        if (pagination.cursor() != null) {
+            try {
+                startIndex = Integer.parseInt(pagination.cursor());
+            } catch (NumberFormatException e) {
+                startIndex = 0;
+            }
+        }
+
+        int     endIndex   = Math.min(startIndex + pagination.pageSize(), matched.size());
+        var     pageItems  = matched.subList(startIndex, endIndex);
+        boolean hasMore    = endIndex < matched.size();
+        String  nextCursor = hasMore ? String.valueOf(endIndex) : null;
+        return new Page<>(pageItems, nextCursor, hasMore);
+    }
+
+    private static boolean matches(EmailMessage m, String lowerQuery) {
+        return containsIgnoreCase(m.subject(), lowerQuery)
+               || containsIgnoreCase(m.from(), lowerQuery)
+               || containsIgnoreCase(m.bodyText(), lowerQuery);
+    }
+
+    private static boolean containsIgnoreCase(String text, String lowerQuery) {
+        return text != null && text.toLowerCase(Locale.ROOT).contains(lowerQuery);
+    }
+
+
 }

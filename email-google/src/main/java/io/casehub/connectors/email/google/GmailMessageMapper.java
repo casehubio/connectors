@@ -1,16 +1,15 @@
 package io.casehub.connectors.email.google;
 
+import com.google.api.services.gmail.model.Message;
+import com.google.api.services.gmail.model.MessagePart;
+import io.casehub.connectors.email.model.EmailAttachment;
+import io.casehub.connectors.email.model.EmailMessage;
+import io.casehub.connectors.email.model.EmailSummary;
+
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
-
-import com.google.api.services.gmail.model.Message;
-import com.google.api.services.gmail.model.MessagePart;
-
-import io.casehub.connectors.email.model.EmailAttachment;
-import io.casehub.connectors.email.model.EmailMessage;
-import io.casehub.connectors.email.model.EmailSummary;
 
 final class GmailMessageMapper {
 
@@ -27,6 +26,23 @@ final class GmailMessageMapper {
         return new EmailSummary(message.getId(), mailboxId, messageId,
                 from, subject, receivedAt, read);
     }
+
+
+    private static final java.util.Set<String> METADATA_LABELS = java.util.Set.of(
+            "UNREAD", "STARRED", "IMPORTANT",
+            "CATEGORY_SOCIAL", "CATEGORY_UPDATES", "CATEGORY_FORUMS",
+            "CATEGORY_PROMOTIONS", "CATEGORY_PERSONAL");
+
+    static String primaryLabel(Message message) {
+        if (message.getLabelIds() == null) {
+            return "INBOX";
+        }
+        return message.getLabelIds().stream()
+                      .filter(id -> !METADATA_LABELS.contains(id))
+                      .findFirst()
+                      .orElse("INBOX");
+    }
+
 
     static EmailMessage toEmailMessage(Message message, String mailboxId) {
         String from = getHeader(message, "From");

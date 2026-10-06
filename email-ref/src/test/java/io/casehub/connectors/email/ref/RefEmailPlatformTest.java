@@ -1,12 +1,11 @@
 package io.casehub.connectors.email.ref;
 
-import java.time.Instant;
-import java.util.NoSuchElementException;
-
+import io.casehub.connectors.PageRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import io.casehub.connectors.PageRequest;
+import java.time.Instant;
+import java.util.NoSuchElementException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -275,4 +274,69 @@ class RefEmailPlatformTest {
         var secondIds = secondMessages.items().stream().map(s -> s.id()).toList();
         assertThat(firstIds).doesNotContainAnyElementsOf(secondIds);
     }
+
+    @Test
+    void search_matchesSubject() {
+        var page = platform.search("invoice", PageRequest.first(50));
+        assertThat(page.items()).isNotEmpty();
+        assertThat(page.items()).allSatisfy(s ->
+                                                    assertThat(s.subject().toLowerCase()).contains("invoice"));
+    }
+
+    @Test
+    void search_matchesFrom() {
+        var allMessages = platform.listMessages("inbox",
+                                                Instant.parse("2026-01-01T00:00:00Z"),
+                                                Instant.parse("2026-12-31T00:00:00Z"),
+                                                PageRequest.first(50));
+        var knownSender = allMessages.items().getFirst().from();
+        var senderPart  = knownSender.split("@")[0];
+
+        var page = platform.search(senderPart, PageRequest.first(50));
+        assertThat(page.items()).isNotEmpty();
+    }
+
+    @Test
+    void search_noMatch_returnsEmpty() {
+        var page = platform.search("xyznonexistentxyz", PageRequest.first(50));
+        assertThat(page.items()).isEmpty();
+        assertThat(page.hasMore()).isFalse();
+    }
+
+    @Test
+    void search_caseInsensitive() {
+        var lowerPage = platform.search("invoice", PageRequest.first(50));
+        var upperPage = platform.search("INVOICE", PageRequest.first(50));
+        assertThat(lowerPage.items()).hasSameSizeAs(upperPage.items());
+    }
+
+    @Test
+    void search_pagination_respectsPageSize() {
+        var allResults = platform.search("", PageRequest.first(50));
+        if (allResults.items().size() <= 2) {return;}
+
+        var firstPage = platform.search("", PageRequest.first(2));
+        assertThat(firstPage.items()).hasSize(2);
+        assertThat(firstPage.hasMore()).isTrue();
+        assertThat(firstPage.nextCursor()).isNotNull();
+
+        var secondPage = platform.search("", new PageRequest(firstPage.nextCursor(), 2));
+        assertThat(secondPage.items()).isNotEmpty();
+        assertThat(secondPage.items())
+                .extracting("id")
+                .doesNotContainAnyElementsOf(
+                        firstPage.items().stream().map(s -> s.id()).toList());
+    }
+
+    @Test
+    void search_spansAllMailboxes() {
+        var results = platform.search("", PageRequest.first(50));
+        var mailboxIds = results.items().stream()
+                                .map(s -> s.mailboxId())
+                                .distinct()
+                                .toList();
+        assertThat(mailboxIds).hasSizeGreaterThan(1);
+    }
+
+
 }

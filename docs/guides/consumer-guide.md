@@ -414,7 +414,7 @@ To use in your app: add `bank-spi` as a dependency -- the corpus files are on th
 
 ### EmailPlatform SPI
 
-Email query/read integration -- mailbox listing, paginated message listing, message retrieval, attachment content. Complements `EmailConnector` (outbound) and `EmailInboundConnector` (push inbound).
+Email query/read integration -- mailbox listing, paginated message listing, message retrieval, attachment content, search. Complements `EmailConnector` (outbound) and `EmailInboundConnector` (push inbound).
 
 ```java
 @SimulationEligible(name = "email-platform")
@@ -424,6 +424,7 @@ public interface EmailPlatform {
     Page<EmailSummary> listMessages(String mailboxId, Instant from, Instant to, PageRequest pagination);
     EmailMessage getMessage(String mailboxId, String messageId);
     byte[] getAttachmentContent(String mailboxId, String messageId, String attachmentId);
+    Page<EmailSummary> search(String query, PageRequest pagination);
 }
 ```
 
@@ -439,11 +440,12 @@ public interface EmailPlatform {
 
 **Correlation with EmailInboundConnector:** RFC 2822 `Message-ID` correlates queries with push events (`InboundMessage.metadata["message-id"]`). Consumers observing both paths must be idempotent. Messages with null `messageId` cannot be deduplicated.
 
-**Simulation:** Same as BankFeedPlatform. Qualified names: `email-platform.listMailboxes`, `email-platform.listMessages`, `email-platform.getMessage`, `email-platform.getAttachmentContent`.
+**Simulation:** Same as BankFeedPlatform. Qualified names: `email-platform.listMailboxes`, `email-platform.listMessages`, `email-platform.getMessage`, `email-platform.getAttachmentContent`, `email-platform.search`.
 
 **Shipped corpus data:** Under `simulation/email/` on the classpath:
 - `mailbox-corpus.yaml` -- 2 mailboxes, 6 messages with realistic UK senders/subjects
 - `messages-corpus.yaml` -- full message bodies, attachments, RFC 2822 Message-IDs
+- `search-corpus.yaml` -- search result samples
 - `simulation.yaml` -- ready-to-use simulation config
 
 **Dependency:**

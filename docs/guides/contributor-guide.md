@@ -119,7 +119,7 @@ To add Commands support to a new `ChatPlatform`: (1) implement `Commands` for re
 
 ### Email Platform Architecture
 
-**`EmailPlatform` SPI** (`email-spi`) -- 5 methods: `id()`, `listMailboxes()`, `listMessages(mailboxId, from, to, pagination)`, `getMessage(mailboxId, messageId)`, `getAttachmentContent(mailboxId, messageId, attachmentId)`. Annotated with `@SimulationEligible(name = "email-platform")`.
+**`EmailPlatform` SPI** (`email-spi`) -- 6 methods: `id()`, `listMailboxes()`, `listMessages(mailboxId, from, to, pagination)`, `getMessage(mailboxId, messageId)`, `getAttachmentContent(mailboxId, messageId, attachmentId)`, `search(query, pagination)`. Annotated with `@SimulationEligible(name = "email-platform")`.
 
 **Complements existing email modules:** `EmailConnector` handles outbound delivery (L1), `EmailInboundConnector` handles push inbound (L3), `EmailPlatform` adds query/read capability (platform SPI level). These are architecturally separate layers.
 
@@ -384,7 +384,7 @@ Depends on: `connectors-api` (Page, PageRequest), `simulation-api` (@SimulationE
 
 ### email-ref
 
-In-memory `EmailPlatform` reference implementation. `EmailBackend` interface with `InMemoryEmailBackend` (pre-loaded: 3 mailboxes, 9 messages, 2 attachments, cursor-based pagination). `RefEmailPlatform` is a thin delegation layer. `EmailRefBeans` CDI producer.
+In-memory `EmailPlatform` reference implementation. `EmailBackend` interface with `InMemoryEmailBackend` (pre-loaded: 3 mailboxes, 9 messages, 2 attachments, cursor-based pagination, naive substring search across subject/from/body). `RefEmailPlatform` is a thin delegation layer. `EmailRefBeans` CDI producer.
 
 Package: `io.casehub.connectors.email.ref`.
 
@@ -396,7 +396,7 @@ Gmail `EmailPlatform` provider. `GoogleEmailPlatform` uses Gmail API with OAuth2
 
 Package: `io.casehub.connectors.email.google`.
 
-Label→mailbox mapping: system labels (INBOX, SENT, DRAFT) get friendly names; category labels excluded; user labels included as-is. Message listing is N+1 (list IDs, then fetch metadata per ID) — paginated via Gmail's `pageToken`.
+Label→mailbox mapping: system labels (INBOX, SENT, DRAFT) get friendly names; category labels excluded; user labels included as-is. Message listing and search are N+1 (list IDs, then fetch metadata per ID) — paginated via Gmail's `pageToken`. Search passes queries directly to Gmail's `q` parameter (supports native syntax: `from:`, `has:attachment`, etc.).
 
 Depends on: `email-spi`, `google-api-services-gmail`, `quarkus-arc`.
 

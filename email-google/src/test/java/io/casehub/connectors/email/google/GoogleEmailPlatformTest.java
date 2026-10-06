@@ -1,21 +1,19 @@
 package io.casehub.connectors.email.google;
 
-import java.time.Instant;
-import java.util.Base64;
-import java.util.NoSuchElementException;
-
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.gmail.Gmail;
-
+import io.casehub.connectors.PageRequest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import io.casehub.connectors.PageRequest;
+import java.time.Instant;
+import java.util.Base64;
+import java.util.NoSuchElementException;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
@@ -402,6 +400,65 @@ class GoogleEmailPlatformTest {
                 platform.getAttachmentContent("INBOX", "msg-1", "att-bad"))
                 .isInstanceOf(RuntimeException.class);
     }
+
+    @Test
+    void search_passesQueryToGmailApi() {
+        wireMock.stubFor(get(urlPathEqualTo("/gmail/v1/users/me/messages"))
+                                 .withQueryParam("q", WireMock.equalTo("invoice"))
+                                 .willReturn(aResponse()
+                                                     .withHeader("Content-Type", "application/json")
+                                                     .withBody("""
+                                                               {
+                                                                 "messages": [
+                                                                   {"id": "msg-s1", "threadId": "t1"}
+                                                                 ],
+                                                                 "resultSizeEstimate": 1
+                                                               }
+                                                               """)));
+
+        wireMock.stubFor(get(urlPathEqualTo("/gmail/v1/users/me/messages/msg-s1"))
+                                 .willReturn(aResponse()
+                                                     .withHeader("Content-Type", "application/json")
+                                                     .withBody("""
+                                                               {
+                                                                 "id": "msg-s1",
+                                                                 "labelIds": ["INBOX"],
+                                                                 "payload": {
+                                                                   "headers": [
+                                                                     {"name": "From", "value": "bob@example.com"},
+                                                                     {"name": "Subject", "value": "Invoice #4821"},
+                                                                     {"name": "Date", "value": "Mon, 15 Sep 2026 09:30:00 +0000"},
+                                                                     {"name": "Message-ID", "value": "<msg-s1@mail.example.com>"}
+                                                                   ]
+                                                                 },
+                                                                 "internalDate": "1789388200000"
+                                                               }
+                                                               """)));
+
+        var page = platform.search("invoice", PageRequest.first(10));
+
+        assertThat(page.items()).hasSize(1);
+        assertThat(page.items().getFirst().subject()).isEqualTo("Invoice #4821");
+        assertThat(page.items().getFirst().mailboxId()).isEqualTo("INBOX");
+    }
+
+    @Test
+    void search_emptyResult() {
+        wireMock.stubFor(get(urlPathEqualTo("/gmail/v1/users/me/messages"))
+                                 .willReturn(aResponse()
+                                                     .withHeader("Content-Type", "application/json")
+                                                     .withBody("""
+                                                               {
+                                                                 "resultSizeEstimate": 0
+                                                               }
+                                                               """)));
+
+        var page = platform.search("nonexistent", PageRequest.first(10));
+
+        assertThat(page.items()).isEmpty();
+        assertThat(page.hasMore()).isFalse();
+    }
+
 
     private static String base64url(String text) {
         return Base64.getUrlEncoder().withoutPadding().encodeToString(text.getBytes());
