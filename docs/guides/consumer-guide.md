@@ -19,7 +19,7 @@ No Camel, no vendor SDKs -- pure `java.net.http.HttpClient` for HTTP-based conne
 
 ## Module Structure
 
-There are 26 active modules in the build (pom.xml `<modules>`):
+There are 28 active modules in the build (pom.xml `<modules>`):
 
 | Module (artifactId prefix: `casehub-connectors-`) | What consumers need to know |
 |----------------------------------------------------|-----------------------------|
@@ -54,6 +54,8 @@ There are 26 active modules in the build (pom.xml `<modules>`):
 | `location-google` | Google Maps `LocationPlatform` provider (`GoogleLocationPlatform`) — Places API for search/details, Geocoding API, Directions API |
 | `commerce-spi` | `CommercePlatform` SPI with `@SimulationEligible` and capability sub-interfaces (`ProductSearch`, `ProductDetails`, `Cart`, `Checkout`, `OrderTracking`), user-scoped accessors for cart/checkout/orders, `supports(Class<?>)` introspection, `CommercePlatformService` routing |
 | `commerce-ref` | In-memory reference `CommercePlatform` for testing (`RefCommercePlatform`) — 8 pre-loaded UK products across electronics/books/home/clothing, full cart/checkout/order lifecycle with user-scoped state |
+| `travel-spi` | `TravelPlatform` SPI with `@SimulationEligible` and capability sub-interfaces (`TransportSearch`, `TransportBooking`, `AccommodationSearch`, `AccommodationBooking`). Search capabilities are unauthenticated (app-level auth); booking capabilities are user-scoped. `supports(Class<?>)` introspection, `TravelPlatformService` routing |
+| `travel-ref` | In-memory reference `TravelPlatform` for testing (`RefTravelPlatform`) — 8 UK transport options (train/flight/bus/ferry/coach) and 8 UK accommodations (hotel/hostel/apartment/B&B/holiday home), full booking lifecycle with user-scoped state |
 | `project-spi` | `ProjectPlatform` SPI with `@SimulationEligible` and capability sub-interfaces (`Issues`, `Labels`, `Milestones`, `Comments`, `Boards`), user-scoped accessors, `OwnerRepo`-scoped methods, `supports(Class<?>)` introspection, `ProjectPlatformService` routing |
 | `project-ref` | In-memory reference `ProjectPlatform` for testing (`RefProjectPlatform`) — 5 issues, 3 labels, 2 milestones, comments, 1 project board with 3 columns |
 | `github-client` | Shared GitHub HTTP client (`GitHubClient`) — REST API v3 for issues/labels/milestones/comments, GraphQL POST for Projects v2 boards. Uses `HttpHelper.CLIENT`, fail-soft pagination |

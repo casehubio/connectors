@@ -1,2 +1,3 @@
 io.casehub.connectors.spring.ConnectorsAutoConfiguration
 io.casehub.connectors.spring.ProjectRefManualConfig
+io.casehub.connectors.spring.TravelRefManualConfig
