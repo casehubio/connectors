@@ -30,6 +30,11 @@ Full fidelity — all operations native. No external infrastructure.</descriptio
       <artifactId>jackson-dataformat-yaml</artifactId>
     </dependency>
     <dependency>
+      <groupId>io.casehub</groupId>
+      <artifactId>casehub-platform-yaml-jackson</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>com.fasterxml.jackson.datatype</groupId>
       <artifactId>jackson-datatype-jsr310</artifactId>
     </dependency>

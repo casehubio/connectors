@@ -1,19 +1,19 @@
 package io.casehub.connectors.travel.ref;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import io.casehub.connectors.travel.model.AccommodationDetail;
+import io.casehub.connectors.travel.model.TransportOption;
+import io.casehub.yaml.jackson.YamlMappers;
+
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.List;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import io.casehub.connectors.travel.model.AccommodationDetail;
-import io.casehub.connectors.travel.model.TransportOption;
-
 final class SeedLoader {
 
-    private static final ObjectMapper YAML = new ObjectMapper(new YAMLFactory())
+    private static final ObjectMapper YAML = YamlMappers.create()
             .registerModule(new JavaTimeModule());
 
     static List<TransportOption> loadTransport() {

@@ -2,11 +2,11 @@ package io.casehub.connectors.bank.ref;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.casehub.connectors.bank.model.AccountBalance;
 import io.casehub.connectors.bank.model.AccountInfo;
 import io.casehub.connectors.bank.model.Transaction;
+import io.casehub.yaml.jackson.YamlMappers;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 final class SeedLoader {
 
-    private static final ObjectMapper YAML = new ObjectMapper(new YAMLFactory())
+    private static final ObjectMapper YAML = YamlMappers.create()
             .registerModule(new JavaTimeModule());
 
     static List<AccountInfo> loadAccounts() {

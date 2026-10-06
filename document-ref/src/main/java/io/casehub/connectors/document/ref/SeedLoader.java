@@ -2,9 +2,9 @@ package io.casehub.connectors.document.ref;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.casehub.connectors.document.model.Folder;
+import io.casehub.yaml.jackson.YamlMappers;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -13,7 +13,7 @@ import java.util.List;
 
 final class SeedLoader {
 
-    private static final ObjectMapper YAML = new ObjectMapper(new YAMLFactory())
+    private static final ObjectMapper YAML = YamlMappers.create()
             .registerModule(new JavaTimeModule());
 
     record FileSeed(String id, String name, String folderId, String contentType,
