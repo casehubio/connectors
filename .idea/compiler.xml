@@ -694,6 +694,7 @@
       <module name="casehub-graphql-client" options="-parameters" />
       <module name="casehub-platform" options="-parameters" />
       <module name="casehub-platform-acl-admin" options="-parameters -AgenerateGraphQL=false -AdomainFilter=acl" />
+      <module name="casehub-platform-acl-admin-core" options="-parameters" />
       <module name="casehub-platform-acl-inmem" options="-parameters" />
       <module name="casehub-platform-acl-inmem-core" options="-parameters" />
       <module name="casehub-platform-acl-jpa" options="-parameters" />
@@ -884,6 +885,7 @@
       <module name="casehub-platform-yaml-jackson" options="-parameters" />
       <module name="casehub-platform-yaml-plugin-api" options="-parameters" />
       <module name="casehub-platform-yaml-plugin-processor" options="-parameters" />
+      <module name="casehub-platform-yaml-statemachine-generator" options="-parameters" />
       <module name="casehub-platform-yaml-step-runtime" options="-parameters" />
       <module name="casehub-platform-yaml-step-testing" options="-parameters" />
       <module name="casehub-spring-boot-starter" options="-parameters" />
