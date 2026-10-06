@@ -5,7 +5,7 @@ import io.casehub.connectors.contacts.model.Group;
 
 import java.util.List;
 
-interface ContactsBackend {
+public interface ContactsBackend {
 
     List<Contact> allContacts();
 

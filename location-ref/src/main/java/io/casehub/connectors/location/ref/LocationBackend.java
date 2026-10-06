@@ -4,7 +4,7 @@ import io.casehub.connectors.location.model.*;
 
 import java.util.List;
 
-interface LocationBackend {
+public interface LocationBackend {
 
     List<Place> allPlaces();
 

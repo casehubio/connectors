@@ -10,7 +10,7 @@ import io.casehub.connectors.commerce.model.ShoppingCart;
 
 import java.util.List;
 
-interface CommerceBackend {
+public interface CommerceBackend {
 
     List<Product> allProducts();
 

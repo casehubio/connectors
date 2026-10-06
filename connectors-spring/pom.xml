@@ -46,6 +46,116 @@
       <artifactId>spring-boot-starter-test</artifactId>
       <scope>test</scope>
     </dependency>
+
+    <!-- Platform SPI refs — provided scope for generator scanning + @ConditionalOnClass -->
+    <dependency>
+      <groupId>io.casehub</groupId>
+      <artifactId>casehub-connectors-chat-spi</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.casehub</groupId>
+      <artifactId>casehub-connectors-chat-ref</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.casehub</groupId>
+      <artifactId>casehub-connectors-bank-spi</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.casehub</groupId>
+      <artifactId>casehub-connectors-bank-ref</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.casehub</groupId>
+      <artifactId>casehub-connectors-calendar-spi</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.casehub</groupId>
+      <artifactId>casehub-connectors-calendar-ref</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.casehub</groupId>
+      <artifactId>casehub-connectors-commerce-spi</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.casehub</groupId>
+      <artifactId>casehub-connectors-commerce-ref</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.casehub</groupId>
+      <artifactId>casehub-connectors-contacts-spi</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.casehub</groupId>
+      <artifactId>casehub-connectors-contacts-ref</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.casehub</groupId>
+      <artifactId>casehub-connectors-document-spi</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.casehub</groupId>
+      <artifactId>casehub-connectors-document-ref</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.casehub</groupId>
+      <artifactId>casehub-connectors-email-spi</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.casehub</groupId>
+      <artifactId>casehub-connectors-email-ref</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.casehub</groupId>
+      <artifactId>casehub-connectors-location-spi</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.casehub</groupId>
+      <artifactId>casehub-connectors-location-ref</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.casehub</groupId>
+      <artifactId>casehub-connectors-project-spi</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.casehub</groupId>
+      <artifactId>casehub-connectors-project-ref</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>
   </dependencies>
 
   <build>
@@ -59,6 +169,48 @@
             <id>jandex</id>
             <phase>process-classes</phase>
             <goals><goal>jandex</goal></goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>io.casehub</groupId>
+        <artifactId>casehub-platform-spring-generator</artifactId>
+        <version>${project.version}</version>
+        <executions>
+          <execution>
+            <id>generate</id>
+            <goals><goal>generate</goal></goals>
+            <configuration>
+              <quarkusModules>
+                <quarkusModule>${project.basedir}/../chat-ref</quarkusModule>
+                <quarkusModule>${project.basedir}/../bank-ref</quarkusModule>
+                <quarkusModule>${project.basedir}/../calendar-ref</quarkusModule>
+                <quarkusModule>${project.basedir}/../commerce-ref</quarkusModule>
+                <quarkusModule>${project.basedir}/../contacts-ref</quarkusModule>
+                <quarkusModule>${project.basedir}/../document-ref</quarkusModule>
+                <quarkusModule>${project.basedir}/../email-ref</quarkusModule>
+                <quarkusModule>${project.basedir}/../location-ref</quarkusModule>
+                <quarkusModule>${project.basedir}/../project-ref</quarkusModule>
+              </quarkusModules>
+            </configuration>
+          </execution>
+          <execution>
+            <id>verify-drift</id>
+            <goals><goal>verify</goal></goals>
+            <phase>verify</phase>
+            <configuration>
+              <quarkusModules>
+                <quarkusModule>${project.basedir}/../chat-ref</quarkusModule>
+                <quarkusModule>${project.basedir}/../bank-ref</quarkusModule>
+                <quarkusModule>${project.basedir}/../calendar-ref</quarkusModule>
+                <quarkusModule>${project.basedir}/../commerce-ref</quarkusModule>
+                <quarkusModule>${project.basedir}/../contacts-ref</quarkusModule>
+                <quarkusModule>${project.basedir}/../document-ref</quarkusModule>
+                <quarkusModule>${project.basedir}/../email-ref</quarkusModule>
+                <quarkusModule>${project.basedir}/../location-ref</quarkusModule>
+                <quarkusModule>${project.basedir}/../project-ref</quarkusModule>
+              </quarkusModules>
+            </configuration>
           </execution>
         </executions>
       </plugin>
