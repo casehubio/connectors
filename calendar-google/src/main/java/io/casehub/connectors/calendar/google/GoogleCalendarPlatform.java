@@ -9,7 +9,8 @@ import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.CalendarList;
 import com.google.api.services.calendar.model.Events;
 import com.google.auth.http.HttpCredentialsAdapter;
-import com.google.auth.oauth2.UserCredentials;
+import com.google.auth.oauth2.AccessToken;
+import com.google.auth.oauth2.GoogleCredentials;
 import io.casehub.connectors.SyncRequest;
 import io.casehub.connectors.SyncResult;
 import io.casehub.connectors.SyncTokenExpiredException;
@@ -17,6 +18,8 @@ import io.casehub.connectors.calendar.model.CalendarEvent;
 import io.casehub.connectors.calendar.model.CalendarInfo;
 import io.casehub.connectors.calendar.model.EventDetails;
 import io.casehub.connectors.calendar.spi.CalendarPlatform;
+import io.casehub.platform.api.authn.RequiresScopes;
+import io.casehub.platform.api.authn.ServiceConnectionProvider;
 import org.jboss.logging.Logger;
 
 import java.io.IOException;
@@ -24,19 +27,24 @@ import java.security.GeneralSecurityException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
+@RequiresScopes(provider = "google",
+    scopes = {"https://www.googleapis.com/auth/calendar.readonly",
+              "https://www.googleapis.com/auth/calendar.events"})
 public class GoogleCalendarPlatform implements CalendarPlatform {
 
-    private static final Logger LOG       = Logger.getLogger(GoogleCalendarPlatform.class);
-    private static final int    MAX_PAGES = 20;
+    private static final Logger LOG             = Logger.getLogger(GoogleCalendarPlatform.class);
+    private static final int    MAX_PAGES       = 20;
+    private static final String DEFAULT_TENANCY = "default";
 
-    private final GoogleCredentialResolver resolver;
-    private       NetHttpTransport         transport;
-    private       Calendar                 calendarService;
+    private final ServiceConnectionProvider connectionProvider;
+    private final NetHttpTransport transport;
+    private       Calendar         calendarService;
 
-    public GoogleCalendarPlatform(GoogleCredentialResolver resolver) {
-        this.resolver = resolver;
+    public GoogleCalendarPlatform(ServiceConnectionProvider connectionProvider) {
+        this.connectionProvider = connectionProvider;
         try {
             this.transport = GoogleNetHttpTransport.newTrustedTransport();
         } catch (GeneralSecurityException | IOException e) {
@@ -44,46 +52,16 @@ public class GoogleCalendarPlatform implements CalendarPlatform {
         }
     }
 
-    public GoogleCalendarPlatform(String clientId, String clientSecret, String refreshToken) {
-        this.resolver  = null;
-        this.transport = null;
-        if (clientId.isBlank() || clientSecret.isBlank() || refreshToken.isBlank()) {
-            LOG.warn("Google Calendar credentials not configured — platform inactive");
-            return;
-        }
-        try {
-            var credentials = UserCredentials.newBuilder()
-                                             .setClientId(clientId)
-                                             .setClientSecret(clientSecret)
-                                             .setRefreshToken(refreshToken)
-                                             .build();
-            calendarService = new Calendar.Builder(
-                    GoogleNetHttpTransport.newTrustedTransport(),
-                    GsonFactory.getDefaultInstance(),
-                    new HttpCredentialsAdapter(credentials))
-                                      .setApplicationName("casehub-connectors")
-                                      .build();
-        } catch (GeneralSecurityException | IOException e) {
-            LOG.errorf(e, "Failed to initialize Google Calendar client");
-        }
-    }
-
     GoogleCalendarPlatform(Calendar calendarService) {
-        this.resolver        = null;
-        this.transport       = null;
-        this.calendarService = calendarService;
+        this.connectionProvider = null;
+        this.transport          = null;
+        this.calendarService    = calendarService;
     }
 
-    Calendar buildService(String userId) {
-        if (resolver == null) {
-            throw new IllegalStateException("No credential resolver configured");
-        }
-        var config = resolver.resolve(userId);
-        var credentials = UserCredentials.newBuilder()
-                                         .setClientId(config.clientId())
-                                         .setClientSecret(config.clientSecret())
-                                         .setRefreshToken(config.refreshToken())
-                                         .build();
+    Calendar buildService(String actorId) {
+        var token = connectionProvider.getAccessToken(actorId, "google", DEFAULT_TENANCY);
+        var credentials = GoogleCredentials.create(
+            new AccessToken(token.accessToken(), Date.from(token.expiresAt())));
         return new Calendar.Builder(transport, GsonFactory.getDefaultInstance(),
                                     new HttpCredentialsAdapter(credentials))
                        .setApplicationName("casehub-connectors")
@@ -253,10 +231,6 @@ public class GoogleCalendarPlatform implements CalendarPlatform {
         }
         return new SyncResult<>(Collections.unmodifiableList(items),
                                 Collections.unmodifiableList(deletedIds), syncToken, false);
-    }
-
-    boolean isActive() {
-        return calendarService != null || resolver != null;
     }
 
     private void requireClient() {

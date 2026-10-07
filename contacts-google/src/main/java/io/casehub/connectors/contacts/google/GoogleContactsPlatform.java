@@ -11,7 +11,8 @@ import com.google.api.services.people.v1.model.Organization;
 import com.google.api.services.people.v1.model.Person;
 import com.google.api.services.people.v1.model.PhoneNumber;
 import com.google.auth.http.HttpCredentialsAdapter;
-import com.google.auth.oauth2.UserCredentials;
+import com.google.auth.oauth2.AccessToken;
+import com.google.auth.oauth2.GoogleCredentials;
 import io.casehub.connectors.Page;
 import io.casehub.connectors.PageRequest;
 import io.casehub.connectors.SyncRequest;
@@ -24,27 +25,34 @@ import io.casehub.connectors.contacts.model.Group;
 import io.casehub.connectors.contacts.model.GroupType;
 import io.casehub.connectors.contacts.model.LabelledValue;
 import io.casehub.connectors.contacts.spi.ContactsPlatform;
+import io.casehub.platform.api.authn.RequiresScopes;
+import io.casehub.platform.api.authn.ServiceConnectionProvider;
 import org.jboss.logging.Logger;
 
 import com.google.api.client.http.javanet.NetHttpTransport;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+@RequiresScopes(provider = "google",
+    scopes = {"https://www.googleapis.com/auth/contacts.readonly",
+              "https://www.googleapis.com/auth/contacts"})
 public class GoogleContactsPlatform implements ContactsPlatform {
 
     private static final Logger LOG = Logger.getLogger(GoogleContactsPlatform.class);
     private static final String PERSON_FIELDS =
         "names,emailAddresses,phoneNumbers,addresses,organizations,photos,biographies,metadata";
     private static final String GROUP_FIELDS = "name,groupType,memberCount";
+    private static final String DEFAULT_TENANCY = "default";
 
-    private final GoogleCredentialResolver resolver;
+    private final ServiceConnectionProvider connectionProvider;
     private final NetHttpTransport transport;
 
-    public GoogleContactsPlatform(GoogleCredentialResolver resolver) {
-        this.resolver = resolver;
+    public GoogleContactsPlatform(ServiceConnectionProvider connectionProvider) {
+        this.connectionProvider = connectionProvider;
         try {
             this.transport = GoogleNetHttpTransport.newTrustedTransport();
         } catch (GeneralSecurityException | IOException e) {
@@ -79,13 +87,10 @@ public class GoogleContactsPlatform implements ContactsPlatform {
         return new GoogleContactWrite(buildService(userId));
     }
 
-    private PeopleService buildService(String userId) {
-        var config = resolver.resolve(userId);
-        var credentials = UserCredentials.newBuilder()
-            .setClientId(config.clientId())
-            .setClientSecret(config.clientSecret())
-            .setRefreshToken(config.refreshToken())
-            .build();
+    private PeopleService buildService(String actorId) {
+        var token = connectionProvider.getAccessToken(actorId, "google", DEFAULT_TENANCY);
+        var credentials = GoogleCredentials.create(
+            new AccessToken(token.accessToken(), Date.from(token.expiresAt())));
         return new PeopleService.Builder(transport, GsonFactory.getDefaultInstance(),
                 new HttpCredentialsAdapter(credentials))
             .setApplicationName("casehub-connectors")

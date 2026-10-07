@@ -91,8 +91,14 @@
     <file url="file://$PROJECT_DIR$/slack-bot/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/travel-ref/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/travel-ref/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/travel-spi/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/travel-spi/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/webhook/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/webhook/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/acl-admin-core/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/acl-admin-core/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/acl-admin/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/acl-admin/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/acl-inmem-core/src/main/java" charset="UTF-8" />
@@ -177,10 +183,38 @@
     <file url="file://$PROJECT_DIR$/../platform/agent-runtime-spring/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/agent-runtime/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/agent-runtime/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/agent-session-core/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/agent-session-core/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/agent-session/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/agent-session/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/agent-simulation-core/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/agent-simulation-core/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/agent-spring/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/agent-spring/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/authn-core/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/authn-core/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/authn-inmem/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/authn-inmem/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/authn-social-core/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/authn-social-core/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/authn-social-jpa-common/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/authn-social-jpa-common/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/authn-social-jpa/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/authn-social-jpa/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/authn-social-spring-jpa/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/authn-social-spring-jpa/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/authn-spring/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/authn-spring/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/authn-webauthn-core/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/authn-webauthn-core/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/authn-webauthn-jpa-common/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/authn-webauthn-jpa-common/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/authn-webauthn-jpa/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/authn-webauthn-jpa/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/authn-webauthn-spring-jpa/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/authn-webauthn-spring-jpa/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/authn/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/authn/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/callback-api/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/callback-api/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/callback-client-core/src/main/java" charset="UTF-8" />
@@ -397,6 +431,14 @@
     <file url="file://$PROJECT_DIR$/../platform/scim-spring/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/scim/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/scim/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/security-spring/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/security-spring/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/session-jpa-common/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/session-jpa-common/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/session-jpa/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/session-jpa/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/session-spring-jpa/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/session-spring-jpa/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/simulation-api/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/simulation-api/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/simulation-config-core/src/main/java" charset="UTF-8" />
@@ -415,6 +457,8 @@
     <file url="file://$PROJECT_DIR$/../platform/simulation-testing/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/spring-boot-starter-agent/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/spring-boot-starter-agent/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/spring-boot-starter-authn/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/spring-boot-starter-authn/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/spring-boot-starter-streams/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/spring-boot-starter-streams/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/spring-boot-starter/src/main/java" charset="UTF-8" />
@@ -485,6 +529,8 @@
     <file url="file://$PROJECT_DIR$/../platform/yaml-plugin-api/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/yaml-plugin-processor/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/yaml-plugin-processor/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/yaml-statemachine-generator/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/yaml-statemachine-generator/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/yaml-step-runtime/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/yaml-step-runtime/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/yaml-step-testing/src/main/java" charset="UTF-8" />

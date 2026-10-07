@@ -8,7 +8,8 @@ import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.Permission;
 import com.google.auth.http.HttpCredentialsAdapter;
-import com.google.auth.oauth2.UserCredentials;
+import com.google.auth.oauth2.AccessToken;
+import com.google.auth.oauth2.GoogleCredentials;
 import io.casehub.connectors.Page;
 import io.casehub.connectors.SyncRequest;
 import io.casehub.connectors.SyncResult;
@@ -18,6 +19,8 @@ import io.casehub.connectors.document.model.DocumentMetadata;
 import io.casehub.connectors.document.model.DocumentSummary;
 import io.casehub.connectors.document.model.Folder;
 import io.casehub.connectors.document.spi.DocumentPlatform;
+import io.casehub.platform.api.authn.RequiresScopes;
+import io.casehub.platform.api.authn.ServiceConnectionProvider;
 import org.jboss.logging.Logger;
 
 import java.io.ByteArrayOutputStream;
@@ -29,17 +32,18 @@ import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+@RequiresScopes(provider = "google",
+    scopes = {"https://www.googleapis.com/auth/drive.readonly",
+              "https://www.googleapis.com/auth/drive.file"})
 public class GoogleDocumentPlatform implements DocumentPlatform {
 
     private static final Logger LOG = Logger.getLogger(GoogleDocumentPlatform.class);
     private static final String FOLDER_MIME = "application/vnd.google-apps.folder";
     private static final String FILE_FIELDS = "id,name,mimeType,size,parents,owners,webViewLink,createdTime,modifiedTime";
     private static final int    MAX_PAGES   = 20;
+    private static final String DEFAULT_TENANCY = "default";
 
-
-    private final String clientId;
-    private final String clientSecret;
-    private final String refreshToken;
+    private final ServiceConnectionProvider connectionProvider;
     private Drive driveService;
 
     private final FileOperations fileOps = new GoogleFileOperations();
@@ -47,40 +51,13 @@ public class GoogleDocumentPlatform implements DocumentPlatform {
     private final SearchOperations searchOps = new GoogleSearchOperations();
     private final SharingOperations sharingOps = new GoogleSharingOperations();
 
-    public GoogleDocumentPlatform(String clientId, String clientSecret, String refreshToken) {
-        this.clientId = clientId;
-        this.clientSecret = clientSecret;
-        this.refreshToken = refreshToken;
-        init();
+    public GoogleDocumentPlatform(ServiceConnectionProvider connectionProvider) {
+        this.connectionProvider = connectionProvider;
     }
 
     GoogleDocumentPlatform(Drive driveService) {
-        this.clientId = "";
-        this.clientSecret = "";
-        this.refreshToken = "";
+        this.connectionProvider = null;
         this.driveService = driveService;
-    }
-
-    void init() {
-        if (clientId.isBlank() || clientSecret.isBlank() || refreshToken.isBlank()) {
-            LOG.warn("Google Drive credentials not configured — platform inactive");
-            return;
-        }
-        try {
-            var credentials = UserCredentials.newBuilder()
-                    .setClientId(clientId)
-                    .setClientSecret(clientSecret)
-                    .setRefreshToken(refreshToken)
-                    .build();
-            driveService = new Drive.Builder(
-                    GoogleNetHttpTransport.newTrustedTransport(),
-                    GsonFactory.getDefaultInstance(),
-                    new HttpCredentialsAdapter(credentials))
-                    .setApplicationName("casehub-connectors")
-                    .build();
-        } catch (GeneralSecurityException | IOException e) {
-            LOG.errorf(e, "Failed to initialize Google Drive client");
-        }
     }
 
     @Override
@@ -100,10 +77,6 @@ public class GoogleDocumentPlatform implements DocumentPlatform {
     @Override public FolderOperations folders() { return folderOps; }
     @Override public SearchOperations search() { return searchOps; }
     @Override public SharingOperations sharing() { return sharingOps; }
-
-    boolean isActive() {
-        return driveService != null;
-    }
 
     private void requireClient() {
         if (driveService == null) {

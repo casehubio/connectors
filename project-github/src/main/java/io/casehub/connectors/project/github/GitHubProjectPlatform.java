@@ -11,16 +11,21 @@ import io.casehub.connectors.project.model.OwnerRepo;
 import io.casehub.connectors.project.model.ProjectBoard;
 import io.casehub.connectors.project.model.ProjectColumn;
 import io.casehub.connectors.project.spi.ProjectPlatform;
+import io.casehub.platform.api.authn.RequiresScopes;
+import io.casehub.platform.api.authn.ServiceConnectionProvider;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
 import java.util.List;
 
 @ApplicationScoped
+@RequiresScopes(provider = "github", scopes = {"repo", "project"})
 public class GitHubProjectPlatform implements ProjectPlatform {
 
+    private static final String DEFAULT_TENANCY = "default";
+
     @Inject GitHubClient client;
-    @Inject GitHubCredentialResolver resolver;
+    @Inject ServiceConnectionProvider connectionProvider;
 
     @Override
     public String id() {
@@ -38,27 +43,27 @@ public class GitHubProjectPlatform implements ProjectPlatform {
 
     @Override
     public Issues issues(String userId) {
-        return new GitHubIssues(resolver.resolveToken(userId));
+        return new GitHubIssues(connectionProvider.getAccessToken(userId, "github", DEFAULT_TENANCY).accessToken());
     }
 
     @Override
     public Labels labels(String userId) {
-        return new GitHubLabels(resolver.resolveToken(userId));
+        return new GitHubLabels(connectionProvider.getAccessToken(userId, "github", DEFAULT_TENANCY).accessToken());
     }
 
     @Override
     public Milestones milestones(String userId) {
-        return new GitHubMilestones(resolver.resolveToken(userId));
+        return new GitHubMilestones(connectionProvider.getAccessToken(userId, "github", DEFAULT_TENANCY).accessToken());
     }
 
     @Override
     public Comments comments(String userId) {
-        return new GitHubComments(resolver.resolveToken(userId));
+        return new GitHubComments(connectionProvider.getAccessToken(userId, "github", DEFAULT_TENANCY).accessToken());
     }
 
     @Override
     public Boards boards(String userId) {
-        return new GitHubBoards(resolver.resolveToken(userId));
+        return new GitHubBoards(connectionProvider.getAccessToken(userId, "github", DEFAULT_TENANCY).accessToken());
     }
 
     private class GitHubIssues implements Issues {

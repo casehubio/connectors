@@ -13,6 +13,7 @@ import io.casehub.connectors.Page;
 import io.casehub.connectors.PageRequest;
 import io.casehub.connectors.location.model.*;
 import io.casehub.connectors.location.spi.LocationPlatform;
+import io.casehub.platform.api.authn.StaticCredentialStore;
 import org.jboss.logging.Logger;
 
 import java.io.IOException;
@@ -23,12 +24,13 @@ import java.util.concurrent.ConcurrentHashMap;
 public class GoogleLocationPlatform implements LocationPlatform {
 
     private static final Logger LOG = Logger.getLogger(GoogleLocationPlatform.class);
+    private static final String DEFAULT_TENANCY = "default";
 
-    private final GoogleMapsKeyResolver resolver;
+    private final StaticCredentialStore credentialStore;
     private final ConcurrentHashMap<String, GeoApiContext> contexts = new ConcurrentHashMap<>();
 
-    public GoogleLocationPlatform(GoogleMapsKeyResolver resolver) {
-        this.resolver = resolver;
+    public GoogleLocationPlatform(StaticCredentialStore credentialStore) {
+        this.credentialStore = credentialStore;
     }
 
     @Override
@@ -65,8 +67,10 @@ public class GoogleLocationPlatform implements LocationPlatform {
     }
 
     private GeoApiContext contextFor(String userId) {
-        var config = resolver.resolve(userId);
-        return contexts.computeIfAbsent(config.apiKey(), key ->
+        var record = credentialStore.find(userId, "google-maps", DEFAULT_TENANCY)
+            .orElseThrow(() -> new IllegalStateException(
+                "No Google Maps API key configured for user " + userId));
+        return contexts.computeIfAbsent(record.credential(), key ->
             new GeoApiContext.Builder().apiKey(key).build());
     }
 

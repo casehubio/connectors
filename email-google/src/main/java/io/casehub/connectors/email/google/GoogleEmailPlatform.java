@@ -15,7 +15,8 @@ import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.gmail.Gmail;
 import com.google.auth.http.HttpCredentialsAdapter;
-import com.google.auth.oauth2.UserCredentials;
+import com.google.auth.oauth2.AccessToken;
+import com.google.auth.oauth2.GoogleCredentials;
 
 import org.jboss.logging.Logger;
 
@@ -25,7 +26,14 @@ import io.casehub.connectors.email.model.EmailMessage;
 import io.casehub.connectors.email.model.EmailSummary;
 import io.casehub.connectors.email.model.Mailbox;
 import io.casehub.connectors.email.spi.EmailPlatform;
+import io.casehub.platform.api.authn.RequiresScopes;
+import io.casehub.platform.api.authn.ServiceConnectionProvider;
 
+import java.util.Date;
+
+@RequiresScopes(provider = "google",
+    scopes = {"https://www.googleapis.com/auth/gmail.readonly",
+              "https://www.googleapis.com/auth/gmail.modify"})
 public class GoogleEmailPlatform implements EmailPlatform {
 
     private static final Logger LOG = Logger.getLogger(GoogleEmailPlatform.class);
@@ -37,45 +45,18 @@ public class GoogleEmailPlatform implements EmailPlatform {
             "CATEGORY_PROMOTIONS", "CATEGORY_PERSONAL");
 
 
-    private final String clientId;
-    private final String clientSecret;
-    private final String refreshToken;
+    private static final String DEFAULT_TENANCY = "default";
+
+    private final ServiceConnectionProvider connectionProvider;
     private Gmail gmailService;
 
-    public GoogleEmailPlatform(String clientId, String clientSecret, String refreshToken) {
-        this.clientId = clientId;
-        this.clientSecret = clientSecret;
-        this.refreshToken = refreshToken;
-        init();
+    public GoogleEmailPlatform(ServiceConnectionProvider connectionProvider) {
+        this.connectionProvider = connectionProvider;
     }
 
     GoogleEmailPlatform(Gmail gmailService) {
-        this.clientId = "";
-        this.clientSecret = "";
-        this.refreshToken = "";
+        this.connectionProvider = null;
         this.gmailService = gmailService;
-    }
-
-    void init() {
-        if (clientId.isBlank() || clientSecret.isBlank() || refreshToken.isBlank()) {
-            LOG.warn("Gmail credentials not configured — platform inactive");
-            return;
-        }
-        try {
-            var credentials = UserCredentials.newBuilder()
-                    .setClientId(clientId)
-                    .setClientSecret(clientSecret)
-                    .setRefreshToken(refreshToken)
-                    .build();
-            gmailService = new Gmail.Builder(
-                    GoogleNetHttpTransport.newTrustedTransport(),
-                    GsonFactory.getDefaultInstance(),
-                    new HttpCredentialsAdapter(credentials))
-                    .setApplicationName("casehub-connectors")
-                    .build();
-        } catch (GeneralSecurityException | IOException e) {
-            LOG.errorf(e, "Failed to initialize Gmail client");
-        }
     }
 
     @Override
@@ -221,10 +202,6 @@ public class GoogleEmailPlatform implements EmailPlatform {
         }
     }
 
-
-    boolean isActive() {
-        return gmailService != null;
-    }
 
     private void requireClient() {
         if (gmailService == null) {

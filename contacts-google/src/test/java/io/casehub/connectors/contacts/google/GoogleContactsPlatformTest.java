@@ -92,10 +92,24 @@ class GoogleContactsPlatformTest {
 
     @Test
     void supportsAllCapabilities() {
-        var platform = new GoogleContactsPlatform(userId -> null);
+        var provider = new io.casehub.platform.api.authn.ServiceConnectionProvider() {
+            public io.casehub.platform.api.authn.ServiceConnection getConnection(String a, String p, String t) { return null; }
+            public java.util.List<io.casehub.platform.api.authn.ServiceConnection> listConnections(String a, String t) { return java.util.List.of(); }
+            public io.casehub.platform.api.authn.ServiceAccessToken getAccessToken(String a, String p, String t) { return null; }
+            public java.util.Set<String> missingScopes(String a, String p, String t) { return java.util.Set.of(); }
+        };
+        var platform = new GoogleContactsPlatform(provider);
         assertThat(platform.id()).isEqualTo("google");
         assertThat(platform.supports(io.casehub.connectors.contacts.spi.ContactsPlatform.ContactRead.class)).isTrue();
         assertThat(platform.supports(io.casehub.connectors.contacts.spi.ContactsPlatform.GroupRead.class)).isTrue();
         assertThat(platform.supports(io.casehub.connectors.contacts.spi.ContactsPlatform.ContactWrite.class)).isTrue();
+    }
+
+    @Test
+    void requiresScopes_annotationPresent() {
+        var annotation = GoogleContactsPlatform.class.getAnnotation(
+            io.casehub.platform.api.authn.RequiresScopes.class);
+        assertThat(annotation).isNotNull();
+        assertThat(annotation.provider()).isEqualTo("google");
     }
 }
