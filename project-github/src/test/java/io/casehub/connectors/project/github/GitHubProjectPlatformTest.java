@@ -28,4 +28,13 @@ class GitHubProjectPlatformTest {
         var platform = new GitHubProjectPlatform();
         assertThat(platform.supports(Runnable.class)).isFalse();
     }
+
+    @Test
+    void requiresScopes_annotationPresent() {
+        var annotation = GitHubProjectPlatform.class.getAnnotation(
+            io.casehub.platform.api.authn.RequiresScopes.class);
+        assertThat(annotation).isNotNull();
+        assertThat(annotation.provider()).isEqualTo("github");
+        assertThat(annotation.scopes()).contains("repo", "project");
+    }
 }

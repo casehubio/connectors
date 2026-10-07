@@ -22,6 +22,10 @@ Uses google-api-services-people with per-user OAuth2 credential resolution.</des
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>io.casehub</groupId>
+      <artifactId>casehub-platform-api</artifactId>
+    </dependency>
+    <dependency>
       <groupId>com.google.apis</groupId>
       <artifactId>google-api-services-people</artifactId>
       <version>v1-rev20251117-2.0.0</version>

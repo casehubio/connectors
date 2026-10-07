@@ -63,22 +63,19 @@ class GoogleDocumentPlatformTest {
     }
 
     @Test
-    void isActive_withClient_true() {
-        assertThat(platform.isActive()).isTrue();
-    }
-
-    @Test
-    void isActive_withoutClient_false() {
-        var unconfigured = new GoogleDocumentPlatform("", "", "");
-        assertThat(unconfigured.isActive()).isFalse();
-    }
-
-    @Test
     void requireClient_noClient_throwsIllegalState() {
-        var unconfigured = new GoogleDocumentPlatform("", "", "");
+        var unconfigured = new GoogleDocumentPlatform((Drive) null);
         assertThatThrownBy(() -> unconfigured.files().list("root", PageRequest.first(10)))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("not initialised");
+    }
+
+    @Test
+    void requiresScopes_annotationPresent() {
+        var annotation = GoogleDocumentPlatform.class.getAnnotation(
+            io.casehub.platform.api.authn.RequiresScopes.class);
+        assertThat(annotation).isNotNull();
+        assertThat(annotation.provider()).isEqualTo("google");
     }
 
     // --- FileOperations ---

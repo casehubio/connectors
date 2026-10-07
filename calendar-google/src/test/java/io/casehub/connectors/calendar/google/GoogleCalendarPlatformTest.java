@@ -322,22 +322,11 @@ class GoogleCalendarPlatformTest {
 
     @Test
     void requireClient_noClient_throwsIllegalState() {
-        var unconfigured = new GoogleCalendarPlatform("", "", "");
+        var unconfigured = new GoogleCalendarPlatform((Calendar) null);
 
         assertThatThrownBy(() -> unconfigured.listCalendars())
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("not initialised");
-    }
-
-    @Test
-    void isActive_withClient_true() {
-        assertThat(platform.isActive()).isTrue();
-    }
-
-    @Test
-    void isActive_withoutClient_false() {
-        var unconfigured = new GoogleCalendarPlatform("", "", "");
-        assertThat(unconfigured.isActive()).isFalse();
     }
 
     @Test
@@ -465,16 +454,14 @@ class GoogleCalendarPlatformTest {
     }
 
     @Test
-    void resolverConstructor_buildServiceUsesResolver() {
-        var resolver = new GoogleCredentialResolver() {
-            @Override
-            public GoogleOAuthConfig resolve(String userId) {
-                return new GoogleOAuthConfig("refresh", "client", "secret");
-            }
-        };
-        var resolverPlatform = new GoogleCalendarPlatform(resolver);
-        assertThat(resolverPlatform.isActive()).isTrue();
-        assertThat(resolverPlatform.id()).isEqualTo("google");
+    void requiresScopes_annotationPresent() {
+        var annotation = GoogleCalendarPlatform.class.getAnnotation(
+            io.casehub.platform.api.authn.RequiresScopes.class);
+        assertThat(annotation).isNotNull();
+        assertThat(annotation.provider()).isEqualTo("google");
+        assertThat(annotation.scopes()).contains(
+            "https://www.googleapis.com/auth/calendar.readonly",
+            "https://www.googleapis.com/auth/calendar.events");
     }
 
 

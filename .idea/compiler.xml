@@ -12,12 +12,15 @@
         <module name="casehub-connectors-document-spi" />
         <module name="casehub-platform-delivery-channel-inmem-core" />
         <module name="casehub-platform-subscriptions-inmem-core" />
+        <module name="casehub-platform-security-spring" />
         <module name="casehub-platform-scim" />
         <module name="casehub-platform-datasource-inmem-core" />
         <module name="casehub-platform-agent-config-core" />
         <module name="casehub-platform-endpoints-memory" />
+        <module name="casehub-platform-agent-session-core" />
         <module name="casehub-platform-persistence-jpa" />
         <module name="casehub-platform-config-core" />
+        <module name="casehub-platform-authn-social-core" />
         <module name="casehub-platform-rest-spring-generator" />
         <module name="casehub-platform-subscriptions-spring-jpa" />
         <module name="casehub-platform-datasource-jpa" />
@@ -46,6 +49,7 @@
         <module name="casehub-platform-agent-codex" />
         <module name="casehub-platform-simulation-config-core" />
         <module name="casehub-platform-oidc" />
+        <module name="casehub-platform-authn-webauthn-jpa-common" />
         <module name="casehub-platform-spring-actuator" />
         <module name="casehub-platform-observability-core" />
         <module name="casehub-platform-agent-router-core" />
@@ -55,15 +59,18 @@
         <module name="casehub-connectors-chat-discord" />
         <module name="casehub-connectors-bank-spi" />
         <module name="casehub-platform-simulation-testing" />
+        <module name="casehub-platform-authn-core" />
         <module name="casehub-platform-notification-settings-jpa-common" />
         <module name="casehub-platform-agent-openai-core" />
         <module name="casehub-platform-agent-runtime" />
         <module name="casehub-platform-delivery-tracking-spring-jpa" />
+        <module name="casehub-connectors-travel-ref" />
         <module name="casehub-platform-notifications-jpa" />
         <module name="casehub-platform-agent-api" />
         <module name="casehub-platform-digest-spring-jpa" />
         <module name="casehub-platform-spring" />
         <module name="casehub-platform-expression-core" />
+        <module name="casehub-platform-session-jpa-common" />
         <module name="casehub-platform-llm-config-bedrock" />
         <module name="casehub-platform-event-simulation-core" />
         <module name="casehub-platform-notification-settings-inmem" />
@@ -73,10 +80,12 @@
         <module name="casehub-connectors-document-google" />
         <module name="casehub-platform-agent-ollama-core" />
         <module name="casehub-platform-datasource-inmem" />
+        <module name="casehub-platform-authn-webauthn-spring-jpa" />
         <module name="casehub-platform-datasource-alpha" />
         <module name="casehub-platform-delivery-tracking-jpa-common" />
         <module name="casehub-platform-simulation-config" />
         <module name="casehub-platform-acl-jpa" />
+        <module name="casehub-platform-authn-social-jpa" />
         <module name="casehub-connectors-email-inbound" />
         <module name="casehub-platform-expression" />
         <module name="casehub-platform-identity-spring" />
@@ -84,6 +93,7 @@
         <module name="casehub-platform-subscriptions-jpa" />
         <module name="casehub-platform-agent-gemini" />
         <module name="casehub-connectors-api" />
+        <module name="casehub-platform-authn-social-spring-jpa" />
         <module name="casehub-platform-governance-core" />
         <module name="casehub-platform-digest-inmem-core" />
         <module name="casehub-platform-callback-core" />
@@ -92,6 +102,7 @@
         <module name="casehub-platform-identity" />
         <module name="casehub-platform-yaml-jackson" />
         <module name="casehub-platform-agent-gate-core" />
+        <module name="casehub-platform-agent-session" />
         <module name="casehub-platform-delivery-tracking-inmem-core" />
         <module name="casehub-platform-endpoints-config-core" />
         <module name="casehub-connectors-commerce-spi" />
@@ -99,14 +110,17 @@
         <module name="casehub-platform-scim-core" />
         <module name="casehub-connectors-contacts-google" />
         <module name="casehub-platform-llm-config-core" />
+        <module name="casehub-platform-session-jpa" />
         <module name="casehub-platform-pdf" />
         <module name="casehub-platform-agent-gemini-core" />
         <module name="casehub-platform" />
         <module name="casehub-platform-mcp-spring-generator" />
+        <module name="casehub-platform-authn-webauthn-core" />
         <module name="casehub-platform-datasource-jpa-common" />
         <module name="casehub-platform-spring-generator" />
         <module name="casehub-platform-acl-worker" />
         <module name="casehub-platform-yaml-plugin-api" />
+        <module name="casehub-platform-authn-webauthn-jpa" />
         <module name="casehub-connectors-signal-cli" />
         <module name="casehub-platform-yaml-core" />
         <module name="casehub-platform-mcp" />
@@ -135,6 +149,7 @@
         <module name="casehub-platform-governance" />
         <module name="casehub-connectors-calendar-ref" />
         <module name="casehub-platform-credentials-spring" />
+        <module name="casehub-platform-authn" />
         <module name="casehub-platform-endpoints-config" />
         <module name="casehub-platform-callback-inmem-core" />
         <module name="casehub-platform-agent-langchain4j" />
@@ -158,11 +173,13 @@
         <module name="casehub-platform-simulation-core" />
         <module name="casehub-platform-streams-kafka-core" />
         <module name="casehub-platform-scim-spring" />
+        <module name="casehub-platform-authn-inmem" />
         <module name="casehub-connectors-spring" />
         <module name="casehub-platform-endpoints-memory-core" />
         <module name="casehub-platform-generator-common" />
         <module name="casehub-connectors-notification-bridge" />
         <module name="casehub-platform-spring-testing" />
+        <module name="casehub-platform-authn-social-jpa-common" />
         <module name="casehub-platform-graphql" />
         <module name="casehub-platform-api" />
         <module name="casehub-connectors-chat-signal" />
@@ -180,14 +197,18 @@
         <module name="casehub-platform-notifications-core" />
         <module name="casehub-platform-persistence-spring-jpa" />
         <module name="casehub-connectors-calendar-google" />
+        <module name="casehub-platform-yaml-statemachine-generator" />
+        <module name="casehub-platform-authn-spring" />
         <module name="casehub-connectors-chat-irc" />
         <module name="casehub-platform-agent-ollama" />
         <module name="casehub-platform-simulation-api" />
         <module name="casehub-platform-streams-poll-core" />
         <module name="casehub-platform-expression-spring" />
+        <module name="casehub-platform-session-spring-jpa" />
         <module name="casehub-platform-mcp-core" />
         <module name="casehub-connectors-slack-bot" />
         <module name="casehub-platform-acl-inmem" />
+        <module name="casehub-platform-acl-admin-core" />
         <module name="casehub-platform-subscriptions-inmem" />
         <module name="casehub-platform-view-spring-jpa" />
         <module name="casehub-platform-view-inmem" />
@@ -198,6 +219,7 @@
         <module name="casehub-platform-callback-client-core" />
         <module name="casehub-platform-callback-spring" />
         <module name="casehub-platform-drift-detection" />
+        <module name="casehub-connectors-travel-spi" />
         <module name="casehub-platform-oidc-spring" />
         <module name="casehub-platform-subscriptions-jpa-common" />
         <module name="casehub-connectors-chat-slack" />
@@ -299,6 +321,11 @@
           <entry name="$MAVEN_REPOSITORY$/io/casehub/casehub-platform-api/0.2-SNAPSHOT/casehub-platform-api-0.2-SNAPSHOT.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/casehub/casehub-neocortex-memory-api/0.2-SNAPSHOT/casehub-neocortex-memory-api-0.2-SNAPSHOT.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/casehub/casehub-neocortex-cognitive-api/0.2-SNAPSHOT/casehub-neocortex-cognitive-api-0.2-SNAPSHOT.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/casehub/casehub-neocortex-fusion-api/0.2-SNAPSHOT/casehub-neocortex-fusion-api-0.2-SNAPSHOT.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/casehub/casehub-platform-api/0.2-SNAPSHOT/casehub-platform-api-0.2-SNAPSHOT.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/casehub/casehub-platform-api/0.2-SNAPSHOT/casehub-platform-api-0.2-SNAPSHOT.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/casehub/casehub-neocortex-memory-api/0.2-SNAPSHOT/casehub-neocortex-memory-api-0.2-SNAPSHOT.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/casehub/casehub-neocortex-cognitive-api/0.2-SNAPSHOT/casehub-neocortex-cognitive-api-0.2-SNAPSHOT.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/casehub/casehub-neocortex-fusion-api/0.2-SNAPSHOT/casehub-neocortex-fusion-api-0.2-SNAPSHOT.jar" />
@@ -690,6 +717,8 @@
       <module name="casehub-connectors-signal-cli" options="-parameters" />
       <module name="casehub-connectors-slack-bot" options="-parameters" />
       <module name="casehub-connectors-spring" options="-parameters" />
+      <module name="casehub-connectors-travel-ref" options="-parameters" />
+      <module name="casehub-connectors-travel-spi" options="-parameters" />
       <module name="casehub-connectors-webhook" options="-parameters -AgenerateGraphQL=false -AdomainFilter=connectors/webhooks" />
       <module name="casehub-graphql-client" options="-parameters" />
       <module name="casehub-platform" options="-parameters" />
@@ -736,9 +765,23 @@
       <module name="casehub-platform-agent-runtime" options="-parameters" />
       <module name="casehub-platform-agent-runtime-core" options="-parameters" />
       <module name="casehub-platform-agent-runtime-spring" options="-parameters" />
+      <module name="casehub-platform-agent-session" options="-parameters" />
+      <module name="casehub-platform-agent-session-core" options="-parameters" />
       <module name="casehub-platform-agent-simulation-core" options="-parameters" />
       <module name="casehub-platform-agent-spring" options="-parameters" />
       <module name="casehub-platform-api" options="-parameters" />
+      <module name="casehub-platform-authn" options="-parameters" />
+      <module name="casehub-platform-authn-core" options="-parameters" />
+      <module name="casehub-platform-authn-inmem" options="-parameters" />
+      <module name="casehub-platform-authn-social-core" options="-parameters" />
+      <module name="casehub-platform-authn-social-jpa" options="-parameters" />
+      <module name="casehub-platform-authn-social-jpa-common" options="-parameters" />
+      <module name="casehub-platform-authn-social-spring-jpa" options="-parameters" />
+      <module name="casehub-platform-authn-spring" options="-parameters" />
+      <module name="casehub-platform-authn-webauthn-core" options="-parameters" />
+      <module name="casehub-platform-authn-webauthn-jpa" options="-parameters" />
+      <module name="casehub-platform-authn-webauthn-jpa-common" options="-parameters" />
+      <module name="casehub-platform-authn-webauthn-spring-jpa" options="-parameters" />
       <module name="casehub-platform-callback" options="-parameters -AgenerateGraphQL=false -AdomainFilter=callbacks" />
       <module name="casehub-platform-callback-api" options="-parameters" />
       <module name="casehub-platform-callback-client" options="-parameters -AgenerateGraphQL=false -AdomainFilter=casehub/callbacks" />
@@ -836,6 +879,10 @@
       <module name="casehub-platform-scim" options="-parameters" />
       <module name="casehub-platform-scim-core" options="-parameters" />
       <module name="casehub-platform-scim-spring" options="-parameters" />
+      <module name="casehub-platform-security-spring" options="-parameters" />
+      <module name="casehub-platform-session-jpa" options="-parameters" />
+      <module name="casehub-platform-session-jpa-common" options="-parameters" />
+      <module name="casehub-platform-session-spring-jpa" options="-parameters" />
       <module name="casehub-platform-signing" options="-parameters" />
       <module name="casehub-platform-simulation-api" options="-parameters" />
       <module name="casehub-platform-simulation-config" options="-parameters" />
@@ -890,6 +937,7 @@
       <module name="casehub-platform-yaml-step-testing" options="-parameters" />
       <module name="casehub-spring-boot-starter" options="-parameters" />
       <module name="casehub-spring-boot-starter-agent" options="-parameters" />
+      <module name="casehub-spring-boot-starter-authn" options="-parameters" />
       <module name="casehub-spring-boot-starter-streams" options="-parameters" />
     </option>
   </component>

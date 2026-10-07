@@ -75,6 +75,11 @@ Zero heavy dependencies — HTTP-based connectors use java.net.http only.</descr
   <dependencyManagement>
     <dependencies>
       <dependency>
+        <groupId>io.casehub</groupId>
+        <artifactId>casehub-platform-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
         <groupId>org.wiremock</groupId>
         <artifactId>wiremock-standalone</artifactId>
         <version>3.9.1</version>

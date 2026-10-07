@@ -54,22 +54,19 @@ class GoogleEmailPlatformTest {
     }
 
     @Test
-    void isActive_withClient_true() {
-        assertThat(platform.isActive()).isTrue();
-    }
-
-    @Test
-    void isActive_withoutClient_false() {
-        var unconfigured = new GoogleEmailPlatform("", "", "");
-        assertThat(unconfigured.isActive()).isFalse();
-    }
-
-    @Test
     void requireClient_noClient_throwsIllegalState() {
-        var unconfigured = new GoogleEmailPlatform("", "", "");
+        var unconfigured = new GoogleEmailPlatform((Gmail) null);
         assertThatThrownBy(unconfigured::listMailboxes)
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("not initialised");
+    }
+
+    @Test
+    void requiresScopes_annotationPresent() {
+        var annotation = GoogleEmailPlatform.class.getAnnotation(
+            io.casehub.platform.api.authn.RequiresScopes.class);
+        assertThat(annotation).isNotNull();
+        assertThat(annotation.provider()).isEqualTo("google");
     }
 
     @Test
