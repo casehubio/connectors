@@ -7,6 +7,7 @@ import io.casehub.connectors.PageRequest;
 import io.casehub.connectors.document.model.DocumentMetadata;
 import io.casehub.connectors.document.model.DocumentSummary;
 import io.casehub.connectors.document.model.Folder;
+import io.casehub.platform.api.confirmation.RequiresConfirmation;
 import io.casehub.platform.simulation.SimulationEligible;
 
 import java.util.List;
@@ -38,6 +39,7 @@ public interface DocumentPlatform {
         DocumentMetadata upload(String folderId, String name,
                                 String contentType, byte[] content);
 
+        @RequiresConfirmation(summary = "Delete file ${fileId}")
         void delete(String fileId);
 
         SyncResult<DocumentSummary> listSync(SyncRequest request);

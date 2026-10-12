@@ -8,6 +8,7 @@ import io.casehub.connectors.SyncRequest;
 import io.casehub.connectors.SyncResult;
 import io.casehub.connectors.contacts.model.Contact;
 import io.casehub.connectors.contacts.model.Group;
+import io.casehub.platform.api.confirmation.RequiresConfirmation;
 import io.casehub.platform.simulation.SimulationEligible;
 
 @SimulationEligible(name = "contacts-platform",
@@ -48,6 +49,7 @@ public interface ContactsPlatform {
 
         Contact update(String contactId, Contact contact);
 
+        @RequiresConfirmation(summary = "Delete contact ${contactId}")
         void delete(String contactId);
     }
 }
