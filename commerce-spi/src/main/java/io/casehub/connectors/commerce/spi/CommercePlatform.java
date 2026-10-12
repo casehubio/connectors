@@ -11,6 +11,7 @@ import io.casehub.connectors.commerce.model.Product;
 import io.casehub.connectors.commerce.model.ProductDetail;
 import io.casehub.connectors.commerce.model.ProductReview;
 import io.casehub.connectors.commerce.model.ShoppingCart;
+import io.casehub.platform.api.confirmation.RequiresConfirmation;
 import io.casehub.platform.simulation.SimulationEligible;
 
 @SimulationEligible(name = "commerce-platform",
@@ -60,6 +61,7 @@ public interface CommercePlatform {
 
     interface Checkout {
 
+        @RequiresConfirmation(summary = "Checkout cart ${request.cartId}")
         CheckoutResult checkout(CheckoutRequest request);
     }
 
