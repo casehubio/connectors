@@ -10,6 +10,8 @@ import io.casehub.connectors.bank.BankPlatformService;
 import io.casehub.connectors.calendar.CalendarPlatformService;
 import io.casehub.connectors.chat.ChatPlatformService;
 import io.casehub.connectors.chat.spi.ChatPlatform;
+import io.casehub.connectors.commerce.spi.CommercePlatform;
+import io.casehub.connectors.commerce.spi.CommercePlatformService;
 import io.casehub.connectors.contacts.spi.ContactsPlatformService;
 import io.casehub.connectors.document.spi.DocumentPlatformService;
 import io.casehub.connectors.email.spi.EmailPlatformService;
@@ -50,12 +52,14 @@ class ConnectorOperationsImplTest {
         var documentPlatformService = new DocumentPlatformService(List.of());
         var contactsPlatformService = new ContactsPlatformService(List.of());
         var projectPlatformService = new ProjectPlatformService(List.of());
+        var commercePlatformService = new CommercePlatformService(List.of());
 
         ops = new ConnectorOperationsImpl(
                 inboundService, connectorService, chatPlatformService,
                 calendarPlatformService, bankPlatformService,
                 emailPlatformService, documentPlatformService,
                 contactsPlatformService, projectPlatformService,
+                commercePlatformService,
                 List.of(connector), List.of(), java.util.Optional.empty(), null);
     }
 
@@ -171,6 +175,7 @@ class ConnectorOperationsImplTest {
                 new CalendarPlatformService(List.of()), bankService,
                 new EmailPlatformService(List.of()), new DocumentPlatformService(List.of()),
                 new ContactsPlatformService(List.of()), new ProjectPlatformService(List.of()),
+                new CommercePlatformService(List.of()),
                 List.of(), List.of(), java.util.Optional.empty(), null);
 
         var result = ops.connectorsReport("bank");
@@ -195,6 +200,7 @@ class ConnectorOperationsImplTest {
                 new CalendarPlatformService(List.of()), bankService,
                 new EmailPlatformService(List.of()), new DocumentPlatformService(List.of()),
                 new ContactsPlatformService(List.of()), new ProjectPlatformService(List.of()),
+                new CommercePlatformService(List.of()),
                 List.of(), List.of(), java.util.Optional.empty(), null);
 
         var result = ops.connectorsReport("bank");
@@ -227,6 +233,7 @@ class ConnectorOperationsImplTest {
                 new CalendarPlatformService(List.of()), new BankPlatformService(List.of()),
                 new EmailPlatformService(List.of()), docService,
                 new ContactsPlatformService(List.of()), new ProjectPlatformService(List.of()),
+                new CommercePlatformService(List.of()),
                 List.of(), List.of(), java.util.Optional.empty(), null);
 
         var result = ops.connectorsReport("document");
@@ -238,6 +245,55 @@ class ConnectorOperationsImplTest {
         assertThat(doc.capabilities()).doesNotContain("SharingOperations");
     }
 
+
+    @Test
+    void connectorsReportWithCommercePlatformCapabilities() {
+        var commercePlatform = new StubCommercePlatform("ref-commerce", true, true, true, true, true);
+        var commerceService = new CommercePlatformService(List.of(commercePlatform));
+
+        var inboundService = InboundConnectorService.withEventBus(List.of(), msg -> {});
+        var chatPlatformService = new ChatPlatformService(List.of());
+        var connectorService = ConnectorService.withEventSink(List.of(), msg -> {});
+        var ops = new ConnectorOperationsImpl(
+                inboundService, connectorService, chatPlatformService,
+                new CalendarPlatformService(List.of()), new BankPlatformService(List.of()),
+                new EmailPlatformService(List.of()), new DocumentPlatformService(List.of()),
+                new ContactsPlatformService(List.of()), new ProjectPlatformService(List.of()),
+                commerceService,
+                List.of(), List.of(), java.util.Optional.empty(), null);
+
+        var result = ops.connectorsReport("commerce");
+
+        assertThat(result.platforms()).containsOnlyKeys("commerce");
+        var commerce = result.platforms().get("commerce");
+        assertThat(commerce.providerId()).isEqualTo("ref-commerce");
+        assertThat(commerce.status()).isEqualTo("CONNECTED");
+        assertThat(commerce.capabilities()).containsExactlyInAnyOrder(
+            "ProductSearch", "ProductDetails", "Cart", "Checkout", "OrderTracking");
+    }
+
+    @Test
+    void connectorsReportWithPartialCommerceCapabilities() {
+        var commercePlatform = new StubCommercePlatform("limited", true, true, false, false, false);
+        var commerceService = new CommercePlatformService(List.of(commercePlatform));
+
+        var inboundService = InboundConnectorService.withEventBus(List.of(), msg -> {});
+        var chatPlatformService = new ChatPlatformService(List.of());
+        var connectorService = ConnectorService.withEventSink(List.of(), msg -> {});
+        var ops = new ConnectorOperationsImpl(
+                inboundService, connectorService, chatPlatformService,
+                new CalendarPlatformService(List.of()), new BankPlatformService(List.of()),
+                new EmailPlatformService(List.of()), new DocumentPlatformService(List.of()),
+                new ContactsPlatformService(List.of()), new ProjectPlatformService(List.of()),
+                commerceService,
+                List.of(), List.of(), java.util.Optional.empty(), null);
+
+        var result = ops.connectorsReport("commerce");
+
+        var commerce = result.platforms().get("commerce");
+        assertThat(commerce.capabilities()).containsExactly("ProductSearch", "ProductDetails");
+        assertThat(commerce.capabilities()).doesNotContain("Cart", "Checkout", "OrderTracking");
+    }
 
     @Test
     void sentMessagesReturnsEmptyWhenCaptureAbsent() {
@@ -297,5 +353,24 @@ class ConnectorOperationsImplTest {
         }
     }
 
+    private record StubCommercePlatform(String id, boolean supportsSearch, boolean supportsDetails,
+                                        boolean supportsCart, boolean supportsCheckout,
+                                        boolean supportsTracking) implements CommercePlatform {
+        @Override public ProductSearch productSearch(String u) { throw new UnsupportedOperationException(); }
+        @Override public ProductDetails productDetails(String u) { throw new UnsupportedOperationException(); }
+        @Override public Cart cart(String u) { throw new UnsupportedOperationException(); }
+        @Override public Checkout checkout(String u) { throw new UnsupportedOperationException(); }
+        @Override public OrderTracking orderTracking(String u) { throw new UnsupportedOperationException(); }
+
+        @Override
+        public boolean supports(Class<?> capability) {
+            if (capability == ProductSearch.class) return supportsSearch;
+            if (capability == ProductDetails.class) return supportsDetails;
+            if (capability == Cart.class) return supportsCart;
+            if (capability == Checkout.class) return supportsCheckout;
+            if (capability == OrderTracking.class) return supportsTracking;
+            return false;
+        }
+    }
 
 }

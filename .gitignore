@@ -4,6 +4,7 @@ target/
 wksp
 
 .idea/
+*.iml
 .quinoa/
 chat-demo/chat-demo.db*
 .claude
