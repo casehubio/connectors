@@ -237,6 +237,14 @@
     <file url="file://$PROJECT_DIR$/../platform/config-core/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/config/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/config/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/confirmation-core/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/confirmation-core/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/confirmation-generator/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/confirmation-generator/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/confirmation-spring/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/confirmation-spring/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/confirmation/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/confirmation/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/credentials-quarkus/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/credentials-quarkus/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/credentials-spring/src/main/java" charset="UTF-8" />
@@ -419,6 +427,20 @@
     <file url="file://$PROJECT_DIR$/../platform/preferences-editor-core/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/preferences-editor/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/preferences-editor/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/registry-client-quarkus/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/registry-client-quarkus/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/registry-client/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/registry-client/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/registry-inmem-core/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/registry-inmem-core/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/registry-inmem/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/registry-inmem/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/registry-jpa-common/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/registry-jpa-common/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/registry-jpa/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/registry-jpa/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/registry-spring-jpa/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/registry-spring-jpa/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/rest-client-simulation-generator/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/rest-client-simulation-generator/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/rest-spring-generator/src/main/java" charset="UTF-8" />

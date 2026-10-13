@@ -16,6 +16,8 @@ import io.casehub.connectors.contacts.spi.ContactsPlatformService;
 import io.casehub.connectors.document.spi.DocumentPlatformService;
 import io.casehub.connectors.email.spi.EmailPlatformService;
 import io.casehub.connectors.project.spi.ProjectPlatformService;
+import io.casehub.connectors.travel.spi.TravelPlatform;
+import io.casehub.connectors.travel.spi.TravelPlatformService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -60,6 +62,7 @@ class ConnectorOperationsImplTest {
                 emailPlatformService, documentPlatformService,
                 contactsPlatformService, projectPlatformService,
                 commercePlatformService,
+                new TravelPlatformService(List.of()),
                 List.of(connector), List.of(), java.util.Optional.empty(), null);
     }
 
@@ -176,6 +179,7 @@ class ConnectorOperationsImplTest {
                 new EmailPlatformService(List.of()), new DocumentPlatformService(List.of()),
                 new ContactsPlatformService(List.of()), new ProjectPlatformService(List.of()),
                 new CommercePlatformService(List.of()),
+                new TravelPlatformService(List.of()),
                 List.of(), List.of(), java.util.Optional.empty(), null);
 
         var result = ops.connectorsReport("bank");
@@ -201,6 +205,7 @@ class ConnectorOperationsImplTest {
                 new EmailPlatformService(List.of()), new DocumentPlatformService(List.of()),
                 new ContactsPlatformService(List.of()), new ProjectPlatformService(List.of()),
                 new CommercePlatformService(List.of()),
+                new TravelPlatformService(List.of()),
                 List.of(), List.of(), java.util.Optional.empty(), null);
 
         var result = ops.connectorsReport("bank");
@@ -234,6 +239,7 @@ class ConnectorOperationsImplTest {
                 new EmailPlatformService(List.of()), docService,
                 new ContactsPlatformService(List.of()), new ProjectPlatformService(List.of()),
                 new CommercePlatformService(List.of()),
+                new TravelPlatformService(List.of()),
                 List.of(), List.of(), java.util.Optional.empty(), null);
 
         var result = ops.connectorsReport("document");
@@ -260,6 +266,7 @@ class ConnectorOperationsImplTest {
                 new EmailPlatformService(List.of()), new DocumentPlatformService(List.of()),
                 new ContactsPlatformService(List.of()), new ProjectPlatformService(List.of()),
                 commerceService,
+                new TravelPlatformService(List.of()),
                 List.of(), List.of(), java.util.Optional.empty(), null);
 
         var result = ops.connectorsReport("commerce");
@@ -286,6 +293,7 @@ class ConnectorOperationsImplTest {
                 new EmailPlatformService(List.of()), new DocumentPlatformService(List.of()),
                 new ContactsPlatformService(List.of()), new ProjectPlatformService(List.of()),
                 commerceService,
+                new TravelPlatformService(List.of()),
                 List.of(), List.of(), java.util.Optional.empty(), null);
 
         var result = ops.connectorsReport("commerce");
@@ -293,6 +301,59 @@ class ConnectorOperationsImplTest {
         var commerce = result.platforms().get("commerce");
         assertThat(commerce.capabilities()).containsExactly("ProductSearch", "ProductDetails");
         assertThat(commerce.capabilities()).doesNotContain("Cart", "Checkout", "OrderTracking");
+    }
+
+
+    @Test
+    void connectorsReportWithTravelPlatformCapabilities() {
+        var travelPlatform = new StubTravelPlatform("ref-travel", true, true, true, true);
+        var travelService  = new TravelPlatformService(List.of(travelPlatform));
+
+        var inboundService      = InboundConnectorService.withEventBus(List.of(), msg -> {});
+        var chatPlatformService = new ChatPlatformService(List.of());
+        var connectorService    = ConnectorService.withEventSink(List.of(), msg -> {});
+        var ops = new ConnectorOperationsImpl(
+                inboundService, connectorService, chatPlatformService,
+                new CalendarPlatformService(List.of()), new BankPlatformService(List.of()),
+                new EmailPlatformService(List.of()), new DocumentPlatformService(List.of()),
+                new ContactsPlatformService(List.of()), new ProjectPlatformService(List.of()),
+                new CommercePlatformService(List.of()),
+                travelService,
+                List.of(), List.of(), java.util.Optional.empty(), null);
+
+        var result = ops.connectorsReport("travel");
+
+        assertThat(result.platforms()).containsOnlyKeys("travel");
+        var travel = result.platforms().get("travel");
+        assertThat(travel.providerId()).isEqualTo("ref-travel");
+        assertThat(travel.status()).isEqualTo("CONNECTED");
+        assertThat(travel.capabilities()).containsExactlyInAnyOrder(
+                "TransportSearch", "TransportBooking", "AccommodationSearch", "AccommodationBooking");
+    }
+
+
+    @Test
+    void connectorsReportWithPartialTravelCapabilities() {
+        var travelPlatform = new StubTravelPlatform("limited", true, false, true, false);
+        var travelService  = new TravelPlatformService(List.of(travelPlatform));
+
+        var inboundService      = InboundConnectorService.withEventBus(List.of(), msg -> {});
+        var chatPlatformService = new ChatPlatformService(List.of());
+        var connectorService    = ConnectorService.withEventSink(List.of(), msg -> {});
+        var ops = new ConnectorOperationsImpl(
+                inboundService, connectorService, chatPlatformService,
+                new CalendarPlatformService(List.of()), new BankPlatformService(List.of()),
+                new EmailPlatformService(List.of()), new DocumentPlatformService(List.of()),
+                new ContactsPlatformService(List.of()), new ProjectPlatformService(List.of()),
+                new CommercePlatformService(List.of()),
+                travelService,
+                List.of(), List.of(), java.util.Optional.empty(), null);
+
+        var result = ops.connectorsReport("travel");
+
+        var travel = result.platforms().get("travel");
+        assertThat(travel.capabilities()).containsExactly("TransportSearch", "AccommodationSearch");
+        assertThat(travel.capabilities()).doesNotContain("TransportBooking", "AccommodationBooking");
     }
 
     @Test
@@ -373,4 +434,30 @@ class ConnectorOperationsImplTest {
         }
     }
 
+
+    private record StubTravelPlatform(String id, boolean supportsTransportSearch,
+                                      boolean supportsTransportBooking,
+                                      boolean supportsAccommodationSearch,
+                                      boolean supportsAccommodationBooking) implements TravelPlatform {
+        @Override
+        public TransportSearch transportSearch()                   {throw new UnsupportedOperationException();}
+
+        @Override
+        public TransportBooking transportBooking(String u)         {throw new UnsupportedOperationException();}
+
+        @Override
+        public AccommodationSearch accommodationSearch()           {throw new UnsupportedOperationException();}
+
+        @Override
+        public AccommodationBooking accommodationBooking(String u) {throw new UnsupportedOperationException();}
+
+        @Override
+        public boolean supports(Class<?> capability) {
+            if (capability == TransportSearch.class) {return supportsTransportSearch;}
+            if (capability == TransportBooking.class) {return supportsTransportBooking;}
+            if (capability == AccommodationSearch.class) {return supportsAccommodationSearch;}
+            if (capability == AccommodationBooking.class) {return supportsAccommodationBooking;}
+            return false;
+        }
+    }
 }
