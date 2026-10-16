@@ -11,7 +11,7 @@
   </parent>
 
   <artifactId>casehub-connectors-parent</artifactId>
-  <version>${revision}</version>
+  <version>0.4-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>CaseHub Connectors — Parent</name>
@@ -68,7 +68,6 @@ Zero heavy dependencies — HTTP-based connectors use java.net.http only.</descr
   </modules>
 
   <properties>
-    <revision>0.4-SNAPSHOT</revision>
     <quarkus.version>${quarkus.platform.version}</quarkus.version>
     <quarkus-mcp-server.version>1.11.1</quarkus-mcp-server.version>
   </properties>
@@ -130,29 +129,4 @@ Zero heavy dependencies — HTTP-based connectors use java.net.http only.</descr
   </distributionManagement>
 
 
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>flatten-maven-plugin</artifactId>
-        <version>1.7.0</version>
-        <configuration>
-          <updatePomFile>true</updatePomFile>
-          <flattenMode>resolveCiFriendliesOnly</flattenMode>
-        </configuration>
-        <executions>
-          <execution>
-            <id>flatten</id>
-            <phase>validate</phase>
-            <goals><goal>flatten</goal></goals>
-          </execution>
-          <execution>
-            <id>flatten.clean</id>
-            <phase>clean</phase>
-            <goals><goal>clean</goal></goals>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
 </project>
