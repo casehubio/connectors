@@ -7,7 +7,7 @@
   <parent>
     <groupId>io.casehub</groupId>
     <artifactId>casehub-parent</artifactId>
-    <version>0.4-SNAPSHOT</version>
+    <version>${revision}</version>
   </parent>
 
   <artifactId>casehub-connectors-parent</artifactId>
@@ -68,6 +68,7 @@ Zero heavy dependencies — HTTP-based connectors use java.net.http only.</descr
   </modules>
 
   <properties>
+    <revision>0.4-SNAPSHOT</revision>
     <quarkus.version>${quarkus.platform.version}</quarkus.version>
     <quarkus-mcp-server.version>1.11.1</quarkus-mcp-server.version>
   </properties>
