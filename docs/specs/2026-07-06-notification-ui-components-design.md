@@ -12,7 +12,7 @@ Composable Lit web components for the CaseHub notification system. Covers notifi
 
 **Reuse-first:** Components are built on existing pages-primitives (`PagesFilterChips`, `PagesScopeSelector`, a11y mixins), pages-ui-tokens (`--pages-*` design tokens), blocks-ui-core (`BlocksConfirmDialog`), and the upcoming `pages-data-table` (blocks-ui#22) for row display. Only notification-specific orchestration and domain logic is new.
 
-Lives in casehub-agency-ui as a new `notification-inbox` component package — alongside `work-item-inbox`, which follows the identical pattern (Lit orchestrator + reused primitives + SSE push). The components share the same dependency set (`@casehubio/agency-ui-core`, `@casehubio/pages-primitives`, `@casehubio/pages-ui-tokens`) and design conventions.
+Lives in casehub-blocks-ui as a new `notification-inbox` component package — alongside `work-item-inbox`, which follows the identical pattern (Lit orchestrator + reused primitives + SSE push). The components share the same dependency set (`@casehubio/agency-ui-core`, `@casehubio/pages-primitives`, `@casehubio/pages-ui-tokens`) and design conventions.
 
 **Implementation gate:** `pages-data-table` (blocks-ui#22) must land before implementation begins. The spec designs column definitions against its known API. A proposed `pages-summary-bar` primitive (to be filed on pages) should also land first.
 
@@ -636,7 +636,7 @@ Not standalone — a section or tab alongside "My Subscriptions."
 
 ## Section 7: Module Structure & Dependencies (formerly §6)
 
-**Location:** `casehub-agency-ui/components/notification-inbox/` — follows the same package structure as `work-item-inbox` and all other blocks-ui components.
+**Location:** `casehub-blocks-ui/components/notification-inbox/` — follows the same package structure as `work-item-inbox` and all other blocks-ui components.
 
 ```
 components/notification-inbox/
