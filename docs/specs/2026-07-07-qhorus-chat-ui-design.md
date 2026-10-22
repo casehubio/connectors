@@ -691,7 +691,7 @@ Human participation via oversight channel.
 ## 7. Accessibility
 
 All components use Lit accessibility mixins from
-`@casehubio/blocks-ui-core` (`packages/blocks-ui-core/src/mixins/`).
+`@casehubio/agency-ui-core` (`packages/blocks-ui-core/src/mixins/`).
 These are Lit 3.3 mixins with tests. The mixins are planned to migrate
 to `@casehubio/pages-primitives` (per pages ARC42STORIES §5/§10); when
 that migration happens, import paths change but APIs do not.
@@ -755,7 +755,7 @@ Commitment state badge colors:
 
 - **Build tooling:** Vite for dev server + HMR, esbuild for production
   bundle (Vite uses esbuild internally). Aligns with blocks-ui convention.
-- **Lit version:** Lit 3.3, matching `@casehubio/blocks-ui-core` (per
+- **Lit version:** Lit 3.3, matching `@casehubio/agency-ui-core` (per
   pages ARC42STORIES §10).
 - **WebSocket vs SSE:** The adapter pattern supports both. Chat-demo uses
   WebSocket; claudony uses SSE. No single primary — each backend provides

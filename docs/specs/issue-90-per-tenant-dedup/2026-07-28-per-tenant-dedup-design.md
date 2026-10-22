@@ -267,6 +267,6 @@ falls back to the `Connector` default returning `id()` ("slack" / "teams").
 1. Platform API + implementation changes → `mvn install` to local repo
 2. Connectors changes (depend on updated platform-api SNAPSHOT)
 3. Blocks-UI: update TypeScript `DeliveryChannelDescriptor` interface in
-   `casehub-blocks-ui-npm` to include `destinationScope` field (additive —
+   `casehub-agency-ui-npm` to include `destinationScope` field (additive —
    existing UI code is unaffected, field is informational)
 4. Push platform first, then connectors, then blocks-ui

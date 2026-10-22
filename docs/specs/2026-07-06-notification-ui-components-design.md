@@ -12,7 +12,7 @@ Composable Lit web components for the CaseHub notification system. Covers notifi
 
 **Reuse-first:** Components are built on existing pages-primitives (`PagesFilterChips`, `PagesScopeSelector`, a11y mixins), pages-ui-tokens (`--pages-*` design tokens), blocks-ui-core (`BlocksConfirmDialog`), and the upcoming `pages-data-table` (blocks-ui#22) for row display. Only notification-specific orchestration and domain logic is new.
 
-Lives in casehub-blocks-ui as a new `notification-inbox` component package — alongside `work-item-inbox`, which follows the identical pattern (Lit orchestrator + reused primitives + SSE push). The components share the same dependency set (`@casehubio/blocks-ui-core`, `@casehubio/pages-primitives`, `@casehubio/pages-ui-tokens`) and design conventions.
+Lives in casehub-agency-ui as a new `notification-inbox` component package — alongside `work-item-inbox`, which follows the identical pattern (Lit orchestrator + reused primitives + SSE push). The components share the same dependency set (`@casehubio/agency-ui-core`, `@casehubio/pages-primitives`, `@casehubio/pages-ui-tokens`) and design conventions.
 
 **Implementation gate:** `pages-data-table` (blocks-ui#22) must land before implementation begins. The spec designs column definitions against its known API. A proposed `pages-summary-bar` primitive (to be filed on pages) should also land first.
 
@@ -32,7 +32,7 @@ The following already exist and must be imported, not rebuilt:
 | `KeyboardShortcutMixin` | `@casehubio/pages-primitives` | Keyboard shortcuts mixin |
 | `FocusTrapMixin` | `@casehubio/pages-primitives` | Focus containment for modals/popovers |
 | `LiveRegionMixin` | `@casehubio/pages-primitives` | Screen reader announcements for new notifications |
-| `BlocksConfirmDialog` | `@casehubio/blocks-ui-core` | Confirmation dialogs for delete/mute |
+| `BlocksConfirmDialog` | `@casehubio/agency-ui-core` | Confirmation dialogs for delete/mute |
 | `--pages-*` tokens | `@casehubio/pages-ui-tokens` | Spacing, typography, colour, motion, radius |
 
 ### Use `pages-data-table` for notification rows
@@ -55,7 +55,7 @@ REST API for queries (cursor-paginated list, unread count), mutations (mark read
 
 ### Use `WorkIdentity` from blocks-ui-core for user context
 
-All components accept `identity?: WorkIdentity` — the same type `work-item-inbox` uses. Defined in `@casehubio/blocks-ui-core` as `{ userId: string; displayName: string; groups: readonly string[] }`. The `userId` drives SSE connection scoping (the server captures `CurrentPrincipal` at stream establishment, so the identity is verified server-side). The `displayName` is available for display purposes. The `groups` field is unused by notification components but carried for type consistency with the blocks-ui pattern.
+All components accept `identity?: WorkIdentity` — the same type `work-item-inbox` uses. Defined in `@casehubio/agency-ui-core` as `{ userId: string; displayName: string; groups: readonly string[] }`. The `userId` drives SSE connection scoping (the server captures `CurrentPrincipal` at stream establishment, so the identity is verified server-side). The `displayName` is available for display purposes. The `groups` field is unused by notification components but carried for type consistency with the blocks-ui pattern.
 
 ### Personal subscriptions fully editable, system subscriptions read-only
 
@@ -636,7 +636,7 @@ Not standalone — a section or tab alongside "My Subscriptions."
 
 ## Section 7: Module Structure & Dependencies (formerly §6)
 
-**Location:** `casehub-blocks-ui/components/notification-inbox/` — follows the same package structure as `work-item-inbox` and all other blocks-ui components.
+**Location:** `casehub-agency-ui/components/notification-inbox/` — follows the same package structure as `work-item-inbox` and all other blocks-ui components.
 
 ```
 components/notification-inbox/
@@ -663,7 +663,7 @@ components/notification-inbox/
 └── dist/
 ```
 
-**Package:** `@casehubio/blocks-ui-notification-inbox`
+**Package:** `@casehubio/agency-ui-notification-inbox`
 
 **Dependencies:**
 
@@ -674,7 +674,7 @@ components/notification-inbox/
     "@casehubio/pages-data": "workspace:*",
     "@casehubio/pages-primitives": "workspace:*",
     "@casehubio/pages-ui-tokens": "workspace:*",
-    "@casehubio/blocks-ui-core": "workspace:*"
+    "@casehubio/agency-ui-core": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5.6.0",
