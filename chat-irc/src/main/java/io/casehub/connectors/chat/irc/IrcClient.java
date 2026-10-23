@@ -56,9 +56,9 @@ public class IrcClient {
      */
     @Inject
     public IrcClient(
-            @ConfigProperty(name = "casehub.connectors.chat-irc.host") String host,
+            @ConfigProperty(name = "casehub.connectors.chat-irc.host", defaultValue = "") String host,
             @ConfigProperty(name = "casehub.connectors.chat-irc.port", defaultValue = "6667") int port,
-            @ConfigProperty(name = "casehub.connectors.chat-irc.nick") String nick) {
+            @ConfigProperty(name = "casehub.connectors.chat-irc.nick", defaultValue = "") String nick) {
         this.host = host;
         this.port = port;
         this.nick = nick;
