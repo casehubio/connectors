@@ -1,0 +1,29 @@
+- name: "family"
+  topic: "Family chat"
+  description: "Jonny, Sarah, Ella, Tom — family coordination"
+  isPrivate: false
+  members: ["jonny", "sarah", "ella", "tom"]
+
+- name: "household"
+  topic: "Household admin"
+  description: "Jonny & Sarah — adult coordination, bills, contractors, elder care"
+  isPrivate: true
+  members: ["jonny", "sarah"]
+
+- name: "school"
+  topic: "School matters"
+  description: "Jonny & Sarah — Oakwood Academy, homework, events, teachers"
+  isPrivate: true
+  members: ["jonny", "sarah"]
+
+- name: "contractors"
+  topic: "Home maintenance"
+  description: "Jonny — Bob's Plumbing, British Gas, tradespeople"
+  isPrivate: true
+  members: ["jonny"]
+
+- name: "grandma-jean"
+  topic: "Elder care coordination"
+  description: "Jonny & Sarah — Grandma Jean visits, medication, care home liaison"
+  isPrivate: true
+  members: ["jonny", "sarah"]

@@ -1,12 +1,16 @@
-- id: "g-mycontacts"
-  name: "myContacts"
-  groupType: "SYSTEM"
+- id: "g-family"
+  name: "Family"
+  groupType: "USER_CREATED"
   memberCount: 0
-- id: "g-starred"
-  name: "Starred"
-  groupType: "SYSTEM"
+- id: "g-friends"
+  name: "Friends"
+  groupType: "USER_CREATED"
   memberCount: 0
-- id: "g-work"
-  name: "Work"
+- id: "g-professional"
+  name: "Professional"
+  groupType: "USER_CREATED"
+  memberCount: 0
+- id: "g-services"
+  name: "Service Providers"
   groupType: "USER_CREATED"
   memberCount: 0

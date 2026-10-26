@@ -1,9 +1,73 @@
 - id: "prod-1"
+  name: "Admiral Car Insurance — Annual Policy"
+  brand: "Admiral"
+  sku: "prod-admiral-car"
+  category: "insurance"
+  description: "Comprehensive car insurance with protected no-claims bonus. Renewal quote for VW Golf."
+  price:
+    amount: 612.00
+    currency: "GBP"
+  rating: 3.8
+  reviewCount: 12500
+  inStock: true
+  stockQuantity: 999
+  images:
+    - url: "https://example.com/admiral-car.jpg"
+      altText: "Admiral Car Insurance"
+      width: 800
+      height: 400
+  reviews:
+    - author: "Verified Customer"
+      rating: 4.0
+      text: "Good value, easy claims process"
+      timestampMs: 1727900000000
+    - author: "Verified Customer"
+      rating: 3.0
+      text: "Price went up 6% at renewal — had to phone to negotiate"
+      timestampMs: 1727800000000
+  specifications:
+    cover_type: "Comprehensive"
+    excess: "£350"
+    no_claims: "9 years protected"
+    annual_mileage: "10,000"
+  url: "https://shop.example.com/product/prod-1"
+
+- id: "prod-2"
+  name: "Direct Line Car Insurance — Annual Policy"
+  brand: "Direct Line"
+  sku: "prod-directline-car"
+  category: "insurance"
+  description: "Comprehensive car insurance with courtesy car and personal belongings cover."
+  price:
+    amount: 585.00
+    currency: "GBP"
+  rating: 4.0
+  reviewCount: 9800
+  inStock: true
+  stockQuantity: 999
+  images:
+    - url: "https://example.com/directline-car.jpg"
+      altText: "Direct Line Car Insurance"
+      width: 800
+      height: 400
+  reviews:
+    - author: "Verified Customer"
+      rating: 4.0
+      text: "Competitive quote, switched from Admiral"
+      timestampMs: 1727700000000
+  specifications:
+    cover_type: "Comprehensive"
+    excess: "£300"
+    no_claims: "Transferable"
+    annual_mileage: "10,000"
+  url: "https://shop.example.com/product/prod-2"
+
+- id: "prod-3"
   name: "Sony WH-1000XM5 Headphones"
   brand: "Sony"
   sku: "prod-sony-xm5"
   category: "electronics"
-  description: "Premium noise-cancelling wireless headphones with 30-hour battery life."
+  description: "Premium noise-cancelling wireless headphones. Birthday gift idea for Jonny."
   price:
     amount: 299.99
     currency: "GBP"
@@ -17,11 +81,11 @@
       width: 800
       height: 600
   reviews:
-    - author: "Alice S."
+    - author: "Sarah A."
       rating: 5.0
-      text: "Best noise cancelling I've ever used"
+      text: "Perfect for the commute"
       timestampMs: 1727900000000
-    - author: "Bob J."
+    - author: "Dave T."
       rating: 4.0
       text: "Great sound, slightly tight fit"
       timestampMs: 1727800000000
@@ -30,14 +94,14 @@
     connectivity: "Bluetooth 5.2"
     battery: "30 hours"
     weight: "250g"
-  url: "https://shop.example.com/product/prod-1"
+  url: "https://shop.example.com/product/prod-3"
 
-- id: "prod-2"
+- id: "prod-4"
   name: "Kindle Paperwhite"
   brand: "Amazon"
   sku: "prod-kindle-pw"
   category: "electronics"
-  description: "6.8-inch display with adjustable warm light."
+  description: "6.8-inch display with adjustable warm light. Gift idea for Grandma Jean."
   price:
     amount: 139.99
     currency: "GBP"
@@ -51,195 +115,130 @@
       width: 800
       height: 600
   reviews:
-    - author: "Carol S."
+    - author: "Jean A."
       rating: 5.0
-      text: "Perfect for reading on the tube"
+      text: "Easy to read, lovely screen"
       timestampMs: 1727700000000
   specifications:
     display: "6.8-inch glare-free"
     storage: "16 GB"
     battery: "Up to 10 weeks"
     waterproof: "IPX8"
-  url: "https://shop.example.com/product/prod-2"
-
-- id: "prod-3"
-  name: "The Thursday Murder Club"
-  brand: "Richard Osman"
-  sku: "prod-tmc-book"
-  category: "books"
-  description: "A cosy mystery novel set in a Kent retirement village."
-  price:
-    amount: 8.99
-    currency: "GBP"
-  rating: 4.3
-  reviewCount: 45000
-  inStock: true
-  stockQuantity: 500
-  images:
-    - url: "https://example.com/tmc-1.jpg"
-      altText: "The Thursday Murder Club"
-      width: 400
-      height: 600
-  reviews:
-    - author: "Dave W."
-      rating: 4.0
-      text: "Charming and witty"
-      timestampMs: 1727600000000
-  specifications:
-    format: "Paperback"
-    pages: "400"
-    publisher: "Penguin"
-    isbn: "978-0241988268"
-  url: "https://shop.example.com/product/prod-3"
-
-- id: "prod-4"
-  name: "Le Creuset Dutch Oven"
-  brand: "Le Creuset"
-  sku: "prod-lc-oven"
-  category: "home"
-  description: "Classic 4.5 qt round Dutch oven in Marseille blue."
-  price:
-    amount: 259.00
-    currency: "GBP"
-  rating: 4.8
-  reviewCount: 8500
-  inStock: true
-  stockQuantity: 15
-  images:
-    - url: "https://example.com/lc-oven-1.jpg"
-      altText: "Le Creuset Dutch Oven"
-      width: 800
-      height: 800
-  reviews:
-    - author: "Eve B."
-      rating: 5.0
-      text: "Worth every penny, cooks beautifully"
-      timestampMs: 1727500000000
-    - author: "Frank L."
-      rating: 5.0
-      text: "A kitchen staple"
-      timestampMs: 1727400000000
-  specifications:
-    capacity: "4.5 qt"
-    material: "Enamelled cast iron"
-    colour: "Marseille"
-    dishwasher_safe: "Yes"
   url: "https://shop.example.com/product/prod-4"
 
 - id: "prod-5"
-  name: "Barbour Bedale Jacket"
-  brand: "Barbour"
-  sku: "prod-barbour-bedale"
-  category: "clothing"
-  description: "Classic wax jacket, a British countryside essential."
+  name: "Nike Phantom Academy FG Football Boots"
+  brand: "Nike"
+  sku: "prod-nike-phantom-jr"
+  category: "sports"
+  description: "Junior firm-ground football boots. Tom's size — UK 4."
   price:
-    amount: 219.00
+    amount: 42.00
     currency: "GBP"
   rating: 4.5
-  reviewCount: 3200
+  reviewCount: 890
   inStock: true
-  stockQuantity: 30
+  stockQuantity: 35
   images:
-    - url: "https://example.com/barbour-1.jpg"
-      altText: "Barbour Bedale"
-      width: 600
-      height: 800
+    - url: "https://example.com/nike-phantom-1.jpg"
+      altText: "Nike Phantom Academy FG"
+      width: 800
+      height: 600
   reviews:
-    - author: "Grace C."
+    - author: "Jonny A."
       rating: 5.0
-      text: "Keeps me dry on dog walks"
-      timestampMs: 1727300000000
+      text: "Tom loves them, good grip on muddy pitches"
+      timestampMs: 1727600000000
   specifications:
-    material: "Waxed cotton"
-    lining: "Cotton"
-    closure: "Zip and press-stud"
-    country_of_origin: "England"
+    size: "UK 4"
+    surface: "Firm ground"
+    closure: "Lace-up"
+    material: "Synthetic"
   url: "https://shop.example.com/product/prod-5"
 
 - id: "prod-6"
-  name: "Dyson V15 Detect"
-  brand: "Dyson"
-  sku: "prod-dyson-v15"
-  category: "home"
-  description: "Cordless vacuum with laser dust detection."
+  name: "Stagecoach Drama Workshop Voucher"
+  brand: "Stagecoach"
+  sku: "prod-stagecoach-voucher"
+  category: "gifts"
+  description: "Gift voucher for Stagecoach performing arts workshops. Ella's birthday idea."
   price:
-    amount: 599.99
+    amount: 60.00
     currency: "GBP"
-  rating: 4.4
-  reviewCount: 5600
+  rating: 4.8
+  reviewCount: 320
   inStock: true
-  stockQuantity: 22
+  stockQuantity: 999
   images:
-    - url: "https://example.com/dyson-v15-1.jpg"
-      altText: "Dyson V15 Detect"
-      width: 800
-      height: 800
+    - url: "https://example.com/stagecoach-voucher.jpg"
+      altText: "Stagecoach Gift Voucher"
+      width: 600
+      height: 400
   reviews:
-    - author: "Hank M."
-      rating: 4.0
-      text: "Impressive tech, heavy for stairs"
-      timestampMs: 1727200000000
+    - author: "Sarah A."
+      rating: 5.0
+      text: "Ella loved the extra workshops"
+      timestampMs: 1727500000000
   specifications:
-    runtime: "60 minutes"
-    bin_capacity: "0.76L"
-    weight: "3.1 kg"
-    filtration: "Whole-machine HEPA"
+    validity: "12 months"
+    redeemable_at: "Any Stagecoach centre"
   url: "https://shop.example.com/product/prod-6"
 
 - id: "prod-7"
-  name: "Penguin Classics Box Set"
-  brand: "Various"
-  sku: "prod-penguin-box"
-  category: "books"
-  description: "20 essential Penguin Classics in a collector's box."
+  name: "Grohe Minta Kitchen Mixer Tap"
+  brand: "Grohe"
+  sku: "prod-grohe-minta"
+  category: "home"
+  description: "Chrome single-lever kitchen mixer with pull-out spray. Replacement for kitchen tap."
   price:
-    amount: 79.99
+    amount: 189.00
     currency: "GBP"
-  rating: 4.9
-  reviewCount: 1200
+  rating: 4.4
+  reviewCount: 1450
   inStock: true
-  stockQuantity: 40
+  stockQuantity: 18
   images:
-    - url: "https://example.com/penguin-box-1.jpg"
-      altText: "Penguin Classics Box Set"
+    - url: "https://example.com/grohe-minta-1.jpg"
+      altText: "Grohe Minta Kitchen Mixer"
       width: 800
-      height: 600
+      height: 800
   reviews:
-    - author: "Ivy D."
+    - author: "Bob J."
       rating: 5.0
-      text: "Beautiful editions, perfect gift"
-      timestampMs: 1727100000000
+      text: "Easy to fit, excellent quality"
+      timestampMs: 1727400000000
   specifications:
-    format: "Paperback box set"
-    volumes: "20"
-    publisher: "Penguin Classics"
+    finish: "Chrome"
+    spout_type: "Pull-out spray"
+    mounting: "Single-hole"
+    flow_rate: "7.6 l/min"
   url: "https://shop.example.com/product/prod-7"
 
 - id: "prod-8"
-  name: "Marshall Stanmore III Speaker"
-  brand: "Marshall"
-  sku: "prod-marshall-iii"
-  category: "electronics"
-  description: "Bluetooth home speaker with iconic Marshall design."
+  name: "Oakwood Academy School Uniform Bundle"
+  brand: "John Lewis"
+  sku: "prod-school-uniform"
+  category: "clothing"
+  description: "Complete school uniform pack — 2 shirts, trousers, jumper, PE kit."
   price:
-    amount: 329.99
+    amount: 85.00
     currency: "GBP"
-  rating: 4.6
-  reviewCount: 2100
-  inStock: false
-  stockQuantity: 0
+  rating: 4.2
+  reviewCount: 560
+  inStock: true
+  stockQuantity: 200
   images:
-    - url: "https://example.com/marshall-iii-1.jpg"
-      altText: "Marshall Stanmore III"
-      width: 800
-      height: 600
+    - url: "https://example.com/school-uniform-1.jpg"
+      altText: "School Uniform Bundle"
+      width: 600
+      height: 800
   reviews:
-    - author: "Jack R."
-      rating: 5.0
-      text: "Looks and sounds incredible"
-      timestampMs: 1727000000000
+    - author: "Parent"
+      rating: 4.0
+      text: "Good quality, lasts the year"
+      timestampMs: 1727300000000
   specifications:
-    connectivity: "Bluetooth 5.2"
-    power: "80W"
-    dimensions: "350 x 195 x 185 mm"
+    includes: "2 shirts, 1 trousers, 1 jumper, PE kit"
+    sizes: "Multiple"
+    wash: "Machine washable"
   url: "https://shop.example.com/product/prod-8"

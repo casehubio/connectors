@@ -8,34 +8,33 @@ import static org.assertj.core.api.Assertions.assertThat;
 class SeedLoaderTest {
 
     @Test
-    void loadsThreeGroups() {
+    void loadsFourGroups() {
         var groups = SeedLoader.loadGroups();
-        assertThat(groups).hasSize(3);
+        assertThat(groups).hasSize(4);
         assertThat(groups).extracting("name")
-                .containsExactly("myContacts", "Starred", "Work");
+                .containsExactly("Family", "Friends", "Professional", "Service Providers");
     }
 
     @Test
-    void groupTypesAreCorrect() {
+    void allGroupsAreUserCreated() {
         var groups = SeedLoader.loadGroups();
-        assertThat(groups.getFirst().groupType()).isEqualTo(GroupType.SYSTEM);
-        assertThat(groups.getLast().groupType()).isEqualTo(GroupType.USER_CREATED);
+        assertThat(groups).allMatch(g -> g.groupType() == GroupType.USER_CREATED);
     }
 
     @Test
-    void loadsTenContacts() {
+    void loadsHouseholdContacts() {
         var contacts = SeedLoader.loadContacts();
-        assertThat(contacts).hasSize(10);
+        assertThat(contacts).hasSizeGreaterThanOrEqualTo(28);
     }
 
     @Test
-    void firstContactHasCorrectFields() {
+    void firstContactIsJonnyAlpha() {
         var contacts = SeedLoader.loadContacts();
-        var alice = contacts.getFirst();
-        assertThat(alice.displayName()).isEqualTo("Alice Smith");
-        assertThat(alice.givenName()).isEqualTo("Alice");
-        assertThat(alice.email()).isEqualTo("alice@example.com");
-        assertThat(alice.company()).isEqualTo("Acme Corp");
-        assertThat(alice.groups()).containsExactly("g-mycontacts", "g-work");
+        var jonny    = contacts.getFirst();
+        assertThat(jonny.displayName()).isEqualTo("Jonny Alpha");
+        assertThat(jonny.givenName()).isEqualTo("Jonny");
+        assertThat(jonny.email()).isEqualTo("jonny.alpha@meridian-eng.co.uk");
+        assertThat(jonny.company()).isEqualTo("Meridian Engineering");
+        assertThat(jonny.groups()).containsExactly("g-family");
     }
 }

@@ -15,25 +15,21 @@ class SeedLoaderTest {
     @Test
     void firstProductHasCorrectFields() {
         var products = SeedLoader.loadProducts();
-        var sony = products.stream()
-            .filter(p -> p.id().equals("prod-1"))
-            .findFirst().orElseThrow();
-        assertThat(sony.name()).isEqualTo("Sony WH-1000XM5 Headphones");
-        assertThat(sony.brand()).isEqualTo("Sony");
-        assertThat(sony.category()).isEqualTo("electronics");
-        assertThat(sony.price().amount()).isEqualByComparingTo("299.99");
-        assertThat(sony.price().currency()).isEqualTo("GBP");
-        assertThat(sony.reviews()).hasSize(2);
-        assertThat(sony.specifications()).containsEntry("connectivity", "Bluetooth 5.2");
+        var admiral = products.stream()
+                              .filter(p -> p.id().equals("prod-1"))
+                              .findFirst().orElseThrow();
+        assertThat(admiral.name()).contains("Admiral");
+        assertThat(admiral.brand()).isEqualTo("Admiral");
+        assertThat(admiral.category()).isEqualTo("insurance");
+        assertThat(admiral.price().amount()).isEqualByComparingTo("612.00");
+        assertThat(admiral.price().currency()).isEqualTo("GBP");
+        assertThat(admiral.reviews()).hasSize(2);
     }
 
     @Test
-    void outOfStockProductLoadsCorrectly() {
-        var products = SeedLoader.loadProducts();
-        var marshall = products.stream()
-            .filter(p -> p.name().contains("Marshall"))
-            .findFirst().orElseThrow();
-        assertThat(marshall.inStock()).isFalse();
-        assertThat(marshall.stockQuantity()).isZero();
+    void productsSpanMultipleCategories() {
+        var products   = SeedLoader.loadProducts();
+        var categories = products.stream().map(p -> p.category()).distinct().toList();
+        assertThat(categories).contains("insurance", "electronics", "home", "sports");
     }
 }

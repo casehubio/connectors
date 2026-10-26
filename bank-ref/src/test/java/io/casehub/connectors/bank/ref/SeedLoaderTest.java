@@ -21,18 +21,21 @@ class SeedLoaderTest {
         var balances = SeedLoader.loadBalances();
         assertThat(balances).hasSize(3);
         assertThat(balances.get("acc-100").currency()).isEqualTo("GBP");
-        assertThat(balances.get("acc-100").available()).isEqualByComparingTo("2450.00");
+        assertThat(balances.get("acc-100").available()).isEqualByComparingTo("3245.67");
     }
 
     @Test
-    void loadsTwelveTransactions() {
+    void loadsLifeDomainTransactions() {
         var txns = SeedLoader.loadTransactions();
-        assertThat(txns).hasSize(12);
+        assertThat(txns).hasSizeGreaterThanOrEqualTo(60);
+        assertThat(txns).extracting("merchantName")
+                        .contains("Meridian Engineering", "Camden NHS Trust", "Halifax", "British Gas");
     }
 
     @Test
-    void lastTransactionIsPending() {
+    void includesBookedAndPendingTransactions() {
         var txns = SeedLoader.loadTransactions();
-        assertThat(txns.getLast().status()).isEqualTo(TransactionStatus.PENDING);
+        assertThat(txns).extracting("status")
+                        .contains(TransactionStatus.BOOKED, TransactionStatus.PENDING);
     }
 }

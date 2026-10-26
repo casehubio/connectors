@@ -1,12 +1,5 @@
 package io.casehub.connectors.chat.ref;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.time.Instant;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import io.casehub.connectors.chat.model.Channel;
 import io.casehub.connectors.chat.model.ChatChannelRef;
 import io.casehub.connectors.chat.model.ChatContent;
@@ -23,6 +16,12 @@ import io.casehub.connectors.chat.spi.Messaging;
 import io.casehub.connectors.chat.spi.Presence;
 import io.casehub.connectors.chat.spi.Reactions;
 import io.casehub.connectors.chat.spi.Threading;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.time.Instant;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class RefChatPlatformContractTest {
 
@@ -87,8 +86,9 @@ class RefChatPlatformContractTest {
 
     @Test
     void listChannelsReturnsCreatedChannels() {
+        int baseline = platform.discovery().listChannels().size();
         platform.channelManagement().create("random", "Random chat", null, false);
-        assertThat(platform.discovery().listChannels()).hasSize(2);
+        assertThat(platform.discovery().listChannels()).hasSize(baseline + 1);
     }
 
     @Test

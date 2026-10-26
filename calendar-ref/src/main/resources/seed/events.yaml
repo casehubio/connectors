@@ -1,0 +1,656 @@
+# ──────────────────────────────────────────────
+# Jonny's Calendar (cal-jonny)
+# ──────────────────────────────────────────────
+
+# Weekly recurring — work
+- calendarId: "cal-jonny"
+  summary: "Work — Meridian Engineering"
+  description: "Office day, Canary Wharf"
+  location: "Meridian Engineering, Canary Wharf, London"
+  timing:
+    "@type": "Timed"
+    start: "2026-10-26T08:30:00Z"
+    end: "2026-10-26T17:30:00Z"
+    timeZone: "Europe/London"
+  attendees: []
+
+- calendarId: "cal-jonny"
+  summary: "Work — Meridian Engineering"
+  description: "Office day, Canary Wharf"
+  location: "Meridian Engineering, Canary Wharf, London"
+  timing:
+    "@type": "Timed"
+    start: "2026-10-27T08:30:00Z"
+    end: "2026-10-27T17:30:00Z"
+    timeZone: "Europe/London"
+  attendees: []
+
+- calendarId: "cal-jonny"
+  summary: "Work — Meridian Engineering"
+  description: "Office day, Canary Wharf"
+  location: "Meridian Engineering, Canary Wharf, London"
+  timing:
+    "@type": "Timed"
+    start: "2026-10-28T08:30:00Z"
+    end: "2026-10-28T17:30:00Z"
+    timeZone: "Europe/London"
+  attendees: []
+
+- calendarId: "cal-jonny"
+  summary: "Work — Meridian Engineering"
+  description: "Office day, Canary Wharf"
+  location: "Meridian Engineering, Canary Wharf, London"
+  timing:
+    "@type": "Timed"
+    start: "2026-10-29T08:30:00Z"
+    end: "2026-10-29T17:30:00Z"
+    timeZone: "Europe/London"
+  attendees: []
+
+- calendarId: "cal-jonny"
+  summary: "Work — Meridian Engineering"
+  description: "Office day, Canary Wharf"
+  location: "Meridian Engineering, Canary Wharf, London"
+  timing:
+    "@type": "Timed"
+    start: "2026-10-30T08:30:00Z"
+    end: "2026-10-30T17:30:00Z"
+    timeZone: "Europe/London"
+  attendees: []
+
+# Gym — Tue/Thu 6:30am
+- calendarId: "cal-jonny"
+  summary: "PureGym"
+  description: "Morning session"
+  location: "PureGym, Clapham High Street"
+  timing:
+    "@type": "Timed"
+    start: "2026-10-27T06:30:00Z"
+    end: "2026-10-27T07:30:00Z"
+    timeZone: "Europe/London"
+  attendees: []
+
+- calendarId: "cal-jonny"
+  summary: "PureGym"
+  description: "Morning session"
+  location: "PureGym, Clapham High Street"
+  timing:
+    "@type": "Timed"
+    start: "2026-10-29T06:30:00Z"
+    end: "2026-10-29T07:30:00Z"
+    timeZone: "Europe/London"
+  attendees: []
+
+# 5-a-side — Wed 7pm
+- calendarId: "cal-jonny"
+  summary: "5-a-side football"
+  description: "Weekly game with Dave, Chris, Ravi"
+  location: "Goals, Wandsworth"
+  timing:
+    "@type": "Timed"
+    start: "2026-10-28T19:00:00Z"
+    end: "2026-10-28T20:00:00Z"
+    timeZone: "Europe/London"
+  attendees: ["dave.thompson@gmail.com"]
+
+# Tom's football — alternate Sat
+- calendarId: "cal-jonny"
+  summary: "Tom's football — Balham FC"
+  description: "Under-12s match, Jonny on sideline duty"
+  location: "Balham FC, Tooting Bec Common"
+  timing:
+    "@type": "Timed"
+    start: "2026-10-31T09:00:00Z"
+    end: "2026-10-31T10:30:00Z"
+    timeZone: "Europe/London"
+  attendees: []
+
+# One-offs — Jonny
+- calendarId: "cal-jonny"
+  summary: "Car MOT"
+  description: "VW Golf annual MOT — book online or phone"
+  location: "Halfords Autocentre, Streatham"
+  timing:
+    "@type": "Timed"
+    start: "2026-11-09T09:00:00Z"
+    end: "2026-11-09T10:00:00Z"
+    timeZone: "Europe/London"
+  attendees: []
+
+- calendarId: "cal-jonny"
+  summary: "Bob's Plumbing — kitchen tap"
+  description: "Follow-up visit, kitchen mixer tap replacement"
+  location: "Home"
+  timing:
+    "@type": "Timed"
+    start: "2026-11-03T10:00:00Z"
+    end: "2026-11-03T12:00:00Z"
+    timeZone: "Europe/London"
+  attendees: ["bob@bobsplumbing.co.uk"]
+
+- calendarId: "cal-jonny"
+  summary: "Admiral insurance renewal deadline"
+  description: "Car insurance renewal — current quote £612, compare Direct Line and Churchill"
+  location: ""
+  timing:
+    "@type": "Timed"
+    start: "2026-11-20T09:00:00Z"
+    end: "2026-11-20T09:30:00Z"
+    timeZone: "Europe/London"
+  attendees: []
+
+- calendarId: "cal-jonny"
+  summary: "Harris & Co — LPA meeting"
+  description: "Lasting Power of Attorney review for Grandma Jean"
+  location: "Harris & Co Solicitors, Balham High Road"
+  timing:
+    "@type": "Timed"
+    start: "2026-11-12T14:00:00Z"
+    end: "2026-11-12T15:00:00Z"
+    timeZone: "Europe/London"
+  attendees: ["info@harrisandco.co.uk"]
+
+# ──────────────────────────────────────────────
+# Sarah's Calendar (cal-sarah)
+# ──────────────────────────────────────────────
+
+# Weekly recurring — work
+- calendarId: "cal-sarah"
+  summary: "Work — Camden NHS Trust"
+  description: "Practice manager shift"
+  location: "Camden NHS Trust, Camden"
+  timing:
+    "@type": "Timed"
+    start: "2026-10-26T08:00:00Z"
+    end: "2026-10-26T17:00:00Z"
+    timeZone: "Europe/London"
+  attendees: []
+
+- calendarId: "cal-sarah"
+  summary: "Work — Camden NHS Trust"
+  description: "Practice manager shift"
+  location: "Camden NHS Trust, Camden"
+  timing:
+    "@type": "Timed"
+    start: "2026-10-27T08:00:00Z"
+    end: "2026-10-27T17:00:00Z"
+    timeZone: "Europe/London"
+  attendees: []
+
+- calendarId: "cal-sarah"
+  summary: "Work — Camden NHS Trust"
+  description: "Practice manager shift"
+  location: "Camden NHS Trust, Camden"
+  timing:
+    "@type": "Timed"
+    start: "2026-10-28T08:00:00Z"
+    end: "2026-10-28T17:00:00Z"
+    timeZone: "Europe/London"
+  attendees: []
+
+- calendarId: "cal-sarah"
+  summary: "Work — Camden NHS Trust"
+  description: "Practice manager shift"
+  location: "Camden NHS Trust, Camden"
+  timing:
+    "@type": "Timed"
+    start: "2026-10-29T08:00:00Z"
+    end: "2026-10-29T17:00:00Z"
+    timeZone: "Europe/London"
+  attendees: []
+
+- calendarId: "cal-sarah"
+  summary: "Work — Camden NHS Trust"
+  description: "Practice manager shift"
+  location: "Camden NHS Trust, Camden"
+  timing:
+    "@type": "Timed"
+    start: "2026-10-30T08:00:00Z"
+    end: "2026-10-30T17:00:00Z"
+    timeZone: "Europe/London"
+  attendees: []
+
+# Gym — Mon/Wed/Fri 7am
+- calendarId: "cal-sarah"
+  summary: "David Lloyd — gym class"
+  description: "Spin class (Mon), yoga (Wed), HIIT (Fri)"
+  location: "David Lloyd, Balham"
+  timing:
+    "@type": "Timed"
+    start: "2026-10-26T07:00:00Z"
+    end: "2026-10-26T08:00:00Z"
+    timeZone: "Europe/London"
+  attendees: []
+
+- calendarId: "cal-sarah"
+  summary: "David Lloyd — gym class"
+  description: "Spin class (Mon), yoga (Wed), HIIT (Fri)"
+  location: "David Lloyd, Balham"
+  timing:
+    "@type": "Timed"
+    start: "2026-10-28T07:00:00Z"
+    end: "2026-10-28T08:00:00Z"
+    timeZone: "Europe/London"
+  attendees: []
+
+- calendarId: "cal-sarah"
+  summary: "David Lloyd — gym class"
+  description: "Spin class (Mon), yoga (Wed), HIIT (Fri)"
+  location: "David Lloyd, Balham"
+  timing:
+    "@type": "Timed"
+    start: "2026-10-30T07:00:00Z"
+    end: "2026-10-30T08:00:00Z"
+    timeZone: "Europe/London"
+  attendees: []
+
+# Book club — monthly Thu 6pm
+- calendarId: "cal-sarah"
+  summary: "Book club"
+  description: "Monthly book club — this month: Hamnet by Maggie O'Farrell"
+  location: "The Crown, Balham"
+  timing:
+    "@type": "Timed"
+    start: "2026-11-05T18:00:00Z"
+    end: "2026-11-05T20:00:00Z"
+    timeZone: "Europe/London"
+  attendees: []
+
+# One-offs — Sarah
+- calendarId: "cal-sarah"
+  summary: "Ella's parents' evening"
+  description: "Year 11 GCSE subject teachers — 15-minute slots"
+  location: "Oakwood Academy"
+  timing:
+    "@type": "Timed"
+    start: "2026-11-10T16:30:00Z"
+    end: "2026-11-10T19:30:00Z"
+    timeZone: "Europe/London"
+  attendees: ["jonny.alpha@meridian-eng.co.uk"]
+
+- calendarId: "cal-sarah"
+  summary: "Grandma Jean — medication review"
+  description: "Quarterly medication review with care home and GP"
+  location: "Tunbridge Wells Care Home"
+  timing:
+    "@type": "Timed"
+    start: "2026-11-06T11:00:00Z"
+    end: "2026-11-06T12:00:00Z"
+    timeZone: "Europe/London"
+  attendees: []
+
+# ──────────────────────────────────────────────
+# Family Calendar (cal-family)
+# ──────────────────────────────────────────────
+
+# Children — weekly recurring
+- calendarId: "cal-family"
+  summary: "Ella — Piano (Mrs. Chen)"
+  description: "Grade 6 preparation, Thu after school"
+  location: "Mrs. Chen's studio, Tooting"
+  timing:
+    "@type": "Timed"
+    start: "2026-10-29T16:30:00Z"
+    end: "2026-10-29T17:30:00Z"
+    timeZone: "Europe/London"
+  attendees: []
+
+- calendarId: "cal-family"
+  summary: "Ella — Stagecoach drama"
+  description: "Musical theatre and acting"
+  location: "Stagecoach, Balham"
+  timing:
+    "@type": "Timed"
+    start: "2026-10-31T10:00:00Z"
+    end: "2026-10-31T13:00:00Z"
+    timeZone: "Europe/London"
+  attendees: []
+
+- calendarId: "cal-family"
+  summary: "Tom — Swimming lessons"
+  description: "Stroke improvement, Tue after school"
+  location: "Lambeth Swimming Pool"
+  timing:
+    "@type": "Timed"
+    start: "2026-10-27T16:00:00Z"
+    end: "2026-10-27T17:00:00Z"
+    timeZone: "Europe/London"
+  attendees: []
+
+- calendarId: "cal-family"
+  summary: "Tom — Football (Balham FC)"
+  description: "Under-12s Saturday training"
+  location: "Balham FC, Tooting Bec Common"
+  timing:
+    "@type": "Timed"
+    start: "2026-10-31T09:00:00Z"
+    end: "2026-10-31T10:30:00Z"
+    timeZone: "Europe/London"
+  attendees: []
+
+- calendarId: "cal-family"
+  summary: "Tom — Scouts"
+  description: "Alternate Wed evening"
+  location: "1st Balham Scout Hut"
+  timing:
+    "@type": "Timed"
+    start: "2026-10-28T18:30:00Z"
+    end: "2026-10-28T20:00:00Z"
+    timeZone: "Europe/London"
+  attendees: []
+
+# Weekly household
+- calendarId: "cal-family"
+  summary: "Tesco click & collect"
+  description: "Weekly shop — Saturday morning"
+  location: "Tesco Superstore, Streatham"
+  timing:
+    "@type": "Timed"
+    start: "2026-10-31T11:00:00Z"
+    end: "2026-10-31T11:30:00Z"
+    timeZone: "Europe/London"
+  attendees: []
+
+# Fortnightly — Grandma Jean visit
+- calendarId: "cal-family"
+  summary: "Visit Grandma Jean"
+  description: "Fortnightly Sunday visit — lunch, check medications, garden"
+  location: "Jean Alpha, 14 Warwick Park, Tunbridge Wells"
+  timing:
+    "@type": "Timed"
+    start: "2026-11-01T10:30:00Z"
+    end: "2026-11-01T16:00:00Z"
+    timeZone: "Europe/London"
+  attendees: []
+
+# GP appointment
+- calendarId: "cal-family"
+  summary: "GP appointment — Tom"
+  description: "Persistent cough follow-up with Dr. Patel"
+  location: "Elm Street Surgery"
+  timing:
+    "@type": "Timed"
+    start: "2026-11-02T10:20:00Z"
+    end: "2026-11-02T10:40:00Z"
+    timeZone: "Europe/London"
+  attendees: ["appointments@elmstreetsurgery.nhs.uk"]
+
+# Boiler service
+- calendarId: "cal-family"
+  summary: "Boiler annual service — British Gas"
+  description: "HomeCare annual service visit"
+  location: "Home"
+  timing:
+    "@type": "Timed"
+    start: "2026-11-14T09:00:00Z"
+    end: "2026-11-14T11:00:00Z"
+    timeZone: "Europe/London"
+  attendees: []
+
+# School events
+- calendarId: "cal-family"
+  summary: "INSET day — Oakwood Academy"
+  description: "Teacher training day, kids off school. Childcare needed."
+  timing:
+    "@type": "AllDay"
+    start: "2026-11-06"
+    end: "2026-11-07"
+  attendees: []
+
+- calendarId: "cal-family"
+  summary: "Class photos — Oakwood Academy"
+  description: "Individual and class photos, smart uniform"
+  location: "Oakwood Academy"
+  timing:
+    "@type": "AllDay"
+    start: "2026-10-28"
+    end: "2026-10-29"
+  attendees: []
+
+# October half-term
+- calendarId: "cal-family"
+  summary: "October half-term"
+  description: "School holiday week"
+  timing:
+    "@type": "AllDay"
+    start: "2026-10-26"
+    end: "2026-10-31"
+  attendees: []
+
+# Birthdays
+- calendarId: "cal-family"
+  summary: "Grandma Jean's birthday"
+  description: "Jean turns 78 — Tunbridge Wells lunch, John Lewis scarf ordered"
+  timing:
+    "@type": "AllDay"
+    start: "2026-11-19"
+    end: "2026-11-20"
+  attendees: []
+
+- calendarId: "cal-family"
+  summary: "Uncle Pete's birthday"
+  description: "Pete's birthday — phone call, card posted"
+  timing:
+    "@type": "AllDay"
+    start: "2026-12-11"
+    end: "2026-12-12"
+  attendees: []
+
+- calendarId: "cal-family"
+  summary: "Tom's birthday"
+  description: "Tom turns 12 — party with school friends, bowling"
+  timing:
+    "@type": "AllDay"
+    start: "2027-02-03"
+    end: "2027-02-04"
+  attendees: []
+
+- calendarId: "cal-family"
+  summary: "Jonny's birthday"
+  description: "Jonny's birthday — family dinner out"
+  timing:
+    "@type": "AllDay"
+    start: "2027-03-15"
+    end: "2027-03-16"
+  attendees: []
+
+- calendarId: "cal-family"
+  summary: "Ella's birthday"
+  description: "Ella turns 16 — milestone birthday, drama workshop voucher"
+  timing:
+    "@type": "AllDay"
+    start: "2026-09-08"
+    end: "2026-09-09"
+  attendees: []
+
+- calendarId: "cal-family"
+  summary: "Jonny & Sarah anniversary"
+  description: "Wedding anniversary — restaurant booked"
+  timing:
+    "@type": "AllDay"
+    start: "2027-06-10"
+    end: "2027-06-11"
+  attendees: []
+
+# School calendar — term dates
+- calendarId: "cal-family"
+  summary: "Christmas holidays"
+  description: "Oakwood Academy — end of autumn term to start of spring term"
+  timing:
+    "@type": "AllDay"
+    start: "2026-12-18"
+    end: "2027-01-05"
+  attendees: []
+
+- calendarId: "cal-family"
+  summary: "February half-term"
+  description: "School holiday week"
+  timing:
+    "@type": "AllDay"
+    start: "2027-02-15"
+    end: "2027-02-22"
+  attendees: []
+
+- calendarId: "cal-family"
+  summary: "Easter holidays"
+  description: "Oakwood Academy — Lake District trip planned"
+  timing:
+    "@type": "AllDay"
+    start: "2027-03-27"
+    end: "2027-04-13"
+  attendees: []
+
+# School events — specific
+- calendarId: "cal-family"
+  summary: "School play — Oakwood Academy"
+  description: "Winter production — Ella performing. Tickets booked."
+  location: "Oakwood Academy, Main Hall"
+  timing:
+    "@type": "Timed"
+    start: "2026-12-10T19:00:00Z"
+    end: "2026-12-10T21:00:00Z"
+    timeZone: "Europe/London"
+  attendees: []
+
+- calendarId: "cal-family"
+  summary: "Ella — GCSE mock exams start"
+  description: "Mock exam period — revised timetable, no after-school clubs"
+  timing:
+    "@type": "AllDay"
+    start: "2027-01-12"
+    end: "2027-01-24"
+  attendees: []
+
+# Public holidays
+- calendarId: "cal-family"
+  summary: "Christmas Day"
+  description: "At Grandma Jean's in Tunbridge Wells"
+  location: "Jean Alpha, 14 Warwick Park, Tunbridge Wells"
+  timing:
+    "@type": "AllDay"
+    start: "2026-12-25"
+    end: "2026-12-26"
+  attendees: []
+
+- calendarId: "cal-family"
+  summary: "Boxing Day"
+  description: "Still at Grandma Jean's — walk, leftovers, board games"
+  location: "Jean Alpha, 14 Warwick Park, Tunbridge Wells"
+  timing:
+    "@type": "AllDay"
+    start: "2026-12-26"
+    end: "2026-12-27"
+  attendees: []
+
+- calendarId: "cal-family"
+  summary: "New Year's Day"
+  description: "Quiet day at home — Dave & Lisa for drinks in the evening"
+  timing:
+    "@type": "AllDay"
+    start: "2027-01-01"
+    end: "2027-01-02"
+  attendees: []
+
+# Bonfire Night
+- calendarId: "cal-family"
+  summary: "Bonfire Night — Battersea Park fireworks"
+  description: "Annual fireworks display with Tom. Wrap up warm."
+  location: "Battersea Park"
+  timing:
+    "@type": "Timed"
+    start: "2026-11-05T18:00:00Z"
+    end: "2026-11-05T20:30:00Z"
+    timeZone: "Europe/London"
+  attendees: []
+
+# Halloween
+- calendarId: "cal-family"
+  summary: "Halloween — trick-or-treating"
+  description: "Tom trick-or-treating with Jake. Pumpkin carving after school."
+  location: "Home / neighbourhood"
+  timing:
+    "@type": "Timed"
+    start: "2026-10-31T16:00:00Z"
+    end: "2026-10-31T19:30:00Z"
+    timeZone: "Europe/London"
+  attendees: []
+
+# Family holidays — future
+- calendarId: "cal-family"
+  summary: "Summer holiday — Algarve"
+  description: "2-week family holiday. Flights Gatwick→Faro, villa booked."
+  location: "Algarve, Portugal"
+  timing:
+    "@type": "AllDay"
+    start: "2027-08-01"
+    end: "2027-08-15"
+  attendees: []
+
+- calendarId: "cal-family"
+  summary: "Easter break — Lake District"
+  description: "1 week cottage, walking and cycling"
+  location: "Lake District"
+  timing:
+    "@type": "AllDay"
+    start: "2027-03-28"
+    end: "2027-04-04"
+  attendees: []
+
+- calendarId: "cal-family"
+  summary: "May bank holiday — camping"
+  description: "New Forest camping weekend"
+  location: "New Forest, Hampshire"
+  timing:
+    "@type": "AllDay"
+    start: "2027-05-23"
+    end: "2027-05-26"
+  attendees: []
+
+# Renewal / maintenance markers
+- calendarId: "cal-family"
+  summary: "Aviva home insurance renewal"
+  description: "Annual renewal — last year £384, check comparison sites"
+  timing:
+    "@type": "AllDay"
+    start: "2027-01-15"
+    end: "2027-01-16"
+  attendees: []
+
+- calendarId: "cal-family"
+  summary: "DVLA car tax due"
+  description: "VW Golf — renew online"
+  timing:
+    "@type": "AllDay"
+    start: "2027-02-01"
+    end: "2027-02-02"
+  attendees: []
+
+- calendarId: "cal-family"
+  summary: "AA breakdown cover renewal"
+  description: "Annual renewal — £85, check if worth upgrading"
+  timing:
+    "@type": "AllDay"
+    start: "2027-03-01"
+    end: "2027-03-02"
+  attendees: []
+
+- calendarId: "cal-family"
+  summary: "Passport check — Ella"
+  description: "Check Ella's passport expiry before summer booking"
+  timing:
+    "@type": "AllDay"
+    start: "2027-04-01"
+    end: "2027-04-02"
+  attendees: []
+
+# Monthly family activity
+- calendarId: "cal-family"
+  summary: "Family cinema — Vue Wandsworth"
+  description: "Monthly family outing"
+  location: "Vue Cinema, Wandsworth"
+  timing:
+    "@type": "Timed"
+    start: "2026-11-15T14:00:00Z"
+    end: "2026-11-15T16:30:00Z"
+    timeZone: "Europe/London"
+  attendees: []

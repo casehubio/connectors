@@ -1,124 +1,174 @@
+# Inbox
 - id: "msg-001"
   mailboxId: "inbox"
-  messageId: "<msg-001@mail.example.com>"
-  from: "alice@example.com"
-  to: ["user@example.com"]
+  messageId: "<msg-001@elmstreetsurgery.nhs.uk>"
+  from: "appointments@elmstreetsurgery.nhs.uk"
+  to: ["jonny.alpha@meridian-eng.co.uk"]
   cc: []
-  subject: "Q3 Planning Session"
-  bodyText: "Hi, let's schedule the Q3 planning session for next week."
+  subject: "Appointment confirmation — Tom Alpha"
+  bodyText: "Your appointment for Tom Alpha with Dr. Patel is confirmed for Monday 2 November at 10:20am. Please arrive 5 minutes early."
   bodyHtml: null
-  receivedAt: "2026-09-15T09:30:00Z"
+  receivedAt: "2026-10-22T09:30:00Z"
   read: true
   attachments: []
 
 - id: "msg-002"
   mailboxId: "inbox"
-  messageId: "<msg-002@mail.example.com>"
-  from: "bob@example.com"
-  to: ["user@example.com"]
-  cc: ["carol@example.com"]
-  subject: "Invoice #4821 attached"
-  bodyText: "Please find the invoice attached."
-  bodyHtml: "<html><body><p>Please find the invoice attached.</p></body></html>"
-  receivedAt: "2026-09-16T14:15:00Z"
+  messageId: "<msg-002@admiral.com>"
+  from: "renewals@admiral.com"
+  to: ["jonny.alpha@meridian-eng.co.uk"]
+  cc: []
+  subject: "Your car insurance renewal — quote enclosed"
+  bodyText: "Dear Jonny, your Admiral car insurance policy is due for renewal on 20 November. This year's quote: £612 (last year: £576). Log in to accept or call us to discuss."
+  bodyHtml: "<html><body><p>Dear Jonny,</p><p>Your Admiral car insurance policy is due for renewal on 20 November.</p><p>This year's quote: <strong>£612</strong> (last year: £576).</p></body></html>"
+  receivedAt: "2026-10-20T14:15:00Z"
   read: true
   attachments:
     - id: "att-001"
-      filename: "invoice-4821.pdf"
+      filename: "admiral-renewal-2026.pdf"
       contentType: "application/pdf"
       size: 24576
 
 - id: "msg-003"
   mailboxId: "inbox"
-  messageId: "<msg-003@mail.example.com>"
-  from: "noreply@github.com"
-  to: ["user@example.com"]
+  messageId: "<msg-003@oakwoodacademy.co.uk>"
+  from: "office@oakwoodacademy.co.uk"
+  to: ["jonny.alpha@meridian-eng.co.uk", "sarah.alpha@nhs.net"]
   cc: []
-  subject: "[connectors] PR #112 merged"
-  bodyText: "Your pull request #112 has been merged into main."
-  bodyHtml: "<html><body><p>Your pull request #112 has been merged into main.</p></body></html>"
-  receivedAt: "2026-09-17T08:00:00Z"
-  read: false
+  subject: "Parents' evening — Year 11, 10 November"
+  bodyText: "Dear parents, Oakwood Academy's Year 11 parents' evening is on Tuesday 10 November, 4:30pm–7:30pm. Please book 15-minute slots via the school portal."
+  bodyHtml: null
+  receivedAt: "2026-10-18T08:00:00Z"
+  read: true
   attachments: []
 
 - id: "msg-004"
   mailboxId: "inbox"
-  messageId: "<msg-004@mail.example.com>"
-  from: "carol@example.com"
-  to: ["user@example.com", "dave@example.com"]
+  messageId: "<msg-004@bobsplumbing.co.uk>"
+  from: "bob@bobsplumbing.co.uk"
+  to: ["jonny.alpha@meridian-eng.co.uk"]
   cc: []
-  subject: "Architecture review notes"
-  bodyText: "Attached are the notes from today's architecture review."
+  subject: "Quote — kitchen mixer tap replacement"
+  bodyText: "Hi Jonny, as discussed, the kitchen mixer tap replacement will be £280 plus parts. I can come Tuesday 3 November between 10am and 12pm. Let me know if that works. Cheers, Bob"
   bodyHtml: null
-  receivedAt: "2026-09-18T16:45:00Z"
+  receivedAt: "2026-10-19T16:45:00Z"
   read: false
   attachments:
     - id: "att-002"
-      filename: "arch-review-notes.docx"
-      contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+      filename: "bobs-plumbing-quote-oct26.pdf"
+      contentType: "application/pdf"
       size: 18432
 
 - id: "msg-005"
   mailboxId: "inbox"
-  messageId: "<msg-005@mail.example.com>"
-  from: "dave@example.com"
-  to: ["user@example.com"]
+  messageId: "<msg-005@britishgas.co.uk>"
+  from: "noreply@britishgas.co.uk"
+  to: ["jonny.alpha@meridian-eng.co.uk"]
   cc: []
-  subject: "Re: Architecture review notes"
-  bodyText: "Thanks for sharing. I have a few comments inline."
-  bodyHtml: null
-  receivedAt: "2026-09-19T10:20:00Z"
-  read: false
+  subject: "Your energy bill — October 2026"
+  bodyText: "Your October energy bill is £145.00. This is £5 more than last month (£140.00) and £10 more than the same month last year (£135.00). View your bill online."
+  bodyHtml: "<html><body><p>Your October energy bill is <strong>£145.00</strong>.</p></body></html>"
+  receivedAt: "2026-10-15T06:00:00Z"
+  read: true
   attachments: []
 
 - id: "msg-006"
   mailboxId: "inbox"
-  messageId: null
-  from: "newsletter@techweekly.com"
-  to: ["user@example.com"]
+  messageId: "<msg-006@oakwoodacademy.co.uk>"
+  from: "office@oakwoodacademy.co.uk"
+  to: ["jonny.alpha@meridian-eng.co.uk", "sarah.alpha@nhs.net"]
   cc: []
-  subject: "This week in tech — September 2026"
-  bodyText: "Your weekly tech roundup is here."
-  bodyHtml: "<html><body><h1>Tech Weekly</h1><p>Your weekly tech roundup.</p></body></html>"
-  receivedAt: "2026-09-20T06:00:00Z"
+  subject: "Oakwood Academy newsletter — October half-term"
+  bodyText: "Dear parents, a reminder that October half-term runs 26–30 October. INSET day on 6 November — school closed for pupils. Class photos on 28 October, smart uniform please."
+  bodyHtml: null
+  receivedAt: "2026-10-17T09:00:00Z"
   read: true
   attachments: []
 
+- id: "msg-007"
+  mailboxId: "inbox"
+  messageId: "<msg-007@harrisandco.co.uk>"
+  from: "info@harrisandco.co.uk"
+  to: ["jonny.alpha@meridian-eng.co.uk"]
+  cc: []
+  subject: "LPA meeting confirmation — 12 November"
+  bodyText: "Dear Mr Alpha, this confirms your appointment to discuss Lasting Power of Attorney for Jean Alpha on Thursday 12 November at 2pm at our Balham High Road office."
+  bodyHtml: null
+  receivedAt: "2026-10-21T10:20:00Z"
+  read: false
+  attachments: []
+
+- id: "msg-008"
+  mailboxId: "inbox"
+  messageId: "<msg-008@halfords.co.uk>"
+  from: "bookings@halfords.co.uk"
+  to: ["jonny.alpha@meridian-eng.co.uk"]
+  cc: []
+  subject: "MOT reminder — your VW Golf"
+  bodyText: "Your MOT is due soon. Book online at Halfords Autocentre Streatham. We have availability from 9 November."
+  bodyHtml: null
+  receivedAt: "2026-10-16T11:00:00Z"
+  read: false
+  attachments: []
+
+- id: "msg-009"
+  mailboxId: "inbox"
+  messageId: "<msg-009@easyjet.com>"
+  from: "noreply@easyjet.com"
+  to: ["jonny.alpha@meridian-eng.co.uk"]
+  cc: ["sarah.alpha@nhs.net"]
+  subject: "Booking confirmation — Gatwick to Faro, August 2027"
+  bodyText: "Your flights are confirmed. Outbound: 1 Aug 2027, Gatwick→Faro, 10:15. Return: 15 Aug 2027, Faro→Gatwick, 18:40. 4 passengers. Total: £1,240."
+  bodyHtml: null
+  receivedAt: "2026-10-10T14:00:00Z"
+  read: true
+  attachments:
+    - id: "att-003"
+      filename: "easyjet-booking-ABCD123.pdf"
+      contentType: "application/pdf"
+      size: 32768
+
+# Sent
 - id: "msg-101"
   mailboxId: "sent"
-  messageId: "<msg-101@mail.example.com>"
-  from: "user@example.com"
-  to: ["alice@example.com"]
+  messageId: "<msg-101@meridian-eng.co.uk>"
+  from: "jonny.alpha@meridian-eng.co.uk"
+  to: ["bob@bobsplumbing.co.uk"]
   cc: []
-  subject: "Re: Q3 Planning Session"
-  bodyText: "Thursday 2pm works for me."
+  subject: "Re: Quote — kitchen mixer tap replacement"
+  bodyText: "Thanks Bob, Tuesday 3 Nov works. See you then."
   bodyHtml: null
-  receivedAt: "2026-09-15T10:05:00Z"
+  receivedAt: "2026-10-19T17:30:00Z"
   read: true
   attachments: []
 
 - id: "msg-102"
   mailboxId: "sent"
-  messageId: "<msg-102@mail.example.com>"
-  from: "user@example.com"
-  to: ["bob@example.com"]
-  cc: ["carol@example.com"]
-  subject: "Re: Invoice #4821 attached"
-  bodyText: "Received, I'll process it today."
+  messageId: "<msg-102@meridian-eng.co.uk>"
+  from: "jonny.alpha@meridian-eng.co.uk"
+  to: ["renewals@admiral.com"]
+  cc: []
+  subject: "Re: Your car insurance renewal"
+  bodyText: "Thanks for the quote. I'll compare before the deadline and get back to you."
   bodyHtml: null
-  receivedAt: "2026-09-16T15:30:00Z"
+  receivedAt: "2026-10-20T15:30:00Z"
   read: true
   attachments: []
 
+# Archive
 - id: "msg-201"
   mailboxId: "archive"
-  messageId: "<msg-201@mail.example.com>"
-  from: "hr@example.com"
-  to: ["user@example.com"]
+  messageId: "<msg-201@bobsplumbing.co.uk>"
+  from: "bob@bobsplumbing.co.uk"
+  to: ["jonny.alpha@meridian-eng.co.uk"]
   cc: []
-  subject: "Holiday policy update"
-  bodyText: "Please review the updated holiday policy."
-  bodyHtml: "<html><body><p>Please review the updated holiday policy.</p></body></html>"
-  receivedAt: "2026-08-01T09:00:00Z"
+  subject: "Invoice — bathroom renovation"
+  bodyText: "Hi Jonny, please find attached the final invoice for the bathroom renovation. Total: £4,200. Payment within 14 days please. Cheers, Bob"
+  bodyHtml: null
+  receivedAt: "2026-02-15T09:00:00Z"
   read: true
-  attachments: []
+  attachments:
+    - id: "att-004"
+      filename: "bobs-plumbing-invoice-bathroom.pdf"
+      contentType: "application/pdf"
+      size: 20480

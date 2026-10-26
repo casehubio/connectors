@@ -18,7 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class RefProjectPlatformTest {
 
     private RefProjectPlatform platform;
-    private static final OwnerRepo REPO = new OwnerRepo("test-org", "test-repo");
+    private static final OwnerRepo REPO = new OwnerRepo("alpha-household", "home-tasks");
 
     @BeforeEach
     void setUp() {
@@ -72,21 +72,21 @@ class RefProjectPlatformTest {
 
     @Test
     void searchIssues() {
-        var results = platform.issues("user1").search(REPO, "bug", PageRequest.first(10));
+        var results = platform.issues("user1").search(REPO, "insurance", PageRequest.first(10));
         assertThat(results.items()).isNotEmpty();
         assertThat(results.items()).allSatisfy(i ->
             assertThat(i.title().toLowerCase() + " " + (i.body() != null ? i.body().toLowerCase() : ""))
-                .containsIgnoringCase("bug"));
+                .containsIgnoringCase("insurance"));
     }
 
     @Test
     void addAndRemoveLabels() {
-        platform.issues("user1").addLabels(REPO, 1, List.of("documentation"));
+        platform.issues("user1").addLabels(REPO, 1, List.of("financial"));
         var issue = platform.issues("user1").get(REPO, 1);
-        assertThat(issue.labels()).extracting(Label::name).contains("documentation");
-        platform.issues("user1").removeLabel(REPO, 1, "documentation");
+        assertThat(issue.labels()).extracting(Label::name).contains("financial");
+        platform.issues("user1").removeLabel(REPO, 1, "financial");
         issue = platform.issues("user1").get(REPO, 1);
-        assertThat(issue.labels()).extracting(Label::name).doesNotContain("documentation");
+        assertThat(issue.labels()).extracting(Label::name).doesNotContain("financial");
     }
 
     @Test
@@ -105,18 +105,18 @@ class RefProjectPlatformTest {
 
     @Test
     void getAndUpdateLabel() {
-        var label = platform.labels("user1").get(REPO, "bug");
-        assertThat(label.name()).isEqualTo("bug");
-        var updated = platform.labels("user1").update(REPO, "bug",
-            new Label(null, "bug", "ff0000", "Updated description"));
+        var label = platform.labels("user1").get(REPO, "urgent");
+        assertThat(label.name()).isEqualTo("urgent");
+        var updated = platform.labels("user1").update(REPO, "urgent",
+                                                      new Label(null, "urgent", "ff0000", "Updated description"));
         assertThat(updated.color()).isEqualTo("ff0000");
     }
 
     @Test
     void deleteLabel() {
-        platform.labels("user1").delete(REPO, "documentation");
+        platform.labels("user1").delete(REPO, "financial");
         assertThat(platform.labels("user1").list(REPO)).extracting(Label::name)
-            .doesNotContain("documentation");
+            .doesNotContain("financial");
     }
 
     @Test
@@ -128,7 +128,7 @@ class RefProjectPlatformTest {
     @Test
     void getMilestone() {
         var milestone = platform.milestones("user1").get(REPO, 1);
-        assertThat(milestone.title()).isEqualTo("v1.0");
+        assertThat(milestone.title()).isEqualTo("This Month");
     }
 
     @Test
@@ -166,15 +166,15 @@ class RefProjectPlatformTest {
     void listBoards() {
         var boards = platform.boards("user1").listProjects(REPO);
         assertThat(boards).hasSize(1);
-        assertThat(boards.get(0).title()).isEqualTo("Project Board");
+        assertThat(boards.get(0).title()).isEqualTo("Household Tasks");
     }
 
     @Test
     void listColumns() {
         var boards = platform.boards("user1").listProjects(REPO);
         var columns = platform.boards("user1").listColumns(REPO, boards.get(0).id());
-        assertThat(columns).hasSize(3);
+        assertThat(columns).hasSize(4);
         assertThat(columns).extracting(ProjectColumn::name)
-            .containsExactly("To Do", "In Progress", "Done");
+            .containsExactly("Backlog", "In Progress", "Waiting", "Done");
     }
 }

@@ -1,0 +1,14 @@
+- id: "cal-jonny"
+  summary: "Jonny's Calendar"
+  description: "Jonny Alpha — work, gym, football, household"
+  primary: true
+
+- id: "cal-sarah"
+  summary: "Sarah's Calendar"
+  description: "Sarah Alpha — work, gym, book club, school liaison"
+  primary: false
+
+- id: "cal-family"
+  summary: "Family Calendar"
+  description: "Shared household calendar — kids, visits, holidays, renewals"
+  primary: false

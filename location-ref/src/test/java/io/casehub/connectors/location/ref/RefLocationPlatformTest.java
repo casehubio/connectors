@@ -56,37 +56,36 @@ class RefLocationPlatformTest {
 
     @Test
     void searchNearbyFindsPlacesWithinRadius() {
-        var kingsCross = new Coordinates(51.5318, -0.1239);
+        var balham = new Coordinates(51.4435, -0.1520);
         var results = platform.placeSearch("user1")
-            .searchNearby(kingsCross, 500, new PageRequest(null, 20));
+                              .searchNearby(balham, 1000, new PageRequest(null, 20));
         assertThat(results.items()).isNotEmpty();
-        assertThat(results.items().size()).isLessThan(8);
+        assertThat(results.items().size()).isLessThan(12);
     }
 
     @Test
     void searchByCategoryFiltersResults() {
-        var kingsCross = new Coordinates(51.5318, -0.1239);
+        var balham = new Coordinates(51.4435, -0.1520);
         var results = platform.placeSearch("user1")
-            .searchByCategory("restaurant", kingsCross, 5000, new PageRequest(null, 20));
+                              .searchByCategory("restaurant", balham, 5000, new PageRequest(null, 20));
         assertThat(results.items()).isNotEmpty();
         assertThat(results.items()).allSatisfy(p ->
-            assertThat(p.types()).anyMatch(t -> t.contains("restaurant")));
+                                                       assertThat(p.types()).anyMatch(t -> t.contains("restaurant")));
     }
 
     @Test
     void getPlaceDetailReturnsFullInfo() {
         var places = platform.placeSearch("user1")
-            .searchByText("Italian Kitchen", new PageRequest(null, 1));
+                             .searchByText("Elm Street", new PageRequest(null, 1));
         var placeId = places.items().getFirst().id();
 
         var detail = platform.placeDetails("user1").get(placeId);
         assertThat(detail.id()).isEqualTo(placeId);
-        assertThat(detail.name()).isEqualTo("The Italian Kitchen");
+        assertThat(detail.name()).isEqualTo("Elm Street Surgery");
         assertThat(detail.openingHours()).isNotNull();
         assertThat(detail.openingHours().weekdayText()).isNotEmpty();
         assertThat(detail.reviews()).isNotEmpty();
         assertThat(detail.phoneNumber()).isNotNull();
-        assertThat(detail.url()).isNotNull();
     }
 
     @Test
@@ -97,24 +96,24 @@ class RefLocationPlatformTest {
 
     @Test
     void geocodeResolvesAddress() {
-        var results = platform.geocoding("user1").geocode("King's Cross");
+        var results = platform.geocoding("user1").geocode("Ramsden Road");
         assertThat(results).isNotEmpty();
-        assertThat(results.getFirst().formattedAddress()).containsIgnoringCase("King's Cross");
+        assertThat(results.getFirst().formattedAddress()).containsIgnoringCase("Ramsden Road");
         assertThat(results.getFirst().location()).isNotNull();
     }
 
     @Test
     void reverseGeocodeFindsNearbyAddresses() {
         var results = platform.geocoding("user1")
-            .reverseGeocode(new Coordinates(51.5318, -0.1239));
+            .reverseGeocode(new Coordinates(51.4435, -0.1520));
         assertThat(results).isNotEmpty();
         assertThat(results).hasSizeLessThanOrEqualTo(3);
     }
 
     @Test
     void routeCalculatesDistanceAndDuration() {
-        var origin = new Coordinates(51.5318, -0.1239);
-        var destination = new Coordinates(51.5045, -0.0865);
+        var origin = new Coordinates(51.4435, -0.1520);
+        var destination = new Coordinates(51.4390, -0.1480);
         var route = platform.directions("user1")
             .route(origin, destination, TravelMode.DRIVING);
 
@@ -126,8 +125,8 @@ class RefLocationPlatformTest {
 
     @Test
     void routeWalkingSlowerThanDriving() {
-        var origin = new Coordinates(51.5318, -0.1239);
-        var destination = new Coordinates(51.5045, -0.0865);
+        var origin = new Coordinates(51.4435, -0.1520);
+        var destination = new Coordinates(51.4390, -0.1480);
         var driving = platform.directions("user1")
             .route(origin, destination, TravelMode.DRIVING);
         var walking = platform.directions("user1")

@@ -31,10 +31,35 @@ class RefCalendarPlatformTest {
     }
 
     @Test
-    void listCalendars_returnsDefault() {
-        assertThat(platform.listCalendars()).isNotEmpty();
-        assertThat(platform.listCalendars().getFirst().primary()).isTrue();
+    void listCalendars_returns3Calendars() {
+        var calendars = platform.listCalendars();
+        assertThat(calendars).hasSize(3);
+        assertThat(calendars).extracting("id")
+                             .containsExactly("cal-jonny", "cal-sarah", "cal-family");
+        assertThat(calendars.stream().filter(c -> c.primary()).count()).isEqualTo(1);
     }
+
+    @Test
+    void seedEvents_accessibleViaListEvents() {
+        var jonnyEvents = platform.listEvents("cal-jonny",
+                                             Instant.parse("2026-10-26T00:00:00Z"),
+                                             Instant.parse("2026-11-30T00:00:00Z"));
+        assertThat(jonnyEvents).isNotEmpty();
+        assertThat(jonnyEvents).extracting("summary")
+                              .anyMatch(s -> ((String) s).contains("Meridian Engineering"));
+    }
+
+    @Test
+    void seedEvents_familyCalendarHasAllDayEvents() {
+        var familyEvents = platform.listEvents("cal-family",
+                                               Instant.parse("2026-10-01T00:00:00Z"),
+                                               Instant.parse("2027-09-01T00:00:00Z"));
+        assertThat(familyEvents).isNotEmpty();
+        assertThat(familyEvents.stream()
+                               .filter(e -> e.timing() instanceof EventTiming.AllDay).count())
+                .isGreaterThanOrEqualTo(10);
+    }
+
 
     @Test
     void createEvent_timedEvent_returnsWithId() {
