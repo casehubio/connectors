@@ -46,7 +46,7 @@ class RefDocumentPlatformTest {
         var folders = platform.folders().list("root");
         assertThat(folders).isNotEmpty();
         assertThat(folders).extracting("name")
-                .contains("Documents", "Reports");
+                .contains("Family Documents", "Financial");
     }
 
     @Test
@@ -76,7 +76,7 @@ class RefDocumentPlatformTest {
     void files_list_returnsPreloadedFiles() {
         var folders = platform.folders().list("root");
         var docsFolder = folders.stream()
-                .filter(f -> f.name().equals("Documents"))
+                .filter(f -> f.name().equals("Family Documents"))
                 .findFirst().orElseThrow();
         var page = platform.files().list(docsFolder.id(), PageRequest.first(50));
         assertThat(page.items()).isNotEmpty();
@@ -86,7 +86,7 @@ class RefDocumentPlatformTest {
     void files_list_pagination_respectsPageSize() {
         var folders = platform.folders().list("root");
         var docsFolder = folders.stream()
-                .filter(f -> f.name().equals("Documents"))
+                .filter(f -> f.name().equals("Family Documents"))
                 .findFirst().orElseThrow();
         var firstPage = platform.files().list(docsFolder.id(), PageRequest.first(2));
         assertThat(firstPage.items()).hasSize(2);
@@ -98,7 +98,7 @@ class RefDocumentPlatformTest {
     void files_list_pagination_cursorFetchesNextPage() {
         var folders = platform.folders().list("root");
         var docsFolder = folders.stream()
-                .filter(f -> f.name().equals("Documents"))
+                .filter(f -> f.name().equals("Family Documents"))
                 .findFirst().orElseThrow();
         var firstPage = platform.files().list(docsFolder.id(), PageRequest.first(2));
         var secondPage = platform.files().list(docsFolder.id(),
@@ -120,7 +120,7 @@ class RefDocumentPlatformTest {
     void files_get_returnsMetadata() {
         var folders = platform.folders().list("root");
         var docsFolder = folders.stream()
-                .filter(f -> f.name().equals("Documents"))
+                .filter(f -> f.name().equals("Family Documents"))
                 .findFirst().orElseThrow();
         var files = platform.files().list(docsFolder.id(), PageRequest.first(1));
         var fileId = files.items().getFirst().id();
@@ -143,7 +143,7 @@ class RefDocumentPlatformTest {
     void files_download_returnsContent() {
         var folders = platform.folders().list("root");
         var docsFolder = folders.stream()
-                .filter(f -> f.name().equals("Documents"))
+                .filter(f -> f.name().equals("Family Documents"))
                 .findFirst().orElseThrow();
         var files = platform.files().list(docsFolder.id(), PageRequest.first(1));
         var fileId = files.items().getFirst().id();
@@ -165,7 +165,7 @@ class RefDocumentPlatformTest {
     void files_upload_returnsMetadata() {
         var folders = platform.folders().list("root");
         var docsFolder = folders.stream()
-                .filter(f -> f.name().equals("Documents"))
+                .filter(f -> f.name().equals("Family Documents"))
                 .findFirst().orElseThrow();
 
         byte[] content = "Hello, world!".getBytes();
@@ -183,7 +183,7 @@ class RefDocumentPlatformTest {
     void files_upload_appearsInList() {
         var folders = platform.folders().list("root");
         var docsFolder = folders.stream()
-                .filter(f -> f.name().equals("Documents"))
+                .filter(f -> f.name().equals("Family Documents"))
                 .findFirst().orElseThrow();
 
         platform.files().upload(docsFolder.id(), "uploaded.pdf",
@@ -197,7 +197,7 @@ class RefDocumentPlatformTest {
     void files_upload_downloadRoundTrip() {
         var folders = platform.folders().list("root");
         var docsFolder = folders.stream()
-                .filter(f -> f.name().equals("Documents"))
+                .filter(f -> f.name().equals("Family Documents"))
                 .findFirst().orElseThrow();
 
         byte[] original = "Round trip content".getBytes();
@@ -212,7 +212,7 @@ class RefDocumentPlatformTest {
     void files_delete_removesFile() {
         var folders = platform.folders().list("root");
         var docsFolder = folders.stream()
-                .filter(f -> f.name().equals("Documents"))
+                .filter(f -> f.name().equals("Family Documents"))
                 .findFirst().orElseThrow();
 
         var metadata = platform.files().upload(
@@ -236,19 +236,19 @@ class RefDocumentPlatformTest {
     void folders_move_changesParent() {
         var folders = platform.folders().list("root");
         var docsFolder = folders.stream()
-                .filter(f -> f.name().equals("Documents"))
+                .filter(f -> f.name().equals("Family Documents"))
                 .findFirst().orElseThrow();
-        var reportsFolder = folders.stream()
-                .filter(f -> f.name().equals("Reports"))
+        var financialFolder = folders.stream()
+                .filter(f -> f.name().equals("Financial"))
                 .findFirst().orElseThrow();
 
         var metadata = platform.files().upload(
                 docsFolder.id(), "moving.txt", "text/plain", "move me".getBytes());
 
-        platform.folders().move(metadata.id(), reportsFolder.id());
+        platform.folders().move(metadata.id(), financialFolder.id());
 
         var docsFiles = platform.files().list(docsFolder.id(), PageRequest.first(50));
-        var reportsFiles = platform.files().list(reportsFolder.id(), PageRequest.first(50));
+        var reportsFiles = platform.files().list(financialFolder.id(), PageRequest.first(50));
         assertThat(docsFiles.items()).extracting("id").doesNotContain(metadata.id());
         assertThat(reportsFiles.items()).extracting("id").contains(metadata.id());
     }
@@ -257,7 +257,7 @@ class RefDocumentPlatformTest {
 
     @Test
     void search_findsMatchingFiles() {
-        var page = platform.search().search("quarterly", PageRequest.first(50));
+        var page = platform.search().search("passport", PageRequest.first(50));
         assertThat(page.items()).isNotEmpty();
     }
 
@@ -273,7 +273,7 @@ class RefDocumentPlatformTest {
     void sharing_getShareLink_returnsLink() {
         var folders = platform.folders().list("root");
         var docsFolder = folders.stream()
-                .filter(f -> f.name().equals("Documents"))
+                .filter(f -> f.name().equals("Family Documents"))
                 .findFirst().orElseThrow();
         var files = platform.files().list(docsFolder.id(), PageRequest.first(1));
         var fileId = files.items().getFirst().id();
@@ -312,7 +312,7 @@ class RefDocumentPlatformTest {
     void listSync_initialSync_returnsAllFilesWithToken() {
         var result = platform.files().listSync(io.casehub.connectors.SyncRequest.initial(100));
 
-        assertThat(result.items()).hasSize(7);
+        assertThat(result.items()).hasSize(17);
         assertThat(result.syncToken()).isNotNull();
         assertThat(result.deletedIds()).isEmpty();
         assertThat(result.hasMore()).isFalse();
@@ -323,7 +323,7 @@ class RefDocumentPlatformTest {
         var fullSync = platform.files().listSync(io.casehub.connectors.SyncRequest.initial(100));
         var token    = fullSync.syncToken();
 
-        platform.files().upload("folder-docs", "new-file.txt", "text/plain",
+        platform.files().upload("folder-family", "new-file.txt", "text/plain",
                                 "hello".getBytes());
 
         var incrementalSync = platform.files().listSync(

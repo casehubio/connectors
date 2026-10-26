@@ -1,20 +1,40 @@
-- address: "King's Cross, London"
-  lat: 51.5318
-  lng: -0.1239
-  placeId: "place-kx"
-  types: ["neighborhood", "political"]
-- address: "10 King's Cross Rd, London N1 9AA"
-  lat: 51.5318
-  lng: -0.1239
-  placeId: "p-1"
+- address: "47 Ramsden Road, London SW12 8QX"
+  lat: 51.4480
+  lng: -0.1535
+  placeId: "place-home"
   types: ["street_address"]
-- address: "British Museum, Great Russell St, London WC1B 3DG"
-  lat: 51.5194
-  lng: -0.1270
-  placeId: "p-3"
-  types: ["establishment", "museum"]
-- address: "London Bridge, London SE1"
-  lat: 51.5055
-  lng: -0.0876
-  placeId: "place-lb"
-  types: ["neighborhood", "political"]
+- address: "14 Warwick Park, Tunbridge Wells TN2 5TA"
+  lat: 51.1310
+  lng: 0.2625
+  placeId: "place-grandma"
+  types: ["street_address"]
+- address: "200 Tooting Bec Road, London SW17 8BS"
+  lat: 51.4390
+  lng: -0.1480
+  placeId: "place-school"
+  types: ["establishment", "school"]
+- address: "Meridian Engineering, 1 Canada Square, London E14 5AB"
+  lat: 51.5049
+  lng: -0.0187
+  placeId: "place-work-jonny"
+  types: ["establishment"]
+- address: "Camden NHS Trust, 94 Camden Road, London NW1 9EA"
+  lat: 51.5430
+  lng: -0.1380
+  placeId: "place-work-sarah"
+  types: ["establishment", "hospital"]
+- address: "Mrs Chen's studio, 28 Mitcham Lane, London SW17 6BE"
+  lat: 51.4350
+  lng: -0.1560
+  placeId: "place-piano"
+  types: ["establishment"]
+- address: "Bob's Plumbing, 55 Streatham Vale, London SW16 5SQ"
+  lat: 51.4180
+  lng: -0.1350
+  placeId: "place-bobs"
+  types: ["establishment"]
+- address: "15 Balham High Road, London SW12 9AJ"
+  lat: 51.4432
+  lng: -0.1522
+  placeId: "place-harris"
+  types: ["establishment", "lawyer"]

@@ -1,49 +1,128 @@
+# Family Documents
 - id: "doc-001"
-  name: "Q3 Quarterly Plan.docx"
-  folderId: "folder-docs"
-  contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-  size: 2048
-  owner: "user@example.com"
-  createdAt: "2026-09-15T10:00:00Z"
+  name: "Jonny Alpha — passport scan.pdf"
+  folderId: "folder-family"
+  contentType: "application/pdf"
+  size: 2048000
+  owner: "jonny.alpha@meridian-eng.co.uk"
+  createdAt: "2025-01-10T10:00:00Z"
 - id: "doc-002"
-  name: "Architecture Overview.pdf"
-  folderId: "folder-docs"
+  name: "Sarah Alpha — passport scan.pdf"
+  folderId: "folder-family"
   contentType: "application/pdf"
-  size: 4096
-  owner: "alice@example.com"
-  createdAt: "2026-09-15T11:00:00Z"
+  size: 1980000
+  owner: "jonny.alpha@meridian-eng.co.uk"
+  createdAt: "2025-01-10T10:30:00Z"
 - id: "doc-003"
-  name: "Meeting Notes 2026-09-10.md"
-  folderId: "folder-docs"
-  contentType: "text/markdown"
-  size: 512
-  owner: "user@example.com"
-  createdAt: "2026-09-15T12:00:00Z"
+  name: "Ella Alpha — passport scan.pdf"
+  folderId: "folder-family"
+  contentType: "application/pdf"
+  size: 1920000
+  owner: "jonny.alpha@meridian-eng.co.uk"
+  createdAt: "2025-01-10T11:00:00Z"
 - id: "doc-004"
-  name: "API Design Guidelines.md"
-  folderId: "folder-docs"
-  contentType: "text/markdown"
-  size: 1024
-  owner: "bob@example.com"
-  createdAt: "2026-09-15T13:00:00Z"
-- id: "rpt-001"
-  name: "Monthly Revenue Report.xlsx"
-  folderId: "folder-reports"
+  name: "Tom Alpha — passport scan.pdf"
+  folderId: "folder-family"
+  contentType: "application/pdf"
+  size: 1950000
+  owner: "jonny.alpha@meridian-eng.co.uk"
+  createdAt: "2025-01-10T11:30:00Z"
+- id: "doc-005"
+  name: "Marriage certificate.pdf"
+  folderId: "folder-family"
+  contentType: "application/pdf"
+  size: 512000
+  owner: "jonny.alpha@meridian-eng.co.uk"
+  createdAt: "2025-01-10T12:00:00Z"
+
+# Financial
+- id: "doc-006"
+  name: "Halifax mortgage agreement.pdf"
+  folderId: "folder-financial"
+  contentType: "application/pdf"
+  size: 4096000
+  owner: "jonny.alpha@meridian-eng.co.uk"
+  createdAt: "2025-01-15T10:00:00Z"
+- id: "doc-007"
+  name: "Admiral car insurance policy 2026.pdf"
+  folderId: "folder-financial"
+  contentType: "application/pdf"
+  size: 1024000
+  owner: "jonny.alpha@meridian-eng.co.uk"
+  createdAt: "2025-11-20T14:00:00Z"
+- id: "doc-008"
+  name: "Aviva home insurance policy 2026.pdf"
+  folderId: "folder-financial"
+  contentType: "application/pdf"
+  size: 1536000
+  owner: "jonny.alpha@meridian-eng.co.uk"
+  createdAt: "2026-01-15T11:00:00Z"
+- id: "doc-009"
+  name: "Monthly budget spreadsheet.xlsx"
+  folderId: "folder-financial"
   contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-  size: 8192
-  owner: "carol@example.com"
-  createdAt: "2026-09-15T10:00:00Z"
-- id: "rpt-002"
-  name: "Quarterly Performance Review.pdf"
-  folderId: "folder-reports"
+  size: 98304
+  owner: "jonny.alpha@meridian-eng.co.uk"
+  createdAt: "2026-01-01T09:00:00Z"
+
+# Health & Care
+- id: "doc-010"
+  name: "Jean Alpha — care plan.pdf"
+  folderId: "folder-health"
   contentType: "application/pdf"
-  size: 3072
-  owner: "dave@example.com"
-  createdAt: "2026-09-15T11:00:00Z"
-- id: "arc-001"
-  name: "Old Project Spec.pdf"
-  folderId: "folder-archive"
+  size: 3072000
+  owner: "jonny.alpha@meridian-eng.co.uk"
+  createdAt: "2026-04-10T14:00:00Z"
+- id: "doc-011"
+  name: "Jean Alpha — LPA document.pdf"
+  folderId: "folder-health"
   contentType: "application/pdf"
-  size: 1536
-  owner: "user@example.com"
-  createdAt: "2026-07-17T10:00:00Z"
+  size: 2048000
+  owner: "jonny.alpha@meridian-eng.co.uk"
+  createdAt: "2026-06-15T10:00:00Z"
+- id: "doc-012"
+  name: "Dr Patel referral letter — Tom.pdf"
+  folderId: "folder-health"
+  contentType: "application/pdf"
+  size: 256000
+  owner: "sarah.alpha@nhs.net"
+  createdAt: "2026-09-20T16:00:00Z"
+
+# Home & Maintenance
+- id: "doc-013"
+  name: "Bobs Plumbing invoice — bathroom 2025.pdf"
+  folderId: "folder-home"
+  contentType: "application/pdf"
+  size: 128000
+  owner: "jonny.alpha@meridian-eng.co.uk"
+  createdAt: "2026-02-15T10:00:00Z"
+- id: "doc-014"
+  name: "British Gas boiler service certificate.pdf"
+  folderId: "folder-home"
+  contentType: "application/pdf"
+  size: 64000
+  owner: "jonny.alpha@meridian-eng.co.uk"
+  createdAt: "2025-11-14T12:00:00Z"
+- id: "doc-015"
+  name: "MOT certificate — VW Golf.pdf"
+  folderId: "folder-home"
+  contentType: "application/pdf"
+  size: 48000
+  owner: "jonny.alpha@meridian-eng.co.uk"
+  createdAt: "2025-11-09T11:00:00Z"
+
+# Travel
+- id: "doc-016"
+  name: "Summer holiday booking — Algarve villa.pdf"
+  folderId: "folder-travel"
+  contentType: "application/pdf"
+  size: 512000
+  owner: "jonny.alpha@meridian-eng.co.uk"
+  createdAt: "2026-10-10T15:00:00Z"
+- id: "doc-017"
+  name: "Travel insurance policy 2027.pdf"
+  folderId: "folder-travel"
+  contentType: "application/pdf"
+  size: 256000
+  owner: "jonny.alpha@meridian-eng.co.uk"
+  createdAt: "2026-10-12T09:00:00Z"

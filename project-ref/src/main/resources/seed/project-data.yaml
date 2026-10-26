@@ -1,74 +1,108 @@
 repo:
-  owner: "test-org"
-  name: "test-repo"
+  owner: "alpha-household"
+  name: "home-tasks"
 
 labels:
-  - name: "bug"
+  - name: "urgent"
     color: "d73a4a"
-    description: "Something isn't working"
-  - name: "enhancement"
+    description: "Needs attention this week"
+  - name: "home-maintenance"
     color: "0075ca"
-    description: "New feature or request"
-  - name: "documentation"
+    description: "House repairs and upkeep"
+  - name: "family"
     color: "0e8a16"
-    description: "Documentation improvements"
+    description: "Family events and planning"
+  - name: "financial"
+    color: "e4e669"
+    description: "Bills, renewals, budgeting"
 
 milestones:
-  - title: "v1.0"
-    description: "First release"
+  - title: "This Month"
+    description: "Due within November 2026"
     state: "open"
-  - title: "v0.9"
-    description: "Beta release"
-    state: "closed"
+  - title: "This Quarter"
+    description: "Due by end of January 2027"
+    state: "open"
+  - title: "Summer"
+    description: "Holiday and summer prep"
+    state: "open"
 
 issues:
-  - title: "Fix login bug"
-    body: "Login fails on Safari"
+  - title: "Kitchen tap replacement"
+    body: "Bob's Plumbing booked for 3 Nov. Mixer tap, quote £280 + parts."
     state: "open"
-    labels: ["bug"]
-    milestone: "v1.0"
-  - title: "Add search feature"
-    body: "Full-text search needed"
+    labels: ["home-maintenance"]
+    milestone: "This Month"
+  - title: "Car MOT booking"
+    body: "VW Golf MOT due. Halfords Streatham has availability from 9 Nov."
     state: "open"
-    labels: ["enhancement"]
-    milestone: "v1.0"
-  - title: "Update README"
-    body: "Add setup instructions"
-    state: "closed"
-    labels: ["documentation"]
+    labels: ["urgent", "home-maintenance"]
+    milestone: "This Month"
+  - title: "Admiral car insurance renewal"
+    body: "Renewal deadline 20 Nov. Quote £612 (up from £576). Compare Direct Line and Churchill."
+    state: "open"
+    labels: ["urgent", "financial"]
+    milestone: "This Month"
+  - title: "Boiler annual service"
+    body: "British Gas HomeCare visit booked for 14 Nov."
+    state: "open"
+    labels: ["home-maintenance"]
+    milestone: "This Month"
+  - title: "Grandma Jean LPA renewal"
+    body: "Harris & Co meeting 12 Nov at 2pm. Bring existing LPA docs."
+    state: "open"
+    labels: ["family"]
+    milestone: "This Month"
+  - title: "Summer holiday planning — Algarve"
+    body: "Flights booked via easyJet. Need to book villa and travel insurance."
+    state: "open"
+    labels: ["family"]
+    milestone: "Summer"
+  - title: "Aviva home insurance comparison"
+    body: "Renewal due mid-January. Last year £384. Check comparison sites."
+    state: "open"
+    labels: ["financial"]
+    milestone: "This Quarter"
+  - title: "Garden fence repair"
+    body: "Three panels damaged in October storm. Get quotes from local fencers."
+    state: "open"
+    labels: ["home-maintenance"]
     milestone: null
-  - title: "Performance bug in dashboard"
-    body: "Slow load times"
+  - title: "Ella GCSE revision schedule"
+    body: "Mock exams January. Work with Ella on a revision timetable."
     state: "open"
-    labels: ["bug"]
-    milestone: null
-  - title: "Refactor auth module"
-    body: "Extract token validation"
+    labels: ["family"]
+    milestone: "This Quarter"
+  - title: "Declutter garage"
+    body: "Deferred from summer. Need to sort bikes, tools, camping gear."
     state: "open"
-    labels: ["enhancement"]
+    labels: ["home-maintenance"]
     milestone: null
 
 comments:
   - issueIndex: 0
-    body: "Reproduced on Safari 17"
-    author: "dev1"
+    body: "Bob confirmed 3 Nov 10am-12pm"
+    author: "jonny"
   - issueIndex: 0
-    body: "Fix incoming in next PR"
-    author: "dev2"
-  - issueIndex: 1
-    body: "Should we use Elasticsearch?"
-    author: "dev1"
+    body: "Grohe Minta tap ordered from Amazon, £189"
+    author: "jonny"
+  - issueIndex: 2
+    body: "Direct Line quoted £585, saving £27 vs Admiral"
+    author: "jonny"
 
 boards:
   - id: "board-1"
-    name: "Project Board"
+    name: "Household Tasks"
     columns:
-      - id: "col-1"
-        name: "To Do"
+      - id: "col-backlog"
+        name: "Backlog"
         position: 0
-      - id: "col-2"
+      - id: "col-progress"
         name: "In Progress"
         position: 1
-      - id: "col-3"
-        name: "Done"
+      - id: "col-waiting"
+        name: "Waiting"
         position: 2
+      - id: "col-done"
+        name: "Done"
+        position: 3

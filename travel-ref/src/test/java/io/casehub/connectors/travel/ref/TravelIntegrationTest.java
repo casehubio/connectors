@@ -41,16 +41,16 @@ class TravelIntegrationTest {
     @Test
     void fullLifecycle_searchToBooking() {
         var search = platform.transportSearch();
-        var options = search.search("London", "Paris",
-            LocalDate.of(2026, 12, 1), PageRequest.first(10));
+        var options = search.search("Gatwick", "Faro",
+            LocalDate.of(2027, 8, 1), PageRequest.first(10));
         assertThat(options.items()).isNotEmpty();
         var option = options.items().getFirst();
 
-        var trainOptions = search.searchByMode("London", "Paris",
-            LocalDate.of(2026, 12, 1), TransportMode.TRAIN, PageRequest.first(10));
+        var trainOptions = search.searchByMode("Gatwick", "Faro",
+            LocalDate.of(2027, 8, 1), TransportMode.FLIGHT, PageRequest.first(10));
         assertThat(trainOptions.items()).isNotEmpty();
         assertThat(trainOptions.items()).allSatisfy(opt ->
-            assertThat(opt.mode()).isEqualTo(TransportMode.TRAIN));
+            assertThat(opt.mode()).isEqualTo(TransportMode.FLIGHT));
 
         var booking = platform.transportBooking("user1")
             .book(new TransportBookingRequest(option.id(), "Jane Doe", "jane@example.com"));
@@ -62,8 +62,8 @@ class TravelIntegrationTest {
         assertThat(retrieved.bookingReference()).isEqualTo(booking.bookingReference());
 
         var accSearch = platform.accommodationSearch();
-        var accommodations = accSearch.search("London",
-            LocalDate.of(2026, 12, 1), LocalDate.of(2026, 12, 5), 2, PageRequest.first(10));
+        var accommodations = accSearch.search("",
+            LocalDate.of(2027, 8, 1), LocalDate.of(2027, 8, 5), 2, PageRequest.first(10));
         assertThat(accommodations.items()).isNotEmpty();
         var acc = accommodations.items().getFirst();
 
@@ -74,7 +74,7 @@ class TravelIntegrationTest {
         var accBooking = platform.accommodationBooking("user1")
             .book(new AccommodationBookingRequest(
                 acc.id(), detail.roomTypes().getFirst().name(),
-                LocalDate.of(2026, 12, 1), LocalDate.of(2026, 12, 5),
+                LocalDate.of(2027, 8, 1), LocalDate.of(2027, 8, 5),
                 "Jane Doe", "jane@example.com"));
         assertThat(accBooking.status()).isEqualTo(BookingStatus.CONFIRMED);
         assertThat(accBooking.totalPrice().amount()).isGreaterThan(BigDecimal.ZERO);
