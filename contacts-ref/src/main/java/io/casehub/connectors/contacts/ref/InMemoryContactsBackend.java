@@ -115,7 +115,8 @@ public class InMemoryContactsBackend implements ContactsBackend {
             contact.addresses(), contact.company(), contact.jobTitle(),
             contact.photoUrl(), contact.notes(), contact.metadata());
         contacts.put(id, new VersionedContact(created, version.incrementAndGet()));
-        groupMembers.get("g-mycontacts").add(id);
+        var defaultGroup = groupMembers.keySet().stream().findFirst().orElse(null);
+        if (defaultGroup != null) groupMembers.get(defaultGroup).add(id);
         updateGroupCounts();
         return created;
     }

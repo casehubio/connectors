@@ -1,89 +1,264 @@
-- displayName: "Alice Smith"
-  givenName: "Alice"
-  familyName: "Smith"
-  email: "alice@example.com"
-  phone: "+1234567001"
-  company: "Acme Corp"
-  title: "Engineer"
-  groups: ["g-mycontacts", "g-work"]
+# Family
+- displayName: "Mark Proctor"
+  givenName: "Mark"
+  familyName: "Proctor"
+  email: "mark.proctor@meridian-eng.co.uk"
+  phone: "+447700100001"
+  company: "Meridian Engineering"
+  title: "Senior Engineer"
+  groups: ["g-family"]
 
-- displayName: "Bob Jones"
-  givenName: "Bob"
-  familyName: "Jones"
-  email: "bob@example.com"
-  phone: "+1234567002"
-  company: "Acme Corp"
-  title: "Manager"
-  groups: ["g-mycontacts", "g-work"]
+- displayName: "Sarah Proctor"
+  givenName: "Sarah"
+  familyName: "Proctor"
+  email: "sarah.proctor@nhs.net"
+  phone: "+447700100002"
+  company: "Camden NHS Trust"
+  title: "Practice Manager"
+  groups: ["g-family"]
 
-- displayName: "Carol Smith"
-  givenName: "Carol"
-  familyName: "Smith"
-  email: "carol@example.com"
-  phone: "+1234567003"
-  company: "Beta Inc"
-  title: "Designer"
-  groups: ["g-mycontacts", "g-starred"]
+- displayName: "Ella Proctor"
+  givenName: "Ella"
+  familyName: "Proctor"
+  email: "ella.proctor@oakwoodacademy.co.uk"
+  phone: "+447700100003"
+  company: "Oakwood Academy"
+  title: "Student — Year 11"
+  groups: ["g-family"]
 
-- displayName: "Dave Wilson"
+- displayName: "Tom Proctor"
+  givenName: "Tom"
+  familyName: "Proctor"
+  email: ""
+  phone: ""
+  company: "Oakwood Academy"
+  title: "Student — Year 6"
+  groups: ["g-family"]
+
+- displayName: "Jean Proctor"
+  givenName: "Jean"
+  familyName: "Proctor"
+  email: ""
+  phone: "+441892500100"
+  company: ""
+  title: ""
+  groups: ["g-family"]
+
+- displayName: "Rachel Murray"
+  givenName: "Rachel"
+  familyName: "Murray"
+  email: "rachel.murray@gmail.com"
+  phone: "+447700200001"
+  company: ""
+  title: ""
+  groups: ["g-family"]
+
+- displayName: "Pete Proctor"
+  givenName: "Pete"
+  familyName: "Proctor"
+  email: "pete.proctor@outlook.com"
+  phone: "+447700200002"
+  company: ""
+  title: ""
+  groups: ["g-family"]
+
+# Friends
+- displayName: "Dave Thompson"
   givenName: "Dave"
-  familyName: "Wilson"
-  email: "dave@example.com"
-  phone: "+1234567004"
-  company: "Beta Inc"
-  title: "CEO"
-  groups: ["g-mycontacts"]
+  familyName: "Thompson"
+  email: "dave.thompson@gmail.com"
+  phone: "+447700300001"
+  company: "Barclays"
+  title: "Risk Analyst"
+  groups: ["g-friends"]
 
-- displayName: "Eve Brown"
-  givenName: "Eve"
-  familyName: "Brown"
-  email: "eve@example.com"
-  phone: "+1234567005"
-  company: "Gamma LLC"
-  title: "CTO"
-  groups: ["g-mycontacts", "g-work"]
+- displayName: "Lisa Thompson"
+  givenName: "Lisa"
+  familyName: "Thompson"
+  email: "lisa.thompson@gmail.com"
+  phone: "+447700300002"
+  company: ""
+  title: ""
+  groups: ["g-friends"]
 
-- displayName: "Frank Lee"
-  givenName: "Frank"
-  familyName: "Lee"
-  email: "frank@example.com"
-  phone: "+1234567006"
-  company: "Gamma LLC"
-  title: "Intern"
-  groups: ["g-mycontacts"]
+- displayName: "Jake Harris"
+  givenName: "Jake"
+  familyName: "Harris"
+  email: ""
+  phone: "+447700300003"
+  company: "Oakwood Academy"
+  title: "Student — Year 6"
+  groups: ["g-friends"]
 
-- displayName: "Grace Chen"
-  givenName: "Grace"
+- displayName: "Mia Cooper"
+  givenName: "Mia"
+  familyName: "Cooper"
+  email: ""
+  phone: "+447700300004"
+  company: "Oakwood Academy"
+  title: "Student — Year 11"
+  groups: ["g-friends"]
+
+# Professional
+- displayName: "Dr. Anish Patel"
+  givenName: "Anish"
+  familyName: "Patel"
+  email: "appointments@elmstreetsurgery.nhs.uk"
+  phone: "+442071234567"
+  company: "Elm Street Surgery"
+  title: "General Practitioner"
+  groups: ["g-professional"]
+
+- displayName: "Mrs. Wei Chen"
+  givenName: "Wei"
   familyName: "Chen"
-  email: "grace@example.com"
-  phone: "+1234567007"
-  company: "Delta Co"
-  title: "VP"
-  groups: ["g-mycontacts", "g-starred"]
+  email: "wei.chen@pianolessons.co.uk"
+  phone: "+447700400001"
+  company: ""
+  title: "Piano Teacher"
+  groups: ["g-professional"]
 
-- displayName: "Hank Miller"
-  givenName: "Hank"
-  familyName: "Miller"
-  email: "hank@example.com"
-  phone: "+1234567008"
-  company: "Acme Corp"
-  title: "Analyst"
-  groups: ["g-mycontacts", "g-work"]
+- displayName: "Harris & Co Solicitors"
+  givenName: ""
+  familyName: ""
+  email: "info@harrisandco.co.uk"
+  phone: "+442079876543"
+  company: "Harris & Co Solicitors"
+  title: "Family Law"
+  groups: ["g-professional"]
 
-- displayName: "Ivy Davis"
-  givenName: "Ivy"
-  familyName: "Davis"
-  email: "ivy@example.com"
-  phone: "+1234567009"
-  company: "Beta Inc"
-  title: "PM"
-  groups: ["g-mycontacts"]
+- displayName: "Bob Jenkins"
+  givenName: "Bob"
+  familyName: "Jenkins"
+  email: "bob@bobsplumbing.co.uk"
+  phone: "+447700400002"
+  company: "Bob's Plumbing"
+  title: "Plumber"
+  groups: ["g-professional"]
 
-- displayName: "Jack Taylor"
-  givenName: "Jack"
-  familyName: "Taylor"
-  email: "jack@example.com"
-  phone: "+1234567010"
-  company: "Delta Co"
-  title: "Director"
-  groups: ["g-mycontacts", "g-starred"]
+# Service Providers
+- displayName: "British Gas"
+  givenName: ""
+  familyName: ""
+  email: "customer.service@britishgas.co.uk"
+  phone: "0333 202 9802"
+  company: "British Gas"
+  title: "Energy Supplier"
+  groups: ["g-services"]
+
+- displayName: "Thames Water"
+  givenName: ""
+  familyName: ""
+  email: "customer.services@thameswater.co.uk"
+  phone: "0800 316 9800"
+  company: "Thames Water"
+  title: "Water Supplier"
+  groups: ["g-services"]
+
+- displayName: "Admiral Insurance"
+  givenName: ""
+  familyName: ""
+  email: "renewals@admiral.com"
+  phone: "0333 220 2000"
+  company: "Admiral Group"
+  title: "Car Insurance"
+  groups: ["g-services"]
+
+- displayName: "Aviva"
+  givenName: ""
+  familyName: ""
+  email: "home.insurance@aviva.co.uk"
+  phone: "0800 051 1514"
+  company: "Aviva"
+  title: "Home Insurance"
+  groups: ["g-services"]
+
+- displayName: "Halifax"
+  givenName: ""
+  familyName: ""
+  email: "mortgage.services@halifax.co.uk"
+  phone: "0345 720 3040"
+  company: "Halifax"
+  title: "Mortgage & Banking"
+  groups: ["g-services"]
+
+- displayName: "Oakwood Academy"
+  givenName: ""
+  familyName: ""
+  email: "office@oakwoodacademy.co.uk"
+  phone: "+442071112222"
+  company: "Oakwood Academy"
+  title: "Secondary School"
+  groups: ["g-services"]
+
+- displayName: "PureGym Clapham"
+  givenName: ""
+  familyName: ""
+  email: "clapham@puregym.com"
+  phone: "0344 477 0005"
+  company: "PureGym"
+  title: "Gym"
+  groups: ["g-services"]
+
+- displayName: "David Lloyd Balham"
+  givenName: ""
+  familyName: ""
+  email: "balham@davidlloyd.co.uk"
+  phone: "+442087721100"
+  company: "David Lloyd"
+  title: "Health Club"
+  groups: ["g-services"]
+
+- displayName: "Balham FC"
+  givenName: ""
+  familyName: ""
+  email: "info@balhamfc.co.uk"
+  phone: "+447700500001"
+  company: "Balham FC"
+  title: "Youth Football"
+  groups: ["g-services"]
+
+- displayName: "Stagecoach Performing Arts"
+  givenName: ""
+  familyName: ""
+  email: "balham@stagecoach.co.uk"
+  phone: "+447700500002"
+  company: "Stagecoach"
+  title: "Drama School"
+  groups: ["g-services"]
+
+- displayName: "Sky"
+  givenName: ""
+  familyName: ""
+  email: "help@sky.com"
+  phone: "0333 759 1018"
+  company: "Sky"
+  title: "Broadband & TV"
+  groups: ["g-services"]
+
+- displayName: "Bupa"
+  givenName: ""
+  familyName: ""
+  email: "members@bupa.co.uk"
+  phone: "0345 600 8822"
+  company: "Bupa"
+  title: "Health Insurance"
+  groups: ["g-services"]
+
+- displayName: "AA Breakdown"
+  givenName: ""
+  familyName: ""
+  email: "membership@theaa.com"
+  phone: "0800 887 766"
+  company: "The AA"
+  title: "Breakdown Cover"
+  groups: ["g-services"]
+
+- displayName: "Scottish Widows"
+  givenName: ""
+  familyName: ""
+  email: "customer.services@scottishwidows.co.uk"
+  phone: "0345 769 7200"
+  company: "Scottish Widows"
+  title: "Life Insurance & Pension"
+  groups: ["g-services"]

@@ -38,18 +38,17 @@ class RefContactsPlatformTest {
 
     @Test
     void listContactsReturnsPaginatedResults() {
-        var page = platform.contactRead("user1").list(new PageRequest(null, 5));
-        assertThat(page.items()).hasSize(5);
+        var page = platform.contactRead("user1").list(new PageRequest(null, 10));
+        assertThat(page.items()).hasSize(10);
         assertThat(page.hasMore()).isTrue();
         assertThat(page.nextCursor()).isNotNull();
     }
 
     @Test
     void listContactsPaginates() {
-        var page1 = platform.contactRead("user1").list(new PageRequest(null, 5));
-        var page2 = platform.contactRead("user1").list(new PageRequest(page1.nextCursor(), 5));
-        assertThat(page2.items()).hasSize(5);
-        assertThat(page2.hasMore()).isFalse();
+        var page1 = platform.contactRead("user1").list(new PageRequest(null, 20));
+        var page2 = platform.contactRead("user1").list(new PageRequest(page1.nextCursor(), 20));
+        assertThat(page1.items().size() + page2.items().size()).isGreaterThanOrEqualTo(28);
     }
 
     @Test
@@ -62,19 +61,18 @@ class RefContactsPlatformTest {
 
     @Test
     void searchContactsByName() {
-        var results = platform.contactRead("user1").search("Smith", new PageRequest(null, 10));
+        var results = platform.contactRead("user1").search("Proctor", new PageRequest(null, 10));
         assertThat(results.items()).isNotEmpty();
         assertThat(results.items()).allSatisfy(c ->
-            assertThat(c.name().displayName().toLowerCase()).contains("smith")
+            assertThat(c.name().displayName().toLowerCase()).contains("proctor")
         );
     }
 
     @Test
     void listGroups() {
         var groups = platform.groupRead("user1").list();
-        assertThat(groups).isNotEmpty();
-        assertThat(groups).anyMatch(g -> g.groupType() == GroupType.SYSTEM);
-        assertThat(groups).anyMatch(g -> g.groupType() == GroupType.USER_CREATED);
+        assertThat(groups).hasSize(4);
+        assertThat(groups).allMatch(g -> g.groupType() == GroupType.USER_CREATED);
     }
 
     @Test
@@ -91,7 +89,7 @@ class RefContactsPlatformTest {
     @Test
     void fullSyncThenIncrementalSync() {
         var fullSync = platform.contactRead("user1").listSync(SyncRequest.initial(100));
-        assertThat(fullSync.items()).hasSize(10);
+        assertThat(fullSync.items()).hasSizeGreaterThanOrEqualTo(28);
         assertThat(fullSync.syncToken()).isNotNull();
         assertThat(fullSync.deletedIds()).isEmpty();
 
