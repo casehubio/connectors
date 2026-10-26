@@ -1,12 +1,5 @@
 package io.casehub.connectors.chat.ref;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.time.Instant;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import io.casehub.connectors.chat.model.Channel;
 import io.casehub.connectors.chat.model.ChatChannelRef;
 import io.casehub.connectors.chat.model.ChatContent;
@@ -14,6 +7,12 @@ import io.casehub.connectors.chat.model.Member;
 import io.casehub.connectors.chat.model.MemberRef;
 import io.casehub.connectors.chat.model.PresenceStatus;
 import io.casehub.connectors.chat.model.ReceivedMessage;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.time.Instant;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public abstract class ChatBackendContract {
 
@@ -52,8 +51,9 @@ public abstract class ChatBackendContract {
 
     @Test
     void listChannelsReturnsAllCreated() {
+        int baseline = backend.listChannels().size();
         backend.createChannel("random", "Random", null, false);
-        assertThat(backend.listChannels()).hasSize(2);
+        assertThat(backend.listChannels()).hasSize(baseline + 1);
     }
 
     @Test
@@ -188,10 +188,11 @@ public abstract class ChatBackendContract {
         backend.addReaction(msg.messageRef(), "thumbsup");
         backend.addMember(channel.ref(), new Member(new MemberRef("user1"), "User One"));
 
+        int channelsBefore = backend.listChannels().size();
         backend.deleteChannel(channel.ref().id());
 
         assertThat(backend.findChannel(channel.ref().id())).isEmpty();
-        assertThat(backend.listChannels()).isEmpty();
+        assertThat(backend.listChannels()).hasSize(channelsBefore - 1);
         assertThat(backend.messages(channel.ref(), Instant.EPOCH)).isEmpty();
         assertThat(backend.reactions(msg.messageRef())).isEmpty();
         assertThat(backend.members(channel.ref())).isEmpty();

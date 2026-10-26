@@ -1,16 +1,5 @@
 package io.casehub.connectors.chat.ref;
 
-import java.time.Instant;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
-
-import io.quarkus.arc.DefaultBean;
-import jakarta.enterprise.context.ApplicationScoped;
-
 import io.casehub.connectors.chat.model.Channel;
 import io.casehub.connectors.chat.model.ChatChannelRef;
 import io.casehub.connectors.chat.model.ChatContent;
@@ -19,6 +8,17 @@ import io.casehub.connectors.chat.model.Member;
 import io.casehub.connectors.chat.model.MemberRef;
 import io.casehub.connectors.chat.model.PresenceStatus;
 import io.casehub.connectors.chat.model.ReceivedMessage;
+import io.quarkus.arc.DefaultBean;
+import jakarta.enterprise.context.ApplicationScoped;
+
+import java.time.Instant;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Collectors;
 
 @DefaultBean
 @ApplicationScoped
@@ -29,6 +29,31 @@ public class InMemoryChatBackend implements ChatBackend {
     final Map<String, List<String>> reactionsByMessage = new ConcurrentHashMap<>();
     final Map<String, PresenceStatus> presenceByMember = new ConcurrentHashMap<>();
     final Map<String, List<Member>> membersByChannel = new ConcurrentHashMap<>();
+
+    InMemoryChatBackend() {
+        seed();
+    }
+
+    private void seed() {
+        var allMembers = SeedLoader.loadMembers().stream()
+                                   .collect(Collectors.toMap(
+                                           SeedLoader.MemberSeed::id,
+                                           m -> new Member(new MemberRef(m.id()), m.displayName())));
+        SeedLoader.loadChannels().forEach(cs -> {
+            var channel = new Channel(new ChatChannelRef(cs.name()), cs.name(),
+                                      cs.topic(), cs.description(), cs.isPrivate());
+            channels.put(cs.name(), channel);
+            cs.members().forEach(memberId -> {
+                var member = allMembers.get(memberId);
+                if (member != null) {
+                    membersByChannel
+                            .computeIfAbsent(cs.name(), k -> new CopyOnWriteArrayList<>())
+                            .add(member);
+                }
+            });
+        });
+    }
+
 
     @Override
     public Channel createChannel(final String name, final String topic,

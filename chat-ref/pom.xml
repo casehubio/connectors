@@ -25,6 +25,15 @@ Full fidelity — all capabilities native. No external infrastructure.</descript
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-arc</artifactId>
     </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.dataformat</groupId>
+      <artifactId>jackson-dataformat-yaml</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.casehub</groupId>
+      <artifactId>casehub-platform-yaml-jackson</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
     <!-- Testing -->
     <dependency>
