@@ -11,22 +11,38 @@ import java.time.Instant;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 @DefaultBean
 @ApplicationScoped
 public class InMemoryCalendarBackend implements CalendarBackend {
-
+    private final List<CalendarInfo> calendars = new ArrayList<>();
     private final ConcurrentHashMap<String, List<VersionedEvent>> events          = new ConcurrentHashMap<>();
     private final AtomicLong                                      version         = new AtomicLong(0);
     private final ConcurrentHashMap<String, Long>                 deletedVersions = new ConcurrentHashMap<>();
 
+    InMemoryCalendarBackend() {
+        seed();
+    }
+
+    private void seed() {
+        calendars.addAll(SeedLoader.loadCalendars());
+        SeedLoader.loadEvents().forEach(e -> {
+            var event = new CalendarEvent(
+                    UUID.randomUUID().toString(), e.calendarId(),
+                    e.summary(), e.description(), e.location(),
+                    e.timing(), e.attendees(), null);
+            events.computeIfAbsent(e.calendarId(), k -> new ArrayList<>())
+                  .add(new VersionedEvent(event, version.incrementAndGet()));
+        });
+    }
+
     @Override
     public List<CalendarInfo> listCalendars() {
-        return List.of(new CalendarInfo("primary", "Primary", "Default calendar", true));
+        return List.copyOf(calendars);
     }
 
     @Override
