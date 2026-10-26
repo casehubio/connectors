@@ -1,14 +1,14 @@
-- id: "mark"
-  displayName: "Mark Proctor"
+- id: "jonny"
+  displayName: "Jonny Alpha"
 
 - id: "sarah"
-  displayName: "Sarah Proctor"
+  displayName: "Sarah Alpha"
 
 - id: "ella"
-  displayName: "Ella Proctor"
+  displayName: "Ella Alpha"
 
 - id: "tom"
-  displayName: "Tom Proctor"
+  displayName: "Tom Alpha"
 
 - id: "home-agent"
   displayName: "Home Agent"

@@ -35,17 +35,17 @@ class RefCalendarPlatformTest {
         var calendars = platform.listCalendars();
         assertThat(calendars).hasSize(3);
         assertThat(calendars).extracting("id")
-                             .containsExactly("cal-mark", "cal-sarah", "cal-family");
+                             .containsExactly("cal-jonny", "cal-sarah", "cal-family");
         assertThat(calendars.stream().filter(c -> c.primary()).count()).isEqualTo(1);
     }
 
     @Test
     void seedEvents_accessibleViaListEvents() {
-        var markEvents = platform.listEvents("cal-mark",
+        var jonnyEvents = platform.listEvents("cal-jonny",
                                              Instant.parse("2026-10-26T00:00:00Z"),
                                              Instant.parse("2026-11-30T00:00:00Z"));
-        assertThat(markEvents).isNotEmpty();
-        assertThat(markEvents).extracting("summary")
+        assertThat(jonnyEvents).isNotEmpty();
+        assertThat(jonnyEvents).extracting("summary")
                               .anyMatch(s -> ((String) s).contains("Meridian Engineering"));
     }
 

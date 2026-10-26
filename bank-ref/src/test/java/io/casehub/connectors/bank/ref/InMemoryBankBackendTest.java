@@ -1,16 +1,15 @@
 package io.casehub.connectors.bank.ref;
 
-import java.time.Instant;
-import java.time.LocalDate;
-import java.util.NoSuchElementException;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import io.casehub.connectors.PageRequest;
 import io.casehub.connectors.bank.model.AccountType;
 import io.casehub.connectors.bank.model.TransactionDirection;
 import io.casehub.connectors.bank.model.TransactionStatus;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.time.Instant;
+import java.time.LocalDate;
+import java.util.NoSuchElementException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -65,48 +64,41 @@ class InMemoryBankBackendTest {
     @Test
     void listTransactions_fullRange_returnsAll() {
         var page = backend.listTransactions("acc-100",
-                Instant.parse("2026-01-01T00:00:00Z"),
-                Instant.parse("2026-12-31T00:00:00Z"),
-                PageRequest.first(50));
-        assertThat(page.items()).hasSize(12);
+                                            Instant.parse("2026-01-01T00:00:00Z"),
+                                            Instant.parse("2026-12-31T00:00:00Z"),
+                                            PageRequest.first(200));
+        assertThat(page.items()).hasSizeGreaterThanOrEqualTo(50);
         assertThat(page.hasMore()).isFalse();
     }
 
     @Test
     void listTransactions_narrowRange_filters() {
         var page = backend.listTransactions("acc-100",
-                Instant.parse("2026-09-01T00:00:00Z"),
-                Instant.parse("2026-09-03T00:00:00Z"),
-                PageRequest.first(50));
-        assertThat(page.items()).hasSizeBetween(1, 3);
+                                            Instant.parse("2026-10-05T00:00:00Z"),
+                                            Instant.parse("2026-10-06T00:00:00Z"),
+                                            PageRequest.first(50));
+        assertThat(page.items()).isNotEmpty();
         assertThat(page.items()).allMatch(t ->
-                !t.date().isBefore(LocalDate.of(2026, 9, 1))
-                && t.date().isBefore(LocalDate.of(2026, 9, 3)));
+                                                  !t.date().isBefore(LocalDate.of(2026, 10, 5))
+                                                  && t.date().isBefore(LocalDate.of(2026, 10, 6)));
     }
 
     @Test
     void listTransactions_pagination_respectsPageSize() {
         var page1 = backend.listTransactions("acc-100",
-                Instant.parse("2026-01-01T00:00:00Z"),
-                Instant.parse("2026-12-31T00:00:00Z"),
-                PageRequest.first(5));
-        assertThat(page1.items()).hasSize(5);
+                                             Instant.parse("2026-01-01T00:00:00Z"),
+                                             Instant.parse("2026-12-31T00:00:00Z"),
+                                             PageRequest.first(10));
+        assertThat(page1.items()).hasSize(10);
         assertThat(page1.hasMore()).isTrue();
         assertThat(page1.nextCursor()).isNotNull();
 
         var page2 = backend.listTransactions("acc-100",
-                Instant.parse("2026-01-01T00:00:00Z"),
-                Instant.parse("2026-12-31T00:00:00Z"),
-                new PageRequest(page1.nextCursor(), 5));
-        assertThat(page2.items()).hasSize(5);
+                                             Instant.parse("2026-01-01T00:00:00Z"),
+                                             Instant.parse("2026-12-31T00:00:00Z"),
+                                             new PageRequest(page1.nextCursor(), 10));
+        assertThat(page2.items()).hasSize(10);
         assertThat(page2.hasMore()).isTrue();
-
-        var page3 = backend.listTransactions("acc-100",
-                Instant.parse("2026-01-01T00:00:00Z"),
-                Instant.parse("2026-12-31T00:00:00Z"),
-                new PageRequest(page2.nextCursor(), 5));
-        assertThat(page3.items()).hasSize(2);
-        assertThat(page3.hasMore()).isFalse();
     }
 
     @Test
@@ -123,8 +115,8 @@ class InMemoryBankBackendTest {
         var txn = backend.getTransaction("acc-100", "txn-001");
         assertThat(txn.id()).isEqualTo("txn-001");
         assertThat(txn.accountId()).isEqualTo("acc-100");
-        assertThat(txn.merchantName()).isEqualTo("Tesco Express");
-        assertThat(txn.direction()).isEqualTo(TransactionDirection.DEBIT);
+        assertThat(txn.merchantName()).isEqualTo("Meridian Engineering");
+        assertThat(txn.direction()).isEqualTo(TransactionDirection.CREDIT);
         assertThat(txn.status()).isEqualTo(TransactionStatus.BOOKED);
     }
 

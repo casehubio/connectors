@@ -1,32 +1,32 @@
 # Family
-- displayName: "Mark Proctor"
-  givenName: "Mark"
-  familyName: "Proctor"
-  email: "mark.proctor@meridian-eng.co.uk"
+- displayName: "Jonny Alpha"
+  givenName: "Jonny"
+  familyName: "Alpha"
+  email: "jonny.alpha@meridian-eng.co.uk"
   phone: "+447700100001"
   company: "Meridian Engineering"
   title: "Senior Engineer"
   groups: ["g-family"]
 
-- displayName: "Sarah Proctor"
+- displayName: "Sarah Alpha"
   givenName: "Sarah"
   familyName: "Proctor"
-  email: "sarah.proctor@nhs.net"
+  email: "sarah.alpha@nhs.net"
   phone: "+447700100002"
   company: "Camden NHS Trust"
   title: "Practice Manager"
   groups: ["g-family"]
 
-- displayName: "Ella Proctor"
+- displayName: "Ella Alpha"
   givenName: "Ella"
   familyName: "Proctor"
-  email: "ella.proctor@oakwoodacademy.co.uk"
+  email: "ella.alpha@oakwoodacademy.co.uk"
   phone: "+447700100003"
   company: "Oakwood Academy"
   title: "Student — Year 11"
   groups: ["g-family"]
 
-- displayName: "Tom Proctor"
+- displayName: "Tom Alpha"
   givenName: "Tom"
   familyName: "Proctor"
   email: ""
@@ -35,7 +35,7 @@
   title: "Student — Year 6"
   groups: ["g-family"]
 
-- displayName: "Jean Proctor"
+- displayName: "Jean Alpha"
   givenName: "Jean"
   familyName: "Proctor"
   email: ""
@@ -53,10 +53,10 @@
   title: ""
   groups: ["g-family"]
 
-- displayName: "Pete Proctor"
+- displayName: "Pete Alpha"
   givenName: "Pete"
   familyName: "Proctor"
-  email: "pete.proctor@outlook.com"
+  email: "pete.alpha@outlook.com"
   phone: "+447700200002"
   company: ""
   title: ""

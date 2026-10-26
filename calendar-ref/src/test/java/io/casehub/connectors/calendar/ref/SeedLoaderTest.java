@@ -12,14 +12,14 @@ class SeedLoaderTest {
         var calendars = SeedLoader.loadCalendars();
         assertThat(calendars).hasSize(3);
         assertThat(calendars).extracting("id")
-                .containsExactly("cal-mark", "cal-sarah", "cal-family");
+                .containsExactly("cal-jonny", "cal-sarah", "cal-family");
     }
 
     @Test
-    void loadCalendars_markIsPrimary() {
+    void loadCalendars_jonnyIsPrimary() {
         var calendars = SeedLoader.loadCalendars();
         var primary = calendars.stream().filter(c -> c.primary()).findFirst().orElseThrow();
-        assertThat(primary.id()).isEqualTo("cal-mark");
+        assertThat(primary.id()).isEqualTo("cal-jonny");
     }
 
     @Test
@@ -32,7 +32,7 @@ class SeedLoaderTest {
     void loadEvents_coversAllThreeCalendars() {
         var events = SeedLoader.loadEvents();
         var calendarIds = events.stream().map(SeedLoader.EventSeed::calendarId).distinct().toList();
-        assertThat(calendarIds).contains("cal-mark", "cal-sarah", "cal-family");
+        assertThat(calendarIds).contains("cal-jonny", "cal-sarah", "cal-family");
     }
 
     @Test
@@ -61,14 +61,14 @@ class SeedLoaderTest {
     }
 
     @Test
-    void loadEvents_markCalendarHasWorkAndGym() {
+    void loadEvents_jonnyCalendarHasWorkAndGym() {
         var events = SeedLoader.loadEvents();
-        var markEvents = events.stream()
-                .filter(e -> "cal-mark".equals(e.calendarId()))
+        var jonnyEvents = events.stream()
+                .filter(e -> "cal-jonny".equals(e.calendarId()))
                 .toList();
-        assertThat(markEvents).extracting("summary")
+        assertThat(jonnyEvents).extracting("summary")
                 .anyMatch(s -> ((String) s).contains("Meridian Engineering"));
-        assertThat(markEvents).extracting("summary")
+        assertThat(jonnyEvents).extracting("summary")
                 .anyMatch(s -> ((String) s).contains("PureGym"));
     }
 

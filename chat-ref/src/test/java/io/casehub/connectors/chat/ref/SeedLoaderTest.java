@@ -19,7 +19,7 @@ class SeedLoaderTest {
         var channels = SeedLoader.loadChannels();
         var family = channels.stream().filter(c -> "family".equals(c.name())).findFirst().orElseThrow();
         assertThat(family.isPrivate()).isFalse();
-        assertThat(family.members()).contains("mark", "sarah", "ella", "tom");
+        assertThat(family.members()).contains("jonny", "sarah", "ella", "tom");
     }
 
     @Test
@@ -27,7 +27,7 @@ class SeedLoaderTest {
         var channels = SeedLoader.loadChannels();
         var household = channels.stream().filter(c -> "household".equals(c.name())).findFirst().orElseThrow();
         assertThat(household.isPrivate()).isTrue();
-        assertThat(household.members()).containsExactly("mark", "sarah");
+        assertThat(household.members()).containsExactly("jonny", "sarah");
     }
 
     @Test
@@ -35,7 +35,7 @@ class SeedLoaderTest {
         var members = SeedLoader.loadMembers();
         assertThat(members).hasSize(6);
         assertThat(members).extracting("id")
-                .contains("mark", "sarah", "ella", "tom", "home-agent", "health-agent");
+                .contains("jonny", "sarah", "ella", "tom", "home-agent", "health-agent");
     }
 
     @Test
@@ -54,6 +54,6 @@ class SeedLoaderTest {
                 new io.casehub.connectors.chat.model.ChatChannelRef("family"));
         assertThat(familyMembers).hasSize(4);
         assertThat(familyMembers).extracting("displayName")
-                .contains("Mark Proctor", "Sarah Proctor", "Ella Proctor", "Tom Proctor");
+                .contains("Jonny Alpha", "Sarah Alpha", "Ella Alpha", "Tom Alpha");
     }
 }

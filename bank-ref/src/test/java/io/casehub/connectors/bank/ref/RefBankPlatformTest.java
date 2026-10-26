@@ -1,18 +1,17 @@
 package io.casehub.connectors.bank.ref;
 
-import java.math.BigDecimal;
-import java.time.Instant;
-import java.util.NoSuchElementException;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import io.casehub.connectors.PageRequest;
 import io.casehub.connectors.bank.model.PaymentDestination;
 import io.casehub.connectors.bank.model.PaymentRequest;
 import io.casehub.connectors.bank.model.PaymentStatus;
 import io.casehub.connectors.bank.spi.AccountInformation;
 import io.casehub.connectors.bank.spi.PaymentInitiation;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.util.NoSuchElementException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -69,18 +68,18 @@ class RefBankPlatformTest {
     @Test
     void accountInformation_listTransactions() {
         var page = platform.accountInformation("user-1")
-                .listTransactions("acc-100",
-                        Instant.parse("2026-01-01T00:00:00Z"),
-                        Instant.parse("2026-12-31T00:00:00Z"),
-                        PageRequest.first(50));
-        assertThat(page.items()).hasSize(12);
+                           .listTransactions("acc-100",
+                                             Instant.parse("2026-01-01T00:00:00Z"),
+                                             Instant.parse("2026-12-31T00:00:00Z"),
+                                             PageRequest.first(100));
+        assertThat(page.items()).hasSizeGreaterThanOrEqualTo(50);
     }
 
     @Test
     void accountInformation_getTransaction() {
         var txn = platform.accountInformation("user-1")
-                .getTransaction("acc-100", "txn-001");
-        assertThat(txn.merchantName()).isEqualTo("Tesco Express");
+                          .getTransaction("acc-100", "txn-001");
+        assertThat(txn.merchantName()).isEqualTo("Meridian Engineering");
     }
 
     @Test

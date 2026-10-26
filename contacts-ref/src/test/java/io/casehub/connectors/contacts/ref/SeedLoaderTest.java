@@ -28,13 +28,13 @@ class SeedLoaderTest {
     }
 
     @Test
-    void firstContactIsMarkProctor() {
+    void firstContactIsJonnyAlpha() {
         var contacts = SeedLoader.loadContacts();
-        var mark = contacts.getFirst();
-        assertThat(mark.displayName()).isEqualTo("Mark Proctor");
-        assertThat(mark.givenName()).isEqualTo("Mark");
-        assertThat(mark.email()).isEqualTo("mark.proctor@meridian-eng.co.uk");
-        assertThat(mark.company()).isEqualTo("Meridian Engineering");
-        assertThat(mark.groups()).containsExactly("g-family");
+        var jonny    = contacts.getFirst();
+        assertThat(jonny.displayName()).isEqualTo("Jonny Alpha");
+        assertThat(jonny.givenName()).isEqualTo("Jonny");
+        assertThat(jonny.email()).isEqualTo("jonny.alpha@meridian-eng.co.uk");
+        assertThat(jonny.company()).isEqualTo("Meridian Engineering");
+        assertThat(jonny.groups()).containsExactly("g-family");
     }
 }

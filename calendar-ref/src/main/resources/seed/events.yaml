@@ -1,9 +1,9 @@
 # ──────────────────────────────────────────────
-# Mark's Calendar (cal-mark)
+# Jonny's Calendar (cal-jonny)
 # ──────────────────────────────────────────────
 
 # Weekly recurring — work
-- calendarId: "cal-mark"
+- calendarId: "cal-jonny"
   summary: "Work — Meridian Engineering"
   description: "Office day, Canary Wharf"
   location: "Meridian Engineering, Canary Wharf, London"
@@ -14,7 +14,7 @@
     timeZone: "Europe/London"
   attendees: []
 
-- calendarId: "cal-mark"
+- calendarId: "cal-jonny"
   summary: "Work — Meridian Engineering"
   description: "Office day, Canary Wharf"
   location: "Meridian Engineering, Canary Wharf, London"
@@ -25,7 +25,7 @@
     timeZone: "Europe/London"
   attendees: []
 
-- calendarId: "cal-mark"
+- calendarId: "cal-jonny"
   summary: "Work — Meridian Engineering"
   description: "Office day, Canary Wharf"
   location: "Meridian Engineering, Canary Wharf, London"
@@ -36,7 +36,7 @@
     timeZone: "Europe/London"
   attendees: []
 
-- calendarId: "cal-mark"
+- calendarId: "cal-jonny"
   summary: "Work — Meridian Engineering"
   description: "Office day, Canary Wharf"
   location: "Meridian Engineering, Canary Wharf, London"
@@ -47,7 +47,7 @@
     timeZone: "Europe/London"
   attendees: []
 
-- calendarId: "cal-mark"
+- calendarId: "cal-jonny"
   summary: "Work — Meridian Engineering"
   description: "Office day, Canary Wharf"
   location: "Meridian Engineering, Canary Wharf, London"
@@ -59,7 +59,7 @@
   attendees: []
 
 # Gym — Tue/Thu 6:30am
-- calendarId: "cal-mark"
+- calendarId: "cal-jonny"
   summary: "PureGym"
   description: "Morning session"
   location: "PureGym, Clapham High Street"
@@ -70,7 +70,7 @@
     timeZone: "Europe/London"
   attendees: []
 
-- calendarId: "cal-mark"
+- calendarId: "cal-jonny"
   summary: "PureGym"
   description: "Morning session"
   location: "PureGym, Clapham High Street"
@@ -82,7 +82,7 @@
   attendees: []
 
 # 5-a-side — Wed 7pm
-- calendarId: "cal-mark"
+- calendarId: "cal-jonny"
   summary: "5-a-side football"
   description: "Weekly game with Dave, Chris, Ravi"
   location: "Goals, Wandsworth"
@@ -94,9 +94,9 @@
   attendees: ["dave.thompson@gmail.com"]
 
 # Tom's football — alternate Sat
-- calendarId: "cal-mark"
+- calendarId: "cal-jonny"
   summary: "Tom's football — Balham FC"
-  description: "Under-12s match, Mark on sideline duty"
+  description: "Under-12s match, Jonny on sideline duty"
   location: "Balham FC, Tooting Bec Common"
   timing:
     "@type": "Timed"
@@ -105,8 +105,8 @@
     timeZone: "Europe/London"
   attendees: []
 
-# One-offs — Mark
-- calendarId: "cal-mark"
+# One-offs — Jonny
+- calendarId: "cal-jonny"
   summary: "Car MOT"
   description: "VW Golf annual MOT — book online or phone"
   location: "Halfords Autocentre, Streatham"
@@ -117,7 +117,7 @@
     timeZone: "Europe/London"
   attendees: []
 
-- calendarId: "cal-mark"
+- calendarId: "cal-jonny"
   summary: "Bob's Plumbing — kitchen tap"
   description: "Follow-up visit, kitchen mixer tap replacement"
   location: "Home"
@@ -128,7 +128,7 @@
     timeZone: "Europe/London"
   attendees: ["bob@bobsplumbing.co.uk"]
 
-- calendarId: "cal-mark"
+- calendarId: "cal-jonny"
   summary: "Admiral insurance renewal deadline"
   description: "Car insurance renewal — current quote £612, compare Direct Line and Churchill"
   location: ""
@@ -139,7 +139,7 @@
     timeZone: "Europe/London"
   attendees: []
 
-- calendarId: "cal-mark"
+- calendarId: "cal-jonny"
   summary: "Harris & Co — LPA meeting"
   description: "Lasting Power of Attorney review for Grandma Jean"
   location: "Harris & Co Solicitors, Balham High Road"
@@ -266,7 +266,7 @@
     start: "2026-11-10T16:30:00Z"
     end: "2026-11-10T19:30:00Z"
     timeZone: "Europe/London"
-  attendees: ["mark.proctor@meridian-eng.co.uk"]
+  attendees: ["jonny.alpha@meridian-eng.co.uk"]
 
 - calendarId: "cal-sarah"
   summary: "Grandma Jean — medication review"
@@ -355,7 +355,7 @@
 - calendarId: "cal-family"
   summary: "Visit Grandma Jean"
   description: "Fortnightly Sunday visit — lunch, check medications, garden"
-  location: "Jean Proctor, 14 Warwick Park, Tunbridge Wells"
+  location: "Jean Alpha, 14 Warwick Park, Tunbridge Wells"
   timing:
     "@type": "Timed"
     start: "2026-11-01T10:30:00Z"
@@ -446,8 +446,8 @@
   attendees: []
 
 - calendarId: "cal-family"
-  summary: "Mark's birthday"
-  description: "Mark's birthday — family dinner out"
+  summary: "Jonny's birthday"
+  description: "Jonny's birthday — family dinner out"
   timing:
     "@type": "AllDay"
     start: "2027-03-15"
@@ -464,7 +464,7 @@
   attendees: []
 
 - calendarId: "cal-family"
-  summary: "Mark & Sarah anniversary"
+  summary: "Jonny & Sarah anniversary"
   description: "Wedding anniversary — restaurant booked"
   timing:
     "@type": "AllDay"
@@ -525,7 +525,7 @@
 - calendarId: "cal-family"
   summary: "Christmas Day"
   description: "At Grandma Jean's in Tunbridge Wells"
-  location: "Jean Proctor, 14 Warwick Park, Tunbridge Wells"
+  location: "Jean Alpha, 14 Warwick Park, Tunbridge Wells"
   timing:
     "@type": "AllDay"
     start: "2026-12-25"
@@ -535,7 +535,7 @@
 - calendarId: "cal-family"
   summary: "Boxing Day"
   description: "Still at Grandma Jean's — walk, leftovers, board games"
-  location: "Jean Proctor, 14 Warwick Park, Tunbridge Wells"
+  location: "Jean Alpha, 14 Warwick Park, Tunbridge Wells"
   timing:
     "@type": "AllDay"
     start: "2026-12-26"

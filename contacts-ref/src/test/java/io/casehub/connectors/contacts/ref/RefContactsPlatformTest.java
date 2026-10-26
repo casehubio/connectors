@@ -61,11 +61,11 @@ class RefContactsPlatformTest {
 
     @Test
     void searchContactsByName() {
-        var results = platform.contactRead("user1").search("Proctor", new PageRequest(null, 10));
+        var results = platform.contactRead("user1").search("Alpha", new PageRequest(null, 10));
         assertThat(results.items()).isNotEmpty();
         assertThat(results.items()).allSatisfy(c ->
-            assertThat(c.name().displayName().toLowerCase()).contains("proctor")
-        );
+                                                       assertThat(c.name().displayName().toLowerCase()).contains("alpha")
+                                              );
     }
 
     @Test
