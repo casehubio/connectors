@@ -11,6 +11,7 @@ import io.casehub.connectors.contacts.spi.ContactsPlatformService;
 import io.casehub.connectors.document.spi.DocumentPlatformService;
 import io.casehub.connectors.email.spi.EmailPlatformService;
 import io.casehub.connectors.commerce.spi.CommercePlatformService;
+import io.casehub.connectors.location.spi.LocationPlatformService;
 import io.casehub.connectors.travel.spi.TravelPlatformService;
 import io.casehub.connectors.project.spi.ProjectPlatformService;
 import io.casehub.platform.api.identity.CurrentPrincipal;
@@ -39,6 +40,7 @@ public class GraphqlBeans {
             ProjectPlatformService projectPlatformService,
             CommercePlatformService commercePlatformService,
             TravelPlatformService travelPlatformService,
+            LocationPlatformService locationPlatformService,
             @All List<Connector> connectors,
             @All List<WebhookInboundConnector> webhookConnectors,
             Instance<SentMessageCapture> sentMessageCapture,
@@ -50,6 +52,7 @@ public class GraphqlBeans {
                 contactsPlatformService, projectPlatformService,
                 commercePlatformService,
                 travelPlatformService,
+                locationPlatformService,
                 connectors, webhookConnectors,
                 sentMessageCapture.isResolvable()
                 ? Optional.of(sentMessageCapture.get())

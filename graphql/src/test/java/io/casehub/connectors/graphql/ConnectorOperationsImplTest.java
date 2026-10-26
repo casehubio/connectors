@@ -16,6 +16,7 @@ import io.casehub.connectors.contacts.spi.ContactsPlatformService;
 import io.casehub.connectors.document.spi.DocumentPlatformService;
 import io.casehub.connectors.email.spi.EmailPlatformService;
 import io.casehub.connectors.project.spi.ProjectPlatformService;
+import io.casehub.connectors.location.spi.LocationPlatformService;
 import io.casehub.connectors.travel.spi.TravelPlatform;
 import io.casehub.connectors.travel.spi.TravelPlatformService;
 import org.junit.jupiter.api.BeforeEach;
@@ -63,6 +64,7 @@ class ConnectorOperationsImplTest {
                 contactsPlatformService, projectPlatformService,
                 commercePlatformService,
                 new TravelPlatformService(List.of()),
+                new LocationPlatformService(List.of()),
                 List.of(connector), List.of(), java.util.Optional.empty(), null);
     }
 
@@ -180,6 +182,7 @@ class ConnectorOperationsImplTest {
                 new ContactsPlatformService(List.of()), new ProjectPlatformService(List.of()),
                 new CommercePlatformService(List.of()),
                 new TravelPlatformService(List.of()),
+                new LocationPlatformService(List.of()),
                 List.of(), List.of(), java.util.Optional.empty(), null);
 
         var result = ops.connectorsReport("bank");
@@ -206,6 +209,7 @@ class ConnectorOperationsImplTest {
                 new ContactsPlatformService(List.of()), new ProjectPlatformService(List.of()),
                 new CommercePlatformService(List.of()),
                 new TravelPlatformService(List.of()),
+                new LocationPlatformService(List.of()),
                 List.of(), List.of(), java.util.Optional.empty(), null);
 
         var result = ops.connectorsReport("bank");
@@ -240,6 +244,7 @@ class ConnectorOperationsImplTest {
                 new ContactsPlatformService(List.of()), new ProjectPlatformService(List.of()),
                 new CommercePlatformService(List.of()),
                 new TravelPlatformService(List.of()),
+                new LocationPlatformService(List.of()),
                 List.of(), List.of(), java.util.Optional.empty(), null);
 
         var result = ops.connectorsReport("document");
@@ -267,6 +272,7 @@ class ConnectorOperationsImplTest {
                 new ContactsPlatformService(List.of()), new ProjectPlatformService(List.of()),
                 commerceService,
                 new TravelPlatformService(List.of()),
+                new LocationPlatformService(List.of()),
                 List.of(), List.of(), java.util.Optional.empty(), null);
 
         var result = ops.connectorsReport("commerce");
@@ -294,6 +300,7 @@ class ConnectorOperationsImplTest {
                 new ContactsPlatformService(List.of()), new ProjectPlatformService(List.of()),
                 commerceService,
                 new TravelPlatformService(List.of()),
+                new LocationPlatformService(List.of()),
                 List.of(), List.of(), java.util.Optional.empty(), null);
 
         var result = ops.connectorsReport("commerce");
@@ -319,6 +326,7 @@ class ConnectorOperationsImplTest {
                 new ContactsPlatformService(List.of()), new ProjectPlatformService(List.of()),
                 new CommercePlatformService(List.of()),
                 travelService,
+                new LocationPlatformService(List.of()),
                 List.of(), List.of(), java.util.Optional.empty(), null);
 
         var result = ops.connectorsReport("travel");
@@ -347,6 +355,7 @@ class ConnectorOperationsImplTest {
                 new ContactsPlatformService(List.of()), new ProjectPlatformService(List.of()),
                 new CommercePlatformService(List.of()),
                 travelService,
+                new LocationPlatformService(List.of()),
                 List.of(), List.of(), java.util.Optional.empty(), null);
 
         var result = ops.connectorsReport("travel");
