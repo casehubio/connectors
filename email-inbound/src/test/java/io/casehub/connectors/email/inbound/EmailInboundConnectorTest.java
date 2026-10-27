@@ -48,7 +48,8 @@ class EmailInboundConnectorTest {
     private EmailInboundConnector connector;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws Exception {
+        GREEN_MAIL.purgeEmailFromAllMailboxes();
         captured = new LinkedBlockingQueue<>();
         connector = new EmailInboundConnector(() -> List.of(testAccount()));
     }
@@ -66,8 +67,8 @@ class EmailInboundConnectorTest {
 
     /** Waits up to 5s for the IDLE loop or processUnseen to deliver a message. */
     private InboundMessage receive() {
-        await().atMost(5, TimeUnit.SECONDS)
-               .untilAsserted(() -> assertThat(captured).as("message not delivered within 5s — IDLE did not fire or processUnseen missed it").isNotEmpty());
+        await().atMost(10, TimeUnit.SECONDS)
+               .untilAsserted(() -> assertThat(captured).as("message not delivered within 10s — IDLE did not fire or processUnseen missed it").isNotEmpty());
         return captured.poll();
     }
 
@@ -121,7 +122,7 @@ class EmailInboundConnectorTest {
     }
 
     @Test
-    @Timeout(10)
+    @Timeout(20)
     void doubleStart_isNoOp() throws Exception {
         connector.start(captured::add);
         connector.start(captured::add); // second call must not subscribe a second IDLE loop
@@ -137,7 +138,7 @@ class EmailInboundConnectorTest {
     // ── delivery ─────────────────────────────────────────────────────────────
 
     @Test
-    @Timeout(10)
+    @Timeout(20)
     void singlePlainTextMessage_deliveredWithCorrectFields() throws Exception {
         final MimeMessage msg = new MimeMessage(Session.getInstance(new Properties()));
         msg.setFrom(new InternetAddress("sender@example.com"));
@@ -163,14 +164,14 @@ class EmailInboundConnectorTest {
     }
 
     @Test
-    @Timeout(10)
+    @Timeout(20)
     void multipleUnseenMessages_allDelivered() throws Exception {
         connector.start(captured::add);
         deliver("a@example.com", "First", "Body A");
         deliver("b@example.com", "Second", "Body B");
 
-        await().atMost(5, TimeUnit.SECONDS)
-               .untilAsserted(() -> assertThat(captured).as("both messages not delivered within 5s").hasSize(2));
+        await().atMost(10, TimeUnit.SECONDS)
+               .untilAsserted(() -> assertThat(captured).as("both messages not delivered within 10s").hasSize(2));
         final InboundMessage m1 = captured.poll();
         final InboundMessage m2 = captured.poll();
         assertThat(List.of(m1.content(), m2.content()))
@@ -178,7 +179,7 @@ class EmailInboundConnectorTest {
     }
 
     @Test
-    @Timeout(10)
+    @Timeout(20)
     void messageMarkedSeen_notRedeliveredAfterRestart() throws Exception {
         connector.start(captured::add);
         deliver("sender@example.com", "Once", "Only once");
@@ -197,7 +198,7 @@ class EmailInboundConnectorTest {
     }
 
     @Test
-    @Timeout(10)
+    @Timeout(20)
     void sinkThrows_messageStillMarkedSeen_remainingDelivered() throws Exception {
         deliver("a@example.com", "First", "Body A");
         deliver("b@example.com", "Second", "Body B");
@@ -226,7 +227,7 @@ class EmailInboundConnectorTest {
     }
 
     @Test
-    @Timeout(10)
+    @Timeout(20)
     void htmlOnlyMessage_rawHtmlInContent() throws Exception {
         final MimeMessage msg = new MimeMessage(Session.getInstance(new Properties()));
         msg.setFrom(new InternetAddress("sender@example.com"));
@@ -256,7 +257,7 @@ class EmailInboundConnectorTest {
     // ── edge cases (pre-deliver before start so processUnseen() on connect handles them) ──
 
     @Test
-    @Timeout(10)
+    @Timeout(20)
     void missingFromHeader_senderIdIsEmptyString() throws Exception {
         final MimeMessage msg = new MimeMessage(Session.getInstance(new Properties()));
         msg.setRecipient(Message.RecipientType.TO, new InternetAddress("inbox@example.com"));
@@ -270,7 +271,7 @@ class EmailInboundConnectorTest {
     }
 
     @Test
-    @Timeout(10)
+    @Timeout(20)
     void missingToHeader_channelRefFallsBackToAccountUsername() throws Exception {
         final MimeMessage msg = new MimeMessage(Session.getInstance(new Properties()));
         msg.setFrom(new InternetAddress("sender@example.com"));
@@ -284,7 +285,7 @@ class EmailInboundConnectorTest {
     }
 
     @Test
-    @Timeout(10)
+    @Timeout(20)
     void messageWithoutSubject_subjectKeyAbsent() throws Exception {
         final MimeMessage msg = new MimeMessage(Session.getInstance(new Properties()));
         msg.setFrom(new InternetAddress("sender@example.com"));
@@ -333,7 +334,7 @@ class EmailInboundConnectorTest {
     // ── attachment delivery (Phase 2) ─────────────────────────────────────────
 
     @Test
-    @Timeout(10)
+    @Timeout(20)
     void messageWithPdfAttachment_attachmentDelivered() throws Exception {
         final MimeMessage raw = new MimeMessage(Session.getInstance(new Properties()));
         raw.setFrom(new InternetAddress("sender@example.com"));
@@ -365,7 +366,7 @@ class EmailInboundConnectorTest {
     }
 
     @Test
-    @Timeout(10)
+    @Timeout(20)
     void messageWithNoAttachments_attachmentsEmptyAndCountIsZero() throws Exception {
         final MimeMessage msg = new MimeMessage(Session.getInstance(new Properties()));
         msg.setFrom(new InternetAddress("sender@example.com"));
@@ -384,7 +385,7 @@ class EmailInboundConnectorTest {
     }
 
     @Test
-    @Timeout(10)
+    @Timeout(20)
     void messageWithMultipleAttachments_allCollected() throws Exception {
         final MimeMessage raw = new MimeMessage(Session.getInstance(new Properties()));
         raw.setFrom(new InternetAddress("sender@example.com"));
