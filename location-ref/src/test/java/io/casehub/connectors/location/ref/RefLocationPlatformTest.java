@@ -1,7 +1,7 @@
 package io.casehub.connectors.location.ref;
 
 import io.casehub.connectors.PageRequest;
-import io.casehub.connectors.location.model.Coordinates;
+import io.casehub.connectors.Coordinates;
 import io.casehub.connectors.location.model.TravelMode;
 import io.casehub.connectors.location.spi.LocationPlatform;
 import org.junit.jupiter.api.BeforeEach;

@@ -1,0 +1,162 @@
+# GP surgeries and specialist clinics — London area
+- id:
+    scheme: "ods"
+    value: "Y00001"
+  name: "Riverside Medical Centre"
+  type: "GP_SURGERY"
+  address: "42 Thames Road, Greenwich, London SE10 8EW"
+  location:
+    lat: 51.4834
+    lng: 0.0098
+  phone: "020 8312 5500"
+  acceptingNewPatients: true
+  specialties:
+    - "General Practice"
+    - "Family Medicine"
+    - "Minor Surgery"
+  openingHours:
+    MONDAY:
+      - open: "08:00"
+        close: "18:30"
+    TUESDAY:
+      - open: "08:00"
+        close: "18:30"
+    WEDNESDAY:
+      - open: "08:00"
+        close: "18:30"
+    THURSDAY:
+      - open: "08:00"
+        close: "18:30"
+    FRIDAY:
+      - open: "08:00"
+        close: "17:00"
+
+- id:
+    scheme: "ods"
+    value: "Y00002"
+  name: "Blackheath Village Surgery"
+  type: "GP_SURGERY"
+  address: "15 Montpelier Row, Blackheath, London SE3 0RL"
+  location:
+    lat: 51.4656
+    lng: 0.0085
+  phone: "020 8318 2244"
+  acceptingNewPatients: false
+  specialties:
+    - "General Practice"
+    - "Chronic Disease Management"
+  openingHours:
+    MONDAY:
+      - open: "08:30"
+        close: "18:00"
+    TUESDAY:
+      - open: "08:30"
+        close: "18:00"
+    WEDNESDAY:
+      - open: "08:30"
+        close: "13:00"
+    THURSDAY:
+      - open: "08:30"
+        close: "18:00"
+    FRIDAY:
+      - open: "08:30"
+        close: "17:30"
+
+- id:
+    scheme: "ods"
+    value: "RJ1"
+  name: "Guy's and St Thomas' Cardiology"
+  type: "SPECIALIST_CLINIC"
+  address: "Westminster Bridge Road, London SE1 7EH"
+  location:
+    lat: 51.4985
+    lng: -0.1168
+  phone: "020 7188 7188"
+  acceptingNewPatients: true
+  specialties:
+    - "Cardiology"
+    - "Cardiac Surgery"
+    - "Electrophysiology"
+  openingHours:
+    MONDAY:
+      - open: "09:00"
+        close: "17:00"
+    TUESDAY:
+      - open: "09:00"
+        close: "17:00"
+    WEDNESDAY:
+      - open: "09:00"
+        close: "17:00"
+    THURSDAY:
+      - open: "09:00"
+        close: "17:00"
+    FRIDAY:
+      - open: "09:00"
+        close: "16:00"
+
+- id:
+    scheme: "ods"
+    value: "RJ7"
+  name: "King's College Dermatology"
+  type: "SPECIALIST_CLINIC"
+  address: "Denmark Hill, London SE5 9RS"
+  location:
+    lat: 51.4684
+    lng: -0.0940
+  phone: "020 3299 9000"
+  acceptingNewPatients: true
+  specialties:
+    - "Dermatology"
+    - "Skin Cancer"
+    - "Paediatric Dermatology"
+  openingHours:
+    MONDAY:
+      - open: "08:30"
+        close: "17:00"
+    TUESDAY:
+      - open: "08:30"
+        close: "17:00"
+    WEDNESDAY:
+      - open: "08:30"
+        close: "17:00"
+    THURSDAY:
+      - open: "08:30"
+        close: "17:00"
+    FRIDAY:
+      - open: "08:30"
+        close: "16:30"
+
+- id:
+    scheme: "ods"
+    value: "FKC22"
+  name: "Greenwich Pharmacy"
+  type: "PHARMACY"
+  address: "88 Trafalgar Road, Greenwich, London SE10 9UZ"
+  location:
+    lat: 51.4810
+    lng: 0.0042
+  phone: "020 8858 1666"
+  acceptingNewPatients: true
+  specialties:
+    - "Pharmacy"
+    - "Flu Vaccination"
+    - "Blood Pressure Monitoring"
+  openingHours:
+    MONDAY:
+      - open: "09:00"
+        close: "18:00"
+    TUESDAY:
+      - open: "09:00"
+        close: "18:00"
+    WEDNESDAY:
+      - open: "09:00"
+        close: "18:00"
+    THURSDAY:
+      - open: "09:00"
+        close: "18:00"
+    FRIDAY:
+      - open: "09:00"
+        close: "18:00"
+    SATURDAY:
+      - open: "09:00"
+        close: "13:00"

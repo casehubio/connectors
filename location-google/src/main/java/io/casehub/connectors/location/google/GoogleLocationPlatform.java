@@ -9,6 +9,7 @@ import com.google.maps.errors.ApiException;
 import com.google.maps.model.DirectionsResult;
 import com.google.maps.model.LatLng;
 import com.google.maps.model.PlacesSearchResult;
+import io.casehub.connectors.Coordinates;
 import io.casehub.connectors.Page;
 import io.casehub.connectors.PageRequest;
 import io.casehub.connectors.location.model.*;

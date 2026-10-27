@@ -1,6 +1,6 @@
 package io.casehub.connectors.location.ref;
 
-import io.casehub.connectors.location.model.Coordinates;
+import io.casehub.connectors.Coordinates;
 import io.casehub.connectors.location.model.Distance;
 import io.casehub.connectors.location.model.Duration;
 import io.casehub.connectors.location.model.GeocodingResult;

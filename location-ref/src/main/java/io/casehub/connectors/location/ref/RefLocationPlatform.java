@@ -1,5 +1,6 @@
 package io.casehub.connectors.location.ref;
 
+import io.casehub.connectors.Coordinates;
 import io.casehub.connectors.Page;
 import io.casehub.connectors.PaginationHelper;
 import io.casehub.connectors.PageRequest;

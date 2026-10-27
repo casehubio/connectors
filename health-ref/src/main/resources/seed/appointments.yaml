@@ -1,0 +1,45 @@
+# Appointments keyed by userId
+jonny-alpha:
+  - appointmentId: "apt-seed-001"
+    providerId:
+      scheme: "ods"
+      value: "Y00001"
+    practitionerName: "Dr Patel"
+    specialty: "General Practice"
+    start: "2026-09-15T10:00:00"
+    end: "2026-09-15T10:30:00"
+    reason: "Annual health check"
+    status: "COMPLETED"
+
+  - appointmentId: "apt-seed-002"
+    providerId:
+      scheme: "ods"
+      value: "RJ1"
+    practitionerName: "Dr Harrison"
+    specialty: "Cardiology"
+    start: "2026-10-08T14:00:00"
+    end: "2026-10-08T14:30:00"
+    reason: "Follow-up after elevated cholesterol"
+    status: "COMPLETED"
+
+  - appointmentId: "apt-seed-003"
+    providerId:
+      scheme: "ods"
+      value: "Y00001"
+    practitionerName: "Dr Patel"
+    specialty: "General Practice"
+    start: "2027-01-20T09:00:00"
+    end: "2027-01-20T09:30:00"
+    reason: "Prescription review"
+    status: "CONFIRMED"
+
+  - appointmentId: "apt-seed-004"
+    providerId:
+      scheme: "ods"
+      value: "RJ7"
+    practitionerName: "Dr Okonkwo"
+    specialty: "Dermatology"
+    start: "2026-11-05T11:00:00"
+    end: "2026-11-05T11:30:00"
+    reason: "Mole check"
+    status: "CANCELLED"

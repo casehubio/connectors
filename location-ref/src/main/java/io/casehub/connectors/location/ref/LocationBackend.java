@@ -1,5 +1,6 @@
 package io.casehub.connectors.location.ref;
 
+import io.casehub.connectors.Coordinates;
 import io.casehub.connectors.location.model.*;
 
 import java.util.List;

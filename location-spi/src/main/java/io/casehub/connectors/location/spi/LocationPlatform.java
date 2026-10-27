@@ -4,7 +4,7 @@ import java.util.List;
 
 import io.casehub.connectors.Page;
 import io.casehub.connectors.PageRequest;
-import io.casehub.connectors.location.model.Coordinates;
+import io.casehub.connectors.Coordinates;
 import io.casehub.connectors.location.model.GeocodingResult;
 import io.casehub.connectors.location.model.Place;
 import io.casehub.connectors.location.model.PlaceDetail;

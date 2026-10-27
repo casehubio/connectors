@@ -1,5 +1,7 @@
 package io.casehub.connectors.location.model;
 
+import io.casehub.connectors.Coordinates;
+
 import java.util.List;
 
 public record PlaceDetail(
