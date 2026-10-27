@@ -19,7 +19,7 @@ No Camel, no vendor SDKs -- pure `java.net.http.HttpClient` for HTTP-based conne
 
 ## Module Structure
 
-There are 28 active modules in the build (pom.xml `<modules>`):
+There are 30 active modules in the build (pom.xml `<modules>`):
 
 | Module (artifactId prefix: `casehub-connectors-`) | What consumers need to know |
 |----------------------------------------------------|-----------------------------|
@@ -54,6 +54,8 @@ There are 28 active modules in the build (pom.xml `<modules>`):
 | `location-google` | Google Maps `LocationPlatform` provider (`GoogleLocationPlatform`) — Places API for search/details, Geocoding API, Directions API |
 | `commerce-spi` | `CommercePlatform` SPI with `@SimulationEligible` and capability sub-interfaces (`ProductSearch`, `ProductDetails`, `Cart`, `Checkout`, `OrderTracking`), user-scoped accessors for cart/checkout/orders, `supports(Class<?>)` introspection, `CommercePlatformService` routing |
 | `commerce-ref` | In-memory reference `CommercePlatform` for testing (`RefCommercePlatform`) — 8 pre-loaded UK products across electronics/books/home/clothing, full cart/checkout/order lifecycle with user-scoped state |
+| `commerce-amazon` | Amazon PA-API 5.0 `CommercePlatform` provider (`AmazonCommercePlatform`) — ProductSearch + ProductDetails via AWS Sig v4 signed HTTP, local in-memory cart, redirect checkout via Amazon "Add to Cart" URL. 4/5 capabilities (no OrderTracking). Credential: `StaticCredentialStore` provider `"amazon-paapi"`, JSON: `{"accessKey":"...","secretKey":"...","partnerTag":"...","host":"webservices.amazon.co.uk","region":"eu-west-1","marketplace":"www.amazon.co.uk"}` |
+| `commerce-shopify` | Shopify Storefront API `CommercePlatform` provider (`ShopifyCommercePlatform`) — ProductSearch + ProductDetails + Cart + Checkout via GraphQL, redirect checkout via Shopify hosted checkout URL. 4/5 capabilities (no OrderTracking). Credential: `StaticCredentialStore` provider `"shopify-storefront"`, JSON: `{"storeDomain":"mystore.myshopify.com","storefrontAccessToken":"..."}` |
 | `travel-spi` | `TravelPlatform` SPI with `@SimulationEligible` and capability sub-interfaces (`TransportSearch`, `TransportBooking`, `AccommodationSearch`, `AccommodationBooking`). Search capabilities are unauthenticated (app-level auth); booking capabilities are user-scoped. `supports(Class<?>)` introspection, `TravelPlatformService` routing |
 | `travel-ref` | In-memory reference `TravelPlatform` for testing (`RefTravelPlatform`) — 8 UK transport options (train/flight/bus/ferry/coach) and 8 UK accommodations (hotel/hostel/apartment/B&B/holiday home), full booking lifecycle with user-scoped state |
 | `project-spi` | `ProjectPlatform` SPI with `@SimulationEligible` and capability sub-interfaces (`Issues`, `Labels`, `Milestones`, `Comments`, `Boards`), user-scoped accessors, `OwnerRepo`-scoped methods, `supports(Class<?>)` introspection, `ProjectPlatformService` routing |
