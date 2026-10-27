@@ -61,6 +61,8 @@ Zero heavy dependencies — HTTP-based connectors use java.net.http only.</descr
     <module>commerce-shopify</module>
     <module>travel-spi</module>
     <module>travel-ref</module>
+    <module>travel-amadeus</module>
+    <module>travel-google</module>
     <module>project-spi</module>
     <module>project-ref</module>
     <module>github-client</module>

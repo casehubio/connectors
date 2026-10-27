@@ -1,0 +1,67 @@
+{
+  "meta": { "count": 2 },
+  "data": [
+    {
+      "type": "flight-offer",
+      "id": "1",
+      "source": "GDS",
+      "itineraries": [
+        {
+          "duration": "PT2H15M",
+          "segments": [
+            {
+              "departure": { "iataCode": "LHR", "terminal": "5", "at": "2026-12-20T08:00:00" },
+              "arrival": { "iataCode": "CDG", "terminal": "2E", "at": "2026-12-20T10:15:00" },
+              "carrierCode": "BA",
+              "number": "306",
+              "duration": "PT2H15M",
+              "id": "1",
+              "numberOfStops": 0
+            }
+          ]
+        }
+      ],
+      "price": {
+        "currency": "GBP",
+        "total": "125.50",
+        "grandTotal": "125.50",
+        "base": "95.00"
+      },
+      "validatingAirlineCodes": ["BA"]
+    },
+    {
+      "type": "flight-offer",
+      "id": "2",
+      "source": "GDS",
+      "itineraries": [
+        {
+          "duration": "PT2H25M",
+          "segments": [
+            {
+              "departure": { "iataCode": "LHR", "terminal": "4", "at": "2026-12-20T14:30:00" },
+              "arrival": { "iataCode": "CDG", "terminal": "2F", "at": "2026-12-20T16:55:00" },
+              "carrierCode": "AF",
+              "number": "1681",
+              "duration": "PT2H25M",
+              "id": "3",
+              "numberOfStops": 0
+            }
+          ]
+        }
+      ],
+      "price": {
+        "currency": "GBP",
+        "total": "98.00",
+        "grandTotal": "98.00",
+        "base": "72.00"
+      },
+      "validatingAirlineCodes": ["AF"]
+    }
+  ],
+  "dictionaries": {
+    "carriers": {
+      "BA": "BRITISH AIRWAYS",
+      "AF": "AIR FRANCE"
+    }
+  }
+}

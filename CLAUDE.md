@@ -66,6 +66,8 @@ Multi-module Maven project (`casehub-connectors-parent`):
 | `commerce-shopify` | Shopify Storefront API CommercePlatform provider (ProductSearch + ProductDetails + Cart + Checkout) |
 | `travel-spi` | TravelPlatform SPI (TransportSearch + TransportBooking + AccommodationSearch + AccommodationBooking capabilities) |
 | `travel-ref` | In-memory reference TravelPlatform |
+| `travel-amadeus` | Amadeus Self-Service TravelPlatform provider (TransportSearch + AccommodationSearch) |
+| `travel-google` | Google Directions transit TravelPlatform provider (TransportSearch for TRAIN, BUS) |
 | `project-spi` | ProjectPlatform SPI (Issues + Labels + Milestones + Comments + Boards capabilities) |
 | `project-ref` | In-memory reference ProjectPlatform |
 | `github-client` | GitHub REST + GraphQL API shared HTTP client |

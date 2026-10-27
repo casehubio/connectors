@@ -62,6 +62,8 @@
         <module name="casehub-platform-authn-core" />
         <module name="casehub-platform-notification-settings-jpa-common" />
         <module name="casehub-platform-agent-openai-core" />
+        <module name="casehub-platform-agent-react-core" />
+        <module name="casehub-platform-playbook-compiler" />
         <module name="casehub-platform-agent-runtime" />
         <module name="casehub-platform-delivery-tracking-spring-jpa" />
         <module name="casehub-connectors-travel-ref" />
@@ -85,6 +87,7 @@
         <module name="casehub-platform-authn-webauthn-spring-jpa" />
         <module name="casehub-platform-datasource-alpha" />
         <module name="casehub-platform-delivery-tracking-jpa-common" />
+        <module name="casehub-connectors-health-ref" />
         <module name="casehub-platform-simulation-config" />
         <module name="casehub-platform-registry-inmem-core" />
         <module name="casehub-platform-acl-jpa" />
@@ -125,6 +128,7 @@
         <module name="casehub-platform-yaml-plugin-api" />
         <module name="casehub-platform-authn-webauthn-jpa" />
         <module name="casehub-connectors-signal-cli" />
+        <module name="casehub-platform-playbook-catalog" />
         <module name="casehub-platform-yaml-core" />
         <module name="casehub-platform-mcp" />
         <module name="casehub-platform-persistence-spring-mongodb" />
@@ -132,6 +136,7 @@
         <module name="casehub-platform-streams-poll" />
         <module name="casehub-platform-notification-settings-inmem-core" />
         <module name="casehub-connectors-document-ref" />
+        <module name="casehub-coordination-core" />
         <module name="casehub-platform-notifications-inmem" />
         <module name="casehub-platform-delivery-channel-inmem" />
         <module name="casehub-platform-streams-core" />
@@ -158,6 +163,7 @@
         <module name="casehub-platform-agent-langchain4j" />
         <module name="casehub-platform-streams-webhook-core" />
         <module name="casehub-platform-config" />
+        <module name="casehub-connectors-commerce-amazon" />
         <module name="casehub-platform-acl-worker-spring" />
         <module name="casehub-platform-streams-kafka" />
         <module name="casehub-platform-confirmation-core" />
@@ -192,6 +198,7 @@
         <module name="casehub-platform-view-jpa" />
         <module name="casehub-platform-yaml-codegen" />
         <module name="casehub-platform-streams-camel" />
+        <module name="casehub-connectors-health-spi" />
         <module name="casehub-platform-registry-client" />
         <module name="casehub-platform-llm-config" />
         <module name="casehub-connectors-location-google" />
@@ -237,6 +244,7 @@
         <module name="casehub-connectors-location-ref" />
         <module name="casehub-connectors-chat-ref" />
         <module name="casehub-platform-agent-gemini-cli-core" />
+        <module name="casehub-connectors-commerce-shopify" />
       </profile>
       <profile name="Annotation profile for casehub-platform-callback" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
@@ -325,10 +333,10 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="false">
-          <entry name="$MAVEN_REPOSITORY$/io/casehub/casehub-neocortex-memory-api/0.2-SNAPSHOT/casehub-neocortex-memory-api-0.2-SNAPSHOT.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/casehub/casehub-neocortex-cognitive-api/0.2-SNAPSHOT/casehub-neocortex-cognitive-api-0.2-SNAPSHOT.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/casehub/casehub-neocortex-fusion-api/0.2-SNAPSHOT/casehub-neocortex-fusion-api-0.2-SNAPSHOT.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/casehub/casehub-platform-api/0.2-SNAPSHOT/casehub-platform-api-0.2-SNAPSHOT.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/casehub/casehub-neocortex-memory-api/0.4-SNAPSHOT/casehub-neocortex-memory-api-0.4-SNAPSHOT.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/casehub/casehub-neocortex-cognitive-api/0.4-SNAPSHOT/casehub-neocortex-cognitive-api-0.4-SNAPSHOT.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/casehub/casehub-neocortex-fusion-api/0.4-SNAPSHOT/casehub-neocortex-fusion-api-0.4-SNAPSHOT.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/casehub/casehub-platform-api/0.4-SNAPSHOT/casehub-platform-api-0.4-SNAPSHOT.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
           <entry name="$PROJECT_DIR$/../platform/simulation-generator/target/classes" />
@@ -612,7 +620,7 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <option name="domainFilter" value="connectors,connectors/messaging,connectors/chat,connectors/calendar,connectors/bank-feed,connectors/email,connectors/contacts,connectors/project,connectors/commerce,connectors/travel" />
+        <option name="domainFilter" value="connectors,connectors/messaging,connectors/chat,connectors/calendar,connectors/bank-feed,connectors/email,connectors/contacts,connectors/project,connectors/commerce,connectors/travel,connectors/location,connectors/health" />
         <option name="generateGraphQL" value="false" />
         <processorPath useClasspath="false">
           <entry name="$PROJECT_DIR$/../platform/graphql-generator/target/classes" />
@@ -694,7 +702,9 @@
       <module name="casehub-connectors-chat-signal" options="-parameters" />
       <module name="casehub-connectors-chat-slack" options="-parameters" />
       <module name="casehub-connectors-chat-spi" options="-parameters" />
+      <module name="casehub-connectors-commerce-amazon" options="-parameters" />
       <module name="casehub-connectors-commerce-ref" options="-parameters" />
+      <module name="casehub-connectors-commerce-shopify" options="-parameters" />
       <module name="casehub-connectors-commerce-spi" options="-parameters" />
       <module name="casehub-connectors-contacts-google" options="-parameters" />
       <module name="casehub-connectors-contacts-ref" options="-parameters" />
@@ -710,7 +720,9 @@
       <module name="casehub-connectors-email-ref" options="-parameters" />
       <module name="casehub-connectors-email-spi" options="-parameters" />
       <module name="casehub-connectors-github-client" options="-parameters" />
-      <module name="casehub-connectors-graphql" options="-parameters -AdomainFilter=connectors,connectors/messaging,connectors/chat,connectors/calendar,connectors/bank-feed,connectors/email,connectors/contacts,connectors/project,connectors/commerce,connectors/travel -AgenerateGraphQL=false" />
+      <module name="casehub-connectors-graphql" options="-parameters -AdomainFilter=connectors,connectors/messaging,connectors/chat,connectors/calendar,connectors/bank-feed,connectors/email,connectors/contacts,connectors/project,connectors/commerce,connectors/travel,connectors/location,connectors/health -AgenerateGraphQL=false" />
+      <module name="casehub-connectors-health-ref" options="-parameters" />
+      <module name="casehub-connectors-health-spi" options="-parameters" />
       <module name="casehub-connectors-location-google" options="-parameters" />
       <module name="casehub-connectors-location-ref" options="-parameters" />
       <module name="casehub-connectors-location-spi" options="-parameters" />
@@ -725,6 +737,7 @@
       <module name="casehub-connectors-travel-ref" options="-parameters" />
       <module name="casehub-connectors-travel-spi" options="-parameters" />
       <module name="casehub-connectors-webhook" options="-parameters -AgenerateGraphQL=false -AdomainFilter=connectors/webhooks" />
+      <module name="casehub-coordination-core" options="-parameters" />
       <module name="casehub-graphql-client" options="-parameters" />
       <module name="casehub-platform" options="-parameters" />
       <module name="casehub-platform-acl-admin" options="-parameters -AgenerateGraphQL=false -AdomainFilter=acl" />
@@ -764,6 +777,7 @@
       <module name="casehub-platform-agent-openai" options="-parameters" />
       <module name="casehub-platform-agent-openai-core" options="-parameters" />
       <module name="casehub-platform-agent-openai-spring" options="-parameters" />
+      <module name="casehub-platform-agent-react-core" options="-parameters" />
       <module name="casehub-platform-agent-router" options="-parameters" />
       <module name="casehub-platform-agent-router-core" options="-parameters" />
       <module name="casehub-platform-agent-router-spring" options="-parameters" />
@@ -880,6 +894,8 @@
       <module name="casehub-platform-persistence-spring-mongodb" options="-parameters" />
       <module name="casehub-platform-platform-simulation-core" options="-parameters" />
       <module name="casehub-platform-platform-view-jpa-common" options="-parameters" />
+      <module name="casehub-platform-playbook-catalog" options="-parameters" />
+      <module name="casehub-platform-playbook-compiler" options="-parameters" />
       <module name="casehub-platform-preferences-editor" options="-parameters -AgenerateGraphQL=false -AdomainFilter=preferences,preference-schemas" />
       <module name="casehub-platform-preferences-editor-core" options="-parameters" />
       <module name="casehub-platform-registry-client" options="-parameters" />

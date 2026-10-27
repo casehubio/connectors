@@ -27,8 +27,12 @@
     <file url="file://$PROJECT_DIR$/chat-slack/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/chat-spi/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/chat-spi/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/commerce-amazon/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/commerce-amazon/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/commerce-ref/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/commerce-ref/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/commerce-shopify/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/commerce-shopify/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/commerce-spi/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/commerce-spi/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/connectors-api/src/main/java" charset="UTF-8" />
@@ -69,6 +73,10 @@
     <file url="file://$PROJECT_DIR$/github-client/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/graphql/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/graphql/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/health-ref/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/health-ref/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/health-spi/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/health-spi/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/location-google/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/location-google/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/location-ref/src/main/java" charset="UTF-8" />
@@ -171,6 +179,8 @@
     <file url="file://$PROJECT_DIR$/../platform/agent-openai-spring/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/agent-openai/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/agent-openai/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/agent-react-core/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/agent-react-core/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/agent-router-core/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/agent-router-core/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/agent-router-spring/src/main/java" charset="UTF-8" />
@@ -245,6 +255,8 @@
     <file url="file://$PROJECT_DIR$/../platform/confirmation-spring/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/confirmation/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/confirmation/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/coordination-core/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/coordination-core/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/credentials-quarkus/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/credentials-quarkus/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/credentials-spring/src/main/java" charset="UTF-8" />
@@ -423,6 +435,10 @@
     <file url="file://$PROJECT_DIR$/../platform/platform-view/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/platform/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/platform/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/playbook-catalog/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/playbook-compiler/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/playbook-compiler/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/playbooks" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/preferences-editor-core/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/preferences-editor-core/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/preferences-editor/src/main/java" charset="UTF-8" />

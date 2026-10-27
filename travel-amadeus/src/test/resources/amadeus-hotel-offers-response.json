@@ -1,0 +1,36 @@
+{
+  "data": [
+    {
+      "type": "hotel-offers",
+      "hotel": {
+        "hotelId": "HLLONBIG",
+        "name": "The Big Hotel London",
+        "cityCode": "LON",
+        "latitude": 51.5074,
+        "longitude": -0.1278,
+        "rating": "4",
+        "description": { "text": "A grand hotel in central London with excellent views." },
+        "amenities": ["SWIMMING_POOL", "SPA", "FITNESS_CENTER", "RESTAURANT", "WIFI"],
+        "media": [
+          { "uri": "https://example.com/images/big-hotel-1.jpg" },
+          { "uri": "https://example.com/images/big-hotel-2.jpg" }
+        ]
+      },
+      "available": true,
+      "offers": [
+        {
+          "id": "offer1",
+          "room": { "type": "STANDARD", "typeEstimated": { "category": "STANDARD_ROOM", "beds": 1, "bedType": "DOUBLE" } },
+          "price": { "currency": "GBP", "total": "150.00" },
+          "guests": { "adults": 2 }
+        },
+        {
+          "id": "offer2",
+          "room": { "type": "SUITE", "typeEstimated": { "category": "SUITE", "beds": 1, "bedType": "KING" } },
+          "price": { "currency": "GBP", "total": "350.00" },
+          "guests": { "adults": 2 }
+        }
+      ]
+    }
+  ]
+}
