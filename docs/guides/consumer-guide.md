@@ -23,6 +23,7 @@ There are 30 active modules in the build (pom.xml `<modules>`):
 
 | Module (artifactId prefix: `casehub-connectors-`) | What consumers need to know |
 |----------------------------------------------------|-----------------------------|
+| `connectors-api` | Shared types used by all modules: `Page`, `PageRequest`, `UnsupportedCapabilityException`, `HttpHelper` (shared `java.net.http.HttpClient` singleton), `SyncResult`/`SyncRequest`/`SyncTokenExpiredException` (cross-SPI incremental sync primitives) |
 | `core` | `Connector` outbound SPI, `InboundConnector` / `WebhookInboundConnector` inbound SPIs, `ConnectorService` routing, `ConnectorDiscovery` SPI, `ConnectorsCloudEventAdapter`, `ConnectorMeshBridge` SPI, built-in outbound impls (Slack, Teams, Twilio SMS, WhatsApp), `InboundMessage` / `Attachment` / `ConnectorMessage` records |
 | `email` | Email outbound via `quarkus-mailer` (`EmailConnector`) |
 | `email-inbound` | IMAP polling inbound (`EmailInboundConnector`), `EmailInboundAccountProvider` SPI |
@@ -66,6 +67,7 @@ There are 30 active modules in the build (pom.xml `<modules>`):
 | `project-github` | GitHub `ProjectPlatform` provider (`GitHubProjectPlatform`) — per-user credential resolution via `GitHubCredentialResolver` CDI SPI. All 5 capabilities |
 | `health-spi` | `HealthPlatform` SPI with `@SimulationEligible` and capability sub-interfaces (`ProviderSearch`, `AppointmentBooking`, `MedicalRecords`). Search is app-level; booking and records are user-scoped. `supports(Class<?>)` introspection, `HealthPlatformService` routing |
 | `health-ref` | In-memory reference `HealthPlatform` for testing (`RefHealthPlatform`) — pre-loaded UK healthcare providers, appointment slots, and medical records across multiple specialties |
+| `connectors-spring` | Spring Boot Auto-Configuration — registers all platform SPIs and services as Spring beans for non-Quarkus deployments |
 | `graphql` | `ConnectorOperations` `@McpDomain("connectors")` SPI — GraphQL/MCP surface with 5 operations: `injectChat` (constructs `InboundMessage`, fires via `InboundConnectorService`), `sendNotification` (delegates to `ConnectorService.send()`), `connectorStatus` (aggregates outbound + chat + inbound connectors), `connectorsReport` (scope-filtered capability/status report across all 11 platforms — chat, calendar, bank, email, document, contacts, location, commerce, travel, project, health — with `scope` param: `"all"`, `null`, or comma-separated names), `sentMessages` (queries `SentMessageCapture`, profile-gated). `ConnectorsModelEnricher` provides domain summary/state for MCP. `SentMessageCapture` (`@UnlessBuildProfile("prod")`) CDI observer for test/dev message capture. Capability-gated API methods throw `UnsupportedCapabilityException` (in `connectors-api`) with structured metadata (operation, capability, provider, supportedCapabilities) for LLM self-correction. |
 
 **CDI events:** `ConnectorService.send()` fires `Event<SentMessage>` on every outbound delivery. `SentMessage` record carries the connector ID, recipient, message content, and timestamp. Observe with `@ObservesAsync SentMessage` for delivery tracking.

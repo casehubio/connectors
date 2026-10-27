@@ -28,6 +28,7 @@ Multi-module Maven project (`casehub-connectors-parent`):
 
 | Module | Purpose |
 |--------|---------|
+| `connectors-api` | Shared types: Page, PageRequest, UnsupportedCapabilityException, HttpHelper, SyncResult/SyncRequest |
 | `core` | Connector SPI, ConnectorService, InboundConnector SPI |
 | `webhook` | WebhookInboundConnector SPI |
 | `email` | Email connector (quarkus-mailer) |
@@ -76,6 +77,7 @@ Multi-module Maven project (`casehub-connectors-parent`):
 | `health-ref` | In-memory reference HealthPlatform |
 | `graphql` | GraphQL resolvers for MCP dispatch |
 | `mcp` | MCP tool definitions |
+| `connectors-spring` | Spring Boot Auto-Configuration for non-Quarkus deployments |
 
 ## Build and Test
 
