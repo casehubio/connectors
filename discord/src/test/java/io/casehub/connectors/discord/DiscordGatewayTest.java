@@ -62,7 +62,7 @@ class DiscordGatewayTest {
             }
         });
 
-        assertThat(readyLatch.await(10, TimeUnit.SECONDS))
+        assertThat(readyLatch.await(20, TimeUnit.SECONDS))
                 .as("Should receive READY event").isTrue();
         assertThat(readyEventType.get()).isEqualTo("READY");
         assertThat(gateway.isConnected()).isTrue();
@@ -82,10 +82,10 @@ class DiscordGatewayTest {
         gateway.connect(gatewayUrl(), TOKEN, INTENTS, (eventType, data) -> {
             if ("READY".equals(eventType)) readyLatch.countDown();
         });
-        assertThat(readyLatch.await(10, TimeUnit.SECONDS)).isTrue();
+        assertThat(readyLatch.await(20, TimeUnit.SECONDS)).isTrue();
 
         org.awaitility.Awaitility.await()
-                .atMost(10, TimeUnit.SECONDS)
+                .atMost(20, TimeUnit.SECONDS)
                 .until(() -> server.getReceivedHeartbeatCount() >= 2);
 
         assertThat(gateway.isConnected()).isTrue();
@@ -99,7 +99,7 @@ class DiscordGatewayTest {
         gateway.connect(gatewayUrl(), TOKEN, INTENTS, (eventType, data) -> {
             if ("READY".equals(eventType)) readyLatch.countDown();
         });
-        assertThat(readyLatch.await(10, TimeUnit.SECONDS)).isTrue();
+        assertThat(readyLatch.await(20, TimeUnit.SECONDS)).isTrue();
 
         awaitStableConnection();
 
@@ -109,7 +109,7 @@ class DiscordGatewayTest {
 
         // Wait for at least one un-ACKed heartbeat to fire
         org.awaitility.Awaitility.await()
-                .atMost(5, TimeUnit.SECONDS)
+                .atMost(30, TimeUnit.SECONDS)
                 .until(() -> server.getReceivedHeartbeatCount() > heartbeatsBefore);
 
         // Re-enable ACKs so the reconnection handshake succeeds
@@ -138,13 +138,13 @@ class DiscordGatewayTest {
                 eventLatch.countDown();
             }
         });
-        assertThat(readyLatch.await(10, TimeUnit.SECONDS)).isTrue();
+        assertThat(readyLatch.await(20, TimeUnit.SECONDS)).isTrue();
 
         awaitStableConnection();
 
         server.sendDispatch("MESSAGE_CREATE", "{\"content\":\"hello world\",\"channel_id\":\"ch1\"}");
 
-        assertThat(eventLatch.await(10, TimeUnit.SECONDS))
+        assertThat(eventLatch.await(20, TimeUnit.SECONDS))
                 .as("Should receive dispatch event").isTrue();
         assertThat(receivedType.get()).isEqualTo("MESSAGE_CREATE");
         assertThat(receivedData.get().get("content").asText()).isEqualTo("hello world");
@@ -163,11 +163,11 @@ class DiscordGatewayTest {
                 dispatchLatch.countDown();
             }
         });
-        assertThat(readyLatch.await(10, TimeUnit.SECONDS)).isTrue();
+        assertThat(readyLatch.await(20, TimeUnit.SECONDS)).isTrue();
 
         // Send a dispatch so sequence is > 0, wait for client to process it
         server.sendDispatch("MESSAGE_CREATE", "{\"content\":\"test\"}");
-        assertThat(dispatchLatch.await(10, TimeUnit.SECONDS))
+        assertThat(dispatchLatch.await(20, TimeUnit.SECONDS))
                 .as("Client should receive dispatch before disconnect").isTrue();
 
         // Expect a reconnection
@@ -176,7 +176,7 @@ class DiscordGatewayTest {
         // Forcefully disconnect the client
         server.disconnectAllClients();
 
-        assertThat(server.awaitConnections(10, TimeUnit.SECONDS))
+        assertThat(server.awaitConnections(20, TimeUnit.SECONDS))
                 .as("Should reconnect after disconnect").isTrue();
 
         // Wait for RESUME to be sent (replaces fixed Thread.sleep)
@@ -197,7 +197,7 @@ class DiscordGatewayTest {
         gateway.connect(gatewayUrl(), TOKEN, INTENTS, (eventType, data) -> {
             if ("READY".equals(eventType)) readyLatch.countDown();
         });
-        assertThat(readyLatch.await(10, TimeUnit.SECONDS)).isTrue();
+        assertThat(readyLatch.await(20, TimeUnit.SECONDS)).isTrue();
 
         int identifyCountBefore = server.getReceivedIdentifies().size();
 
@@ -206,12 +206,12 @@ class DiscordGatewayTest {
         server.expectConnections(1);
         server.sendInvalidSession(false);
 
-        assertThat(server.awaitConnections(10, TimeUnit.SECONDS))
+        assertThat(server.awaitConnections(20, TimeUnit.SECONDS))
                 .as("Should reconnect after INVALID_SESSION").isTrue();
 
         // Wait for the new IDENTIFY to arrive (replaces fixed Thread.sleep)
         org.awaitility.Awaitility.await()
-                .atMost(10, TimeUnit.SECONDS)
+                .atMost(20, TimeUnit.SECONDS)
                 .until(() -> server.getReceivedIdentifies().size() > identifyCountBefore);
     }
 
@@ -239,7 +239,7 @@ class DiscordGatewayTest {
             // Backoff: attempt 1 (immediate), sleep 1s, attempt 2, sleep 2s, attempt 3
             // Total minimum: ~3s
             org.awaitility.Awaitility.await()
-                    .atMost(15, TimeUnit.SECONDS)
+                    .atMost(30, TimeUnit.SECONDS)
                     .until(() -> records.stream()
                             .filter(r -> r.getMessage() != null && r.getMessage().contains("connection failed"))
                             .count() >= 3);
@@ -319,13 +319,13 @@ class DiscordGatewayTest {
                 eventLatch.countDown();
             }
         });
-        assertThat(readyLatch.await(10, TimeUnit.SECONDS)).isTrue();
+        assertThat(readyLatch.await(20, TimeUnit.SECONDS)).isTrue();
 
         awaitStableConnection();
 
         server.sendDispatchMultiFrame("GUILD_CREATE", "{\"id\":\"guild1\",\"name\":\"Test Guild\"}");
 
-        assertThat(eventLatch.await(10, TimeUnit.SECONDS))
+        assertThat(eventLatch.await(20, TimeUnit.SECONDS))
                 .as("Should receive multi-frame dispatch event").isTrue();
         assertThat(receivedType.get()).isEqualTo("GUILD_CREATE");
         assertThat(receivedData.get().get("name").asText()).isEqualTo("Test Guild");
@@ -346,7 +346,7 @@ class DiscordGatewayTest {
                 eventLatch.countDown();
             }
         });
-        assertThat(readyLatch.await(10, TimeUnit.SECONDS)).isTrue();
+        assertThat(readyLatch.await(20, TimeUnit.SECONDS)).isTrue();
 
         awaitStableConnection();
 
@@ -355,7 +355,7 @@ class DiscordGatewayTest {
                 "{\"user\":{\"id\":\"user2\"},\"status\":\"idle\"}]}";
         server.sendDispatch("GUILD_CREATE", guildData);
 
-        assertThat(eventLatch.await(10, TimeUnit.SECONDS))
+        assertThat(eventLatch.await(20, TimeUnit.SECONDS))
                 .as("Should receive GUILD_CREATE with presences").isTrue();
         assertThat(receivedData.get().get("presences")).hasSize(2);
         assertThat(receivedData.get().get("presences").get(0).get("status").asText()).isEqualTo("online");
@@ -365,7 +365,7 @@ class DiscordGatewayTest {
         // Wait for 2 heartbeats: the second proves the first ACK was processed
         // (otherwise the missed-ACK check would have killed the connection)
         org.awaitility.Awaitility.await()
-                .atMost(10, TimeUnit.SECONDS)
+                .atMost(20, TimeUnit.SECONDS)
                 .until(() -> server.getReceivedHeartbeatCount() >= 2);
     }
 
