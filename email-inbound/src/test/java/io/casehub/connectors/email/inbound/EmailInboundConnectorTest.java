@@ -124,12 +124,19 @@ class EmailInboundConnectorTest {
     @Test
     @Timeout(20)
     void doubleStart_isNoOp() throws Exception {
+        final MimeMessage msg = new MimeMessage(Session.getInstance(new Properties()));
+        msg.setFrom(new InternetAddress("sender@example.com"));
+        msg.setRecipient(Message.RecipientType.TO, new InternetAddress("inbox@example.com"));
+        msg.setSubject("Subject");
+        msg.setText("Body");
+        msg.setSentDate(Date.from(Instant.now()));
+        msg.saveChanges();
+        deliverDirect(msg);
+
         connector.start(captured::add);
         connector.start(captured::add); // second call must not subscribe a second IDLE loop
 
-        deliver("sender@example.com", "Subject", "Body");
-
-        receive(); // exactly one delivery
+        receive(); // exactly one delivery via processUnseen
         assertThat(captured.poll(500, TimeUnit.MILLISECONDS))
                 .as("second delivery arrived — double-start guard failed")
                 .isNull();
