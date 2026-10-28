@@ -15,6 +15,8 @@ import com.google.auth.oauth2.AccessToken;
 import com.google.auth.oauth2.GoogleCredentials;
 import io.casehub.connectors.Page;
 import io.casehub.connectors.PageRequest;
+import io.casehub.connectors.ProviderApiException;
+import io.casehub.connectors.ProviderErrorMapping;
 import io.casehub.connectors.SyncRequest;
 import io.casehub.connectors.SyncResult;
 import io.casehub.connectors.SyncTokenExpiredException;
@@ -50,6 +52,7 @@ public class GoogleContactsPlatform implements ContactsPlatform {
 
     private final ServiceConnectionProvider connectionProvider;
     private final NetHttpTransport transport;
+    private PeopleService overrideService;
 
     public GoogleContactsPlatform(ServiceConnectionProvider connectionProvider) {
         this.connectionProvider = connectionProvider;
@@ -58,6 +61,12 @@ public class GoogleContactsPlatform implements ContactsPlatform {
         } catch (GeneralSecurityException | IOException e) {
             throw new RuntimeException("Failed to initialize HTTP transport", e);
         }
+    }
+
+    GoogleContactsPlatform(PeopleService peopleService) {
+        this.connectionProvider = null;
+        this.transport = new NetHttpTransport();
+        this.overrideService = peopleService;
     }
 
     @Override
@@ -88,6 +97,7 @@ public class GoogleContactsPlatform implements ContactsPlatform {
     }
 
     private PeopleService buildService(String actorId) {
+        if (overrideService != null) return overrideService;
         var token = connectionProvider.getAccessToken(actorId, "google", DEFAULT_TENANCY);
         var credentials = GoogleCredentials.create(
             new AccessToken(token.accessToken(), Date.from(token.expiresAt())));
@@ -148,12 +158,9 @@ public class GoogleContactsPlatform implements ContactsPlatform {
                 return new SyncResult<>(contacts, deletedIds,
                     response.getNextSyncToken(), response.getNextPageToken() != null);
             } catch (GoogleJsonResponseException e) {
-                if (e.getStatusCode() == 410) {
-                    throw new SyncTokenExpiredException(request.syncToken());
-                }
-                throw new RuntimeException("Google People API sync failed", e);
+                throw handleGoogleError(e);
             } catch (IOException e) {
-                throw new RuntimeException("Google People API sync failed", e);
+                throw new ProviderApiException(0, e.getMessage(), id());
             }
         }
 
@@ -164,8 +171,10 @@ public class GoogleContactsPlatform implements ContactsPlatform {
                     .setPersonFields(PERSON_FIELDS)
                     .execute();
                 return mapContact(person);
+            } catch (GoogleJsonResponseException e) {
+                throw handleGoogleError(e);
             } catch (IOException e) {
-                throw new RuntimeException("Failed to get contact: " + contactId, e);
+                throw new ProviderApiException(0, e.getMessage(), id());
             }
         }
 
@@ -260,8 +269,10 @@ public class GoogleContactsPlatform implements ContactsPlatform {
                 var person = mapToPerson(contact);
                 var created = service.people().createContact(person).execute();
                 return mapContact(created);
+            } catch (GoogleJsonResponseException e) {
+                throw handleGoogleError(e);
             } catch (IOException e) {
-                throw new RuntimeException("Failed to create contact", e);
+                throw new ProviderApiException(0, e.getMessage(), id());
             }
         }
 
@@ -277,8 +288,10 @@ public class GoogleContactsPlatform implements ContactsPlatform {
                     .setUpdatePersonFields(PERSON_FIELDS)
                     .execute();
                 return mapContact(updated);
+            } catch (GoogleJsonResponseException e) {
+                throw handleGoogleError(e);
             } catch (IOException e) {
-                throw new RuntimeException("Failed to update contact: " + contactId, e);
+                throw new ProviderApiException(0, e.getMessage(), id());
             }
         }
 
@@ -286,8 +299,10 @@ public class GoogleContactsPlatform implements ContactsPlatform {
         public void delete(String contactId) {
             try {
                 service.people().deleteContact(contactId).execute();
+            } catch (GoogleJsonResponseException e) {
+                throw handleGoogleError(e);
             } catch (IOException e) {
-                throw new RuntimeException("Failed to delete contact: " + contactId, e);
+                throw new ProviderApiException(0, e.getMessage(), id());
             }
         }
 
@@ -324,6 +339,26 @@ public class GoogleContactsPlatform implements ContactsPlatform {
             .filter(p -> p.getMetadata() == null || !Boolean.TRUE.equals(p.getMetadata().getDeleted()))
             .map(GoogleContactsPlatform::mapContact)
             .toList();
+    }
+
+    private RuntimeException handleGoogleError(GoogleJsonResponseException e) {
+        int code = e.getStatusCode();
+        String body;
+        try {
+            body = e.getDetails() != null ? e.getDetails().toPrettyString() : e.getMessage();
+        } catch (IOException ignored) {
+            body = e.getMessage();
+        }
+        String reason = extractErrorReason(e);
+        return ProviderErrorMapping.mapStatusCode(code, body, id(), reason);
+    }
+
+    private static String extractErrorReason(GoogleJsonResponseException e) {
+        if (e.getDetails() != null && e.getDetails().getErrors() != null
+                && !e.getDetails().getErrors().isEmpty()) {
+            return e.getDetails().getErrors().get(0).getReason();
+        }
+        return null;
     }
 
     static Contact mapContact(Person person) {

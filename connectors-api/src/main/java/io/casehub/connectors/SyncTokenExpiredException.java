@@ -1,11 +1,11 @@
 package io.casehub.connectors;
 
-public class SyncTokenExpiredException extends RuntimeException {
+public class SyncTokenExpiredException extends ProviderApiException {
 
     private final String expiredToken;
 
-    public SyncTokenExpiredException(String expiredToken) {
-        super("Sync token expired — full resync required");
+    public SyncTokenExpiredException(String expiredToken, String provider) {
+        super(410, expiredToken, provider);
         this.expiredToken = expiredToken;
     }
 

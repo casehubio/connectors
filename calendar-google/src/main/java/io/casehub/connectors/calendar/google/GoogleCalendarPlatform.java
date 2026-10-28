@@ -211,7 +211,7 @@ public class GoogleCalendarPlatform implements CalendarPlatform {
             }
         } catch (GoogleJsonResponseException e) {
             if (e.getStatusCode() == 410) {
-                throw new SyncTokenExpiredException(request.syncToken());
+                throw new SyncTokenExpiredException(request.syncToken(), id());
             }
             if (!items.isEmpty()) {
                 LOG.warnf(e, "listEventsSync failed mid-pagination for calendar '%s' — returning %d partial items",

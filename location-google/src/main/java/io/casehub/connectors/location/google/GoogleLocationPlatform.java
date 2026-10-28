@@ -9,9 +9,13 @@ import com.google.maps.errors.ApiException;
 import com.google.maps.model.DirectionsResult;
 import com.google.maps.model.LatLng;
 import com.google.maps.model.PlacesSearchResult;
+import io.casehub.connectors.AuthFailureReason;
 import io.casehub.connectors.Coordinates;
 import io.casehub.connectors.Page;
 import io.casehub.connectors.PageRequest;
+import io.casehub.connectors.ProviderApiException;
+import io.casehub.connectors.ProviderAuthException;
+import io.casehub.connectors.ProviderRateLimitedException;
 import io.casehub.connectors.location.model.*;
 import io.casehub.connectors.location.spi.LocationPlatform;
 import io.casehub.platform.api.authn.StaticCredentialStore;
@@ -32,6 +36,13 @@ public class GoogleLocationPlatform implements LocationPlatform {
 
     public GoogleLocationPlatform(StaticCredentialStore credentialStore) {
         this.credentialStore = credentialStore;
+    }
+
+    private GeoApiContext overrideContext;
+
+    GoogleLocationPlatform(GeoApiContext context) {
+        this((StaticCredentialStore) null);
+        this.overrideContext = context;
     }
 
     @Override
@@ -68,6 +79,7 @@ public class GoogleLocationPlatform implements LocationPlatform {
     }
 
     private GeoApiContext contextFor(String userId) {
+        if (overrideContext != null) return overrideContext;
         var record = credentialStore.find(userId, "google-maps", DEFAULT_TENANCY)
             .orElseThrow(() -> new IllegalStateException(
                 "No Google Maps API key configured for user " + userId));
@@ -171,9 +183,13 @@ public class GoogleLocationPlatform implements LocationPlatform {
                             PlaceDetailsRequest.FieldMask.URL)
                     .await();
                 return mapPlaceDetail(placeId, result);
-            } catch (ApiException | InterruptedException | IOException e) {
-                if (e instanceof InterruptedException) Thread.currentThread().interrupt();
-                throw new RuntimeException("Failed to get place details: " + placeId, e);
+            } catch (ApiException e) {
+                throw handleMapsError(e);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new ProviderApiException(0, "Interrupted", id());
+            } catch (IOException e) {
+                throw new ProviderApiException(0, e.getMessage(), id());
             }
         }
     }
@@ -233,9 +249,13 @@ public class GoogleLocationPlatform implements LocationPlatform {
                     .mode(mapTravelMode(mode))
                     .await();
                 return mapRoute(result);
-            } catch (ApiException | InterruptedException | IOException e) {
-                if (e instanceof InterruptedException) Thread.currentThread().interrupt();
-                throw new RuntimeException("Failed to get directions", e);
+            } catch (ApiException e) {
+                throw handleMapsError(e);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new ProviderApiException(0, "Interrupted", id());
+            } catch (IOException e) {
+                throw new ProviderApiException(0, e.getMessage(), id());
             }
         }
     }
@@ -367,5 +387,17 @@ public class GoogleLocationPlatform implements LocationPlatform {
             case BICYCLING -> com.google.maps.model.TravelMode.BICYCLING;
             case TRANSIT -> com.google.maps.model.TravelMode.TRANSIT;
         };
+    }
+
+    private static final int MAPS_DEFAULT_RETRY_SECONDS = 60;
+
+    private RuntimeException handleMapsError(ApiException e) {
+        if (e instanceof com.google.maps.errors.OverQueryLimitException) {
+            return new ProviderRateLimitedException(MAPS_DEFAULT_RETRY_SECONDS, id());
+        }
+        if (e instanceof com.google.maps.errors.RequestDeniedException) {
+            return new ProviderAuthException(AuthFailureReason.FORBIDDEN, id());
+        }
+        return new ProviderApiException(0, e.getMessage(), id());
     }
 }

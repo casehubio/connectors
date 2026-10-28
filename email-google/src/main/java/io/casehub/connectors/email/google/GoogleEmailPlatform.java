@@ -22,6 +22,8 @@ import org.jboss.logging.Logger;
 
 import io.casehub.connectors.Page;
 import io.casehub.connectors.PageRequest;
+import io.casehub.connectors.ProviderApiException;
+import io.casehub.connectors.ProviderErrorMapping;
 import io.casehub.connectors.email.model.EmailMessage;
 import io.casehub.connectors.email.model.EmailSummary;
 import io.casehub.connectors.email.model.Mailbox;
@@ -79,8 +81,10 @@ public class GoogleEmailPlatform implements EmailPlatform {
                             friendlyName(label.getId(), label.getName()),
                             label.getMessagesUnread() != null ? label.getMessagesUnread() : 0))
                     .toList();
+        } catch (com.google.api.client.googleapis.json.GoogleJsonResponseException e) {
+            throw handleGoogleError(e);
         } catch (IOException e) {
-            throw new RuntimeException("Failed to list mailboxes", e);
+            throw new ProviderApiException(0, e.getMessage(), id());
         }
     }
 
@@ -119,8 +123,10 @@ public class GoogleEmailPlatform implements EmailPlatform {
             String nextPageToken = response.getNextPageToken();
             boolean hasMore = nextPageToken != null;
             return new Page<>(summaries, nextPageToken, hasMore);
+        } catch (com.google.api.client.googleapis.json.GoogleJsonResponseException e) {
+            throw handleGoogleError(e);
         } catch (IOException e) {
-            throw new RuntimeException("Failed to list messages", e);
+            throw new ProviderApiException(0, e.getMessage(), id());
         }
     }
 
@@ -133,13 +139,9 @@ public class GoogleEmailPlatform implements EmailPlatform {
                     .execute();
             return GmailMessageMapper.toEmailMessage(message, mailboxId);
         } catch (com.google.api.client.googleapis.json.GoogleJsonResponseException e) {
-            if (e.getStatusCode() == 404) {
-                throw new NoSuchElementException(
-                        "Message '" + messageId + "' not found in mailbox '" + mailboxId + "'");
-            }
-            throw new RuntimeException("Failed to get message " + messageId, e);
+            throw handleGoogleError(e);
         } catch (IOException e) {
-            throw new RuntimeException("Failed to get message " + messageId, e);
+            throw new ProviderApiException(0, e.getMessage(), id());
         }
     }
 
@@ -153,14 +155,9 @@ public class GoogleEmailPlatform implements EmailPlatform {
                     .execute();
             return Base64.getUrlDecoder().decode(attachment.getData());
         } catch (com.google.api.client.googleapis.json.GoogleJsonResponseException e) {
-            if (e.getStatusCode() == 404) {
-                throw new NoSuchElementException(
-                        "Attachment '" + attachmentId + "' not found on message '"
-                        + messageId + "' in mailbox '" + mailboxId + "'");
-            }
-            throw new RuntimeException("Failed to get attachment " + attachmentId, e);
+            throw handleGoogleError(e);
         } catch (IOException e) {
-            throw new RuntimeException("Failed to get attachment " + attachmentId, e);
+            throw new ProviderApiException(0, e.getMessage(), id());
         }
     }
 
@@ -197,8 +194,10 @@ public class GoogleEmailPlatform implements EmailPlatform {
             String  nextPageToken = response.getNextPageToken();
             boolean hasMore       = nextPageToken != null;
             return new Page<>(summaries, nextPageToken, hasMore);
+        } catch (com.google.api.client.googleapis.json.GoogleJsonResponseException e) {
+            throw handleGoogleError(e);
         } catch (IOException e) {
-            throw new RuntimeException("Failed to search messages", e);
+            throw new ProviderApiException(0, e.getMessage(), id());
         }
     }
 
@@ -223,5 +222,25 @@ public class GoogleEmailPlatform implements EmailPlatform {
             case "DRAFT" -> "Drafts";
             default -> name;
         };
+    }
+
+    private RuntimeException handleGoogleError(com.google.api.client.googleapis.json.GoogleJsonResponseException e) {
+        int code = e.getStatusCode();
+        String body;
+        try {
+            body = e.getDetails() != null ? e.getDetails().toPrettyString() : e.getMessage();
+        } catch (IOException ignored) {
+            body = e.getMessage();
+        }
+        String reason = extractErrorReason(e);
+        return ProviderErrorMapping.mapStatusCode(code, body, id(), reason);
+    }
+
+    private static String extractErrorReason(com.google.api.client.googleapis.json.GoogleJsonResponseException e) {
+        if (e.getDetails() != null && e.getDetails().getErrors() != null
+                && !e.getDetails().getErrors().isEmpty()) {
+            return e.getDetails().getErrors().get(0).getReason();
+        }
+        return null;
     }
 }

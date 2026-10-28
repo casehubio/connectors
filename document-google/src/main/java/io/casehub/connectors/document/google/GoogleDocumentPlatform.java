@@ -11,6 +11,8 @@ import com.google.auth.http.HttpCredentialsAdapter;
 import com.google.auth.oauth2.AccessToken;
 import com.google.auth.oauth2.GoogleCredentials;
 import io.casehub.connectors.Page;
+import io.casehub.connectors.ProviderApiException;
+import io.casehub.connectors.ProviderErrorMapping;
 import io.casehub.connectors.SyncRequest;
 import io.casehub.connectors.SyncResult;
 import io.casehub.connectors.SyncTokenExpiredException;
@@ -135,8 +137,10 @@ public class GoogleDocumentPlatform implements DocumentPlatform {
                 var summaries = files.stream().map(GoogleDocumentPlatform::toSummary).toList();
                 String nextToken = response.getNextPageToken();
                 return new Page<>(summaries, nextToken, nextToken != null);
+            } catch (GoogleJsonResponseException e) {
+                throw handleGoogleError(e);
             } catch (IOException e) {
-                throw new RuntimeException("Failed to list files", e);
+                throw new ProviderApiException(0, e.getMessage(), id());
             }
         }
 
@@ -149,12 +153,9 @@ public class GoogleDocumentPlatform implements DocumentPlatform {
                         .execute();
                 return toMetadata(file);
             } catch (GoogleJsonResponseException e) {
-                if (e.getStatusCode() == 404) {
-                    throw new NoSuchElementException("File '" + fileId + "' not found");
-                }
-                throw new RuntimeException("Failed to get file " + fileId, e);
+                throw handleGoogleError(e);
             } catch (IOException e) {
-                throw new RuntimeException("Failed to get file " + fileId, e);
+                throw new ProviderApiException(0, e.getMessage(), id());
             }
         }
 
@@ -166,12 +167,11 @@ public class GoogleDocumentPlatform implements DocumentPlatform {
                 driveService.files().get(fileId).executeMediaAndDownloadTo(out);
                 return out.toByteArray();
             } catch (GoogleJsonResponseException e) {
-                if (e.getStatusCode() == 404) {
-                    throw new NoSuchElementException("File '" + fileId + "' not found");
-                }
-                throw new RuntimeException("Failed to download file " + fileId, e);
+                throw handleGoogleError(e);
+            } catch (com.google.api.client.http.HttpResponseException e) {
+                throw ProviderErrorMapping.mapStatusCode(e.getStatusCode(), e.getMessage(), id(), null);
             } catch (IOException e) {
-                throw new RuntimeException("Failed to download file " + fileId, e);
+                throw new ProviderApiException(0, e.getMessage(), id());
             }
         }
 
@@ -189,8 +189,10 @@ public class GoogleDocumentPlatform implements DocumentPlatform {
                 request.getMediaHttpUploader().setDirectUploadEnabled(true);
                 var created = request.execute();
                 return toMetadata(created);
+            } catch (GoogleJsonResponseException e) {
+                throw handleGoogleError(e);
             } catch (IOException e) {
-                throw new RuntimeException("Failed to upload file", e);
+                throw new ProviderApiException(0, e.getMessage(), id());
             }
         }
 
@@ -200,12 +202,9 @@ public class GoogleDocumentPlatform implements DocumentPlatform {
             try {
                 driveService.files().delete(fileId).execute();
             } catch (GoogleJsonResponseException e) {
-                if (e.getStatusCode() == 404) {
-                    throw new NoSuchElementException("File '" + fileId + "' not found");
-                }
-                throw new RuntimeException("Failed to delete file " + fileId, e);
+                throw handleGoogleError(e);
             } catch (IOException e) {
-                throw new RuntimeException("Failed to delete file " + fileId, e);
+                throw new ProviderApiException(0, e.getMessage(), id());
             }
         }
 
@@ -219,11 +218,11 @@ public class GoogleDocumentPlatform implements DocumentPlatform {
         }
 
         private SyncResult<DocumentSummary> initialSync(SyncRequest request) {
+            List<DocumentSummary> items = new ArrayList<>();
             try {
                 var    startToken = driveService.changes().getStartPageToken().execute();
                 String token      = startToken.getStartPageToken();
 
-                List<DocumentSummary> items     = new ArrayList<>();
                 String                pageToken = null;
                 int                   page      = 0;
                 while (page < MAX_PAGES) {
@@ -249,7 +248,8 @@ public class GoogleDocumentPlatform implements DocumentPlatform {
                 }
                 return new SyncResult<>(Collections.unmodifiableList(items), List.of(), token, false);
             } catch (IOException e) {
-                throw new RuntimeException("Google Drive initial sync failed", e);
+                LOG.warnf("Google Drive initial sync failed mid-loop after %d items: %s", items.size(), e.getMessage());
+                return new SyncResult<>(Collections.unmodifiableList(items), List.of(), null, false);
             }
         }
 
@@ -287,21 +287,21 @@ public class GoogleDocumentPlatform implements DocumentPlatform {
                 }
             } catch (GoogleJsonResponseException e) {
                 if (e.getStatusCode() == 404) {
-                    throw new SyncTokenExpiredException(request.syncToken());
+                    throw new SyncTokenExpiredException(request.syncToken(), id());
                 }
                 if (!items.isEmpty()) {
                     LOG.warnf(e, "listSync failed mid-pagination — returning %d partial items", items.size());
                     return new SyncResult<>(Collections.unmodifiableList(items),
                                             Collections.unmodifiableList(deletedIds), newToken, false);
                 }
-                throw new RuntimeException("Google Drive sync failed", e);
+                throw handleGoogleError(e);
             } catch (IOException e) {
                 if (!items.isEmpty()) {
                     LOG.warnf(e, "listSync failed mid-pagination — returning %d partial items", items.size());
                     return new SyncResult<>(Collections.unmodifiableList(items),
                                             Collections.unmodifiableList(deletedIds), newToken, false);
                 }
-                throw new RuntimeException("Google Drive sync failed", e);
+                throw new ProviderApiException(0, e.getMessage(), id());
             }
             return new SyncResult<>(Collections.unmodifiableList(items),
                                     Collections.unmodifiableList(deletedIds), newToken, false);
@@ -330,8 +330,10 @@ public class GoogleDocumentPlatform implements DocumentPlatform {
                                         ? Instant.ofEpochMilli(f.getCreatedTime().getValue())
                                         : null))
                         .toList();
+            } catch (GoogleJsonResponseException e) {
+                throw handleGoogleError(e);
             } catch (IOException e) {
-                throw new RuntimeException("Failed to list folders", e);
+                throw new ProviderApiException(0, e.getMessage(), id());
             }
         }
 
@@ -350,8 +352,10 @@ public class GoogleDocumentPlatform implements DocumentPlatform {
                         created.getCreatedTime() != null
                                 ? Instant.ofEpochMilli(created.getCreatedTime().getValue())
                                 : Instant.now());
+            } catch (GoogleJsonResponseException e) {
+                throw handleGoogleError(e);
             } catch (IOException e) {
-                throw new RuntimeException("Failed to create folder", e);
+                throw new ProviderApiException(0, e.getMessage(), id());
             }
         }
 
@@ -368,12 +372,9 @@ public class GoogleDocumentPlatform implements DocumentPlatform {
                         .setRemoveParents(previousParents)
                         .execute();
             } catch (GoogleJsonResponseException e) {
-                if (e.getStatusCode() == 404) {
-                    throw new NoSuchElementException("File '" + fileId + "' not found");
-                }
-                throw new RuntimeException("Failed to move file " + fileId, e);
+                throw handleGoogleError(e);
             } catch (IOException e) {
-                throw new RuntimeException("Failed to move file " + fileId, e);
+                throw new ProviderApiException(0, e.getMessage(), id());
             }
         }
     }
@@ -399,8 +400,10 @@ public class GoogleDocumentPlatform implements DocumentPlatform {
                 var summaries = files.stream().map(GoogleDocumentPlatform::toSummary).toList();
                 String nextToken = response.getNextPageToken();
                 return new Page<>(summaries, nextToken, nextToken != null);
+            } catch (GoogleJsonResponseException e) {
+                throw handleGoogleError(e);
             } catch (IOException e) {
-                throw new RuntimeException("Failed to search files", e);
+                throw new ProviderApiException(0, e.getMessage(), id());
             }
         }
     }
@@ -420,13 +423,30 @@ public class GoogleDocumentPlatform implements DocumentPlatform {
                         .execute();
                 return file.getWebViewLink();
             } catch (GoogleJsonResponseException e) {
-                if (e.getStatusCode() == 404) {
-                    throw new NoSuchElementException("File '" + fileId + "' not found");
-                }
-                throw new RuntimeException("Failed to create share link for " + fileId, e);
+                throw handleGoogleError(e);
             } catch (IOException e) {
-                throw new RuntimeException("Failed to create share link for " + fileId, e);
+                throw new ProviderApiException(0, e.getMessage(), id());
             }
         }
+    }
+
+    private RuntimeException handleGoogleError(GoogleJsonResponseException e) {
+        int code = e.getStatusCode();
+        String body;
+        try {
+            body = e.getDetails() != null ? e.getDetails().toPrettyString() : e.getMessage();
+        } catch (IOException ignored) {
+            body = e.getMessage();
+        }
+        String reason = extractErrorReason(e);
+        return ProviderErrorMapping.mapStatusCode(code, body, id(), reason);
+    }
+
+    private static String extractErrorReason(GoogleJsonResponseException e) {
+        if (e.getDetails() != null && e.getDetails().getErrors() != null
+                && !e.getDetails().getErrors().isEmpty()) {
+            return e.getDetails().getErrors().get(0).getReason();
+        }
+        return null;
     }
 }
