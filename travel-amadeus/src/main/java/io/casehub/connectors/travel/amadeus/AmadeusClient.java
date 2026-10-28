@@ -46,6 +46,12 @@ public class AmadeusClient {
                 : "https://api.amadeus.com";
     }
 
+    AmadeusClient(String clientId, String clientSecret, String baseUrl, boolean unused) {
+        this.clientId = clientId;
+        this.clientSecret = clientSecret;
+        this.baseUrl = baseUrl;
+    }
+
     public String getToken() {
         var current = tokenRef.get();
         if (current != null && !current.isExpired()) {
