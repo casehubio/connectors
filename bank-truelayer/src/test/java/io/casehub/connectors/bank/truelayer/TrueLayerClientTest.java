@@ -11,6 +11,10 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import io.casehub.connectors.ProviderApiException;
+import io.casehub.connectors.ProviderAuthException;
+import io.casehub.connectors.ProviderRateLimitedException;
+
 import java.util.NoSuchElementException;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
@@ -103,7 +107,8 @@ class TrueLayerClientTest {
                 .willReturn(unauthorized()));
 
         assertThatThrownBy(() -> client.listAccounts("expired-token"))
-                .isInstanceOf(ConsentExpiredException.class);
+                .isInstanceOf(ConsentExpiredException.class)
+                .isInstanceOf(ProviderAuthException.class);
     }
 
     @Test
@@ -123,6 +128,7 @@ class TrueLayerClientTest {
 
         assertThatThrownBy(() -> client.listAccounts("user-token"))
                 .isInstanceOf(RateLimitedException.class)
+                .isInstanceOf(ProviderRateLimitedException.class)
                 .satisfies(e -> assertThat(((RateLimitedException) e).retryAfterSeconds()).isEqualTo(30));
     }
 
@@ -133,6 +139,7 @@ class TrueLayerClientTest {
 
         assertThatThrownBy(() -> client.listAccounts("user-token"))
                 .isInstanceOf(TrueLayerApiException.class)
+                .isInstanceOf(ProviderApiException.class)
                 .satisfies(e -> assertThat(((TrueLayerApiException) e).statusCode()).isEqualTo(500));
     }
 }

@@ -1,15 +1,10 @@
 package io.casehub.connectors.bank.truelayer;
 
-public class TrueLayerApiException extends RuntimeException {
+import io.casehub.connectors.ProviderApiException;
 
-    private final int statusCode;
+public class TrueLayerApiException extends ProviderApiException {
 
     public TrueLayerApiException(int statusCode, String message) {
-        super("TrueLayer API error (HTTP " + statusCode + "): " + message);
-        this.statusCode = statusCode;
-    }
-
-    public int statusCode() {
-        return statusCode;
+        super(statusCode, message, "truelayer");
     }
 }

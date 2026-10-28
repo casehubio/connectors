@@ -1,9 +1,16 @@
 package io.casehub.connectors.bank.truelayer;
 
-public class ConsentExpiredException extends RuntimeException {
+import io.casehub.connectors.AuthFailureReason;
+import io.casehub.connectors.ProviderAuthException;
+
+public class ConsentExpiredException extends ProviderAuthException {
+
+    private final String userId;
 
     public ConsentExpiredException(String userId) {
-        super("Consent expired or not found for user '" + userId
-              + "' — re-consent required via browser redirect");
+        super(AuthFailureReason.TOKEN_EXPIRED, "truelayer");
+        this.userId = userId;
     }
+
+    public String userId() { return userId; }
 }

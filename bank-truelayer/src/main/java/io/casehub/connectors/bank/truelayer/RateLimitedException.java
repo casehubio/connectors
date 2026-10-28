@@ -1,15 +1,10 @@
 package io.casehub.connectors.bank.truelayer;
 
-public class RateLimitedException extends RuntimeException {
+import io.casehub.connectors.ProviderRateLimitedException;
 
-    private final int retryAfterSeconds;
+public class RateLimitedException extends ProviderRateLimitedException {
 
     public RateLimitedException(int retryAfterSeconds) {
-        super("TrueLayer rate limit exceeded — retry after " + retryAfterSeconds + "s");
-        this.retryAfterSeconds = retryAfterSeconds;
-    }
-
-    public int retryAfterSeconds() {
-        return retryAfterSeconds;
+        super(retryAfterSeconds, "truelayer");
     }
 }
