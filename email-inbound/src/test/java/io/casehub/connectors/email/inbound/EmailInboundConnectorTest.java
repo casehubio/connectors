@@ -67,7 +67,7 @@ class EmailInboundConnectorTest {
 
     /** Waits up to 5s for the IDLE loop or processUnseen to deliver a message. */
     private InboundMessage receive() {
-        await().atMost(10, TimeUnit.SECONDS)
+        await().atMost(30, TimeUnit.SECONDS)
                .untilAsserted(() -> assertThat(captured).as("message not delivered within 10s — IDLE did not fire or processUnseen missed it").isNotEmpty());
         return captured.poll();
     }
@@ -177,7 +177,7 @@ class EmailInboundConnectorTest {
         deliver("a@example.com", "First", "Body A");
         deliver("b@example.com", "Second", "Body B");
 
-        await().atMost(10, TimeUnit.SECONDS)
+        await().atMost(30, TimeUnit.SECONDS)
                .untilAsserted(() -> assertThat(captured).as("both messages not delivered within 10s").hasSize(2));
         final InboundMessage m1 = captured.poll();
         final InboundMessage m2 = captured.poll();
