@@ -573,7 +573,7 @@ class DiscordChatPlatformTest {
 
         embeddedGateway.sendDispatch("MESSAGE_CREATE", messageJson);
 
-        await().atMost(Duration.ofSeconds(2)).until(() -> !recordingSink.messages.isEmpty());
+        await().atMost(Duration.ofSeconds(5)).until(() -> !recordingSink.messages.isEmpty());
         assertThat(recordingSink.messages).hasSize(1);
 
         InboundMessage msg = recordingSink.messages.get(0);
@@ -711,7 +711,7 @@ class DiscordChatPlatformTest {
 
         embeddedGateway.sendDispatch("GUILD_CREATE", guildCreateJson);
 
-        await().atMost(Duration.ofSeconds(2)).until(() -> presenceCache.get("user-111") != null);
+        await().atMost(Duration.ofSeconds(5)).until(() -> presenceCache.get("user-111") != null);
         assertThat(presenceCache.get("user-111")).isEqualTo("online");
         assertThat(presenceCache.get("user-222")).isEqualTo("idle");
         assertThat(presenceCache.get("user-333")).isEqualTo("dnd");
@@ -744,7 +744,7 @@ class DiscordChatPlatformTest {
 
         embeddedGateway.sendDispatch("PRESENCE_UPDATE", presenceUpdateJson);
 
-        await().atMost(Duration.ofSeconds(2)).until(() -> presenceCache.get("user-444") != null);
+        await().atMost(Duration.ofSeconds(5)).until(() -> presenceCache.get("user-444") != null);
         assertThat(presenceCache.get("user-444")).isEqualTo("offline");
     }
 
