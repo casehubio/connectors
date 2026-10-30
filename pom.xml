@@ -72,6 +72,7 @@ Zero heavy dependencies — HTTP-based connectors use java.net.http only.</descr
     <module>health-ref</module>
     <module>voice-spi</module>
     <module>voice-ref</module>
+    <module>voice-pipeline-steps</module>
     <module>graphql</module>
     <module>connectors-spring</module>
   </modules>
