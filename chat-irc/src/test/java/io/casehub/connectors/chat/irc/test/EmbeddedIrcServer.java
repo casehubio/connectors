@@ -18,7 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
 
-public final class EmbeddedIrcServer {
+public final class EmbeddedIrcServer implements AutoCloseable {
 
     private final int requestedPort;
     private ServerSocket serverSocket;
@@ -36,7 +36,9 @@ public final class EmbeddedIrcServer {
 
     public synchronized void start() {
         try {
-            serverSocket = new ServerSocket(requestedPort);
+            serverSocket = new ServerSocket();
+            serverSocket.setReuseAddress(true);
+            serverSocket.bind(new java.net.InetSocketAddress(requestedPort));
             acceptorThread = Thread.ofVirtual().start(this::acceptLoop);
         } catch (IOException e) {
             throw new RuntimeException("Failed to start IRC server", e);
@@ -58,6 +60,11 @@ public final class EmbeddedIrcServer {
         } catch (IOException e) {
             throw new RuntimeException("Failed to stop IRC server", e);
         }
+    }
+
+    @Override
+    public void close() {
+        stop();
     }
 
     public int getPort() {

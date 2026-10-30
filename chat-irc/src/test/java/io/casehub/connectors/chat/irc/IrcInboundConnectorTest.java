@@ -18,7 +18,6 @@ import io.casehub.connectors.chat.irc.test.EmbeddedIrcServer;
 
 class IrcInboundConnectorTest {
 
-    private static final int FIXED_PORT = 16667;  // Fixed port for reconnect tests
     private EmbeddedIrcServer server;
     private IrcClient client;
     private IrcInboundConnector connector;
@@ -61,9 +60,10 @@ class IrcInboundConnectorTest {
 
     @Test
     void reconnectsAfterServerDrop() {
-        server = new EmbeddedIrcServer(FIXED_PORT);
+        server = new EmbeddedIrcServer(0);
         server.start();
-        client = new IrcClient("localhost", FIXED_PORT, "testbot");
+        int dynamicPort = server.getPort();
+        client = new IrcClient("localhost", dynamicPort, "testbot");
         sink = new RecordingSink();
         connector = new IrcInboundConnector(client, Optional.of(List.of("#test")));
 
@@ -73,12 +73,12 @@ class IrcInboundConnectorTest {
         server.sendToChannel("#test", "alice", "first message");
         await().atMost(Duration.ofSeconds(2)).until(() -> !sink.messages.isEmpty());
 
-        // Stop server
+        // Stop server — SO_REUSEADDR ensures the port can be rebound immediately
         server.stop();
         await().atMost(Duration.ofSeconds(3)).until(() -> !client.isConnected());
 
-        // Start NEW server on SAME port
-        server = new EmbeddedIrcServer(FIXED_PORT);
+        // Start NEW server on SAME dynamic port
+        server = new EmbeddedIrcServer(dynamicPort);
         server.start();
 
         // Wait for reconnect
