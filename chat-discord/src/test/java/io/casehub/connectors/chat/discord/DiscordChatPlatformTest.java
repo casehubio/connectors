@@ -3,6 +3,7 @@ package io.casehub.connectors.chat.discord;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.fail;
 import static org.awaitility.Awaitility.await;
 
 import java.time.Duration;
@@ -10,6 +11,8 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
@@ -558,7 +561,7 @@ class DiscordChatPlatformTest {
         inboundConnector.start(recordingSink);
 
         embeddedGateway.expectConnections(1);
-        await().atMost(Duration.ofSeconds(5)).until(() -> embeddedGateway.getActiveSessionCount() > 0);
+        if (!embeddedGateway.awaitConnections(5, TimeUnit.SECONDS)) fail("Gateway connection timed out");
 
         String messageJson = """
                 {
@@ -573,7 +576,7 @@ class DiscordChatPlatformTest {
 
         embeddedGateway.sendDispatch("MESSAGE_CREATE", messageJson);
 
-        await().atMost(Duration.ofSeconds(5)).until(() -> !recordingSink.messages.isEmpty());
+        if (!recordingSink.awaitMessage(5, TimeUnit.SECONDS)) fail("Message delivery timed out");
         assertThat(recordingSink.messages).hasSize(1);
 
         InboundMessage msg = recordingSink.messages.get(0);
@@ -602,7 +605,7 @@ class DiscordChatPlatformTest {
 
         inboundConnector.start(recordingSink);
         embeddedGateway.expectConnections(1);
-        await().atMost(Duration.ofSeconds(5)).until(() -> embeddedGateway.getActiveSessionCount() > 0);
+        if (!embeddedGateway.awaitConnections(5, TimeUnit.SECONDS)) fail("Gateway connection timed out");
 
         // Type 7 = member join (system message)
         String systemMessageJson = """
@@ -638,7 +641,7 @@ class DiscordChatPlatformTest {
 
         inboundConnector.start(recordingSink);
         embeddedGateway.expectConnections(1);
-        await().atMost(Duration.ofSeconds(5)).until(() -> embeddedGateway.getActiveSessionCount() > 0);
+        if (!embeddedGateway.awaitConnections(5, TimeUnit.SECONDS)) fail("Gateway connection timed out");
 
         String botMessageJson = """
                 {
@@ -695,7 +698,7 @@ class DiscordChatPlatformTest {
 
         inboundConnector.start(recordingSink);
         embeddedGateway.expectConnections(1);
-        await().atMost(Duration.ofSeconds(5)).until(() -> embeddedGateway.getActiveSessionCount() > 0);
+        if (!embeddedGateway.awaitConnections(5, TimeUnit.SECONDS)) fail("Gateway connection timed out");
 
         String guildCreateJson = """
                 {
@@ -733,7 +736,7 @@ class DiscordChatPlatformTest {
 
         inboundConnector.start(recordingSink);
         embeddedGateway.expectConnections(1);
-        await().atMost(Duration.ofSeconds(5)).until(() -> embeddedGateway.getActiveSessionCount() > 0);
+        if (!embeddedGateway.awaitConnections(5, TimeUnit.SECONDS)) fail("Gateway connection timed out");
 
         String presenceUpdateJson = """
                 {
@@ -896,10 +899,16 @@ class DiscordChatPlatformTest {
 
     private static class RecordingSink implements InboundMessageSink {
         final List<InboundMessage> messages = new ArrayList<>();
+        private final CountDownLatch latch = new CountDownLatch(1);
 
         @Override
         public void receive(InboundMessage message) {
             messages.add(message);
+            latch.countDown();
+        }
+
+        boolean awaitMessage(long timeout, TimeUnit unit) throws InterruptedException {
+            return latch.await(timeout, unit);
         }
     }
 }
