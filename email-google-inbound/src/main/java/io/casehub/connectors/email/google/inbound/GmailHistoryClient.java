@@ -25,23 +25,39 @@ public class GmailHistoryClient {
         this.connectionProvider = connectionProvider;
     }
 
-    public List<String> getNewMessageIds(String emailAddress, long startHistoryId) {
+    public record HistoryResult(List<String> messageIds, long historyId) {}
+
+    public HistoryResult getNewMessages(String emailAddress, long startHistoryId) {
         String token = connectionProvider.getAccessToken(emailAddress, "google", null).accessToken();
-        String url = GMAIL_API + "/history?startHistoryId=" + startHistoryId
-                + "&historyTypes=messageAdded";
-        var req = HttpRequest.newBuilder().uri(URI.create(url))
-                .header("Authorization", "Bearer " + token).GET().build();
-        try {
-            var resp = HttpHelper.CLIENT.send(req, HttpResponse.BodyHandlers.ofString());
-            if (resp.statusCode() != 200) {
-                LOG.warning("gmail-history: API returned " + resp.statusCode());
-                return List.of();
+        List<String> allIds = new ArrayList<>();
+        long latestHistoryId = startHistoryId;
+        String pageToken = null;
+
+        do {
+            String url = GMAIL_API + "/history?startHistoryId=" + startHistoryId
+                    + "&historyTypes=messageAdded";
+            if (pageToken != null) url += "&pageToken=" + pageToken;
+            var req = HttpRequest.newBuilder().uri(URI.create(url))
+                    .header("Authorization", "Bearer " + token).GET().build();
+            try {
+                var resp = HttpHelper.CLIENT.send(req, HttpResponse.BodyHandlers.ofString());
+                if (resp.statusCode() != 200) {
+                    LOG.warning("gmail-history: API returned " + resp.statusCode());
+                    break;
+                }
+                var json = Json.createReader(new StringReader(resp.body())).readObject();
+                allIds.addAll(parseMessageIds(json));
+                if (json.containsKey("historyId")) {
+                    latestHistoryId = json.getJsonNumber("historyId").longValue();
+                }
+                pageToken = json.getString("nextPageToken", null);
+            } catch (Exception e) {
+                LOG.warning("gmail-history: failed to fetch history: " + e.getMessage());
+                break;
             }
-            return parseMessageIds(resp.body());
-        } catch (Exception e) {
-            LOG.warning("gmail-history: failed to fetch history: " + e.getMessage());
-            return List.of();
-        }
+        } while (pageToken != null);
+
+        return new HistoryResult(allIds, latestHistoryId);
     }
 
     public long getCurrentHistoryId(String emailAddress) {
@@ -51,8 +67,13 @@ public class GmailHistoryClient {
                 .header("Authorization", "Bearer " + token).GET().build();
         try {
             var resp = HttpHelper.CLIENT.send(req, HttpResponse.BodyHandlers.ofString());
+            if (resp.statusCode() != 200) {
+                throw new RuntimeException("Gmail profile API returned " + resp.statusCode());
+            }
             var json = Json.createReader(new StringReader(resp.body())).readObject();
             return json.getJsonNumber("historyId").longValue();
+        } catch (RuntimeException e) {
+            throw e;
         } catch (Exception e) {
             throw new RuntimeException("Failed to get Gmail profile historyId", e);
         }
@@ -94,9 +115,8 @@ public class GmailHistoryClient {
 
     public record MessageSummary(String messageId, String from, String subject, String snippet) {}
 
-    private static List<String> parseMessageIds(String body) {
+    private static List<String> parseMessageIds(JsonObject json) {
         List<String> ids = new ArrayList<>();
-        var json = Json.createReader(new StringReader(body)).readObject();
         JsonArray history = json.getJsonArray("history");
         if (history == null) return ids;
         for (var entry : history) {

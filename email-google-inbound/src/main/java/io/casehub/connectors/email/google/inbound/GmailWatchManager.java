@@ -9,7 +9,10 @@ import java.util.logging.Logger;
 
 import io.casehub.connectors.http.HttpHelper;
 import io.casehub.platform.api.authn.ServiceConnectionProvider;
+import io.quarkus.runtime.StartupEvent;
+import io.quarkus.scheduler.Scheduled;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.event.Observes;
 import jakarta.inject.Inject;
 import jakarta.json.Json;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
@@ -32,6 +35,31 @@ public class GmailWatchManager {
         this.connectionProvider = connectionProvider;
         this.historyStore = historyStore;
         this.pubsubTopic = pubsubTopic;
+    }
+
+    void onStartup(@Observes StartupEvent event) {
+        if (pubsubTopic.isBlank()) {
+            LOG.info("gmail-push: pubsub-topic not configured, watch registration skipped");
+            return;
+        }
+        refreshWatches();
+    }
+
+    @Scheduled(every = "${casehub.connectors.gmail.push.watch-refresh-interval:24h}")
+    void scheduledRefresh() {
+        if (!pubsubTopic.isBlank()) refreshWatches();
+    }
+
+    private void refreshWatches() {
+        for (var conn : connectionProvider.listConnections(null, null)) {
+            if (!"google".equals(conn.provider())) continue;
+            try {
+                registerWatch(conn.actorId());
+            } catch (Exception e) {
+                LOG.log(Level.WARNING, "gmail-push: watch registration failed for "
+                        + conn.actorId(), e);
+            }
+        }
     }
 
     public void registerWatch(String userId) {

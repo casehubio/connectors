@@ -79,11 +79,14 @@ public class GmailPushInboundConnector extends WebhookInboundConnector {
                 return List.of();
             }
 
-            var messageIds = historyClient.getNewMessageIds(emailAddress, lastId.get());
-            if (messageIds.isEmpty()) return List.of();
+            var historyResult = historyClient.getNewMessages(emailAddress, lastId.get());
+            if (historyResult.messageIds().isEmpty()) {
+                historyStore.setLastHistoryId(emailAddress, historyResult.historyId());
+                return List.of();
+            }
 
             List<InboundMessage> messages = new ArrayList<>();
-            for (String msgId : messageIds) {
+            for (String msgId : historyResult.messageIds()) {
                 try {
                     var summary = historyClient.getMessageSummary(emailAddress, msgId);
                     messages.add(new InboundMessage(
@@ -100,8 +103,7 @@ public class GmailPushInboundConnector extends WebhookInboundConnector {
                 }
             }
 
-            long newHistoryId = historyClient.getCurrentHistoryId(emailAddress);
-            historyStore.setLastHistoryId(emailAddress, newHistoryId);
+            historyStore.setLastHistoryId(emailAddress, historyResult.historyId());
             return messages;
         } finally {
             lock.unlock();
@@ -146,7 +148,7 @@ public class GmailPushInboundConnector extends WebhookInboundConnector {
             if (message == null) return null;
             String data = message.getString("data", null);
             if (data == null) return null;
-            String decoded = new String(Base64.getDecoder().decode(data));
+            String decoded = new String(Base64.getUrlDecoder().decode(data));
             return Json.createReader(new StringReader(decoded)).readObject();
         } catch (Exception e) {
             return null;

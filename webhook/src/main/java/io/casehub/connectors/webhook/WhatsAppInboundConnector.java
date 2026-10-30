@@ -38,9 +38,11 @@ import java.util.logging.Logger;
  * {@code X-Hub-Signature-256: sha256=<hex>} using constant-time comparison.
  *
  * <h2>Media messages</h2>
- * Text messages set {@code content} to the message body. Media messages (image, audio,
- * document, sticker) set {@code content} to the media URL if available, or empty string
- * (v1 limitation — binary media is out of scope).
+ * Text messages are delivered immediately. Media messages (image, audio, document, video,
+ * sticker) return {@link WebhookResult.DeferredDelivery} — the router delivers text messages
+ * synchronously and spawns a virtual thread to download media via the Meta Graph API
+ * (3-attempt exponential backoff). Other message types (contacts, location, etc.) are
+ * delivered immediately with empty content and a {@code message-type} metadata entry.
  */
 public class WhatsAppInboundConnector extends WebhookInboundConnector {
 
@@ -184,6 +186,12 @@ public class WhatsAppInboundConnector extends WebhookInboundConnector {
                 if (mediaId != null) {
                     mediaOut.add(new MediaRef(from, phoneNumberId, type, mediaId, mimeType, msgId));
                 }
+            } else {
+                final Map<String, String> meta = msgId != null
+                        ? Map.of("message-id", msgId, "message-type", type)
+                        : Map.of("message-type", type);
+                textOut.add(new InboundMessage(ID, InboundConnectorTypes.WHATSAPP,
+                        from, phoneNumberId, "", List.of(), Instant.now(), meta, tenancyId));
             }
         }
     }
@@ -254,8 +262,18 @@ public class WhatsAppInboundConnector extends WebhookInboundConnector {
     }
 
     private byte[] downloadBinary(final String url) throws Exception {
+        final var uri = URI.create(url);
+        if (!"https".equals(uri.getScheme())) {
+            throw new SecurityException("whatsapp-inbound: refusing non-HTTPS media URL: " + uri.getScheme());
+        }
+        final String host = uri.getHost();
+        if (host == null || host.startsWith("10.") || host.startsWith("172.")
+                || host.startsWith("192.168.") || host.startsWith("169.254.")
+                || "localhost".equals(host) || host.endsWith(".local")) {
+            throw new SecurityException("whatsapp-inbound: refusing private/local media URL: " + host);
+        }
         final var req = HttpRequest.newBuilder()
-                .uri(URI.create(url))
+                .uri(uri)
                 .header("Authorization", "Bearer " + apiToken)
                 .GET().build();
         final var resp = HttpHelper.CLIENT.send(req, HttpResponse.BodyHandlers.ofByteArray());
