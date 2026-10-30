@@ -1,7 +1,7 @@
 package io.casehub.connectors.email.inbound;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.awaitility.Awaitility.await;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.time.Instant;
 import java.util.Date;
@@ -65,11 +65,10 @@ class EmailInboundConnectorTest {
                 false, "inbox@example.com", "password", "INBOX", 60, null);
     }
 
-    /** Waits up to 5s for the IDLE loop or processUnseen to deliver a message. */
-    private InboundMessage receive() {
-        await().atMost(30, TimeUnit.SECONDS)
-               .untilAsserted(() -> assertThat(captured).as("message not delivered within 10s — IDLE did not fire or processUnseen missed it").isNotEmpty());
-        return captured.poll();
+    private InboundMessage receive() throws InterruptedException {
+        InboundMessage msg = captured.poll(10, TimeUnit.SECONDS);
+        assertNotNull(msg, "message not delivered within 10s — IDLE did not fire or processUnseen missed it");
+        return msg;
     }
 
     // ── helpers ──────────────────────────────────────────────────────────────
@@ -177,10 +176,10 @@ class EmailInboundConnectorTest {
         deliver("a@example.com", "First", "Body A");
         deliver("b@example.com", "Second", "Body B");
 
-        await().atMost(30, TimeUnit.SECONDS)
-               .untilAsserted(() -> assertThat(captured).as("both messages not delivered within 10s").hasSize(2));
-        final InboundMessage m1 = captured.poll();
-        final InboundMessage m2 = captured.poll();
+        final InboundMessage m1 = captured.poll(10, TimeUnit.SECONDS);
+        assertNotNull(m1, "first message not delivered within 10s");
+        final InboundMessage m2 = captured.poll(10, TimeUnit.SECONDS);
+        assertNotNull(m2, "second message not delivered within 10s");
         assertThat(List.of(m1.content(), m2.content()))
                 .containsExactlyInAnyOrder("Body A", "Body B");
     }
