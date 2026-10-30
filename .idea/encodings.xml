@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/../agency/agency-core/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../agency/agency-core/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../chat-app/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../chat-app/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/bank-ref/src/main/java" charset="UTF-8" />
@@ -99,6 +101,10 @@
     <file url="file://$PROJECT_DIR$/slack-bot/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/travel-amadeus/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/travel-amadeus/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/travel-google/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/travel-google/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/travel-ref/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/travel-ref/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/travel-spi/src/main/java" charset="UTF-8" />
@@ -163,6 +169,12 @@
     <file url="file://$PROJECT_DIR$/../platform/agent-gemini-spring/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/agent-gemini/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/agent-gemini/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/agent-http-core/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/agent-http-core/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/agent-http-spring/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/agent-http-spring/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/agent-http/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/agent-http/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/agent-langchain4j-core/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/agent-langchain4j-core/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/agent-langchain4j-spring/src/main/java" charset="UTF-8" />
