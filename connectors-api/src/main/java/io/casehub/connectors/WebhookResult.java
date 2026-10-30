@@ -1,6 +1,7 @@
 package io.casehub.connectors;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 /**
  * Result returned by {@link WebhookInboundConnector#handle(WebhookRequest)}.
@@ -49,4 +50,16 @@ public sealed interface WebhookResult {
      * GET  → HTTP 403 (admin console setup — human needs a clear failure signal).
      */
     record Unauthorized() implements WebhookResult {}
+
+    /**
+     * Some messages are available immediately; others require async work (e.g. media download).
+     *
+     * <p>The router delivers {@code immediate} messages synchronously, then spawns a
+     * virtual thread for the {@code deferred} supplier. If the supplier fails, the
+     * router logs but does not retry — the connector controls retry policy internally.
+     */
+    record DeferredDelivery(
+            List<InboundMessage> immediate,
+            Supplier<List<InboundMessage>> deferred) implements WebhookResult {}
+
 }
