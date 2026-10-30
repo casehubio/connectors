@@ -20,10 +20,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import io.casehub.connectors.discord.test.EmbeddedDiscordGateway;
-import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
+import org.junit.jupiter.api.Timeout;
 
-@DisabledIfEnvironmentVariable(named = "CI", matches = "true",
-        disabledReason = "WebSocket integration tests require a quiet environment — flaky under -T 1C on shared CI runners")
+@Timeout(120)
 class DiscordGatewayTest {
 
     private static final String TOKEN = "test-bot-token";

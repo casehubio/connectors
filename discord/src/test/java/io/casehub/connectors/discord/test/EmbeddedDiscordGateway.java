@@ -20,9 +20,9 @@ import io.vertx.core.http.WebSocketFrame;
  * WebSocket communication. Text frames only. Follows the
  * {@code EmbeddedIrcServer} pattern: port 0, minimal API.
  */
-public final class EmbeddedDiscordGateway {
+public final class EmbeddedDiscordGateway implements AutoCloseable {
 
-    private static final int HEARTBEAT_INTERVAL_MS = 500;
+    private static final int HEARTBEAT_INTERVAL_MS = 1500;
 
     private Vertx vertx;
     private HttpServer server;
@@ -67,6 +67,11 @@ public final class EmbeddedDiscordGateway {
         });
 
         server.listen().toCompletionStage().toCompletableFuture().join();
+    }
+
+    @Override
+    public void close() {
+        stop();
     }
 
     public synchronized void stop() {

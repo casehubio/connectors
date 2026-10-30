@@ -118,6 +118,11 @@ public class DiscordGateway {
         Thread ct = connectThread;
         if (ct != null) {
             ct.interrupt();
+            try {
+                ct.join(5000);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
             connectThread = null;
         }
 
