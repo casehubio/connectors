@@ -11,6 +11,7 @@ import io.casehub.connectors.voice.spi.TextToSpeech;
 import io.casehub.connectors.voice.spi.VoicePlatform;
 import io.casehub.connectors.voice.spi.VoicePlatformService;
 import io.casehub.connectors.voice.steps.SttTranscribePlugin;
+import io.casehub.connectors.voice.steps.TtsSynthesisePlugin;
 import io.casehub.yaml.plugin.api.MapServiceRegistry;
 import io.casehub.yaml.plugin.api.StreamingStep;
 import io.casehub.yaml.plugin.api.StreamingTypeInfo;
@@ -173,4 +174,55 @@ class VoiceRoundTripTest {
             assertThat(stt.confidence()).isEqualTo(0.95);
         }
     }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void yamlRoundTripPipelineResolvesAndExecutesBothSteps() throws Exception {
+        var scanner  = new PluginScanner();
+        var registry = new CompositePluginRegistry();
+        scanner.scanAndRegister(TtsSynthesisePlugin.class, registry);
+        scanner.scanAndRegister(SttTranscribePlugin.class, registry);
+
+        var ttsDefn = registry.resolve("tts-synthesise").orElseThrow();
+        var sttDefn = registry.resolve("stt-transcribe").orElseThrow();
+        assertThat(ttsDefn.streamingType()).isPresent();
+        assertThat(sttDefn.streamingType()).isPresent();
+
+        var                 yaml = new org.yaml.snakeyaml.Yaml();
+        Map<String, Object> doc;
+        try (var stream = getClass().getResourceAsStream("/voice-tts-stt-chain.yaml")) {
+            doc = yaml.load(stream);
+        }
+        var stepMaps = (List<Map<String, Object>>) doc.get("steps");
+        assertThat(stepMaps).hasSizeGreaterThanOrEqualTo(2);
+
+        var resolved = Walker.resolve(stepMaps, registry);
+        assertThat(resolved.stream()
+                           .filter(s -> s instanceof ResolvedStep.PluginStep)
+                           .map(s -> ((ResolvedStep.PluginStep) s).actionName())
+                           .toList()).contains("tts-synthesise", "stt-transcribe");
+
+        var fusedSteps = io.casehub.yaml.step.eval.FusionPass.fuse(resolved, registry);
+        assertThat(fusedSteps).hasSizeGreaterThanOrEqualTo(2);
+
+        var services = new MapServiceRegistry()
+                               .register(VoicePlatform.class, platform);
+
+        StreamingStep<String, SynthesisResult> ttsStep =
+                (StreamingStep<String, SynthesisResult>) ttsDefn.streamingType().get()
+                                                                .factory().create(Map.of("language", "en"), services);
+
+        SynthesisResult ttsResult = ttsStep.apply("Round-trip via YAML pipeline");
+        assertThat(ttsResult.audioData()).isNotEmpty();
+        assertThat(ttsResult.audioFormat()).isEqualTo("wav");
+
+        StreamingStep<byte[], TranscriptionResult> sttStep =
+                (StreamingStep<byte[], TranscriptionResult>) sttDefn.streamingType().get()
+                                                                    .factory().create(Map.of(), services);
+
+        TranscriptionResult sttResult = sttStep.apply(ttsResult.audioData());
+        assertThat(sttResult.text()).isNotBlank();
+        assertThat(sttResult.confidence()).isGreaterThan(0.0);
+    }
+
 }
