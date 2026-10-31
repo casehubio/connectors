@@ -51,7 +51,7 @@
       <scope>test</scope>
     </dependency>
 
-    <!-- YAML plugin runtime (PluginScanner, ServiceRegistry) -->
+    <!-- YAML plugin runtime (PluginScanner, Walker, CatalogStepRunner) -->
     <dependency>
       <groupId>io.casehub</groupId>
       <artifactId>casehub-platform-yaml-step-runtime</artifactId>
@@ -60,6 +60,11 @@
     <dependency>
       <groupId>io.casehub</groupId>
       <artifactId>casehub-platform-yaml-plugin-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.casehub</groupId>
+      <artifactId>casehub-platform-yaml-core</artifactId>
       <scope>test</scope>
     </dependency>
 

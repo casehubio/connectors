@@ -16,6 +16,8 @@ import io.casehub.yaml.plugin.api.StreamingStep;
 import io.casehub.yaml.plugin.api.StreamingTypeInfo;
 import io.casehub.yaml.step.catalog.CompositePluginRegistry;
 import io.casehub.yaml.step.catalog.PluginScanner;
+import io.casehub.yaml.step.catalog.ResolvedStep;
+import io.casehub.yaml.step.catalog.Walker;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -89,6 +91,49 @@ class VoiceRoundTripTest {
 
         SynthesisResult ttsResult = platform.textToSpeech()
                 .synthesise("Hello from YAML pipeline", new SynthesisOptions(null, "en", "wav", false));
+
+        TranscriptionResult sttResult = step.apply(ttsResult.audioData());
+
+        assertThat(sttResult.text()).isNotBlank();
+        assertThat(sttResult.language()).isEqualTo("en");
+        assertThat(sttResult.confidence()).isEqualTo(0.95);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void yamlLoadedPipelineResolvesAndExecutesSttStep() throws Exception {
+        var scanner = new PluginScanner();
+        var registry = new CompositePluginRegistry();
+        scanner.scanAndRegister(SttTranscribePlugin.class, registry);
+
+        var yaml = new org.yaml.snakeyaml.Yaml();
+        Map<String, Object> doc;
+        try (var stream = getClass().getResourceAsStream("/voice-message-pipeline.yaml")) {
+            doc = yaml.load(stream);
+        }
+        var stepMaps = (List<Map<String, Object>>) doc.get("steps");
+        assertThat(stepMaps).hasSize(1);
+
+        var resolved = Walker.resolve(stepMaps, registry);
+        assertThat(resolved).hasSize(1);
+        assertThat(resolved.get(0)).isInstanceOf(ResolvedStep.PluginStep.class);
+
+        var pluginStep = (ResolvedStep.PluginStep) resolved.get(0);
+        assertThat(pluginStep.actionName()).isEqualTo("stt-transcribe");
+        assertThat(pluginStep.name()).isEqualTo("transcribe");
+
+        var definition = registry.resolve("stt-transcribe").orElseThrow();
+        assertThat(definition.streamingType()).isPresent();
+
+        var services = new MapServiceRegistry()
+                .register(VoicePlatform.class, platform);
+
+        StreamingStep<byte[], TranscriptionResult> step =
+                (StreamingStep<byte[], TranscriptionResult>) definition.streamingType().get()
+                        .factory().create(pluginStep.params(), services);
+
+        SynthesisResult ttsResult = platform.textToSpeech()
+                .synthesise("YAML pipeline round-trip", new SynthesisOptions(null, "en", "wav", false));
 
         TranscriptionResult sttResult = step.apply(ttsResult.audioData());
 
