@@ -1,3 +1,9 @@
 package io.casehub.connectors.voice.model;
 
-public record TranscriptionResult(String text, String language, double confidence) {}
+import java.util.Objects;
+
+public record TranscriptionResult(String text, String language, double confidence) {
+    public TranscriptionResult {
+        Objects.requireNonNull(text, "text");
+    }
+}

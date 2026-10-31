@@ -6,6 +6,10 @@ public record TranscriptionOptions(
         String modelSize,
         String vocabularyHint) {
 
+    public TranscriptionOptions(String audioFormat, String languageHint, String modelSize) {
+        this(audioFormat, languageHint, modelSize, null);
+    }
+
     public static TranscriptionOptions defaults() {
         return new TranscriptionOptions(null, null, null, null);
     }
@@ -16,5 +20,9 @@ public record TranscriptionOptions(
 
     public TranscriptionOptions withModelSize(String size) {
         return new TranscriptionOptions(audioFormat, languageHint, size, vocabularyHint);
+    }
+
+    public TranscriptionOptions withVocabularyHint(String hint) {
+        return new TranscriptionOptions(audioFormat, languageHint, modelSize, hint);
     }
 }

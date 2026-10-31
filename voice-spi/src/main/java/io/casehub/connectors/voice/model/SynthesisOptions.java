@@ -4,4 +4,9 @@ public record SynthesisOptions(
         String voice,
         String language,
         String audioFormat,
-        boolean includePhonemes) {}
+        boolean includePhonemes) {
+
+    public static SynthesisOptions defaults() {
+        return new SynthesisOptions(null, null, "wav", false);
+    }
+}
