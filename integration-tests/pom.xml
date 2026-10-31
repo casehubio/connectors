@@ -51,6 +51,18 @@
       <scope>test</scope>
     </dependency>
 
+    <!-- YAML plugin runtime (PluginScanner, ServiceRegistry) -->
+    <dependency>
+      <groupId>io.casehub</groupId>
+      <artifactId>casehub-platform-yaml-step-runtime</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.casehub</groupId>
+      <artifactId>casehub-platform-yaml-plugin-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+
     <!-- Shared -->
     <dependency>
       <groupId>io.casehub</groupId>

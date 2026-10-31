@@ -11,9 +11,15 @@ import io.casehub.connectors.voice.spi.TextToSpeech;
 import io.casehub.connectors.voice.spi.VoicePlatform;
 import io.casehub.connectors.voice.spi.VoicePlatformService;
 import io.casehub.connectors.voice.steps.SttTranscribePlugin;
+import io.casehub.yaml.plugin.api.MapServiceRegistry;
+import io.casehub.yaml.plugin.api.StreamingStep;
+import io.casehub.yaml.plugin.api.StreamingTypeInfo;
+import io.casehub.yaml.step.catalog.CompositePluginRegistry;
+import io.casehub.yaml.step.catalog.PluginScanner;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -43,7 +49,7 @@ class VoiceRoundTripTest {
     }
 
     @Test
-    void roundTripViaSttTranscribePlugin() {
+    void roundTripViaSttTranscribePluginDirect() {
         SynthesisResult ttsResult = platform.textToSpeech()
                 .synthesise("Testing pipeline", new SynthesisOptions(null, "en", "wav", false));
 
@@ -53,6 +59,42 @@ class VoiceRoundTripTest {
         assertThat(result.text()).isNotBlank();
         assertThat(result.language()).isEqualTo("en");
         assertThat(result.confidence()).isGreaterThan(0.0);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void roundTripViaPluginScannerAndStreamingStep() {
+        var scanner = new PluginScanner();
+        var registry = new CompositePluginRegistry();
+        scanner.scanAndRegister(SttTranscribePlugin.class, registry);
+
+        var def = registry.resolve("stt-transcribe");
+        assertThat(def).isPresent();
+        assertThat(def.get().description()).isEqualTo("Transcribe audio bytes to text via VoicePlatform STT");
+        assertThat(def.get().inputs()).containsKey("language");
+        assertThat(def.get().inputs()).containsKey("model");
+        assertThat(def.get().inputs().get("language").required()).isFalse();
+
+        assertThat(def.get().streamingType()).isPresent();
+        StreamingTypeInfo streamingInfo = def.get().streamingType().get();
+        assertThat(streamingInfo.inputType()).isEqualTo(byte[].class);
+        assertThat(streamingInfo.outputType()).isEqualTo(TranscriptionResult.class);
+
+        var services = new MapServiceRegistry()
+                .register(VoicePlatform.class, platform);
+
+        StreamingStep<byte[], TranscriptionResult> step =
+                (StreamingStep<byte[], TranscriptionResult>) streamingInfo.factory()
+                        .create(Map.of("language", "en"), services);
+
+        SynthesisResult ttsResult = platform.textToSpeech()
+                .synthesise("Hello from YAML pipeline", new SynthesisOptions(null, "en", "wav", false));
+
+        TranscriptionResult sttResult = step.apply(ttsResult.audioData());
+
+        assertThat(sttResult.text()).isNotBlank();
+        assertThat(sttResult.language()).isEqualTo("en");
+        assertThat(sttResult.confidence()).isEqualTo(0.95);
     }
 
     @Test
