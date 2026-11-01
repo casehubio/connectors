@@ -1,0 +1,5 @@
+[     171ms] [ERROR] Access to fetch at 'http://localhost:8947/2026-10-30-mdp01-your-workflow-engine-is-a-data-pipeline.md' from origin 'http://localhost:8948' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ http://localhost:8948/blog-viewer.html:0
+[     171ms] [ERROR] Failed to load resource: net::ERR_FAILED @ http://localhost:8947/2026-10-30-mdp01-your-workflow-engine-is-a-data-pipeline.md:0
+[     176ms] TypeError: Failed to fetch
+    at http://localhost:8948/blog-viewer.html:22:1
+[     175ms] [ERROR] Failed to load resource: the server responded with a status of 404 (File not found) @ http://localhost:8948/favicon.ico:0

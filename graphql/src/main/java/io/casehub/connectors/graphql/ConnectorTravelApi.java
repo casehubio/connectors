@@ -25,7 +25,6 @@ import jakarta.ws.rs.QueryParam;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.List;
 
 @McpDomain(value = "connectors/travel", app = "connectors",
     basePath = "/api/connectors/travel",
