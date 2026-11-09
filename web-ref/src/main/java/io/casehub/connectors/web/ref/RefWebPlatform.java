@@ -1,6 +1,6 @@
 package io.casehub.connectors.web.ref;
 
-import io.casehub.connectors.web.model.CapturedImage;
+import io.casehub.connectors.web.model.BrowserCookie;
 import io.casehub.connectors.web.model.FetchOptions;
 import io.casehub.connectors.web.model.FetchResult;
 import io.casehub.connectors.web.model.ImageProcessingResult;
@@ -10,6 +10,7 @@ import io.casehub.connectors.web.model.PanelDefinition;
 import io.casehub.connectors.web.model.ParseResult;
 import io.casehub.connectors.web.spi.WebPlatform;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -22,6 +23,7 @@ public class RefWebPlatform implements WebPlatform {
     private final ImageCapture imageCaptureOps;
     private final DocumentParsing documentParsingOps;
     private final InterventionManagement interventionOps;
+    private final SessionTransfer sessionTransferOps;
 
     public RefWebPlatform(InMemoryWebBackend backend) {
         this.backend = backend;
@@ -30,6 +32,7 @@ public class RefWebPlatform implements WebPlatform {
         this.imageCaptureOps = new RefImageCapture();
         this.documentParsingOps = new RefDocumentParsing();
         this.interventionOps = new RefInterventionManagement(backend);
+        this.sessionTransferOps = new RefSessionTransfer();
     }
 
     @Override
@@ -39,7 +42,8 @@ public class RefWebPlatform implements WebPlatform {
 
     private static final Set<Class<?>> SUPPORTED = Set.of(
         Fetch.class, Parse.class, ImageCapture.class,
-        DocumentParsing.class, InterventionManagement.class
+        DocumentParsing.class, InterventionManagement.class,
+        SessionTransfer.class
     );
 
     @Override
@@ -52,6 +56,7 @@ public class RefWebPlatform implements WebPlatform {
     @Override public ImageCapture imageCapture() { return imageCaptureOps; }
     @Override public DocumentParsing documentParsing() { return documentParsingOps; }
     @Override public InterventionManagement interventionManagement() { return interventionOps; }
+    @Override public SessionTransfer sessionTransfer() { return sessionTransferOps; }
 
     public InMemoryWebBackend backend() { return backend; }
 
@@ -126,6 +131,26 @@ public class RefWebPlatform implements WebPlatform {
         @Override
         public void resolve(String requestId, String html) {
             backend.resolveIntervention(requestId, html);
+        }
+    }
+
+    static class RefSessionTransfer implements SessionTransfer {
+        private final List<BrowserCookie> cookies = new ArrayList<>();
+
+        @Override
+        public void transferSession(List<BrowserCookie> cookies) {
+            this.cookies.clear();
+            this.cookies.addAll(cookies);
+        }
+
+        @Override
+        public void clearSession() {
+            cookies.clear();
+        }
+
+        @Override
+        public boolean hasActiveSession() {
+            return !cookies.isEmpty();
         }
     }
 }

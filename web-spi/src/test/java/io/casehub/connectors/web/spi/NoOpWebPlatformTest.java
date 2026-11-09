@@ -1,6 +1,9 @@
 package io.casehub.connectors.web.spi;
 
+import io.casehub.connectors.web.model.BrowserCookie;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -21,6 +24,7 @@ class NoOpWebPlatformTest {
         assertThat(platform.supports(WebPlatform.ImageCapture.class)).isFalse();
         assertThat(platform.supports(WebPlatform.DocumentParsing.class)).isFalse();
         assertThat(platform.supports(WebPlatform.InterventionManagement.class)).isFalse();
+        assertThat(platform.supports(WebPlatform.SessionTransfer.class)).isFalse();
     }
 
     @Test
@@ -62,5 +66,17 @@ class NoOpWebPlatformTest {
     void interventionRequestThrowsUnsupported() {
         assertThatThrownBy(() -> platform.interventionManagement().request("https://example.com", "paywall"))
                 .isInstanceOf(UnsupportedOperationException.class);
+    }
+
+    @Test
+    void sessionTransferThrowsUnsupported() {
+        assertThatThrownBy(() -> platform.sessionTransfer().transferSession(
+                List.of(BrowserCookie.of("sid", "abc", "example.com"))))
+                .isInstanceOf(UnsupportedOperationException.class);
+    }
+
+    @Test
+    void sessionTransferHasNoActiveSession() {
+        assertThat(platform.sessionTransfer().hasActiveSession()).isFalse();
     }
 }

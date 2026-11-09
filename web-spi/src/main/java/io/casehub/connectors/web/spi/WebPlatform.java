@@ -1,6 +1,6 @@
 package io.casehub.connectors.web.spi;
 
-import io.casehub.connectors.web.model.CapturedImage;
+import io.casehub.connectors.web.model.BrowserCookie;
 import io.casehub.connectors.web.model.FetchOptions;
 import io.casehub.connectors.web.model.FetchResult;
 import io.casehub.connectors.web.model.ImageProcessingResult;
@@ -11,7 +11,8 @@ import io.casehub.platform.simulation.SimulationEligible;
 import java.util.List;
 
 @SimulationEligible(name = "web-platform",
-    capabilities = {"fetch", "parse", "imageCapture", "documentParsing", "interventionManagement"})
+    capabilities = {"fetch", "parse", "imageCapture", "documentParsing",
+        "interventionManagement", "sessionTransfer"})
 public interface WebPlatform {
 
     String id();
@@ -27,6 +28,8 @@ public interface WebPlatform {
     DocumentParsing documentParsing();
 
     InterventionManagement interventionManagement();
+
+    SessionTransfer sessionTransfer();
 
     interface Fetch {
 
@@ -61,5 +64,14 @@ public interface WebPlatform {
         List<InterventionRequest> pending();
 
         void resolve(String requestId, String html);
+    }
+
+    interface SessionTransfer {
+
+        void transferSession(List<BrowserCookie> cookies);
+
+        void clearSession();
+
+        boolean hasActiveSession();
     }
 }

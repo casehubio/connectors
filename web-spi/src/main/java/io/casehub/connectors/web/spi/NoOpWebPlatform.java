@@ -1,5 +1,6 @@
 package io.casehub.connectors.web.spi;
 
+import io.casehub.connectors.web.model.BrowserCookie;
 import io.casehub.connectors.web.model.FetchOptions;
 import io.casehub.connectors.web.model.FetchResult;
 import io.casehub.connectors.web.model.ImageProcessingResult;
@@ -49,6 +50,11 @@ public class NoOpWebPlatform implements WebPlatform {
     @Override
     public InterventionManagement interventionManagement() {
         return NoOpInterventionManagement.INSTANCE;
+    }
+
+    @Override
+    public SessionTransfer sessionTransfer() {
+        return NoOpSessionTransfer.INSTANCE;
     }
 
     enum NoOpFetch implements Fetch {
@@ -118,6 +124,25 @@ public class NoOpWebPlatform implements WebPlatform {
         @Override
         public void resolve(String requestId, String html) {
             throw new UnsupportedOperationException(NOT_CONFIGURED);
+        }
+    }
+
+    enum NoOpSessionTransfer implements SessionTransfer {
+        INSTANCE;
+
+        @Override
+        public void transferSession(List<BrowserCookie> cookies) {
+            throw new UnsupportedOperationException(NOT_CONFIGURED);
+        }
+
+        @Override
+        public void clearSession() {
+            throw new UnsupportedOperationException(NOT_CONFIGURED);
+        }
+
+        @Override
+        public boolean hasActiveSession() {
+            return false;
         }
     }
 }

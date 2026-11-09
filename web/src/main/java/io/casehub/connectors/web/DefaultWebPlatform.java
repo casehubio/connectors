@@ -1,6 +1,6 @@
 package io.casehub.connectors.web;
 
-import io.casehub.connectors.web.model.CapturedImage;
+import io.casehub.connectors.web.model.BrowserCookie;
 import io.casehub.connectors.web.model.FetchOptions;
 import io.casehub.connectors.web.model.FetchResult;
 import io.casehub.connectors.web.model.ImageProcessingResult;
@@ -19,6 +19,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -35,6 +36,7 @@ public class DefaultWebPlatform implements WebPlatform {
     private final WebImageProcessor imageProcessor;
     private final InterventionQueue interventionQueue;
     private final List<io.casehub.connectors.web.spi.DocumentParser> documentParsers;
+    private final CookieManager sessionCookieManager = new CookieManager();
 
     public DefaultWebPlatform(WebImageProcessor imageProcessor,
                                InterventionQueue interventionQueue,
@@ -53,7 +55,8 @@ public class DefaultWebPlatform implements WebPlatform {
 
     private static final Set<Class<?>> SUPPORTED = Set.of(
         Fetch.class, Parse.class, ImageCapture.class,
-        DocumentParsing.class, InterventionManagement.class
+        DocumentParsing.class, InterventionManagement.class,
+        SessionTransfer.class
     );
 
     @Override
@@ -63,7 +66,7 @@ public class DefaultWebPlatform implements WebPlatform {
 
     @Override
     public Fetch fetch() {
-        return new DefaultFetch();
+        return new DefaultFetch(sessionCookieManager);
     }
 
     @Override
@@ -88,7 +91,18 @@ public class DefaultWebPlatform implements WebPlatform {
         return new DefaultInterventionManagement();
     }
 
+    @Override
+    public SessionTransfer sessionTransfer() {
+        return new DefaultSessionTransfer(sessionCookieManager);
+    }
+
     static class DefaultFetch implements Fetch {
+
+        private final CookieManager sessionCookieManager;
+
+        DefaultFetch(CookieManager sessionCookieManager) {
+            this.sessionCookieManager = sessionCookieManager;
+        }
 
         @Override
         public FetchResult fetch(String url) {
@@ -98,28 +112,33 @@ public class DefaultWebPlatform implements WebPlatform {
         @Override
         public FetchResult fetch(String url, FetchOptions options) {
             try {
-                var clientBuilder = HttpClient.newBuilder()
-                    .followRedirects(HttpClient.Redirect.NORMAL)
-                    .connectTimeout(Duration.ofSeconds(10));
+                CookieManager requestCookieManager = new CookieManager();
+                URI uri = URI.create(url);
+
+                for (HttpCookie sc : sessionCookieManager.getCookieStore().getCookies()) {
+                    requestCookieManager.getCookieStore().add(uri, sc);
+                }
 
                 if (options != null && options.cookies() != null && !options.cookies().isEmpty()) {
-                    CookieManager cookieManager = new CookieManager();
-                    URI uri = URI.create(url);
                     for (var entry : options.cookies().entrySet()) {
                         HttpCookie cookie = new HttpCookie(entry.getKey(), entry.getValue());
                         cookie.setDomain(uri.getHost());
                         cookie.setPath("/");
-                        cookieManager.getCookieStore().add(uri, cookie);
+                        requestCookieManager.getCookieStore().add(uri, cookie);
                     }
-                    clientBuilder.cookieHandler(cookieManager);
                 }
 
-                HttpClient client = clientBuilder.build();
+                HttpClient client = HttpClient.newBuilder()
+                    .followRedirects(HttpClient.Redirect.NORMAL)
+                    .connectTimeout(Duration.ofSeconds(10))
+                    .cookieHandler(requestCookieManager)
+                    .build();
+
                 Duration timeout = (options != null && options.timeout() != null)
                     ? options.timeout() : DEFAULT_TIMEOUT;
 
                 var requestBuilder = HttpRequest.newBuilder()
-                    .uri(URI.create(url))
+                    .uri(uri)
                     .timeout(timeout)
                     .GET();
 
@@ -191,6 +210,43 @@ public class DefaultWebPlatform implements WebPlatform {
         @Override
         public void resolve(String requestId, String html) {
             interventionQueue.resolve(requestId);
+        }
+    }
+
+    static class DefaultSessionTransfer implements SessionTransfer {
+
+        private final CookieManager cookieManager;
+
+        DefaultSessionTransfer(CookieManager cookieManager) {
+            this.cookieManager = cookieManager;
+        }
+
+        @Override
+        public void transferSession(List<BrowserCookie> cookies) {
+            cookieManager.getCookieStore().removeAll();
+            for (BrowserCookie bc : cookies) {
+                HttpCookie httpCookie = new HttpCookie(bc.name(), bc.value());
+                httpCookie.setDomain(bc.domain());
+                httpCookie.setPath(bc.path());
+                httpCookie.setSecure(bc.secure());
+                httpCookie.setHttpOnly(bc.httpOnly());
+                if (bc.expires() != null) {
+                    long maxAge = Duration.between(Instant.now(), bc.expires()).getSeconds();
+                    httpCookie.setMaxAge(Math.max(0, maxAge));
+                }
+                URI uri = URI.create("http" + (bc.secure() ? "s" : "") + "://" + bc.domain() + bc.path());
+                cookieManager.getCookieStore().add(uri, httpCookie);
+            }
+        }
+
+        @Override
+        public void clearSession() {
+            cookieManager.getCookieStore().removeAll();
+        }
+
+        @Override
+        public boolean hasActiveSession() {
+            return !cookieManager.getCookieStore().getCookies().isEmpty();
         }
     }
 }

@@ -1,10 +1,13 @@
 package io.casehub.connectors.web.ref;
 
+import io.casehub.connectors.web.model.BrowserCookie;
 import io.casehub.connectors.web.model.FetchResult;
 import io.casehub.connectors.web.model.ParseResult;
 import io.casehub.connectors.web.spi.WebPlatform;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -31,6 +34,7 @@ class RefWebPlatformTest {
         assertThat(platform.supports(WebPlatform.ImageCapture.class)).isTrue();
         assertThat(platform.supports(WebPlatform.DocumentParsing.class)).isTrue();
         assertThat(platform.supports(WebPlatform.InterventionManagement.class)).isTrue();
+        assertThat(platform.supports(WebPlatform.SessionTransfer.class)).isTrue();
     }
 
     @Test
@@ -87,5 +91,20 @@ class RefWebPlatformTest {
         FetchResult result = platform.fetch().fetch("https://paywall.com");
         assertThat(result.statusCode()).isEqualTo(200);
         assertThat(result.html()).contains("Resolved");
+    }
+
+    @Test
+    void sessionTransferStoresCookies() {
+        platform.sessionTransfer().transferSession(
+            List.of(BrowserCookie.of("sid", "abc", "example.com")));
+        assertThat(platform.sessionTransfer().hasActiveSession()).isTrue();
+    }
+
+    @Test
+    void sessionTransferClearsSession() {
+        platform.sessionTransfer().transferSession(
+            List.of(BrowserCookie.of("sid", "abc", "example.com")));
+        platform.sessionTransfer().clearSession();
+        assertThat(platform.sessionTransfer().hasActiveSession()).isFalse();
     }
 }
