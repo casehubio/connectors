@@ -115,7 +115,7 @@ public class Qwen3TextToSpeech implements StreamingTextToSpeech, AutoCloseable {
             var body = new JsonObject();
             body.addProperty("model", "qwen3-tts");
             body.addProperty("input", text);
-            body.addProperty("voice", speaker);
+            if (speaker != null) body.addProperty("voice", speaker);
             body.addProperty("response_format", "wav");
 
             long start = System.currentTimeMillis();
@@ -151,7 +151,7 @@ public class Qwen3TextToSpeech implements StreamingTextToSpeech, AutoCloseable {
         try {
             var body = new JsonObject();
             body.addProperty("text", text);
-            body.addProperty("speaker", speaker);
+            if (speaker != null) body.addProperty("speaker", speaker);
             body.addProperty("language", "en");
 
             long start = System.currentTimeMillis();
