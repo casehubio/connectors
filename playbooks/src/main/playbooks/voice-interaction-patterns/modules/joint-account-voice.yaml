@@ -1,0 +1,88 @@
+module:
+  name: joint-account-voice
+  parameters:
+    alice-voice:
+      type: STRING
+      default: af_heart
+    bob-voice:
+      type: STRING
+      default: bm_daniel
+    alice-name:
+      type: STRING
+      default: Alice Smith
+    bob-name:
+      type: STRING
+      default: Bob Smith
+    confirmation-voice:
+      type: STRING
+    confirmation-text:
+      type: STRING
+    amount:
+      type: STRING
+      default: "500"
+
+steps:
+  register-voiceprints:
+    - tts-synthesise:
+        text: "Hello, I am ${var.alice-name}, joint account holder"
+        voice: ${var.alice-voice}
+      capture: aliceSample
+    - speaker register:
+        name: ${var.alice-name}
+        audio: ${aliceSample.audio-data}
+    - tts-synthesise:
+        text: "Hello, I am ${var.bob-name}, joint account holder"
+        voice: ${var.bob-voice}
+      capture: bobSample
+    - speaker register:
+        name: ${var.bob-name}
+        audio: ${bobSample.audio-data}
+
+  alice-confirms:
+    - tts-synthesise:
+        text: "I, ${var.alice-name}, confirm this transaction of ${var.amount} pounds"
+        voice: ${var.alice-voice}
+      capture: aliceMessage
+
+  second-confirms:
+    - tts-synthesise:
+        text: "${var.confirmation-text}"
+        voice: ${var.confirmation-voice}
+      capture: secondMessage
+
+  process-audio:
+    - audio-denoise:
+        audio: ${aliceMessage.audio-data}
+      capture: aliceClean
+    - audio-denoise:
+        audio: ${secondMessage.audio-data}
+      capture: secondClean
+    - speaker identify:
+        audio: ${aliceClean.audio-data}
+      capture: aliceId
+    - speaker identify:
+        audio: ${secondClean.audio-data}
+      capture: secondId
+    - audio join:
+        first: ${aliceClean.audio-data}
+        second: ${secondClean.audio-data}
+      capture: combinedRecording
+    - stt-transcribe: ${combinedRecording.audio-data}
+      capture: fullTranscript
+
+  notify-failure:
+    - chat-send:
+        channel: security
+        message: "ALERT: Voice identification issue on joint account authorisation of ${var.amount} GBP. Alice: ${aliceId.identified} (${aliceId.name}), second speaker: ${secondId.identified} (${secondId.name}). Transcript: ${fullTranscript.text}"
+      capture: securityAlert
+    - chat-send:
+        channel: compliance
+        message: "Joint authorisation REJECTED — voice identification issue. Audio preserved."
+        attachment: ${combinedRecording.audio-data}
+        attachment-type: audio/wav
+        attachment-name: flagged-authorisation.wav
+      capture: auditRecord
+    - chat-send:
+        channel: family
+        message: "Your joint account transaction of ${var.amount} GBP has been blocked — voice verification issue. Please visit your branch with photo ID."
+      capture: participantNotice
