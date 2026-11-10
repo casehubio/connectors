@@ -69,6 +69,7 @@ No production Java — playbooks in src/main/playbooks, tests in src/test/playbo
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
+
     <dependency>
       <groupId>io.casehub</groupId>
       <artifactId>casehub-connectors-bank-spi</artifactId>
@@ -127,5 +128,6 @@ No production Java — playbooks in src/main/playbooks, tests in src/test/playbo
       <scope>test</scope>
     </dependency>
   </dependencies>
+
 
 </project>

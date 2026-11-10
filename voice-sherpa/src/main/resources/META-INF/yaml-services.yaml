@@ -1,0 +1,6 @@
+io.casehub.connectors.voice.spi.VoicePlatform: io.casehub.connectors.voice.sherpa.KokoroVoicePlatform
+io.casehub.connectors.voice.spi.VoicePlatform#whisper: io.casehub.connectors.voice.sherpa.WhisperVoicePlatform
+io.casehub.connectors.voice.spi.RoutingVoicePlatformService: io.casehub.connectors.voice.spi.RoutingVoicePlatformService
+io.casehub.connectors.voice.spi.SpeechDenoiser: io.casehub.connectors.voice.sherpa.SherpaOnnxSpeechDenoiser
+io.casehub.connectors.voice.spi.SpeakerEmbeddingExtractor: io.casehub.connectors.voice.sherpa.CampplusSpeakerEmbeddingExtractor
+io.casehub.connectors.voice.spi.SpeakerRegistry: io.casehub.connectors.voice.sherpa.CosineDistanceSpeakerRegistry

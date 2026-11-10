@@ -20,7 +20,13 @@ public class RoutingVoicePlatformService {
 
 
     public RoutingVoicePlatformService() {
-        var platforms = discoverPlatforms();
+        List<VoicePlatform> platforms;
+        try {
+            platforms = discoverPlatforms();
+        } catch (Exception e) {
+            LOG.warnf("Platform discovery failed, using empty list: %s", e.getMessage());
+            platforms = List.of();
+        }
         this.platformService = new VoicePlatformService(platforms);
         var registry  = new InMemoryVoiceRegistry();
         var loader    = new io.casehub.connectors.voice.config.VoiceManifestLoader();
@@ -140,10 +146,15 @@ public class RoutingVoicePlatformService {
                     @SuppressWarnings("unchecked")
                     var mappings = (java.util.Map<String, String>) mapper.readValue(stream, java.util.Map.class);
                     if (mappings == null) {continue;}
-                    var implName = mappings.get(VoicePlatform.class.getName());
-                    if (implName != null) {
-                        platforms.add((VoicePlatform) Class.forName(implName, true, cl)
-                                                           .getDeclaredConstructor().newInstance());
+                    String prefix = VoicePlatform.class.getName();
+                    for (var entry : mappings.entrySet()) {
+                        if (entry.getKey().equals(prefix) || entry.getKey().startsWith(prefix + "#")) {
+                            try {
+                                platforms.add(instantiatePlatform(entry.getValue(), cl));
+                            } catch (Exception ex) {
+                                LOG.warnf("Skipping VoicePlatform %s: %s", entry.getValue(), ex.getMessage());
+                            }
+                        }
                     }
                 }
             }
@@ -152,5 +163,20 @@ public class RoutingVoicePlatformService {
         }
         return platforms;
     }
+
+    private static VoicePlatform instantiatePlatform(String className, ClassLoader cl) throws Exception {
+        Class<?> implClass = Class.forName(className, true, cl);
+        try {
+            return (VoicePlatform) implClass.getDeclaredConstructor().newInstance();
+        } catch (NoSuchMethodException e) {
+            try {
+                var factory = implClass.getMethod("withDefaults");
+                return (VoicePlatform) factory.invoke(null);
+            } catch (NoSuchMethodException e2) {
+                throw new IllegalStateException("VoicePlatform " + className + " has no no-arg constructor or withDefaults() factory", e2);
+            }
+        }
+    }
+
 
 }
