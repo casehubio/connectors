@@ -12,7 +12,7 @@ tests:
       - assertThat: result.succeeded
         equals: true
       - assertThat: result.captures.transcript.text
-        equals: I need to check my account balance
+        contains: check my account balance
       - assertThat: result.captures.classification.response
         contains: BALANCE
       - assertThat: result.captures.audio.audio-format
