@@ -135,7 +135,7 @@ public class Qwen3TextToSpeech implements StreamingTextToSpeech, AutoCloseable {
             byte[] wavBytes = response.body();
             long elapsed = System.currentTimeMillis() - start;
             LOG.log(System.Logger.Level.INFO,
-                    "Qwen3-TTS [{0}]: {1} bytes in {2}ms", speaker, wavBytes.length, elapsed);
+                    "Qwen3-TTS [{0}]: {1} bytes in {2}ms", speaker != null ? speaker : "clone", wavBytes.length, elapsed);
             return new SynthesisResult(wavBytes, "wav", List.of());
         } catch (SherpaException e) {
             throw e;
@@ -197,7 +197,7 @@ public class Qwen3TextToSpeech implements StreamingTextToSpeech, AutoCloseable {
             long elapsed = System.currentTimeMillis() - start;
             LOG.log(System.Logger.Level.INFO,
                     "Qwen3-TTS streaming [{0}]: {1} chunks in {2}ms",
-                    speaker, chunkCount, elapsed);
+                    speaker != null ? speaker : "clone", chunkCount, elapsed);
         } catch (SherpaException e) {
             throw e;
         } catch (IOException | InterruptedException e) {
