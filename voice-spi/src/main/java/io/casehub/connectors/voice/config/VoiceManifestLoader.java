@@ -24,7 +24,7 @@ public class VoiceManifestLoader {
 
     public VoiceManifest load(Path projectDir, String profile) {
         var entries = new ArrayList<PrioritizedManifest>();
-        addClasspathResource(entries, "voices/seed-catalog.yaml", 0);
+        addClasspathResource(entries, "voices/voice-config.yaml", 0);
         addFileIfExists(entries, Path.of("/etc/casehub/voice-config.yaml"), 10);
         var home = Path.of(System.getProperty("user.home"));
         addFileIfExists(entries, home.resolve(".casehub/voice-config.yaml"), 20);

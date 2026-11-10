@@ -53,6 +53,7 @@
         <module name="casehub-platform-agent-gemini-cli" />
         <module name="casehub-platform-agent-codex" />
         <module name="casehub-platform-simulation-config-core" />
+        <module name="casehub-connectors-voice-sherpa" />
         <module name="casehub-platform-oidc" />
         <module name="casehub-platform-authn-webauthn-jpa-common" />
         <module name="casehub-platform-spring-actuator" />
@@ -62,7 +63,6 @@
         <module name="casehub-platform-agent-gate" />
         <module name="casehub-platform-acl-spring-jpa" />
         <module name="casehub-connectors-chat-discord" />
-        <module name="casehub-connectors-bank-spi" />
         <module name="casehub-platform-simulation-testing" />
         <module name="casehub-platform-authn-core" />
         <module name="casehub-platform-notification-settings-jpa-common" />
@@ -86,7 +86,6 @@
         <module name="casehub-platform-notification-settings-inmem" />
         <module name="casehub-connectors-integration-tests" />
         <module name="casehub-platform-digest-jpa" />
-        <module name="casehub-connectors-chat-spi" />
         <module name="casehub-platform-streams-amqp" />
         <module name="casehub-platform-registry-jpa" />
         <module name="casehub-platform-registration-spring" />
@@ -106,6 +105,7 @@
         <module name="casehub-platform-expression" />
         <module name="casehub-platform-identity-spring" />
         <module name="casehub-platform-agent-openai" />
+        <module name="casehub-connectors-web-spi" />
         <module name="casehub-platform-subscriptions-jpa" />
         <module name="casehub-platform-agent-gemini" />
         <module name="casehub-platform-user-jpa-common" />
@@ -163,7 +163,6 @@
         <module name="casehub-connectors-bank-truelayer" />
         <module name="casehub-platform-yaml-step-testing" />
         <module name="casehub-platform-callback-inmem" />
-        <module name="casehub-connectors-email-spi" />
         <module name="casehub-platform-notification-settings-spring-jpa" />
         <module name="casehub-platform-digest-jpa-common" />
         <module name="casehub-connectors-voice-spi" />
@@ -182,6 +181,7 @@
         <module name="casehub-platform-authn" />
         <module name="casehub-platform-endpoints-config" />
         <module name="casehub-platform-label-inmem-core" />
+        <module name="casehub-agency-core" />
         <module name="casehub-platform-callback-inmem-core" />
         <module name="casehub-platform-agent-langchain4j" />
         <module name="casehub-platform-streams-webhook-core" />
@@ -204,6 +204,7 @@
         <module name="casehub-platform-user-spring-jpa" />
         <module name="casehub-platform-notifications-jpa-common" />
         <module name="casehub-platform-agent-langchain4j-core" />
+        <module name="casehub-connectors-web" />
         <module name="casehub-platform-streams-spring" />
         <module name="casehub-platform-schema-generator" />
         <module name="casehub-platform-simulation-core" />
@@ -264,6 +265,7 @@
         <module name="casehub-platform-callback-spring" />
         <module name="casehub-platform-drift-detection" />
         <module name="casehub-connectors-travel-spi" />
+        <module name="casehub-connectors-web-ref" />
         <module name="casehub-platform-oidc-spring" />
         <module name="casehub-platform-subscriptions-jpa-common" />
         <module name="casehub-connectors-chat-slack" />
@@ -272,7 +274,6 @@
         <module name="casehub-connectors-location-ref" />
         <module name="casehub-connectors-chat-ref" />
         <module name="casehub-platform-agent-gemini-cli-core" />
-        <module name="casehub-connectors-voice-pipeline-steps" />
         <module name="casehub-connectors-commerce-shopify" />
         <module name="casehub-connectors-email-google-inbound" />
       </profile>
@@ -446,24 +447,10 @@
         <option name="domainFilter" value="connectors/webhooks" />
         <option name="generateGraphQL" value="false" />
         <processorPath useClasspath="false">
-          <entry name="$PROJECT_DIR$/../platform/graphql-generator/target/classes" />
-          <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
-          <entry name="$PROJECT_DIR$/../platform/mcp-api/target/classes" />
-          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/casehub/casehub-platform-graphql-generator/0.4-SNAPSHOT/casehub-platform-graphql-generator-0.4-SNAPSHOT.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/smallrye/jandex/3.6.0/jandex-3.6.0.jar" />
-          <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
-          <entry name="$PROJECT_DIR$/../platform/mcp-api/target/classes" />
-          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
-          <entry name="$PROJECT_DIR$/../platform/graphql-generator/target/classes" />
-          <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
-          <entry name="$PROJECT_DIR$/../platform/mcp-api/target/classes" />
-          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/smallrye/jandex/3.6.0/jandex-3.6.0.jar" />
-          <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
-          <entry name="$PROJECT_DIR$/../platform/mcp-api/target/classes" />
+          <entry name="$MAVEN_REPOSITORY$/io/casehub/casehub-platform-api/0.4-SNAPSHOT/casehub-platform-api-0.4-SNAPSHOT.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/casehub/casehub-mcp-api/0.4-SNAPSHOT/casehub-mcp-api-0.4-SNAPSHOT.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
         </processorPath>
@@ -797,30 +784,6 @@
         </processorPath>
         <module name="casehub-chat-app" />
       </profile>
-      <profile name="Annotation profile for CaseHub Connectors — Parent" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
-        <outputRelativeToContentRoot value="true" />
-        <option name="domainFilter" value="connectors,connectors/messaging,connectors/chat,connectors/calendar,connectors/bank-feed,connectors/email,connectors/contacts,connectors/project,connectors/commerce,connectors/travel,connectors/location,connectors/health" />
-        <option name="generateGraphQL" value="false" />
-        <processorPath useClasspath="false">
-          <entry name="$PROJECT_DIR$/../platform/graphql-generator/target/classes" />
-          <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
-          <entry name="$PROJECT_DIR$/../platform/mcp-api/target/classes" />
-          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/smallrye/jandex/3.6.0/jandex-3.6.0.jar" />
-          <entry name="$PROJECT_DIR$/connectors-api/target/classes" />
-          <entry name="$PROJECT_DIR$/../platform/graphql-generator/target/classes" />
-          <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
-          <entry name="$PROJECT_DIR$/../platform/mcp-api/target/classes" />
-          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/smallrye/jandex/3.6.0/jandex-3.6.0.jar" />
-          <entry name="$PROJECT_DIR$/connectors-api/target/classes" />
-        </processorPath>
-        <module name="casehub-connectors-graphql" />
-      </profile>
       <profile name="Annotation profile for casehub-platform-parent" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
@@ -851,9 +814,134 @@
         </processorPath>
         <module name="casehub-platform-acl-admin" />
       </profile>
+      <profile name="Annotation profile for casehub-connectors-bank-spi" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/io/casehub/casehub-platform-yaml-plugin-processor/0.4-SNAPSHOT/casehub-platform-yaml-plugin-processor-0.4-SNAPSHOT.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/casehub/casehub-platform-yaml-plugin-api/0.4-SNAPSHOT/casehub-platform-yaml-plugin-api-0.4-SNAPSHOT.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/casehub/casehub-platform-api/0.4-SNAPSHOT/casehub-platform-api-0.4-SNAPSHOT.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/casehub/casehub-mcp-api/0.4-SNAPSHOT/casehub-mcp-api-0.4-SNAPSHOT.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/casehub/casehub-platform-schema-generator/0.4-SNAPSHOT/casehub-platform-schema-generator-0.4-SNAPSHOT.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/victools/jsonschema-generator/5.0.0/jsonschema-generator-5.0.0.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/classmate/1.7.2/classmate-1.7.2.jar" />
+          <entry name="$MAVEN_REPOSITORY$/tools/jackson/core/jackson-core/3.0.3/jackson-core-3.0.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/tools/jackson/core/jackson-databind/3.0.3/jackson-databind-3.0.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/slf4j/slf4j-api/2.0.17/slf4j-api-2.0.17.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/victools/jsonschema-module-jackson/5.0.0/jsonschema-module-jackson-5.0.0.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/victools/jsonschema-module-jakarta-validation/5.0.0/jsonschema-module-jakarta-validation-5.0.0.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-databind/2.22.2/jackson-databind-2.22.2.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-annotations/2.22/jackson-annotations-2.22.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-core/2.22.2/jackson-core-2.22.2.jar" />
+          <entry name="$MAVEN_REPOSITORY$/jakarta/validation/jakarta.validation-api/3.1.1/jakarta.validation-api-3.1.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/smallrye/jandex/3.6.0/jandex-3.6.0.jar" />
+        </processorPath>
+        <module name="casehub-connectors-bank-spi" />
+      </profile>
+      <profile name="Annotation profile for casehub-connectors-chat-spi" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/io/casehub/casehub-platform-yaml-plugin-processor/0.4-SNAPSHOT/casehub-platform-yaml-plugin-processor-0.4-SNAPSHOT.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/casehub/casehub-platform-yaml-plugin-api/0.4-SNAPSHOT/casehub-platform-yaml-plugin-api-0.4-SNAPSHOT.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/casehub/casehub-platform-api/0.4-SNAPSHOT/casehub-platform-api-0.4-SNAPSHOT.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/casehub/casehub-mcp-api/0.4-SNAPSHOT/casehub-mcp-api-0.4-SNAPSHOT.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/casehub/casehub-platform-schema-generator/0.4-SNAPSHOT/casehub-platform-schema-generator-0.4-SNAPSHOT.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/victools/jsonschema-generator/5.0.0/jsonschema-generator-5.0.0.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/classmate/1.7.2/classmate-1.7.2.jar" />
+          <entry name="$MAVEN_REPOSITORY$/tools/jackson/core/jackson-core/3.0.3/jackson-core-3.0.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/tools/jackson/core/jackson-databind/3.0.3/jackson-databind-3.0.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/slf4j/slf4j-api/2.0.17/slf4j-api-2.0.17.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/victools/jsonschema-module-jackson/5.0.0/jsonschema-module-jackson-5.0.0.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/victools/jsonschema-module-jakarta-validation/5.0.0/jsonschema-module-jakarta-validation-5.0.0.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-databind/2.22.2/jackson-databind-2.22.2.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-annotations/2.22/jackson-annotations-2.22.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-core/2.22.2/jackson-core-2.22.2.jar" />
+          <entry name="$MAVEN_REPOSITORY$/jakarta/validation/jakarta.validation-api/3.1.1/jakarta.validation-api-3.1.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/smallrye/jandex/3.6.0/jandex-3.6.0.jar" />
+        </processorPath>
+        <module name="casehub-connectors-chat-spi" />
+      </profile>
+      <profile name="Annotation profile for casehub-connectors-email-spi" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/io/casehub/casehub-platform-yaml-plugin-processor/0.4-SNAPSHOT/casehub-platform-yaml-plugin-processor-0.4-SNAPSHOT.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/casehub/casehub-platform-yaml-plugin-api/0.4-SNAPSHOT/casehub-platform-yaml-plugin-api-0.4-SNAPSHOT.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/casehub/casehub-platform-api/0.4-SNAPSHOT/casehub-platform-api-0.4-SNAPSHOT.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/casehub/casehub-mcp-api/0.4-SNAPSHOT/casehub-mcp-api-0.4-SNAPSHOT.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/casehub/casehub-platform-schema-generator/0.4-SNAPSHOT/casehub-platform-schema-generator-0.4-SNAPSHOT.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/victools/jsonschema-generator/5.0.0/jsonschema-generator-5.0.0.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/classmate/1.7.2/classmate-1.7.2.jar" />
+          <entry name="$MAVEN_REPOSITORY$/tools/jackson/core/jackson-core/3.0.3/jackson-core-3.0.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/tools/jackson/core/jackson-databind/3.0.3/jackson-databind-3.0.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/slf4j/slf4j-api/2.0.17/slf4j-api-2.0.17.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/victools/jsonschema-module-jackson/5.0.0/jsonschema-module-jackson-5.0.0.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/victools/jsonschema-module-jakarta-validation/5.0.0/jsonschema-module-jakarta-validation-5.0.0.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-databind/2.22.2/jackson-databind-2.22.2.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-annotations/2.22/jackson-annotations-2.22.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-core/2.22.2/jackson-core-2.22.2.jar" />
+          <entry name="$MAVEN_REPOSITORY$/jakarta/validation/jakarta.validation-api/3.1.1/jakarta.validation-api-3.1.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/smallrye/jandex/3.6.0/jandex-3.6.0.jar" />
+        </processorPath>
+        <module name="casehub-connectors-email-spi" />
+      </profile>
+      <profile name="Annotation profile for CaseHub Connectors — Parent" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <option name="domainFilter" value="connectors,connectors/messaging,connectors/chat,connectors/calendar,connectors/bank-feed,connectors/email,connectors/contacts,connectors/project,connectors/commerce,connectors/travel,connectors/location,connectors/health" />
+        <option name="generateGraphQL" value="false" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/io/casehub/casehub-platform-graphql-generator/0.4-SNAPSHOT/casehub-platform-graphql-generator-0.4-SNAPSHOT.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/casehub/casehub-platform-api/0.4-SNAPSHOT/casehub-platform-api-0.4-SNAPSHOT.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/casehub/casehub-mcp-api/0.4-SNAPSHOT/casehub-mcp-api-0.4-SNAPSHOT.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/smallrye/jandex/3.6.0/jandex-3.6.0.jar" />
+          <entry name="$PROJECT_DIR$/connectors-api/target/classes" />
+          <entry name="$PROJECT_DIR$/connectors-api/target/classes" />
+        </processorPath>
+        <module name="casehub-connectors-graphql" />
+      </profile>
+      <profile name="Annotation profile for casehub-connectors-voice-pipeline-steps" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/io/casehub/casehub-platform-yaml-plugin-processor/0.4-SNAPSHOT/casehub-platform-yaml-plugin-processor-0.4-SNAPSHOT.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/casehub/casehub-platform-yaml-plugin-api/0.4-SNAPSHOT/casehub-platform-yaml-plugin-api-0.4-SNAPSHOT.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/casehub/casehub-platform-api/0.4-SNAPSHOT/casehub-platform-api-0.4-SNAPSHOT.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/casehub/casehub-mcp-api/0.4-SNAPSHOT/casehub-mcp-api-0.4-SNAPSHOT.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/casehub/casehub-platform-schema-generator/0.4-SNAPSHOT/casehub-platform-schema-generator-0.4-SNAPSHOT.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/victools/jsonschema-generator/5.0.0/jsonschema-generator-5.0.0.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/classmate/1.7.2/classmate-1.7.2.jar" />
+          <entry name="$MAVEN_REPOSITORY$/tools/jackson/core/jackson-core/3.0.3/jackson-core-3.0.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/tools/jackson/core/jackson-databind/3.0.3/jackson-databind-3.0.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/slf4j/slf4j-api/2.0.17/slf4j-api-2.0.17.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/victools/jsonschema-module-jackson/5.0.0/jsonschema-module-jackson-5.0.0.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/victools/jsonschema-module-jakarta-validation/5.0.0/jsonschema-module-jakarta-validation-5.0.0.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-databind/2.22.2/jackson-databind-2.22.2.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-annotations/2.22/jackson-annotations-2.22.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-core/2.22.2/jackson-core-2.22.2.jar" />
+          <entry name="$MAVEN_REPOSITORY$/jakarta/validation/jakarta.validation-api/3.1.1/jakarta.validation-api-3.1.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/smallrye/jandex/3.6.0/jandex-3.6.0.jar" />
+        </processorPath>
+        <module name="casehub-connectors-voice-pipeline-steps" />
+      </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="casehub-agency-core" target="21" />
       <module name="casehub-connectors" target="21" />
       <module name="casehub-connectors-playbook-tests" target="21" />
       <module name="casehub-platform-agent-claude-spring" target="21" />
@@ -934,7 +1022,11 @@
       <module name="casehub-connectors-travel-spi" options="-parameters" />
       <module name="casehub-connectors-voice-pipeline-steps" options="-parameters" />
       <module name="casehub-connectors-voice-ref" options="-parameters" />
+      <module name="casehub-connectors-voice-sherpa" options="-parameters" />
       <module name="casehub-connectors-voice-spi" options="-parameters" />
+      <module name="casehub-connectors-web" options="-parameters" />
+      <module name="casehub-connectors-web-ref" options="-parameters" />
+      <module name="casehub-connectors-web-spi" options="-parameters" />
       <module name="casehub-connectors-webhook" options="-parameters -AgenerateGraphQL=false -AdomainFilter=connectors/webhooks" />
       <module name="casehub-coordination-core" options="-parameters" />
       <module name="casehub-generator-parent" options="-parameters" />

@@ -111,7 +111,7 @@ aliases:
 
 | Priority | Source |
 |----------|--------|
-| 0 | Classpath seed catalog (`voices/seed-catalog.yaml`) |
+| 0 | Classpath voice config (`voices/voice-config.yaml`) |
 | 10 | `/etc/casehub/voice-config.yaml` |
 | 20 | `~/.casehub/voice-config.yaml` |
 | 25 | `~/.casehub/voice-config-{profile}.yaml` |
@@ -303,7 +303,7 @@ public class VoiceManifestLoader {
     public VoiceManifest load(Path projectDir, String profile) {
         var entries = new ArrayList<PrioritizedManifest>();
 
-        addClasspathResource(entries, "voices/seed-catalog.yaml", 0);
+        addClasspathResource(entries, "voices/voice-config.yaml", 0);
         addFileIfExists(entries, Path.of("/etc/casehub/voice-config.yaml"), 10);
         addFileIfExists(entries, Path.of(home(), ".casehub", "voice-config.yaml"), 20);
         if (profile != null) {
@@ -424,7 +424,7 @@ public record SttTranscribePlugin(@Optional String model) {
 
 ## Seed Catalog
 
-The classpath seed catalog (`voices/seed-catalog.yaml`) ships with voice-spi and provides the Kokoro voice entries that playbooks already reference:
+The classpath voice config (`voices/voice-config.yaml`) ships with voice-spi and provides the Kokoro voice entries that playbooks already reference:
 
 ```yaml
 providers:
@@ -453,7 +453,7 @@ defaults:
   stt-vendor: ref
 ```
 
-The seed catalog maps to the `ref` vendor (ReferenceVoicePlatform). Real deployments override with project-level `voice-config.yaml` that maps the same voice names to real vendor implementations (Kokoro, OpenAI, etc.).
+The voice config maps to the `ref` vendor (ReferenceVoicePlatform). Real deployments override with project-level `voice-config.yaml` that maps the same voice names to real vendor implementations (Kokoro, OpenAI, etc.).
 
 ## Credential Resolution
 
@@ -491,7 +491,7 @@ public class VoiceConfigProducer {
 - `VoiceRegistryTest` — resolveById, query by criteria, empty registry
 - `RoutingVoicePlatformServiceTest` — resolve by name, by alias (direct + criteria), by vendor key, default TTS/STT
 - `VoiceManifestProcessorTest` — populates registry from manifest
-- Existing playbook tests continue to pass — seed catalog maps existing voice names to ref platform
+- Existing playbook tests continue to pass — voice config maps existing voice names to ref platform
 
 ## References
 

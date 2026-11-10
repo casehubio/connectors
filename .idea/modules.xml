@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/../agency/agency-core/casehub-agency-core.iml" filepath="$PROJECT_DIR$/../agency/agency-core/casehub-agency-core.iml" />
       <module fileurl="file://$PROJECT_DIR$/../chat-app/casehub-chat-app.iml" filepath="$PROJECT_DIR$/../chat-app/casehub-chat-app.iml" />
       <module fileurl="file://$PROJECT_DIR$/cloud-events/casehub-connectors-cloud-events.iml" filepath="$PROJECT_DIR$/cloud-events/casehub-connectors-cloud-events.iml" />
       <module fileurl="file://$PROJECT_DIR$/mcp/casehub-connectors-mcp.iml" filepath="$PROJECT_DIR$/mcp/casehub-connectors-mcp.iml" />

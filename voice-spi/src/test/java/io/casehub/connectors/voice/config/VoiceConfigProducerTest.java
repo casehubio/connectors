@@ -21,14 +21,16 @@ class VoiceConfigProducerTest {
         var manifest = loader.load(null, null);
         assertThat(manifest.voices()).containsKey("af_heart");
         assertThat(manifest.voices()).containsKey("bm_daniel");
-        assertThat(manifest.voices().get("af_heart").vendor()).isEqualTo("ref");
+        assertThat(manifest.voices().get("af_heart").vendor()).isEqualTo("kokoro");
         assertThat(manifest.voices().get("af_heart").capability()).isEqualTo(VoiceCapability.TTS);
     }
 
     @Test
     void endToEndRoutingWithSeedCatalog() {
         var refPlatform     = new StubVoicePlatform("ref");
-        var platformService = new VoicePlatformService(List.of(refPlatform));
+        var kokoroPlatform  = new StubVoicePlatform("kokoro");
+        var whisperPlatform = new StubVoicePlatform("whisper");
+        var platformService = new VoicePlatformService(List.of(refPlatform, kokoroPlatform, whisperPlatform));
         var registry        = new InMemoryVoiceRegistry();
         var loader          = new VoiceManifestLoader();
         var manifest        = loader.load(null, null);
@@ -38,7 +40,7 @@ class VoiceConfigProducerTest {
                 platformService, registry, result.aliases(), manifest.defaults());
 
         var resolved = routing.resolve("af_heart");
-        assertThat(resolved.platform().id()).isEqualTo("ref");
+        assertThat(resolved.platform().id()).isEqualTo("kokoro");
         assertThat(resolved.descriptor().voiceId()).isEqualTo("af_heart");
         assertThat(resolved.descriptor().name()).isEqualTo("Heart");
     }

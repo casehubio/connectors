@@ -158,4 +158,31 @@ class VoiceManifestLoaderTest {
         assertThat(manifest.voices()).isEmpty();
         assertThat(manifest.providers()).isEmpty();
     }
+
+    @Test
+    void seedCatalog_declaresKokoroAndWhisperProviders() {
+        var loader   = new VoiceManifestLoader();
+        var manifest = loader.loadResource("voices/voice-config.yaml");
+        var vendors = manifest.providers().stream()
+                              .map(VoiceProviderDeclaration::vendor)
+                              .toList();
+        assertThat(vendors).contains("kokoro", "whisper");
+    }
+
+    @Test
+    void seedCatalog_defaultsToKokoroTtsAndWhisperStt() {
+        var loader   = new VoiceManifestLoader();
+        var manifest = loader.loadResource("voices/voice-config.yaml");
+        assertThat(manifest.defaults()).isNotNull();
+        assertThat(manifest.defaults().ttsVendor()).isEqualTo("kokoro");
+        assertThat(manifest.defaults().sttVendor()).isEqualTo("whisper");
+    }
+
+    @Test
+    void seedCatalog_heartVoiceIsKokoroVendor() {
+        var loader   = new VoiceManifestLoader();
+        var manifest = loader.loadResource("voices/voice-config.yaml");
+        assertThat(manifest.voices()).containsKey("af_heart");
+        assertThat(manifest.voices().get("af_heart").vendor()).isEqualTo("kokoro");
+    }
 }
