@@ -8,6 +8,7 @@ import io.casehub.connectors.calendar.CalendarPlatformService;
 import io.casehub.connectors.chat.ChatPlatformService;
 import io.casehub.connectors.document.spi.DocumentPlatformService;
 import io.casehub.connectors.email.spi.EmailPlatformService;
+import io.casehub.connectors.voice.spi.VoicePlatformService;
 import io.casehub.platform.api.mcp.McpDomain;
 import io.casehub.platform.api.mcp.ModelEnricher;
 import io.quarkus.arc.All;
@@ -31,7 +32,8 @@ public class ConnectorsModelEnricher implements ModelEnricher {
     EmailPlatformService emailPlatformService;
     @Inject
     DocumentPlatformService documentPlatformService;
-
+    @Inject
+    VoicePlatformService voicePlatformService;
 
     @Inject InboundConnectorService inboundConnectorService;
     @Inject @All List<WebhookInboundConnector> webhookConnectors;
@@ -52,6 +54,7 @@ public class ConnectorsModelEnricher implements ModelEnricher {
                 "bankPlatforms", bankPlatformService.ids().size(),
                 "emailPlatforms", emailPlatformService.ids().size(),
                 "documentPlatforms", documentPlatformService.ids().size(),
+                "voicePlatforms", voicePlatformService.ids().size(),
                 "inboundConnectors", inboundConnectorService.pullIds().size()
                                      + webhookConnectors.size());
     }
