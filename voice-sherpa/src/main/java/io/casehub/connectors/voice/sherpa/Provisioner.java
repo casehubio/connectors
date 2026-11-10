@@ -736,6 +736,90 @@ public final class Provisioner {
     }
 
 
+    // --- Qwen3-TTS ---
+
+    private static final String QWEN3_TTS_VERSION = "v0.23.0";
+
+    private static final Map<String, String> QWEN3_BINARY_ASSETS = Map.of(
+            "osx-arm64", "qwen_tts-macos-arm64",
+            "linux-x64", "qwen_tts-linux-x86_64",
+            "linux-arm64", "qwen_tts-linux-aarch64"
+    );
+
+    private static final Map<String, String> QWEN3_MODEL_REPOS = Map.of(
+            "0.6b-customvoice", "Qwen/Qwen3-TTS-12Hz-0.6B-CustomVoice",
+            "0.6b-base", "Qwen/Qwen3-TTS-12Hz-0.6B-Base",
+            "1.7b-customvoice", "Qwen/Qwen3-TTS-12Hz-1.7B-CustomVoice",
+            "1.7b-base", "Qwen/Qwen3-TTS-12Hz-1.7B-Base"
+    );
+
+    private static final List<String> QWEN3_MODEL_FILES = List.of(
+            "config.json", "generation_config.json", "tokenizer_config.json",
+            "preprocessor_config.json", "model.safetensors", "vocab.json", "merges.txt",
+            "speech_tokenizer/config.json", "speech_tokenizer/configuration.json",
+            "speech_tokenizer/model.safetensors", "speech_tokenizer/preprocessor_config.json"
+    );
+
+    static Path qwen3BinaryDir() {
+        return cacheBaseDir().resolve("native").resolve("qwen3-tts")
+                             .resolve(QWEN3_TTS_VERSION).resolve(SherpaLibrary.platformId());
+    }
+
+    public static Path ensureQwen3Binary() {
+        String platformId = SherpaLibrary.platformId();
+        String asset = QWEN3_BINARY_ASSETS.get(platformId);
+        if (asset == null) {
+            throw new SherpaException("No Qwen3-TTS binary for platform: " + platformId
+                                      + ". Supported: " + QWEN3_BINARY_ASSETS.keySet());
+        }
+        Path targetDir = qwen3BinaryDir();
+        Path binary = targetDir.resolve("qwen_tts");
+        if (Files.isExecutable(binary)) {return binary;}
+
+        synchronized (NATIVE_LOCK) {
+            if (Files.isExecutable(binary)) {return binary;}
+            try {
+                Files.createDirectories(targetDir);
+                String url = "https://github.com/gabriele-mastrapasqua/qwen3-tts/releases/download/"
+                             + QWEN3_TTS_VERSION + "/" + asset;
+                LOG.log(System.Logger.Level.INFO, "Downloading Qwen3-TTS binary: {0}", url);
+                Path downloaded = downloadWithRetry(url, targetDir, 3);
+                Files.move(downloaded, binary, StandardCopyOption.REPLACE_EXISTING);
+                binary.toFile().setExecutable(true);
+                LOG.log(System.Logger.Level.INFO, "Qwen3-TTS binary ready at {0}", binary);
+                return binary;
+            } catch (IOException e) {
+                throw new SherpaException("Failed to download Qwen3-TTS binary. "
+                                          + "Download manually to " + binary, e);
+            }
+        }
+    }
+
+    static Path qwen3ModelDir(String variant) {
+        return cacheBaseDir().resolve("models").resolve("qwen3-tts").resolve(variant);
+    }
+
+    public static Path ensureQwen3Model(String variant) {
+        String repo = QWEN3_MODEL_REPOS.get(variant);
+        if (repo == null) {
+            throw new SherpaException("Unknown Qwen3-TTS variant: " + variant
+                                      + ". Known: " + QWEN3_MODEL_REPOS.keySet());
+        }
+        Path targetDir = qwen3ModelDir(variant);
+        if (Files.isDirectory(targetDir)
+                && Files.exists(targetDir.resolve("model.safetensors"))) {
+            return targetDir;
+        }
+        synchronized (MODEL_LOCK) {
+            if (Files.isDirectory(targetDir)
+                    && Files.exists(targetDir.resolve("model.safetensors"))) {
+                return targetDir;
+            }
+            provisionFromHuggingFace(repo, QWEN3_MODEL_FILES, targetDir);
+            return targetDir;
+        }
+    }
+
     private static void provisionFromHuggingFace(String repo, List<String> files, Path targetDir) {
         try {
             Files.createDirectories(targetDir);
