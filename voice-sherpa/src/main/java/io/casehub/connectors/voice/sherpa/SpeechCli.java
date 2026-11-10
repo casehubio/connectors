@@ -185,7 +185,7 @@ public final class SpeechCli {
         System.err.println();
         System.err.println("Example:");
         System.err.println("  java --enable-native-access=ALL-UNNAMED -cp speech-sherpa.jar \\");
-        System.err.println("    io.casehub.agency.speech.sherpa.SpeechCli transcribe ./whisper-tiny test.wav");
+        System.err.println("    io.casehub.connectors.voice.sherpa.SpeechCli transcribe ./whisper-tiny test.wav");
         System.exit(1);
     }
 }

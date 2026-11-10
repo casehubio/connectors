@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class DenoiserIntegrationTest {
 
     @Test
-    @EnabledIf("io.casehub.agency.speech.sherpa.WhisperLibrary#isAvailable")
+    @EnabledIf("io.casehub.connectors.voice.sherpa.WhisperLibrary#isAvailable")
     void whisperSttCallsDenoiserWhenEnabled() {
         var callCount = new AtomicInteger();
         var enabled = new AtomicBoolean(true);
@@ -44,7 +44,7 @@ class DenoiserIntegrationTest {
     }
 
     @Test
-    @EnabledIf("io.casehub.agency.speech.sherpa.WhisperLibrary#isAvailable")
+    @EnabledIf("io.casehub.connectors.voice.sherpa.WhisperLibrary#isAvailable")
     void sttWithoutDenoiserPassesThroughUnchanged() {
         var stt = WhisperSpeechToText.withDefaults();
         var stream = stt.startStream(

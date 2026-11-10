@@ -2,6 +2,7 @@ package io.casehub.connectors.voice.sherpa;
 
 import io.casehub.connectors.voice.model.SynthesisOptions;
 import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 
 import java.nio.file.Path;

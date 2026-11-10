@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class VadIntegrationTest {
 
     @Test
-    @EnabledIf("io.casehub.agency.speech.sherpa.WhisperLibrary#isAvailable")
+    @EnabledIf("io.casehub.connectors.voice.sherpa.WhisperLibrary#isAvailable")
     void whisperSttCallsVadFilterWhenEnabled() {
         var callCount = new AtomicInteger();
         var enabled = new AtomicBoolean(true);
@@ -44,7 +44,7 @@ class VadIntegrationTest {
     }
 
     @Test
-    @EnabledIf("io.casehub.agency.speech.sherpa.WhisperLibrary#isAvailable")
+    @EnabledIf("io.casehub.connectors.voice.sherpa.WhisperLibrary#isAvailable")
     void vadFilterDroppingChunkPreventsAccumulation() {
         VoiceActivityFilterFactory factory = () -> new VoiceActivityFilter() {
             @Override

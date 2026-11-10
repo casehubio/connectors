@@ -1,6 +1,8 @@
 package io.casehub.connectors.voice.sherpa.correction;
 
 import io.casehub.connectors.voice.spi.CorrectionStrategy;
+import io.casehub.connectors.voice.spi.CorrectionStrategy.Candidate;
+import io.casehub.connectors.voice.spi.CorrectionStrategy.CorrectionContext;
 
 import java.util.List;
 

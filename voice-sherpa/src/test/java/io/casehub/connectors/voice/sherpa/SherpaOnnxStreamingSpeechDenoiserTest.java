@@ -7,7 +7,7 @@ import org.junit.jupiter.api.condition.EnabledIf;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@EnabledIf("io.casehub.agency.speech.sherpa.SherpaLibrary#isAvailable")
+@EnabledIf("io.casehub.connectors.voice.sherpa.SherpaLibrary#isAvailable")
 class SherpaOnnxStreamingSpeechDenoiserTest {
 
     @Test
