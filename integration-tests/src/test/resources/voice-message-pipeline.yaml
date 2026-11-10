@@ -1,0 +1,7 @@
+name: voice-message-pipeline
+description: Transcribe incoming audio via VoicePlatform STT
+
+steps:
+  - step: transcribe
+    stt-transcribe:
+      language: en

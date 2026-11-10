@@ -3,6 +3,7 @@ package io.casehub.connectors.graphql;
 import io.casehub.connectors.Page;
 import io.casehub.connectors.PageRequest;
 import io.casehub.connectors.UnsupportedCapabilityException;
+import io.casehub.connectors.graphql.dto.OperationResult;
 import io.casehub.connectors.project.model.Comment;
 import io.casehub.connectors.project.model.Issue;
 import io.casehub.connectors.project.model.Label;
@@ -145,7 +146,7 @@ public class ConnectorProjectApi {
     @PlatformMutation("Add labels to an issue")
     @RestPath("/issues/{issueNumber}/labels")
     @Blocking
-    public void addLabels(
+    public OperationResult addLabels(
             @QueryParam("platform") String platformId,
             @QueryParam("owner") String owner,
             @QueryParam("repo") String repo,
@@ -154,12 +155,13 @@ public class ConnectorProjectApi {
         var p = platformService.platform(platformId);
         requireCapability(p, ProjectPlatform.Issues.class, "addLabels");
         p.issues(userId()).addLabels(repo(owner, repo), issueNumber, labelNames);
+        return new OperationResult(true, platformId, repo, "Labels added to issue #" + issueNumber);
     }
 
     @PlatformMutation("Remove a label from an issue")
     @RestPath("/issues/{issueNumber}/labels/{name}")
     @Blocking
-    public void removeLabel(
+    public OperationResult removeLabel(
             @QueryParam("platform") String platformId,
             @QueryParam("owner") String owner,
             @QueryParam("repo") String repo,
@@ -168,6 +170,7 @@ public class ConnectorProjectApi {
         var p = platformService.platform(platformId);
         requireCapability(p, ProjectPlatform.Issues.class, "removeLabel");
         p.issues(userId()).removeLabel(repo(owner, repo), issueNumber, name);
+        return new OperationResult(true, platformId, repo, "Label '" + name + "' removed from issue #" + issueNumber);
     }
 
     // --- Labels ---
@@ -227,7 +230,7 @@ public class ConnectorProjectApi {
     @PlatformMutation("Delete a label")
     @RestPath("/labels/{name}/delete")
     @Blocking
-    public void deleteLabel(
+    public OperationResult deleteLabel(
             @QueryParam("platform") String platformId,
             @QueryParam("owner") String owner,
             @QueryParam("repo") String repo,
@@ -235,6 +238,7 @@ public class ConnectorProjectApi {
         var p = platformService.platform(platformId);
         requireCapability(p, ProjectPlatform.Labels.class, "deleteLabel");
         p.labels(userId()).delete(repo(owner, repo), name);
+        return new OperationResult(true, platformId, repo, "Label '" + name + "' deleted");
     }
 
     // --- Milestones ---
@@ -368,7 +372,7 @@ public class ConnectorProjectApi {
     @PlatformMutation("Move an issue to a column")
     @RestPath("/boards/{projectId}/move")
     @Blocking
-    public void moveIssue(
+    public OperationResult moveIssue(
             @QueryParam("platform") String platformId,
             @QueryParam("owner") String owner,
             @QueryParam("repo") String repo,
@@ -378,6 +382,7 @@ public class ConnectorProjectApi {
         var p = platformService.platform(platformId);
         requireCapability(p, ProjectPlatform.Boards.class, "moveIssue");
         p.boards(userId()).moveIssue(repo(owner, repo), projectId, columnId, issueNumber);
+        return new OperationResult(true, platformId, repo, "Issue #" + issueNumber + " moved to column " + columnId);
     }
 
     // --- Capability check ---

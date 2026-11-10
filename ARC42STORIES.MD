@@ -200,6 +200,12 @@ C4Context
 | `project-ref` | `casehub-connectors-project-ref` | `project-spi`, `quarkus-arc` |
 | `github-client` | `casehub-connectors-github-client` | `core`, `project-spi`, `jackson-databind` |
 | `project-github` | `casehub-connectors-project-github` | `project-spi`, `github-client`, `quarkus-arc` |
+| `voice-spi` | `casehub-connectors-voice-spi` | `connectors-api`, `simulation-api`, `quarkus-arc` |
+| `voice-ref` | `casehub-connectors-voice-ref` | `voice-spi`, `quarkus-arc` |
+| `voice-pipeline-steps` | `casehub-connectors-voice-pipeline-steps` | `voice-spi`, `yaml-plugin-api` |
+| `email-google-inbound` | `casehub-connectors-email-google-inbound` | `core`, `webhook`, `email-google` |
+| `integration-tests` | `casehub-connectors-integration-tests` | `voice-spi`, `voice-ref`, `voice-pipeline-steps`, `email-google-inbound`, `webhook` |
+| `playbooks` | `casehub-connectors-playbooks` | `voice-spi`, `voice-ref`, `voice-pipeline-steps`, `bank-spi`, `bank-ref`, `chat-spi`, `email-spi`, `email-ref`, `yaml-test`, `yaml-step-runtime` |
 
 `email` and `email-inbound` are separate because `quarkus-mailer` (SMTP) and `angus-mail` (IMAP) share no infrastructure. `webhook` is separate because `quarkus-rest` is unnecessary for outbound-only deployments. `mcp` is separate because `quarkus-mcp-server-core` is not in the Quarkus BOM. `discord` (HTTP client + Gateway) is separate from `chat-discord` (ChatPlatform) because the client can be consumed independently. `chat-slack` depends on `slack-bot` (existing HTTP client) rather than duplicating Slack API calls.
 
@@ -445,6 +451,7 @@ Full protocol docs: `docs/protocols/connectors/`
 |---|---|---|---|
 | Connector Infrastructure | End-to-end message transport for the casehubio platform — outbound delivery, inbound reception, MCP agent access, CloudEvent bridging | 6 | ✅ Complete |
 | Chat Platform | Structured interaction with chat systems — capability-composed SPI, graceful degradation, implementations for Slack/Discord/IRC, unified MCP surface, demo UI | 4 | 🟢 Active |
+| Voice & Real-time Inbound | Voice processing SPI, real-time inbound channels (Gmail push, WhatsApp media), YAML playbook integration tests | 1 | 🟢 Active |
 
 ### §9.2 Chapter Index
 
@@ -460,6 +467,7 @@ Full protocol docs: `docs/protocols/connectors/`
 | 8 | [Discord](#chapter-8--discord) | Chat Platform | + L8; L7 Low | High | ✅ |
 | 9 | [Slack ChatPlatform + MCP Consolidation](#chapter-9--slack-chatplatform--mcp-consolidation) | Chat Platform | + L9, L10; L5 High, L7 Low | High | ✅ |
 | 10 | [Chat Demo](#chapter-10--chat-demo) | Chat Platform | + L11; L7 Low | High | ✅ |
+| 11 | [Voice Platform + Real-time Inbound + Playbooks](#chapter-11--voice-platform--real-time-inbound--playbooks) | Voice & Real-time Inbound | + L15, L16, L17; L2 Medium | High | ✅ |
 
 **Layer × Chapter Matrix**
 
@@ -1314,6 +1322,44 @@ Cursor pagination with `PageResult` fail-soft — loop until cursor empty or MAX
 
 ---
 
+#### Chapter 11 — Voice Platform + Real-time Inbound + Playbooks
+
+**Issue:** #188 — Real-time inbound channels
+**Completed:** 2026-11-09
+
+##### What it adds
+
+**Before:** No voice processing capability, no Gmail push inbound, no YAML playbook integration tests.
+**After:** Full VoicePlatform SPI (STT + TTS), Gmail push via Pub/Sub, WhatsApp media download with DeferredDelivery, and 6 YAML playbook integration tests spanning voice, bank, chat, and email domains.
+
+- **VoicePlatform SPI** (`voice-spi`) — capability sub-interfaces `SpeechToText` (transcribe audio → TranscriptionResult) and `TextToSpeech` (synthesise text → SynthesisResult with audio bytes + optional PhonemeTiming); `supports(Class<?>)` introspection; `@SimulationEligible`; `VoicePlatformService` registry; `NoOpVoicePlatform` default bean
+- **ReferenceVoicePlatform** (`voice-ref`) — in-memory reference implementation; TTS wraps text in valid WAV container (RIFF header + data section), STT extracts text from WAV data section; enables round-trip testing without real audio
+- **Voice pipeline steps** (`voice-pipeline-steps`) — `SttTranscribePlugin` and `TtsSynthesisePlugin` as `@Plugin(streaming=true)` records; APT generates JSON manifests to `META-INF/yaml-plugins/`; integrates with platform YAML playbook engine
+- **Gmail push inbound** (`email-google-inbound`) — `GmailPushInboundConnector` receives Google Cloud Pub/Sub push notifications with JWT validation; `GmailHistoryClient` fetches new message IDs via Gmail History API; `HistoryStore` SPI with `InMemoryHistoryStore` default; `GmailWatchManager` handles watch registration lifecycle
+- **DeferredDelivery** — new `WebhookResult.DeferredDelivery` variant enables connectors to return immediate response synchronously while deferring async work to a virtual thread; router dispatches both paths
+- **WhatsApp media download** — WhatsApp inbound connector uses DeferredDelivery for media (voice note, image) download with 3-attempt exponential backoff and SSRF defense
+- **Playbooks module** — 6 YAML playbook integration tests: voice-echo, voice-agent, banking-assistant, whatsapp-banking-alert, email-voice-notification, joint-account-confirmation; `ConnectorPlaybookTest` (JUnit Jupiter @TestFactory) with manual service wiring via `PluginScanner`; `@Plugin` records in SPI modules (bank-spi, chat-spi, email-spi, voice-pipeline-steps) discovered at test time
+
+##### Key decisions
+
+- **WAV container for reference TTS** — `ReferenceVoicePlatform` wraps text bytes in a valid 44-byte WAV header so the "wav" format claim is honest; STT strips the header on decode; enables round-trip testing that also validates WAV handling
+- **`@Plugin` records in SPI modules, not playbooks** — plugin records live adjacent to the SPI they bind (e.g. `BankBalancePlugin` in `bank-spi`); playbooks module has zero production Java; APT generates discovery manifests per-SPI module
+- **DeferredDelivery as sealed variant** — extends `WebhookResult` sealed hierarchy; router handles it in the exhaustive switch; virtual thread dispatch keeps the webhook response fast while async work (media download) runs in background
+- **PluginScanner over AptPluginSource for tests** — APT-based manifest loading has a platform bug with `byte[]` types (platform#776); tests use runtime `PluginScanner` reflection which handles all types correctly
+
+##### Key files
+
+- `voice-spi/src/main/java/.../VoicePlatform.java` — SPI interface
+- `voice-ref/src/main/java/.../ReferenceVoicePlatform.java` — WAV-wrapping reference implementation
+- `voice-pipeline-steps/src/main/java/.../SttTranscribePlugin.java` — STT `@Plugin` record
+- `voice-pipeline-steps/src/main/java/.../TtsSynthesisePlugin.java` — TTS `@Plugin` record
+- `email-google-inbound/src/main/java/.../GmailPushInboundConnector.java` — Gmail push handler
+- `playbooks/src/test/java/.../ConnectorPlaybookTest.java` — JUnit @TestFactory for YAML playbooks
+- `playbooks/src/main/playbooks/voice-interaction-patterns/` — 6 YAML playbook files
+- `playbooks/src/test/playbooks/voice-interaction-patterns/` — 6 YAML test files
+
+---
+
 ## §10 Architectural Decisions
 
 All layer-specific decisions are recorded inline in §9.4. Cross-cutting decisions:
@@ -1333,6 +1379,10 @@ All layer-specific decisions are recorded inline in §9.4. Cross-cutting decisio
 | — | RichCard as platform-agnostic content model | Translated per-platform (Block Kit for Slack, Embed for Discord); callers never touch platform-specific formats |
 | — | Vert.x WebSocket for Discord Gateway, not JDK | JDK `java.net.http.WebSocket` sends an incorrect `Sec-WebSocket-Accept` header (missing RFC 6455 GUID concatenation); Vert.x handles it correctly; #35 |
 | — | SSRF defense on Discord CDN downloads | Hostname allowlist (`cdn.discordapp.com`, `media.discordapp.net`) verified before fetching; prevents open-redirect exploitation via crafted attachment URLs |
+| — | VoicePlatform capability sub-interfaces follow ChatPlatform pattern | `SpeechToText` and `TextToSpeech` as separate capability interfaces; `supports(Class<?>)` introspection; consistent with all other platform SPIs |
+| — | `WebhookResult.DeferredDelivery` for async webhook work | Sealed variant returns immediate response + defers async work to virtual thread; keeps webhook response fast while background work (media download) runs safely |
+| — | WAV container in ReferenceVoicePlatform | TTS wraps text in valid WAV header so format claim is honest; STT strips header; alternative (raw bytes labelled "wav") was misleading and broke format-aware consumers |
+| — | `@Plugin` records in SPI modules, not playbooks | Plugins live adjacent to the SPI they bind; playbooks module has zero production Java; APT generates manifests per-SPI; zero-Java test target |
 | — | `send_chat` replaces per-platform MCP tools | Unified ChatPlatform send tool routes by platform ID; callers no longer need to know which tool to call for which platform |
 | — | `ChannelManagement.delete()` — Slack archives, Discord deletes | Slack API has no channel delete; `conversations.archive` is the closest equivalent. Discord `DELETE /channels/{id}` is a true delete. Caller sees the same `delete()` method. |
 
@@ -1362,8 +1412,9 @@ Full decision records with alternatives considered: `docs/adr/`
 | 3 | Slack Events API inbound not implemented | Low | Slack inbound via bot token (full Events API — messages sent to bot) not implemented. `SlackBotClient` covers outbound only. No open issue. |
 | 4 | WhatsApp and email edge-case content | Low | Media-only WhatsApp messages yield content = media URL or empty string. HTML-only emails yield raw HTML. Neither is normalised to plain text. Documented. |
 | 5 | Discord Gateway reconnection | Medium | Gateway WebSocket reconnects on close, but no resume/session tracking — missed events during disconnection are lost. Presence cache goes stale until next GUILD_MEMBERS_CHUNK. |
-| 6 | Chat-demo SQLite concurrency | Low | Single-writer SQLite with WAL. Adequate for demo; not a production data store. Profile-gated `-Pdemo`. |
+| 6 | ~~Chat-demo SQLite concurrency~~ | ~~Low~~ | ~~Closed — chat-demo migrated to [casehubio/chat-app](https://github.com/casehubio/chat-app)~~ |
 | 7 | `ChannelManagement.delete()` semantic gap | Low | Slack archives (reversible), Discord deletes (irreversible). Same `delete()` API, different consequences. Documented in caller-facing Javadoc. |
+| 8 | `AptPluginSource` cannot load `byte[]` types | Medium | Platform bug (platform#776): `Class.forName("byte[]")` fails. Blocks migration from `PluginScanner` to APT-based plugin discovery for streaming plugins. Tests use `PluginScanner` workaround. |
 
 ---
 

@@ -1,0 +1,25 @@
+name: voice-round-trip
+description: Synthesise speech then transcribe it back — end-to-end voice pipeline proof
+
+steps:
+  # Real TTS — produces WAV audio bytes via VoicePlatform
+  - step: synthesise
+    tts-synthesise:
+      language: en
+      voice: default
+
+  # Real STT — transcribes the WAV bytes back to text
+  # Input is the audio bytes from the previous step
+  - step: transcribe
+    stt-transcribe:
+      language: en
+    input: "${synthesise.audioData}"
+
+  # Verify the round-trip produced text
+  - step: verify
+    invoke:
+      agent:
+        model: fast
+        system: "Compare these two texts for semantic equivalence. Return JSON: {\"equivalent\": true/false}"
+        user: "Original: ${input.text}\nTranscribed: ${transcribe.text}"
+        structured-output: true

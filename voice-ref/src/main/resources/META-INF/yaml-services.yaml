@@ -1,0 +1,4 @@
+io.casehub.connectors.voice.spi.VoicePlatform: io.casehub.connectors.voice.ref.ReferenceVoicePlatform
+io.casehub.connectors.voice.spi.SpeechDenoiser: io.casehub.connectors.voice.ref.RefSpeechDenoiser
+io.casehub.connectors.voice.spi.SpeakerEmbeddingExtractor: io.casehub.connectors.voice.ref.RefSpeakerEmbeddingExtractor
+io.casehub.connectors.voice.spi.SpeakerRegistry: io.casehub.connectors.voice.ref.RefSpeakerRegistry

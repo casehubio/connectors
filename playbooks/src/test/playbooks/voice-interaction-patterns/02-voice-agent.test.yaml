@@ -1,0 +1,18 @@
+name: Voice agent tests
+simulate:
+  agent:
+    - prompt: balance
+      response: BALANCE
+tests:
+  - name: agent classifies transcribed voice input
+    steps:
+      - run-playbook: ../../../main/playbooks/voice-interaction-patterns/02-voice-agent.playbook.yaml
+        capture: result
+      - assertThat: result.succeeded
+        equals: true
+      - assertThat: result.captures.transcript.text
+        equals: I need to check my account balance
+      - assertThat: result.captures.classification.response
+        contains: BALANCE
+      - assertThat: result.captures.audio.audio-format
+        equals: wav

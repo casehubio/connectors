@@ -23,6 +23,10 @@ PaymentInitiation capabilities, model types, and BankPlatformService routing.</d
     </dependency>
     <dependency>
       <groupId>io.casehub</groupId>
+      <artifactId>casehub-platform-yaml-plugin-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.casehub</groupId>
       <artifactId>casehub-platform-simulation-api</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -61,6 +65,19 @@ PaymentInitiation capabilities, model types, and BankPlatformService routing.</d
             <goals><goal>jandex</goal></goals>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <annotationProcessorPaths>
+            <path>
+              <groupId>io.casehub</groupId>
+              <artifactId>casehub-platform-yaml-plugin-processor</artifactId>
+              <version>${casehub.version}</version>
+            </path>
+          </annotationProcessorPaths>
+        </configuration>
       </plugin>
     </plugins>
   </build>

@@ -268,7 +268,7 @@ class NotificationBridgeStartupTest {
         var input = new io.casehub.platform.api.notification.NotificationInput(
                 "user-1", "tenant-1", "Test", null, "test",
                 io.casehub.platform.api.notification.NotificationSeverity.INFO, null,
-                new io.casehub.platform.api.notification.NotificationSource("e1", "wi", "w1", "a1"));
+                new io.casehub.platform.api.notification.NotificationSource("e1", "wi", "w1", "a1"), null);
         var result = deliverer.deliver(input);
         assertThat(result.success()).isTrue();
     }
@@ -302,7 +302,7 @@ class NotificationBridgeStartupTest {
         var input = new io.casehub.platform.api.notification.NotificationInput(
                 "user-1", "tenant-1", "Test", null, "test",
                 io.casehub.platform.api.notification.NotificationSeverity.INFO, null,
-                new io.casehub.platform.api.notification.NotificationSource("e1", "wi", "w1", "a1"));
+                new io.casehub.platform.api.notification.NotificationSource("e1", "wi", "w1", "a1"), null);
         var result = deliverer.deliver(input);
         assertThat(result.success()).isFalse();
         assertThat(result.failureReason()).contains("no destination resolver");

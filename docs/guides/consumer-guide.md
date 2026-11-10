@@ -9,7 +9,7 @@
 
 ## Purpose
 
-Canonical notification and messaging infrastructure for the platform. Provides CDI SPIs for outbound message delivery, inbound message reception, structured chat-system interaction, calendar integration, and notification bridging. Any casehubio repo that needs to send or receive messages must use these SPIs rather than implementing its own connectors.
+Canonical notification and messaging infrastructure for the platform. Provides CDI SPIs for outbound message delivery, inbound message reception, structured chat-system interaction, calendar integration, voice processing, and notification bridging. Any casehubio repo that needs to send or receive messages must use these SPIs rather than implementing its own connectors.
 
 Pure delivery infrastructure -- no domain logic, no routing decisions, no scheduling. Callers decide when, what, and to whom; observers decide what to do with received messages.
 
@@ -19,7 +19,7 @@ No Camel, no vendor SDKs -- pure `java.net.http.HttpClient` for HTTP-based conne
 
 ## Module Structure
 
-There are 30 active modules in the build (pom.xml `<modules>`):
+There are 36 active modules in the build (pom.xml `<modules>`):
 
 | Module (artifactId prefix: `casehub-connectors-`) | What consumers need to know |
 |----------------------------------------------------|-----------------------------|
@@ -47,6 +47,7 @@ There are 30 active modules in the build (pom.xml `<modules>`):
 | `email-spi` | `EmailPlatform` SPI with `@SimulationEligible`, model records (`Mailbox`, `EmailSummary`, `EmailMessage`, `EmailAttachment`), `EmailPlatformService` routing. Complements `email` (outbound) and `email-inbound` (push) |
 | `email-ref` | In-memory reference `EmailPlatform` for testing (`RefEmailPlatform`) — 3 mailboxes (Inbox/Sent/Archive), 9 messages with attachments, cursor-based pagination |
 | `email-google` | Gmail `EmailPlatform` provider (`GoogleEmailPlatform`) — OAuth2 refresh token auth, label→mailbox mapping, paginated message listing, MIME body parsing, attachment download. Config: `casehub.connectors.email.google.{client-id,client-secret,refresh-token}` |
+| `email-google-inbound` | Gmail push notifications via Cloud Pub/Sub (`GmailPushInboundConnector`) — JWT-validated push, Gmail History API for new message IDs, `HistoryStore` SPI for per-user history tracking, `GmailWatchManager` for watch registration lifecycle |
 | `document-spi` | `DocumentPlatform` SPI with `@SimulationEligible` and capability sub-interfaces (`FileOperations` incl. incremental sync, `FolderOperations`, `SearchOperations`, `SharingOperations`), `supports(Class<?>)` introspection, `DocumentPlatformService` routing |
 | `document-ref` | In-memory reference `DocumentPlatform` for testing (`RefDocumentPlatform`) — 3 folders, 7 files, all 4 capabilities including upload/download round-trip, search, sharing, monotonic version tracking for sync |
 | `document-google` | Google Drive `DocumentPlatform` provider (`GoogleDocumentPlatform`) — OAuth2 refresh token auth, file CRUD with direct upload, folder management, full-text search, share links, incremental sync via `changes.list`. Config: `casehub.connectors.document.google.{client-id,client-secret,refresh-token}` |
@@ -67,6 +68,11 @@ There are 30 active modules in the build (pom.xml `<modules>`):
 | `project-github` | GitHub `ProjectPlatform` provider (`GitHubProjectPlatform`) — per-user credential resolution via `GitHubCredentialResolver` CDI SPI. All 5 capabilities |
 | `health-spi` | `HealthPlatform` SPI with `@SimulationEligible` and capability sub-interfaces (`ProviderSearch`, `AppointmentBooking`, `MedicalRecords`). Search is app-level; booking and records are user-scoped. `supports(Class<?>)` introspection, `HealthPlatformService` routing |
 | `health-ref` | In-memory reference `HealthPlatform` for testing (`RefHealthPlatform`) — pre-loaded UK healthcare providers, appointment slots, and medical records across multiple specialties |
+| `voice-spi` | `VoicePlatform` SPI with `@SimulationEligible` and capability sub-interfaces (`SpeechToText`, `TextToSpeech`), `supports(Class<?>)` introspection, `VoicePlatformService` routing, `NoOpVoicePlatform` `@DefaultBean` fallback |
+| `voice-ref` | In-memory reference `VoicePlatform` for testing (`ReferenceVoicePlatform`) — WAV container encoding for text round-trip |
+| `voice-pipeline-steps` | YAML playbook-compatible voice step types: `stt-transcribe` and `tts-synthesise` `@Plugin(streaming=true)` records for audio transcription and speech synthesis |
+| `integration-tests` | Cross-module integration tests — voice round-trip, WhatsApp media flow, Gmail push flow |
+| `playbooks` | YAML playbook examples with integration tests — 6 voice + multi-domain scenarios, zero Java test code |
 | `connectors-spring` | Spring Boot Auto-Configuration — registers all platform SPIs and services as Spring beans for non-Quarkus deployments |
 | `graphql` | `ConnectorOperations` `@McpDomain("connectors")` SPI — GraphQL/MCP surface with 5 operations: `injectChat` (constructs `InboundMessage`, fires via `InboundConnectorService`), `sendNotification` (delegates to `ConnectorService.send()`), `connectorStatus` (aggregates outbound + chat + inbound connectors), `connectorsReport` (scope-filtered capability/status report across all 11 platforms — chat, calendar, bank, email, document, contacts, location, commerce, travel, project, health — with `scope` param: `"all"`, `null`, or comma-separated names), `sentMessages` (queries `SentMessageCapture`, profile-gated). `ConnectorsModelEnricher` provides domain summary/state for MCP. `SentMessageCapture` (`@UnlessBuildProfile("prod")`) CDI observer for test/dev message capture. Capability-gated API methods throw `UnsupportedCapabilityException` (in `connectors-api`) with structured metadata (operation, capability, provider, supportedCapabilities) for LLM self-correction. |
 
@@ -154,6 +160,8 @@ public abstract class WebhookInboundConnector {
 
 **ID contract for both:** must be lowercase, URL-safe, no slashes or spaces (pattern: `[a-z0-9][a-z0-9\-]*`). Validated at startup -- violations cause startup failure. Webhook connector IDs are also the URL path segment: `POST /connectors/{id}/webhook`.
 
+**DeferredDelivery:** `WebhookResult.DeferredDelivery` returns an immediate HTTP response to the webhook sender while deferring async work (e.g. media download) to a virtual thread. The router dispatches both the immediate response and the deferred `Runnable`. Used by WhatsApp inbound for media download with 3-attempt exponential backoff.
+
 **Breaking contract:** observers MUST use `@ObservesAsync InboundMessage` -- synchronous `@Observes` will not receive events. At-least-once delivery.
 
 ### InboundMessage Record
@@ -187,6 +195,7 @@ Constants for connector types: `InboundConnectorTypes` (e.g. `SLACK = "slack"`, 
 | `discord-inbound` | `DiscordInboundConnector` | `chat-discord` | Discord Gateway WebSocket | Discord bot token |
 | `irc-inbound` | `IrcInboundConnector` | `chat-irc` | IRC connection | IRC server config |
 | `signal-inbound` | `SignalInboundConnector` | `chat-signal` | signal-cli-rest-api WebSocket | signal-cli URL + registered number |
+| `gmail-push-inbound` | `GmailPushInboundConnector` | `email-google-inbound` | Google Cloud Pub/Sub push | JWT validation + Gmail History API |
 
 ### ConnectorDiscovery SPI
 
@@ -418,6 +427,43 @@ To use in your app: add `bank-spi` as a dependency -- the corpus files are on th
 <dependency>
     <groupId>io.casehub</groupId>
     <artifactId>casehub-connectors-bank-spi</artifactId>
+    <version>${casehub.version}</version>
+</dependency>
+```
+
+### VoicePlatform SPI
+
+Speech-to-text and text-to-speech integration with two capability sub-interfaces.
+
+```java
+@SimulationEligible(name = "voice-platform",
+    capabilities = {"speechToText", "textToSpeech"})
+public interface VoicePlatform {
+    String id();
+    SpeechToText speechToText();
+    TextToSpeech textToSpeech();
+    boolean supports(Class<?> capability);
+}
+```
+
+**SpeechToText** -- `transcribe(byte[] audio, TranscriptionOptions)` and `transcribe(Path audioFile, TranscriptionOptions)` return `TranscriptionResult(text, language, confidence)`.
+
+**TextToSpeech** -- `synthesise(String text, SynthesisOptions)` returns `SynthesisResult(audioData, audioFormat)` with optional `PhonemeTiming` for lip-sync.
+
+**VoicePlatformService** -- inject for routing. Same pattern as `CalendarPlatformService`.
+
+**Pipeline steps:** `voice-pipeline-steps` provides `stt-transcribe` and `tts-synthesise` as `@Plugin(streaming=true)` step types for YAML playbook integration. These compose with other platform plugins (bank, chat, email) for multi-domain scenarios.
+
+| Implementation | Platform ID | Notes |
+|----------------|------------|-------|
+| `ReferenceVoicePlatform` | `ref` | WAV container encoding -- TTS wraps text in valid RIFF/WAV, STT extracts and decodes |
+| `NoOpVoicePlatform` | `none` | `@DefaultBean` fallback -- `supports()` returns false for all capabilities |
+
+**Dependency:**
+```xml
+<dependency>
+    <groupId>io.casehub</groupId>
+    <artifactId>casehub-connectors-voice-spi</artifactId>
     <version>${casehub.version}</version>
 </dependency>
 ```

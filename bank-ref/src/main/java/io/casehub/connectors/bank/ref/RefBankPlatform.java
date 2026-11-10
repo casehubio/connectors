@@ -10,6 +10,11 @@ public class RefBankPlatform implements BankPlatform {
 
     private final BankBackend backend;
 
+
+    public RefBankPlatform() {
+        this(new InMemoryBankBackend());
+    }
+
     public RefBankPlatform(BankBackend backend) {
         this.backend = backend;
     }

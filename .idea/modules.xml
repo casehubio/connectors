@@ -2,8 +2,11 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/../agency/agency-core/casehub-agency-core.iml" filepath="$PROJECT_DIR$/../agency/agency-core/casehub-agency-core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../chat-app/casehub-chat-app.iml" filepath="$PROJECT_DIR$/../chat-app/casehub-chat-app.iml" />
       <module fileurl="file://$PROJECT_DIR$/cloud-events/casehub-connectors-cloud-events.iml" filepath="$PROJECT_DIR$/cloud-events/casehub-connectors-cloud-events.iml" />
       <module fileurl="file://$PROJECT_DIR$/mcp/casehub-connectors-mcp.iml" filepath="$PROJECT_DIR$/mcp/casehub-connectors-mcp.iml" />
+      <module fileurl="file://$PROJECT_DIR$/connector-playbook-tests/casehub-connectors-playbook-tests.iml" filepath="$PROJECT_DIR$/connector-playbook-tests/casehub-connectors-playbook-tests.iml" />
       <module fileurl="file://$PROJECT_DIR$/../platform/agent-claude-spring/casehub-platform-agent-claude-spring.iml" filepath="$PROJECT_DIR$/../platform/agent-claude-spring/casehub-platform-agent-claude-spring.iml" />
       <module fileurl="file://$PROJECT_DIR$/../platform/agent-codex-spring/casehub-platform-agent-codex-spring.iml" filepath="$PROJECT_DIR$/../platform/agent-codex-spring/casehub-platform-agent-codex-spring.iml" />
       <module fileurl="file://$PROJECT_DIR$/../platform/agent-config-spring/casehub-platform-agent-config-spring.iml" filepath="$PROJECT_DIR$/../platform/agent-config-spring/casehub-platform-agent-config-spring.iml" />
@@ -16,6 +19,7 @@
       <module fileurl="file://$PROJECT_DIR$/../platform/agent-router-spring/casehub-platform-agent-router-spring.iml" filepath="$PROJECT_DIR$/../platform/agent-router-spring/casehub-platform-agent-router-spring.iml" />
       <module fileurl="file://$PROJECT_DIR$/../platform/agent-runtime-spring/casehub-platform-agent-runtime-spring.iml" filepath="$PROJECT_DIR$/../platform/agent-runtime-spring/casehub-platform-agent-runtime-spring.iml" />
       <module fileurl="file://$PROJECT_DIR$/../platform/memory-inmem/casehub-platform-memory-inmem.iml" filepath="$PROJECT_DIR$/../platform/memory-inmem/casehub-platform-memory-inmem.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../platform/playbook-catalog/casehub-platform-playbook-catalog.iml" filepath="$PROJECT_DIR$/../platform/playbook-catalog/casehub-platform-playbook-catalog.iml" />
       <module fileurl="file://$PROJECT_DIR$/../platform/streams-amqp-spring/casehub-platform-streams-amqp-spring.iml" filepath="$PROJECT_DIR$/../platform/streams-amqp-spring/casehub-platform-streams-amqp-spring.iml" />
       <module fileurl="file://$PROJECT_DIR$/../platform/streams-camel-spring/casehub-platform-streams-camel-spring.iml" filepath="$PROJECT_DIR$/../platform/streams-camel-spring/casehub-platform-streams-camel-spring.iml" />
       <module fileurl="file://$PROJECT_DIR$/../platform/streams-kafka-spring/casehub-platform-streams-kafka-spring.iml" filepath="$PROJECT_DIR$/../platform/streams-kafka-spring/casehub-platform-streams-kafka-spring.iml" />

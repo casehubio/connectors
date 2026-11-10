@@ -9,6 +9,7 @@ import io.casehub.connectors.contacts.model.Contact;
 import io.casehub.connectors.contacts.model.Group;
 import io.casehub.connectors.contacts.spi.ContactsPlatform;
 import io.casehub.connectors.contacts.spi.ContactsPlatformService;
+import io.casehub.connectors.graphql.dto.OperationResult;
 import io.casehub.platform.api.mcp.McpDomain;
 import io.casehub.platform.api.mcp.PathParam;
 import io.casehub.platform.api.mcp.PlatformMutation;
@@ -129,12 +130,13 @@ public class ConnectorContactsApi {
 
     @PlatformMutation("Delete a contact")
     @RestPath("/contacts/{contactId}/delete")
-    public void deleteContact(
+    public OperationResult deleteContact(
             @QueryParam("platform") String platformId,
             @PathParam String contactId) {
         var p = platformService.platform(platformId);
         requireCapability(p, ContactsPlatform.ContactWrite.class, "deleteContact");
         p.contactWrite(userId()).delete(contactId);
+        return new OperationResult(true, platformId, contactId, "Contact deleted");
     }
 
     private static void requireCapability(ContactsPlatform platform, Class<?> capability, String operation) {

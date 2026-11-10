@@ -1,0 +1,1 @@
+io.casehub.connectors.email.spi.EmailPlatform: io.casehub.connectors.email.ref.RefEmailPlatform

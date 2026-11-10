@@ -1,5 +1,6 @@
 package io.casehub.connectors.webhook;
 
+import io.casehub.platform.api.mcp.HandWrittenEndpoint;
 import io.casehub.platform.api.mcp.McpDomain;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
 @Path("/connectors")
 @Produces(MediaType.APPLICATION_JSON)
 @ApplicationScoped
+@HandWrittenEndpoint("Webhook receiver — inbound HTTP hooks from external systems, not agent-facing")
 @McpDomain(value = "connectors/webhooks", app = "connectors", basePath = "/connectors",
         summary = "Webhook management — register, route, verify inbound hooks")
 public class WebhookResource {

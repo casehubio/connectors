@@ -36,6 +36,10 @@ public class RefChatPlatform implements ChatPlatform {
     private final RefCommands commands = new RefCommands();
 
 
+    public RefChatPlatform() {
+        this(new InMemoryChatBackend());
+    }
+
     public RefChatPlatform(final ChatBackend backend) {
         this.backend = backend;
     }

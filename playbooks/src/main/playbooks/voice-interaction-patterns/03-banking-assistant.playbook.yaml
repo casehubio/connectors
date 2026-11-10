@@ -1,0 +1,14 @@
+name: Banking voice assistant
+description: Voice transcription triggers bank balance lookup and voice summary
+steps:
+  - tts-synthesise: What is my current account balance?
+    capture: inputAudio
+
+  - stt-transcribe: ${inputAudio.audio-data}
+    capture: transcript
+
+  - bank-balance: acc-100
+    capture: balance
+
+  - tts-synthesise: Your balance is ${balance.amount} ${balance.currency}
+    capture: audio

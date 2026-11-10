@@ -1,0 +1,8 @@
+name: Voice echo — round-trip
+description: Synthesise text to audio, then transcribe it back to verify content survives
+steps:
+  - tts-synthesise: Hello, this is a round-trip test.
+    capture: audio
+
+  - stt-transcribe: ${audio.audio-data}
+    capture: roundTrip

@@ -14,6 +14,11 @@ public class RefEmailPlatform implements EmailPlatform {
 
     private final EmailBackend backend;
 
+
+    public RefEmailPlatform() {
+        this(new InMemoryEmailBackend());
+    }
+
     public RefEmailPlatform(EmailBackend backend) {
         this.backend = backend;
     }

@@ -12,13 +12,17 @@
         <module name="casehub-connectors-document-spi" />
         <module name="casehub-platform-delivery-channel-inmem-core" />
         <module name="casehub-platform-subscriptions-inmem-core" />
+        <module name="casehub-platform-yaml-test" />
         <module name="casehub-platform-security-spring" />
+        <module name="casehub-platform-plugin-catalog-api" />
         <module name="casehub-platform-scim" />
         <module name="casehub-platform-datasource-inmem-core" />
         <module name="casehub-platform-agent-config-core" />
+        <module name="casehub-mcp-api" />
         <module name="casehub-platform-endpoints-memory" />
         <module name="casehub-platform-agent-session-core" />
         <module name="casehub-platform-persistence-jpa" />
+        <module name="casehub-platform-plugin-catalog-core" />
         <module name="casehub-platform-config-core" />
         <module name="casehub-platform-authn-social-core" />
         <module name="casehub-platform-rest-spring-generator" />
@@ -39,6 +43,7 @@
         <module name="casehub-platform-graphql-spring-generator" />
         <module name="casehub-connectors-mcp" />
         <module name="casehub-platform-digest-inmem" />
+        <module name="casehub-connectors-voice-ref" />
         <module name="casehub-platform-notification-dispatch-core" />
         <module name="casehub-platform-agent-simulation-core" />
         <module name="casehub-platform-streams-camel-core" />
@@ -66,7 +71,9 @@
         <module name="casehub-platform-playbook-compiler" />
         <module name="casehub-platform-agent-runtime" />
         <module name="casehub-platform-delivery-tracking-spring-jpa" />
+        <module name="casehub-platform-registration-core" />
         <module name="casehub-connectors-travel-ref" />
+        <module name="casehub-platform-challenge-spring-jpa" />
         <module name="casehub-platform-notifications-jpa" />
         <module name="casehub-platform-agent-api" />
         <module name="casehub-platform-digest-spring-jpa" />
@@ -77,12 +84,15 @@
         <module name="casehub-platform-llm-config-bedrock" />
         <module name="casehub-platform-event-simulation-core" />
         <module name="casehub-platform-notification-settings-inmem" />
+        <module name="casehub-connectors-integration-tests" />
         <module name="casehub-platform-digest-jpa" />
         <module name="casehub-connectors-chat-spi" />
         <module name="casehub-platform-streams-amqp" />
         <module name="casehub-platform-registry-jpa" />
+        <module name="casehub-platform-registration-spring" />
         <module name="casehub-connectors-document-google" />
         <module name="casehub-platform-agent-ollama-core" />
+        <module name="casehub-platform-user-inmem" />
         <module name="casehub-platform-datasource-inmem" />
         <module name="casehub-platform-authn-webauthn-spring-jpa" />
         <module name="casehub-platform-datasource-alpha" />
@@ -98,11 +108,13 @@
         <module name="casehub-platform-agent-openai" />
         <module name="casehub-platform-subscriptions-jpa" />
         <module name="casehub-platform-agent-gemini" />
+        <module name="casehub-platform-user-jpa-common" />
         <module name="casehub-connectors-api" />
         <module name="casehub-platform-authn-social-spring-jpa" />
         <module name="casehub-platform-governance-core" />
         <module name="casehub-platform-digest-inmem-core" />
         <module name="casehub-platform-callback-core" />
+        <module name="casehub-platform-user-jpa" />
         <module name="casehub-connectors-project-spi" />
         <module name="casehub-platform-governance-spring" />
         <module name="casehub-connectors-location-spi" />
@@ -110,12 +122,17 @@
         <module name="casehub-platform-yaml-jackson" />
         <module name="casehub-platform-agent-gate-core" />
         <module name="casehub-platform-agent-session" />
+        <module name="casehub-platform-playbooks" />
         <module name="casehub-connectors-travel-amadeus" />
+        <module name="casehub-platform-user-inmem-core" />
+        <module name="casehub-platform-playbook-runner-spring" />
         <module name="casehub-platform-delivery-tracking-inmem-core" />
         <module name="casehub-platform-endpoints-config-core" />
         <module name="casehub-connectors-commerce-spi" />
         <module name="casehub-platform-delivery-tracking-jpa" />
         <module name="casehub-platform-scim-core" />
+        <module name="casehub-platform-yaml-test-core" />
+        <module name="casehub-platform-label-inmem" />
         <module name="casehub-connectors-contacts-google" />
         <module name="casehub-platform-llm-config-core" />
         <module name="casehub-platform-session-jpa" />
@@ -130,7 +147,6 @@
         <module name="casehub-platform-yaml-plugin-api" />
         <module name="casehub-platform-authn-webauthn-jpa" />
         <module name="casehub-connectors-signal-cli" />
-        <module name="casehub-platform-playbook-catalog" />
         <module name="casehub-platform-yaml-core" />
         <module name="casehub-platform-mcp" />
         <module name="casehub-platform-persistence-spring-mongodb" />
@@ -150,18 +166,22 @@
         <module name="casehub-connectors-email-spi" />
         <module name="casehub-platform-notification-settings-spring-jpa" />
         <module name="casehub-platform-digest-jpa-common" />
+        <module name="casehub-connectors-voice-spi" />
         <module name="casehub-platform-view" />
         <module name="casehub-platform-testing" />
         <module name="casehub-platform-acl-jpa-common" />
         <module name="casehub-platform-agent-router" />
         <module name="casehub-platform-agent-claude-core" />
         <module name="casehub-platform-subscriptions-core" />
+        <module name="casehub-platform-registration-api" />
         <module name="casehub-platform-governance" />
+        <module name="casehub-platform-challenge-jpa-common" />
         <module name="casehub-connectors-calendar-ref" />
         <module name="casehub-platform-credentials-spring" />
+        <module name="casehub-platform-challenge-jpa" />
         <module name="casehub-platform-authn" />
         <module name="casehub-platform-endpoints-config" />
-        <module name="casehub-agency-core" />
+        <module name="casehub-platform-label-inmem-core" />
         <module name="casehub-platform-callback-inmem-core" />
         <module name="casehub-platform-agent-langchain4j" />
         <module name="casehub-platform-streams-webhook-core" />
@@ -181,6 +201,7 @@
         <module name="casehub-platform-spring-integration-test" />
         <module name="casehub-platform-persistence-mongodb" />
         <module name="casehub-platform-signing" />
+        <module name="casehub-platform-user-spring-jpa" />
         <module name="casehub-platform-notifications-jpa-common" />
         <module name="casehub-platform-agent-langchain4j-core" />
         <module name="casehub-platform-streams-spring" />
@@ -209,6 +230,7 @@
         <module name="casehub-platform-simulation-inmem" />
         <module name="casehub-connectors-github-client" />
         <module name="casehub-platform-agent-runtime-core" />
+        <module name="casehub-connectors-playbooks" />
         <module name="casehub-connectors-project-ref" />
         <module name="casehub-platform-agent-codex-core" />
         <module name="casehub-platform-notifications-core" />
@@ -250,7 +272,9 @@
         <module name="casehub-connectors-location-ref" />
         <module name="casehub-connectors-chat-ref" />
         <module name="casehub-platform-agent-gemini-cli-core" />
+        <module name="casehub-connectors-voice-pipeline-steps" />
         <module name="casehub-connectors-commerce-shopify" />
+        <module name="casehub-connectors-email-google-inbound" />
       </profile>
       <profile name="Annotation profile for casehub-platform-callback" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
@@ -261,20 +285,24 @@
         <processorPath useClasspath="false">
           <entry name="$PROJECT_DIR$/../platform/graphql-generator/target/classes" />
           <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/mcp-api/target/classes" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/smallrye/jandex/3.6.0/jandex-3.6.0.jar" />
           <entry name="$PROJECT_DIR$/../platform/callback-api/target/classes" />
           <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/mcp-api/target/classes" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
           <entry name="$PROJECT_DIR$/../platform/graphql-generator/target/classes" />
           <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/mcp-api/target/classes" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/smallrye/jandex/3.6.0/jandex-3.6.0.jar" />
           <entry name="$PROJECT_DIR$/../platform/callback-api/target/classes" />
           <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/mcp-api/target/classes" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
         </processorPath>
@@ -289,18 +317,22 @@
         <processorPath useClasspath="false">
           <entry name="$PROJECT_DIR$/../platform/graphql-generator/target/classes" />
           <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/mcp-api/target/classes" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/smallrye/jandex/3.6.0/jandex-3.6.0.jar" />
           <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/mcp-api/target/classes" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
           <entry name="$PROJECT_DIR$/../platform/graphql-generator/target/classes" />
           <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/mcp-api/target/classes" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/smallrye/jandex/3.6.0/jandex-3.6.0.jar" />
           <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/mcp-api/target/classes" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
         </processorPath>
@@ -315,20 +347,24 @@
         <processorPath useClasspath="false">
           <entry name="$PROJECT_DIR$/../platform/graphql-generator/target/classes" />
           <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/mcp-api/target/classes" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/smallrye/jandex/3.6.0/jandex-3.6.0.jar" />
           <entry name="$PROJECT_DIR$/../platform/preferences-editor-core/target/classes" />
           <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/mcp-api/target/classes" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
           <entry name="$PROJECT_DIR$/../platform/graphql-generator/target/classes" />
           <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/mcp-api/target/classes" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/smallrye/jandex/3.6.0/jandex-3.6.0.jar" />
           <entry name="$PROJECT_DIR$/../platform/preferences-editor-core/target/classes" />
           <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/mcp-api/target/classes" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
         </processorPath>
@@ -343,6 +379,7 @@
           <entry name="$MAVEN_REPOSITORY$/io/casehub/casehub-neocortex-cognitive-api/0.4-SNAPSHOT/casehub-neocortex-cognitive-api-0.4-SNAPSHOT.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/casehub/casehub-neocortex-fusion-api/0.4-SNAPSHOT/casehub-neocortex-fusion-api-0.4-SNAPSHOT.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/casehub/casehub-platform-api/0.4-SNAPSHOT/casehub-platform-api-0.4-SNAPSHOT.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/casehub/casehub-mcp-api/0.4-SNAPSHOT/casehub-mcp-api-0.4-SNAPSHOT.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
           <entry name="$PROJECT_DIR$/../platform/simulation-generator/target/classes" />
@@ -366,6 +403,7 @@
           <entry name="$MAVEN_REPOSITORY$/io/smallrye/jandex/3.6.0/jandex-3.6.0.jar" />
           <entry name="$PROJECT_DIR$/../platform/simulation-api/target/classes" />
           <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/mcp-api/target/classes" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
           <entry name="$PROJECT_DIR$/../platform/simulation-generator/target/classes" />
@@ -373,6 +411,7 @@
           <entry name="$MAVEN_REPOSITORY$/io/smallrye/jandex/3.6.0/jandex-3.6.0.jar" />
           <entry name="$PROJECT_DIR$/../platform/simulation-api/target/classes" />
           <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/mcp-api/target/classes" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
         </processorPath>
@@ -382,16 +421,18 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <option name="domainFilter" value="temporal-drivers" />
+        <option name="domainFilter" value="temporal-drivers,corpus-selectors" />
         <option name="generateGraphQL" value="false" />
         <processorPath useClasspath="false">
           <entry name="$PROJECT_DIR$/../platform/graphql-generator/target/classes" />
           <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/mcp-api/target/classes" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/smallrye/jandex/3.6.0/jandex-3.6.0.jar" />
           <entry name="$PROJECT_DIR$/../platform/graphql-generator/target/classes" />
           <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/mcp-api/target/classes" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/smallrye/jandex/3.6.0/jandex-3.6.0.jar" />
@@ -407,18 +448,22 @@
         <processorPath useClasspath="false">
           <entry name="$PROJECT_DIR$/../platform/graphql-generator/target/classes" />
           <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/mcp-api/target/classes" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/smallrye/jandex/3.6.0/jandex-3.6.0.jar" />
           <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/mcp-api/target/classes" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
           <entry name="$PROJECT_DIR$/../platform/graphql-generator/target/classes" />
           <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/mcp-api/target/classes" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/smallrye/jandex/3.6.0/jandex-3.6.0.jar" />
           <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/mcp-api/target/classes" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
         </processorPath>
@@ -433,18 +478,22 @@
         <processorPath useClasspath="false">
           <entry name="$PROJECT_DIR$/../platform/graphql-generator/target/classes" />
           <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/mcp-api/target/classes" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/smallrye/jandex/3.6.0/jandex-3.6.0.jar" />
           <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/mcp-api/target/classes" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
           <entry name="$PROJECT_DIR$/../platform/graphql-generator/target/classes" />
           <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/mcp-api/target/classes" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/smallrye/jandex/3.6.0/jandex-3.6.0.jar" />
           <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/mcp-api/target/classes" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
         </processorPath>
@@ -459,18 +508,22 @@
         <processorPath useClasspath="false">
           <entry name="$PROJECT_DIR$/../platform/graphql-generator/target/classes" />
           <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/mcp-api/target/classes" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/smallrye/jandex/3.6.0/jandex-3.6.0.jar" />
           <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/mcp-api/target/classes" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
           <entry name="$PROJECT_DIR$/../platform/graphql-generator/target/classes" />
           <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/mcp-api/target/classes" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/smallrye/jandex/3.6.0/jandex-3.6.0.jar" />
           <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/mcp-api/target/classes" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
         </processorPath>
@@ -484,54 +537,64 @@
           <entry name="$PROJECT_DIR$/../platform/yaml-plugin-processor/target/classes" />
           <entry name="$PROJECT_DIR$/../platform/yaml-plugin-api/target/classes" />
           <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/mcp-api/target/classes" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
           <entry name="$PROJECT_DIR$/../platform/schema-generator/target/classes" />
-          <entry name="$MAVEN_REPOSITORY$/com/github/victools/jsonschema-generator/4.36.0/jsonschema-generator-4.36.0.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/victools/jsonschema-generator/5.0.0/jsonschema-generator-5.0.0.jar" />
           <entry name="$MAVEN_REPOSITORY$/com/fasterxml/classmate/1.7.1/classmate-1.7.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-core/2.22.2/jackson-core-2.22.2.jar" />
+          <entry name="$MAVEN_REPOSITORY$/tools/jackson/core/jackson-core/3.1.5/jackson-core-3.1.5.jar" />
+          <entry name="$MAVEN_REPOSITORY$/tools/jackson/core/jackson-databind/3.0.3/jackson-databind-3.0.3.jar" />
           <entry name="$MAVEN_REPOSITORY$/org/slf4j/slf4j-api/2.0.18/slf4j-api-2.0.18.jar" />
-          <entry name="$MAVEN_REPOSITORY$/com/github/victools/jsonschema-module-jackson/4.36.0/jsonschema-module-jackson-4.36.0.jar" />
-          <entry name="$MAVEN_REPOSITORY$/com/github/victools/jsonschema-module-jakarta-validation/4.36.0/jsonschema-module-jakarta-validation-4.36.0.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/victools/jsonschema-module-jackson/5.0.0/jsonschema-module-jackson-5.0.0.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/victools/jsonschema-module-jakarta-validation/5.0.0/jsonschema-module-jakarta-validation-5.0.0.jar" />
           <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-databind/2.22.2/jackson-databind-2.22.2.jar" />
           <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-annotations/2.22/jackson-annotations-2.22.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-core/2.22.2/jackson-core-2.22.2.jar" />
           <entry name="$MAVEN_REPOSITORY$/jakarta/validation/jakarta.validation-api/3.1.1/jakarta.validation-api-3.1.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/smallrye/jandex/3.6.0/jandex-3.6.0.jar" />
           <entry name="$PROJECT_DIR$/../platform/schema-generator/target/classes" />
-          <entry name="$MAVEN_REPOSITORY$/com/github/victools/jsonschema-generator/4.36.0/jsonschema-generator-4.36.0.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/victools/jsonschema-generator/5.0.0/jsonschema-generator-5.0.0.jar" />
           <entry name="$MAVEN_REPOSITORY$/com/fasterxml/classmate/1.7.1/classmate-1.7.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-core/2.22.2/jackson-core-2.22.2.jar" />
+          <entry name="$MAVEN_REPOSITORY$/tools/jackson/core/jackson-core/3.1.5/jackson-core-3.1.5.jar" />
+          <entry name="$MAVEN_REPOSITORY$/tools/jackson/core/jackson-databind/3.0.3/jackson-databind-3.0.3.jar" />
           <entry name="$MAVEN_REPOSITORY$/org/slf4j/slf4j-api/2.0.18/slf4j-api-2.0.18.jar" />
-          <entry name="$MAVEN_REPOSITORY$/com/github/victools/jsonschema-module-jackson/4.36.0/jsonschema-module-jackson-4.36.0.jar" />
-          <entry name="$MAVEN_REPOSITORY$/com/github/victools/jsonschema-module-jakarta-validation/4.36.0/jsonschema-module-jakarta-validation-4.36.0.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/victools/jsonschema-module-jackson/5.0.0/jsonschema-module-jackson-5.0.0.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/victools/jsonschema-module-jakarta-validation/5.0.0/jsonschema-module-jakarta-validation-5.0.0.jar" />
           <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-databind/2.22.2/jackson-databind-2.22.2.jar" />
           <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-annotations/2.22/jackson-annotations-2.22.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-core/2.22.2/jackson-core-2.22.2.jar" />
           <entry name="$MAVEN_REPOSITORY$/jakarta/validation/jakarta.validation-api/3.1.1/jakarta.validation-api-3.1.1.jar" />
           <entry name="$PROJECT_DIR$/../platform/yaml-plugin-processor/target/classes" />
           <entry name="$PROJECT_DIR$/../platform/yaml-plugin-api/target/classes" />
           <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/mcp-api/target/classes" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
           <entry name="$PROJECT_DIR$/../platform/schema-generator/target/classes" />
-          <entry name="$MAVEN_REPOSITORY$/com/github/victools/jsonschema-generator/4.36.0/jsonschema-generator-4.36.0.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/victools/jsonschema-generator/5.0.0/jsonschema-generator-5.0.0.jar" />
           <entry name="$MAVEN_REPOSITORY$/com/fasterxml/classmate/1.7.1/classmate-1.7.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-core/2.22.2/jackson-core-2.22.2.jar" />
+          <entry name="$MAVEN_REPOSITORY$/tools/jackson/core/jackson-core/3.1.5/jackson-core-3.1.5.jar" />
+          <entry name="$MAVEN_REPOSITORY$/tools/jackson/core/jackson-databind/3.0.3/jackson-databind-3.0.3.jar" />
           <entry name="$MAVEN_REPOSITORY$/org/slf4j/slf4j-api/2.0.18/slf4j-api-2.0.18.jar" />
-          <entry name="$MAVEN_REPOSITORY$/com/github/victools/jsonschema-module-jackson/4.36.0/jsonschema-module-jackson-4.36.0.jar" />
-          <entry name="$MAVEN_REPOSITORY$/com/github/victools/jsonschema-module-jakarta-validation/4.36.0/jsonschema-module-jakarta-validation-4.36.0.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/victools/jsonschema-module-jackson/5.0.0/jsonschema-module-jackson-5.0.0.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/victools/jsonschema-module-jakarta-validation/5.0.0/jsonschema-module-jakarta-validation-5.0.0.jar" />
           <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-databind/2.22.2/jackson-databind-2.22.2.jar" />
           <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-annotations/2.22/jackson-annotations-2.22.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-core/2.22.2/jackson-core-2.22.2.jar" />
           <entry name="$MAVEN_REPOSITORY$/jakarta/validation/jakarta.validation-api/3.1.1/jakarta.validation-api-3.1.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/smallrye/jandex/3.6.0/jandex-3.6.0.jar" />
           <entry name="$PROJECT_DIR$/../platform/schema-generator/target/classes" />
-          <entry name="$MAVEN_REPOSITORY$/com/github/victools/jsonschema-generator/4.36.0/jsonschema-generator-4.36.0.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/victools/jsonschema-generator/5.0.0/jsonschema-generator-5.0.0.jar" />
           <entry name="$MAVEN_REPOSITORY$/com/fasterxml/classmate/1.7.1/classmate-1.7.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-core/2.22.2/jackson-core-2.22.2.jar" />
+          <entry name="$MAVEN_REPOSITORY$/tools/jackson/core/jackson-core/3.1.5/jackson-core-3.1.5.jar" />
+          <entry name="$MAVEN_REPOSITORY$/tools/jackson/core/jackson-databind/3.0.3/jackson-databind-3.0.3.jar" />
           <entry name="$MAVEN_REPOSITORY$/org/slf4j/slf4j-api/2.0.18/slf4j-api-2.0.18.jar" />
-          <entry name="$MAVEN_REPOSITORY$/com/github/victools/jsonschema-module-jackson/4.36.0/jsonschema-module-jackson-4.36.0.jar" />
-          <entry name="$MAVEN_REPOSITORY$/com/github/victools/jsonschema-module-jakarta-validation/4.36.0/jsonschema-module-jakarta-validation-4.36.0.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/victools/jsonschema-module-jackson/5.0.0/jsonschema-module-jackson-5.0.0.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/victools/jsonschema-module-jakarta-validation/5.0.0/jsonschema-module-jakarta-validation-5.0.0.jar" />
           <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-databind/2.22.2/jackson-databind-2.22.2.jar" />
           <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-annotations/2.22/jackson-annotations-2.22.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-core/2.22.2/jackson-core-2.22.2.jar" />
           <entry name="$MAVEN_REPOSITORY$/jakarta/validation/jakarta.validation-api/3.1.1/jakarta.validation-api-3.1.1.jar" />
         </processorPath>
         <module name="casehub-platform-yaml-step-runtime" />
@@ -545,32 +608,38 @@
         <processorPath useClasspath="false">
           <entry name="$PROJECT_DIR$/../platform/graphql-generator/target/classes" />
           <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/mcp-api/target/classes" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/smallrye/jandex/3.6.0/jandex-3.6.0.jar" />
           <entry name="$PROJECT_DIR$/../platform/subscriptions-core/target/classes" />
           <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/mcp-api/target/classes" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-databind/2.22.2/jackson-databind-2.22.2.jar" />
           <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-annotations/2.22/jackson-annotations-2.22.jar" />
           <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-core/2.22.2/jackson-core-2.22.2.jar" />
           <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/mcp-api/target/classes" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
           <entry name="$PROJECT_DIR$/../platform/graphql-generator/target/classes" />
           <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/mcp-api/target/classes" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/smallrye/jandex/3.6.0/jandex-3.6.0.jar" />
           <entry name="$PROJECT_DIR$/../platform/subscriptions-core/target/classes" />
           <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/mcp-api/target/classes" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-databind/2.22.2/jackson-databind-2.22.2.jar" />
           <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-annotations/2.22/jackson-annotations-2.22.jar" />
           <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-core/2.22.2/jackson-core-2.22.2.jar" />
           <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/mcp-api/target/classes" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
         </processorPath>
@@ -585,18 +654,22 @@
         <processorPath useClasspath="false">
           <entry name="$PROJECT_DIR$/../platform/graphql-generator/target/classes" />
           <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/mcp-api/target/classes" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/smallrye/jandex/3.6.0/jandex-3.6.0.jar" />
           <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/mcp-api/target/classes" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
           <entry name="$PROJECT_DIR$/../platform/graphql-generator/target/classes" />
           <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/mcp-api/target/classes" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/smallrye/jandex/3.6.0/jandex-3.6.0.jar" />
           <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/mcp-api/target/classes" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
         </processorPath>
@@ -611,14 +684,17 @@
         <processorPath useClasspath="false">
           <entry name="$PROJECT_DIR$/../platform/graphql-generator/target/classes" />
           <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/mcp-api/target/classes" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/smallrye/jandex/3.6.0/jandex-3.6.0.jar" />
           <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/mcp-api/target/classes" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
           <entry name="$PROJECT_DIR$/../platform/agent-api/target/classes" />
           <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/mcp-api/target/classes" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/smallrye/reactive/mutiny/3.3.0/mutiny-3.3.0.jar" />
@@ -626,14 +702,17 @@
           <entry name="$MAVEN_REPOSITORY$/org/jctools/jctools-core/4.0.5/jctools-core-4.0.5.jar" />
           <entry name="$PROJECT_DIR$/../platform/graphql-generator/target/classes" />
           <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/mcp-api/target/classes" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/smallrye/jandex/3.6.0/jandex-3.6.0.jar" />
           <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/mcp-api/target/classes" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
           <entry name="$PROJECT_DIR$/../platform/agent-api/target/classes" />
           <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/mcp-api/target/classes" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/smallrye/reactive/mutiny/3.3.0/mutiny-3.3.0.jar" />
@@ -641,6 +720,60 @@
           <entry name="$MAVEN_REPOSITORY$/org/jctools/jctools-core/4.0.5/jctools-core-4.0.5.jar" />
         </processorPath>
         <module name="casehub-platform-agent-http" />
+      </profile>
+      <profile name="Annotation profile for casehub-platform-playbook-runner" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <option name="domainFilter" value="playbooks" />
+        <option name="generateGraphQL" value="false" />
+        <processorPath useClasspath="false">
+          <entry name="$PROJECT_DIR$/../platform/graphql-generator/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/mcp-api/target/classes" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/smallrye/jandex/3.6.0/jandex-3.6.0.jar" />
+          <entry name="$PROJECT_DIR$/../platform/graphql-generator/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/mcp-api/target/classes" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/smallrye/jandex/3.6.0/jandex-3.6.0.jar" />
+        </processorPath>
+        <module name="casehub-platform-playbook-runner" />
+      </profile>
+      <profile name="Annotation profile for casehub-platform-registration" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <option name="domainFilter" value="registration,invitations" />
+        <option name="generateGraphQL" value="false" />
+        <processorPath useClasspath="false">
+          <entry name="$PROJECT_DIR$/../platform/graphql-generator/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/mcp-api/target/classes" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/smallrye/jandex/3.6.0/jandex-3.6.0.jar" />
+          <entry name="$PROJECT_DIR$/../platform/registration-api/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/mcp-api/target/classes" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
+          <entry name="$PROJECT_DIR$/../platform/graphql-generator/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/mcp-api/target/classes" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/smallrye/jandex/3.6.0/jandex-3.6.0.jar" />
+          <entry name="$PROJECT_DIR$/../platform/registration-api/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/mcp-api/target/classes" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
+        </processorPath>
+        <module name="casehub-platform-registration" />
       </profile>
       <profile name="Annotation profile for CaseHub Chat App" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
@@ -651,11 +784,13 @@
         <processorPath useClasspath="false">
           <entry name="$PROJECT_DIR$/../platform/graphql-generator/target/classes" />
           <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/mcp-api/target/classes" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/smallrye/jandex/3.6.0/jandex-3.6.0.jar" />
           <entry name="$PROJECT_DIR$/../platform/graphql-generator/target/classes" />
           <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/mcp-api/target/classes" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/smallrye/jandex/3.6.0/jandex-3.6.0.jar" />
@@ -671,12 +806,14 @@
         <processorPath useClasspath="false">
           <entry name="$PROJECT_DIR$/../platform/graphql-generator/target/classes" />
           <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/mcp-api/target/classes" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/smallrye/jandex/3.6.0/jandex-3.6.0.jar" />
           <entry name="$PROJECT_DIR$/connectors-api/target/classes" />
           <entry name="$PROJECT_DIR$/../platform/graphql-generator/target/classes" />
           <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/mcp-api/target/classes" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/smallrye/jandex/3.6.0/jandex-3.6.0.jar" />
@@ -693,18 +830,22 @@
         <processorPath useClasspath="false">
           <entry name="$PROJECT_DIR$/../platform/graphql-generator/target/classes" />
           <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/mcp-api/target/classes" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/smallrye/jandex/3.6.0/jandex-3.6.0.jar" />
           <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/mcp-api/target/classes" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
           <entry name="$PROJECT_DIR$/../platform/graphql-generator/target/classes" />
           <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/mcp-api/target/classes" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/smallrye/jandex/3.6.0/jandex-3.6.0.jar" />
           <entry name="$PROJECT_DIR$/../platform/platform-api/target/classes" />
+          <entry name="$PROJECT_DIR$/../platform/mcp-api/target/classes" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-core/4.0.1/cloudevents-core-4.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/cloudevents/cloudevents-api/4.0.1/cloudevents-api-4.0.1.jar" />
         </processorPath>
@@ -712,7 +853,9 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="casehub-agency-core" target="21" />
       <module name="casehub-connectors" target="21" />
+      <module name="casehub-connectors-playbook-tests" target="21" />
       <module name="casehub-platform-agent-claude-spring" target="21" />
       <module name="casehub-platform-agent-codex-spring" target="21" />
       <module name="casehub-platform-agent-config-spring" target="21" />
@@ -724,6 +867,7 @@
       <module name="casehub-platform-agent-router-spring" target="21" />
       <module name="casehub-platform-agent-runtime-spring" target="21" />
       <module name="casehub-platform-memory-inmem" target="21" />
+      <module name="casehub-platform-playbook-catalog" target="21" />
       <module name="casehub-platform-streams-amqp-spring" target="21" />
       <module name="casehub-platform-streams-camel-spring" target="21" />
       <module name="casehub-platform-streams-kafka-spring" target="21" />
@@ -762,6 +906,7 @@
       <module name="casehub-connectors-document-spi" options="-parameters" />
       <module name="casehub-connectors-email" options="-parameters" />
       <module name="casehub-connectors-email-google" options="-parameters" />
+      <module name="casehub-connectors-email-google-inbound" options="-parameters" />
       <module name="casehub-connectors-email-inbound" options="-parameters" />
       <module name="casehub-connectors-email-ref" options="-parameters" />
       <module name="casehub-connectors-email-spi" options="-parameters" />
@@ -769,11 +914,14 @@
       <module name="casehub-connectors-graphql" options="-parameters -AdomainFilter=connectors,connectors/messaging,connectors/chat,connectors/calendar,connectors/bank-feed,connectors/email,connectors/contacts,connectors/project,connectors/commerce,connectors/travel,connectors/location,connectors/health -AgenerateGraphQL=false" />
       <module name="casehub-connectors-health-ref" options="-parameters" />
       <module name="casehub-connectors-health-spi" options="-parameters" />
+      <module name="casehub-connectors-integration-tests" options="-parameters" />
       <module name="casehub-connectors-location-google" options="-parameters" />
       <module name="casehub-connectors-location-ref" options="-parameters" />
       <module name="casehub-connectors-location-spi" options="-parameters" />
       <module name="casehub-connectors-mcp" options="-parameters" />
       <module name="casehub-connectors-notification-bridge" options="-parameters" />
+      <module name="casehub-connectors-playbook-tests" options="-parameters" />
+      <module name="casehub-connectors-playbooks" options="-parameters" />
       <module name="casehub-connectors-project-github" options="-parameters" />
       <module name="casehub-connectors-project-ref" options="-parameters" />
       <module name="casehub-connectors-project-spi" options="-parameters" />
@@ -784,9 +932,14 @@
       <module name="casehub-connectors-travel-google" options="-parameters" />
       <module name="casehub-connectors-travel-ref" options="-parameters" />
       <module name="casehub-connectors-travel-spi" options="-parameters" />
+      <module name="casehub-connectors-voice-pipeline-steps" options="-parameters" />
+      <module name="casehub-connectors-voice-ref" options="-parameters" />
+      <module name="casehub-connectors-voice-spi" options="-parameters" />
       <module name="casehub-connectors-webhook" options="-parameters -AgenerateGraphQL=false -AdomainFilter=connectors/webhooks" />
       <module name="casehub-coordination-core" options="-parameters" />
+      <module name="casehub-generator-parent" options="-parameters" />
       <module name="casehub-graphql-client" options="-parameters" />
+      <module name="casehub-mcp-api" options="-parameters" />
       <module name="casehub-platform" options="-parameters" />
       <module name="casehub-platform-acl-admin" options="-parameters -AgenerateGraphQL=false -AdomainFilter=acl" />
       <module name="casehub-platform-acl-admin-core" options="-parameters" />
@@ -861,6 +1014,9 @@
       <module name="casehub-platform-callback-inmem" options="-parameters" />
       <module name="casehub-platform-callback-inmem-core" options="-parameters" />
       <module name="casehub-platform-callback-spring" options="-parameters" />
+      <module name="casehub-platform-challenge-jpa" options="-parameters" />
+      <module name="casehub-platform-challenge-jpa-common" options="-parameters" />
+      <module name="casehub-platform-challenge-spring-jpa" options="-parameters" />
       <module name="casehub-platform-config" options="-parameters" />
       <module name="casehub-platform-config-core" options="-parameters" />
       <module name="casehub-platform-confirmation" options="-parameters" />
@@ -893,7 +1049,7 @@
       <module name="casehub-platform-endpoints-config-core" options="-parameters" />
       <module name="casehub-platform-endpoints-memory" options="-parameters" />
       <module name="casehub-platform-endpoints-memory-core" options="-parameters" />
-      <module name="casehub-platform-event-simulation" options="-parameters -AgenerateGraphQL=false -AdomainFilter=temporal-drivers" />
+      <module name="casehub-platform-event-simulation" options="-parameters -AgenerateGraphQL=false -AdomainFilter=temporal-drivers,corpus-selectors" />
       <module name="casehub-platform-event-simulation-core" options="-parameters" />
       <module name="casehub-platform-expression" options="-parameters" />
       <module name="casehub-platform-expression-core" options="-parameters" />
@@ -908,6 +1064,8 @@
       <module name="casehub-platform-identity" options="-parameters" />
       <module name="casehub-platform-identity-core" options="-parameters" />
       <module name="casehub-platform-identity-spring" options="-parameters" />
+      <module name="casehub-platform-label-inmem" options="-parameters" />
+      <module name="casehub-platform-label-inmem-core" options="-parameters" />
       <module name="casehub-platform-llm-config" options="-parameters" />
       <module name="casehub-platform-llm-config-bedrock" options="-parameters" />
       <module name="casehub-platform-llm-config-core" options="-parameters" />
@@ -947,8 +1105,17 @@
       <module name="casehub-platform-platform-view-jpa-common" options="-parameters" />
       <module name="casehub-platform-playbook-catalog" options="-parameters" />
       <module name="casehub-platform-playbook-compiler" options="-parameters" />
+      <module name="casehub-platform-playbook-runner" options="-parameters -AgenerateGraphQL=false -AdomainFilter=playbooks" />
+      <module name="casehub-platform-playbook-runner-spring" options="-parameters" />
+      <module name="casehub-platform-playbooks" options="-parameters" />
+      <module name="casehub-platform-plugin-catalog-api" options="-parameters" />
+      <module name="casehub-platform-plugin-catalog-core" options="-parameters" />
       <module name="casehub-platform-preferences-editor" options="-parameters -AgenerateGraphQL=false -AdomainFilter=preferences,preference-schemas" />
       <module name="casehub-platform-preferences-editor-core" options="-parameters" />
+      <module name="casehub-platform-registration" options="-parameters -AgenerateGraphQL=false -AdomainFilter=registration,invitations" />
+      <module name="casehub-platform-registration-api" options="-parameters" />
+      <module name="casehub-platform-registration-core" options="-parameters" />
+      <module name="casehub-platform-registration-spring" options="-parameters" />
       <module name="casehub-platform-registry-client" options="-parameters" />
       <module name="casehub-platform-registry-client-quarkus" options="-parameters" />
       <module name="casehub-platform-registry-inmem" options="-parameters" />
@@ -1004,6 +1171,11 @@
       <module name="casehub-platform-subscriptions-jpa-common" options="-parameters" />
       <module name="casehub-platform-subscriptions-spring-jpa" options="-parameters" />
       <module name="casehub-platform-testing" options="-parameters" />
+      <module name="casehub-platform-user-inmem" options="-parameters" />
+      <module name="casehub-platform-user-inmem-core" options="-parameters" />
+      <module name="casehub-platform-user-jpa" options="-parameters" />
+      <module name="casehub-platform-user-jpa-common" options="-parameters" />
+      <module name="casehub-platform-user-spring-jpa" options="-parameters" />
       <module name="casehub-platform-view" options="-parameters" />
       <module name="casehub-platform-view-core" options="-parameters" />
       <module name="casehub-platform-view-inmem" options="-parameters" />
@@ -1018,6 +1190,8 @@
       <module name="casehub-platform-yaml-statemachine-generator" options="-parameters" />
       <module name="casehub-platform-yaml-step-runtime" options="-parameters" />
       <module name="casehub-platform-yaml-step-testing" options="-parameters" />
+      <module name="casehub-platform-yaml-test" options="-parameters" />
+      <module name="casehub-platform-yaml-test-core" options="-parameters" />
       <module name="casehub-spring-boot-starter" options="-parameters" />
       <module name="casehub-spring-boot-starter-agent" options="-parameters" />
       <module name="casehub-spring-boot-starter-authn" options="-parameters" />

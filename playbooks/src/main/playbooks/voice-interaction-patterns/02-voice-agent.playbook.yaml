@@ -1,0 +1,20 @@
+name: Voice agent
+description: Voice input to agent classification to voice output
+steps:
+  - tts-synthesise: I need to check my account balance
+    capture: inputAudio
+
+  - stt-transcribe: ${inputAudio.audio-data}
+    capture: transcript
+
+  - agent-session-open classifier:
+      system: You are a request classifier. Respond with exactly one word — BALANCE, TRANSFER, or SUPPORT.
+
+  - agent-query classifier:
+      user: ${transcript.text}
+    capture: classification
+
+  - agent-session-close: classifier
+
+  - tts-synthesise: Your request has been classified as ${classification.response}
+    capture: audio

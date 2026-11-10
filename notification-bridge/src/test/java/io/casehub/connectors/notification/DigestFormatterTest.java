@@ -29,7 +29,7 @@ class DigestFormatterTest {
                     "user-1", "tenant-1", "Alert " + (i + 1),
                     "Body " + (i + 1), i % 2 == 0 ? "sla.breached" : "work-item.created",
                     i == 0 ? NotificationSeverity.URGENT : NotificationSeverity.INFO,
-                    "https://app/item/" + (i + 1), SOURCE));
+                    "https://app/item/" + (i + 1), SOURCE, null));
         }
         return new DigestSummary("user-1", "tenant-1", "email",
                 notifications, PERIOD_START, PERIOD_END, groupBy);

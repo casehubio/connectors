@@ -1,0 +1,24 @@
+name: Email and voice notification
+description: Check inbox, send voice alert, follow up with transcript
+steps:
+  - email-messages: inbox
+    capture: inbox
+
+  - tts-synthesise: You have ${inbox.count} messages in your inbox
+    capture: voiceAlert
+
+  - chat-send:
+      channel: family
+      message: Voice alert — ${inbox.count} messages in inbox
+      attachment: ${voiceAlert.audio-data}
+      attachment-type: audio/wav
+      attachment-name: inbox-alert.wav
+    capture: notification
+
+  - stt-transcribe: ${voiceAlert.audio-data}
+    capture: transcript
+
+  - chat-send:
+      channel: family
+      message: "Here is the transcript for the voice message you just received: ${transcript.text}"
+    capture: followUp

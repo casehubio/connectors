@@ -1,0 +1,30 @@
+name: Joint account verbal confirmation tests
+tests:
+  - name: full pipeline — register, confirm, denoise, identify, join, send
+    steps:
+      - run-playbook: ../../../main/playbooks/voice-interaction-patterns/06-joint-account-confirmation.playbook.yaml
+        capture: result
+      - assertThat: result.succeeded
+        equals: true
+      # Speaker identification
+      - assertThat: result.captures.aliceId.identified
+        equals: true
+      - assertThat: result.captures.aliceId.name
+        equals: Alice Smith
+      - assertThat: result.captures.bobId.identified
+        equals: true
+      - assertThat: result.captures.bobId.name
+        equals: Bob Smith
+      # Combined recording
+      - assertThat: result.captures.combinedRecording.audio-format
+        equals: wav
+      # Transcript contains both confirmations
+      - assertThat: result.captures.fullTranscript.text
+        contains: Alice Smith
+      - assertThat: result.captures.fullTranscript.text
+        contains: Bob Smith
+      - assertThat: result.captures.fullTranscript.text
+        contains: confirm this transaction
+      # Compliance notification sent
+      - assertThat: result.captures.auditRecord.ok
+        equals: true

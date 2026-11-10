@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>io.casehub</groupId>
+    <artifactId>casehub-connectors-parent</artifactId>
+    <version>0.4-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>casehub-connectors-integration-tests</artifactId>
+  <name>CaseHub Connectors — Integration Tests</name>
+  <description>Cross-module integration tests for connectors: voice round-trip, WhatsApp media, Gmail push.</description>
+
+  <dependencies>
+    <!-- Voice -->
+    <dependency>
+      <groupId>io.casehub</groupId>
+      <artifactId>casehub-connectors-voice-spi</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.casehub</groupId>
+      <artifactId>casehub-connectors-voice-ref</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.casehub</groupId>
+      <artifactId>casehub-connectors-voice-pipeline-steps</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- Webhook (WhatsApp, DeferredDelivery) -->
+    <dependency>
+      <groupId>io.casehub</groupId>
+      <artifactId>casehub-connectors-webhook</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- Gmail push -->
+    <dependency>
+      <groupId>io.casehub</groupId>
+      <artifactId>casehub-connectors-email-google-inbound</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- YAML plugin runtime (PluginScanner, Walker, CatalogStepRunner) -->
+    <dependency>
+      <groupId>io.casehub</groupId>
+      <artifactId>casehub-platform-yaml-step-runtime</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.casehub</groupId>
+      <artifactId>casehub-platform-yaml-plugin-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.casehub</groupId>
+      <artifactId>casehub-platform-yaml-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- Shared -->
+    <dependency>
+      <groupId>io.casehub</groupId>
+      <artifactId>casehub-connectors-api</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- Testing -->
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+</project>

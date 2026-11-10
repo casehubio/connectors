@@ -1,0 +1,64 @@
+- generic [ref=f1e2]:
+  - heading "Your Workflow Engine Is a Data Pipeline" [level=1] [ref=f1e3]
+  - paragraph [ref=f1e4]: A WhatsApp voice note arrives. It needs downloading, denoising, transcribing to text, and delivering to whichever agent handles the conversation. That's a pipeline — four stages, binary data flowing between them, each stage needing its own retry policy and timeout.
+  - paragraph [ref=f1e5]:
+    - text: The obvious move is to build one. A custom
+    - code [ref=f1e6]: AudioPipeline
+    - text: class with a chain of processing stages, explicit wiring between them, manual retry logic, and resource cleanup when something fails mid-chain. I've built these before. Everyone has. They work, and they all look the same, and none of them are the interesting part of the system.
+  - paragraph [ref=f1e7]: "We were designing this pipeline for casehub's real-time inbound channels — WhatsApp, Gmail push, Signal — when the question surfaced: could the platform's playbook engine handle this?"
+  - heading "The mental model that gets in the way" [level=2] [ref=f1e8]
+  - paragraph [ref=f1e9]: Workflow engines orchestrate human and agent tasks. Assign a ticket, wait for review, escalate if no response. That's the mental model. It's not wrong — but it's incomplete.
+  - paragraph [ref=f1e10]: A playbook step takes an input, does work, produces an output. It can retry on failure, timeout after a deadline, route to different branches based on the output. Strip away the human-task framing and what you have is a typed transform with orchestration decorators.
+  - paragraph [ref=f1e11]: That's exactly what a pipeline stage is.
+  - paragraph [ref=f1e12]:
+    - img "Streaming step fusion — before and after" [ref=f1e13]
+  - heading "Typed steps and automatic fusion" [level=2] [ref=f1e14]
+  - paragraph [ref=f1e15]:
+    - text: The platform's
+    - code [ref=f1e16]: StreamingStep<I, O>
+    - text: "interface makes this concrete. A step declares its input and output types at runtime:"
+  - code [ref=f1e18]: "@Plugin(value = \"stt-transcribe\", streaming = true) public record SttTranscribePlugin( @Optional String language, @Optional String model) { @Execute public TranscriptionResult apply(byte[] audio, VoicePlatform voicePlatform) { return voicePlatform.speechToText() .transcribe(audio, TranscriptionOptions.defaults() .withLanguageHint(language)); } }"
+  - paragraph [ref=f1e19]:
+    - text: The
+    - code [ref=f1e20]: "@Plugin(streaming = true)"
+    - text: annotation generates a
+    - code [ref=f1e21]: StreamingStep<byte[], TranscriptionResult>
+    - text: adapter at compile time. The first parameter of
+    - code [ref=f1e22]: "@Execute"
+    - text: is the streaming input; additional parameters are resolved from CDI.
+  - paragraph [ref=f1e23]:
+    - text: The compiler's
+    - code [ref=f1e24]: FusionPass
+    - text: then walks the playbook's step list. When consecutive steps have compatible types —
+    - code [ref=f1e25]: consumer.inputType().isAssignableFrom(producer.outputType())
+    - text: — it fuses them into a single
+    - code [ref=f1e26]: FusedPipelineStep
+    - text: . Three separate steps become one execution unit with near-native piped execution, automatic
+    - code [ref=f1e27]: AutoCloseable
+    - text: resource cleanup on mid-chain failure, and per-stage retry and timeout decorators applied inline.
+  - paragraph [ref=f1e28]: "The consuming application writes YAML, not pipeline code:"
+  - code [ref=f1e30]: "steps: - stt-transcribe: audio: \"${event.data.attachments[0].content}\" language: en step: transcript timeout: 120s retry: { max: 2, delay: 5s, backoff: exponential }"
+  - paragraph [ref=f1e31]: No custom pipeline framework. No explicit wiring. The orchestration engine you already have provides retry, timeout, routing, error handling, and CloudEvent triggers. The fusion compiler optimises the data path.
+  - heading "Why this matters for voice" [level=2] [ref=f1e32]
+  - paragraph [ref=f1e33]: Voice is the channel that makes this pattern non-optional. Text messages are small and fast — you can get away with ad hoc processing. Voice notes are binary, they need multiple processing stages (download, denoise, transcribe, clean up the text), and each stage can fail independently. An STT service that's down shouldn't block message delivery. A failed download should retry before giving up. A 120-second transcription shouldn't hold open a webhook connection.
+  - paragraph [ref=f1e34]:
+    - img "Inbound architecture — sources to playbook pipeline" [ref=f1e35]
+  - paragraph [ref=f1e36]: These are orchestration concerns, not data concerns. Building a custom pipeline means reimplementing them. Using the workflow engine means getting them for free — and getting them right, because they've been tested across every other workflow the engine runs.
+  - heading "The typed contract is the key" [level=2] [ref=f1e37]
+  - paragraph [ref=f1e38]:
+    - text: The insight that makes this work is the typed step contract.
+    - code [ref=f1e39]: StreamingStep<I, O>
+    - text: is the same abstraction as a Unix pipe or a Java
+    - code [ref=f1e40]: Function<I, O>
+    - text: . The workflow engine adds orchestration semantics around it — retry, timeout, routing, resource cleanup — but the data flow is just function composition.
+  - paragraph [ref=f1e41]:
+    - text: When a future
+    - code [ref=f1e42]: denoise
+    - text: step produces
+    - code [ref=f1e43]: byte[]
+    - text: and the existing
+    - code [ref=f1e44]: stt-transcribe
+    - text: step consumes
+    - code [ref=f1e45]: byte[]
+    - text: ", the fusion compiler chains them automatically. No configuration change, no new wiring code. The type system handles it."
+  - paragraph [ref=f1e46]: This is the direction we're taking casehub's inbound processing. Connectors download media and fire events. Playbooks route those events through processing steps. VoicePlatform provides the STT and TTS capabilities behind those steps. Each layer does one thing, and the workflow engine — the thing we built for task orchestration — turns out to be the data pipeline we didn't have to build.

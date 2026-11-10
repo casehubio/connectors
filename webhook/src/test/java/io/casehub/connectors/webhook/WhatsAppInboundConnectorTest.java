@@ -20,7 +20,7 @@ class WhatsAppInboundConnectorTest {
 
     @BeforeEach
     void setUp() {
-        connector = new WhatsAppInboundConnector("test-whatsapp-secret", "test-verify-token");
+        connector = new WhatsAppInboundConnector("test-whatsapp-secret", "test-verify-token", "");
     }
 
     // ── Helpers ──────────────────────────────────────────────────────────────
@@ -55,17 +55,17 @@ class WhatsAppInboundConnectorTest {
                 """.formatted(from, text, to).strip();
     }
 
-    private static String mediaMessage(final String mediaUrl) {
+    private static String mediaMessage(final String mediaId) {
         return """
-                {"entry":[{"changes":[{"value":{"messages":[{"from":"15551234","type":"image","image":{"url":"%s"}}],"metadata":{"phone_number_id":"15559999"}}}]}]}
-                """.formatted(mediaUrl).strip();
+                {"entry":[{"changes":[{"value":{"messages":[{"from":"15551234","type":"image","image":{"id":"%s","mime_type":"image/jpeg"}}],"metadata":{"phone_number_id":"15559999"}}}]}]}
+                """.formatted(mediaId).strip();
     }
 
     // ── Blank secret / token ──────────────────────────────────────────────────
 
     @Test
     void blankAppSecret_returnsIgnored() {
-        connector = new WhatsAppInboundConnector("", "test-verify-token");
+        connector = new WhatsAppInboundConnector("", "test-verify-token", "");
 
         assertThat(connector.handle(signedPostRequest(textMessage("15551234", "15559999", "hi"))))
                 .isInstanceOf(WebhookResult.Ignored.class);
@@ -128,15 +128,13 @@ class WhatsAppInboundConnectorTest {
     }
 
     @Test
-    void mediaMessage_contentIsMediaUrl() {
+    void mediaMessage_returnsDeferredDelivery() {
         final WebhookResult result = connector.handle(
-                signedPostRequest(mediaMessage("https://example.com/img.jpg")));
+                signedPostRequest(mediaMessage("media-123")));
 
-        assertThat(result).isInstanceOf(WebhookResult.Delivered.class);
-        final WebhookResult.Delivered delivered = (WebhookResult.Delivered) result;
-        assertThat(delivered.messages().get(0).content()).isEqualTo("https://example.com/img.jpg");
-        // mediaMessage fixture has no message id — metadata["message-id"] absent
-        assertThat(delivered.messages().get(0).metadata()).doesNotContainKey("message-id");
+        assertThat(result).isInstanceOf(WebhookResult.DeferredDelivery.class);
+        final WebhookResult.DeferredDelivery deferred = (WebhookResult.DeferredDelivery) result;
+        assertThat(deferred.immediate()).isEmpty();
     }
 
     @Test

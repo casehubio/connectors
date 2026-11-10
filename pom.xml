@@ -46,6 +46,7 @@ Zero heavy dependencies — HTTP-based connectors use java.net.http only.</descr
     <module>email-spi</module>
     <module>email-ref</module>
     <module>email-google</module>
+    <module>email-google-inbound</module>
     <module>document-spi</module>
     <module>document-ref</module>
     <module>document-google</module>
@@ -72,8 +73,13 @@ Zero heavy dependencies — HTTP-based connectors use java.net.http only.</descr
     <module>web-spi</module>
     <module>web</module>
     <module>web-ref</module>
+    <module>voice-spi</module>
+    <module>voice-ref</module>
+    <module>voice-pipeline-steps</module>
     <module>graphql</module>
     <module>connectors-spring</module>
+    <module>integration-tests</module>
+    <module>playbooks</module>
   </modules>
 
   <properties>

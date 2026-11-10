@@ -56,7 +56,7 @@ class ConnectorNotificationDelivererTest {
 
         var input = new NotificationInput("user-1", "tenant-1", "Alert",
                 "Something happened", "incident", NotificationSeverity.WARNING,
-                "https://app/incidents/1", SOURCE);
+                "https://app/incidents/1", SOURCE, null);
 
         DeliveryResult result = deliverer.deliver(input);
 
@@ -74,7 +74,7 @@ class ConnectorNotificationDelivererTest {
 
         var input = new NotificationInput("user-1", "tenant-1", "Alert",
                 "Body", "sla.breached", NotificationSeverity.URGENT,
-                "https://app/sla/1", SOURCE);
+                "https://app/sla/1", SOURCE, null);
 
         deliverer.deliver(input);
 
@@ -91,7 +91,7 @@ class ConnectorNotificationDelivererTest {
         var deliverer = new ConnectorNotificationDeliverer(connector, "email", resolver, null);
 
         var input = new NotificationInput("user-1", "tenant-1", "Alert title",
-                null, "test", NotificationSeverity.INFO, null, SOURCE);
+                null, "test", NotificationSeverity.INFO, null, SOURCE, null);
 
         deliverer.deliver(input);
 
@@ -105,7 +105,7 @@ class ConnectorNotificationDelivererTest {
         var deliverer = new ConnectorNotificationDeliverer(connector, "email", resolver, null);
 
         var input = new NotificationInput("user-1", "tenant-1", "Alert",
-                "Body", "test", NotificationSeverity.INFO, null, SOURCE);
+                "Body", "test", NotificationSeverity.INFO, null, SOURCE, null);
 
         deliverer.deliver(input);
 
@@ -118,7 +118,7 @@ class ConnectorNotificationDelivererTest {
         var deliverer = new ConnectorNotificationDeliverer(connector, "email", null, null);
 
         var input = new NotificationInput("user-1", "tenant-1", "Alert",
-                "Body", "test", NotificationSeverity.INFO, null, SOURCE);
+                "Body", "test", NotificationSeverity.INFO, null, SOURCE, null);
 
         DeliveryResult result = deliverer.deliver(input);
 
@@ -134,7 +134,7 @@ class ConnectorNotificationDelivererTest {
         var deliverer = new ConnectorNotificationDeliverer(connector, "email", resolver, null);
 
         var input = new NotificationInput("unknown-user", "tenant-1", "Alert",
-                "Body", "test", NotificationSeverity.INFO, null, SOURCE);
+                "Body", "test", NotificationSeverity.INFO, null, SOURCE, null);
 
         DeliveryResult result = deliverer.deliver(input);
 
@@ -150,7 +150,7 @@ class ConnectorNotificationDelivererTest {
         var deliverer = new ConnectorNotificationDeliverer(connector, "email", resolver, null);
 
         var input = new NotificationInput("user-1", "tenant-1", "Alert",
-                "Body", "test", NotificationSeverity.INFO, null, SOURCE);
+                "Body", "test", NotificationSeverity.INFO, null, SOURCE, null);
 
         DeliveryResult result = deliverer.deliver(input);
 
@@ -174,7 +174,7 @@ class ConnectorNotificationDelivererTest {
         var deliverer = new ConnectorNotificationDeliverer(connector, "email", resolver, formatter);
 
         var input = new NotificationInput("user-1", "tenant-1", "Alert",
-                                          null, "test", NotificationSeverity.INFO, null, SOURCE);
+                                          null, "test", NotificationSeverity.INFO, null, SOURCE, null);
         var summary = new DigestSummary("user-1", "tenant-1", "email",
                                         List.of(input), Instant.now().minusSeconds(3600), Instant.now(), null);
 
@@ -192,7 +192,7 @@ class ConnectorNotificationDelivererTest {
         var deliverer = new ConnectorNotificationDeliverer(connector, "email", resolver, null);
 
         var input = new NotificationInput("user-1", "tenant-1", "Alert",
-                                          null, "test", NotificationSeverity.INFO, null, SOURCE);
+                                          null, "test", NotificationSeverity.INFO, null, SOURCE, null);
         var summary = new DigestSummary("user-1", "tenant-1", "email",
                                         List.of(input), Instant.now().minusSeconds(3600), Instant.now(), null);
 
@@ -209,7 +209,7 @@ class ConnectorNotificationDelivererTest {
         var deliverer = new ConnectorNotificationDeliverer(connector, "email", null, null);
 
         var input = new NotificationInput("user-1", "tenant-1", "Alert",
-                                          null, "test", NotificationSeverity.INFO, null, SOURCE);
+                                          null, "test", NotificationSeverity.INFO, null, SOURCE, null);
         var summary = new DigestSummary("user-1", "tenant-1", "email",
                                         List.of(input), Instant.now().minusSeconds(3600), Instant.now(), null);
 
@@ -225,7 +225,7 @@ class ConnectorNotificationDelivererTest {
         var deliverer = new ConnectorNotificationDeliverer(connector, "email", resolver, null);
 
         var input = new NotificationInput("user-1", "tenant-1", "Alert",
-                                          null, "test", NotificationSeverity.INFO, null, SOURCE);
+                                          null, "test", NotificationSeverity.INFO, null, SOURCE, null);
         var summary = new DigestSummary("user-1", "tenant-1", "email",
                                         List.of(input), Instant.now().minusSeconds(3600), Instant.now(), null);
 

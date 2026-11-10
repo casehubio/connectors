@@ -1,0 +1,24 @@
+providers:
+  - vendor: ref
+voices:
+  af_heart:
+    vendor: ref
+    voice-id: af_heart
+    name: Heart
+    gender: female
+    accent: american
+    quality: 4.5
+    languages: [en-US]
+    capability: tts
+  bm_daniel:
+    vendor: ref
+    voice-id: bm_daniel
+    name: Daniel
+    gender: male
+    accent: british
+    quality: 4.3
+    languages: [en-GB]
+    capability: tts
+defaults:
+  tts-vendor: ref
+  stt-vendor: ref

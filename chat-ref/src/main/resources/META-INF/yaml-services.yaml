@@ -1,0 +1,1 @@
+io.casehub.connectors.chat.spi.ChatPlatform: io.casehub.connectors.chat.ref.RefChatPlatform

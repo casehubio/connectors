@@ -2,7 +2,6 @@ package io.casehub.connectors.webhook;
 
 import io.casehub.connectors.HttpMethod;
 import io.casehub.connectors.InboundConnectorService;
-import io.casehub.connectors.InboundMessage;
 import io.casehub.connectors.WebhookInboundConnector;
 import io.casehub.connectors.WebhookRequest;
 import io.casehub.connectors.WebhookResult;
@@ -95,8 +94,20 @@ public class WebhookRouter {
                     msgs.forEach(service::receive);
                     yield Response.ok().build();
                 }
-                case WebhookResult.Challenged(var responseBody, var contentType) ->
-                    Response.ok(responseBody).type(contentType).build();
+                case WebhookResult.DeferredDelivery(var immediate, var deferred) -> {
+                    immediate.forEach(service::receive);
+                    Thread.ofVirtual().name("webhook-deferred-" + id).start(() -> {
+                        try {
+                            deferred.get().forEach(service::receive);
+                        } catch (final Exception e) {
+                            LOG.log(Level.WARNING, "Deferred delivery failed for " + id, e);
+                        }
+                    });
+                    yield Response.ok().build();
+                }
+                case WebhookResult.Challenged(
+                        var responseBody, var contentType
+                ) -> Response.ok(responseBody).type(contentType).build();
                 case WebhookResult.Ignored() -> Response.ok().build();
                 case WebhookResult.Unauthorized() -> {
                     final String rawXff = request.header("x-forwarded-for");

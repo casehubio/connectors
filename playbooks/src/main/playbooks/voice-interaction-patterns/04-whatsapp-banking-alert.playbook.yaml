@@ -1,0 +1,24 @@
+name: WhatsApp banking alert
+description: Check bank balance, send voice summary, follow up with transcript
+steps:
+  - bank-balance: acc-100
+    capture: balance
+
+  - tts-synthesise: Your current balance is ${balance.amount} ${balance.currency}
+    capture: voiceSummary
+
+  - chat-send:
+      channel: family
+      message: Balance update — ${balance.amount} ${balance.currency}
+      attachment: ${voiceSummary.audio-data}
+      attachment-type: audio/wav
+      attachment-name: balance-alert.wav
+    capture: notification
+
+  - stt-transcribe: ${voiceSummary.audio-data}
+    capture: transcript
+
+  - chat-send:
+      channel: family
+      message: "Here is the transcript for the voice message you just received: ${transcript.text}"
+    capture: followUp

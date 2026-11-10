@@ -25,8 +25,9 @@ public class WebhookBeans {
     @ApplicationScoped
     public WhatsAppInboundConnector whatsAppInboundConnector(
             @ConfigProperty(name = "casehub.connectors.whatsapp-inbound.app-secret", defaultValue = "") String appSecret,
-            @ConfigProperty(name = "casehub.connectors.whatsapp-inbound.verify-token", defaultValue = "") String verifyToken) {
-        return new WhatsAppInboundConnector(appSecret, verifyToken);
+            @ConfigProperty(name = "casehub.connectors.whatsapp-inbound.verify-token", defaultValue = "") String verifyToken,
+            @ConfigProperty(name = "casehub.connectors.whatsapp.api-token", defaultValue = "") String apiToken) {
+        return new WhatsAppInboundConnector(appSecret, verifyToken, apiToken);
     }
 
     @Produces

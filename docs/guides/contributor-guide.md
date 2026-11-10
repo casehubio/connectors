@@ -32,6 +32,7 @@ Two transport patterns converge into a single CDI event bus:
 - `Challenged(responseBody, contentType)` -- router returns HTTP 200 with the challenge body (platform verification handshakes)
 - `Ignored()` -- HTTP 200, no event fired (bot messages, unsupported event types)
 - `Unauthorized()` -- POST returns HTTP 200 + SECURITY WARNING log (suppress retry storms); GET returns HTTP 403 (admin needs clear failure signal)
+- `DeferredDelivery(List<InboundMessage>, Runnable)` -- router processes messages immediately (same as `Delivered`), then dispatches the `Runnable` on a virtual thread for async follow-up work. Used by `WhatsAppInboundConnector` for media download (3-attempt exponential backoff) after the webhook response is sent.
 
 **Exception handling:** the router wraps `handle()` in a try-catch as defense-in-depth, mapping exceptions to HTTP 200. Connectors are still expected to catch their own exceptions and return `Ignored` or `Unauthorized`.
 
@@ -115,7 +116,7 @@ To add Commands support to a new `ChatPlatform`: (1) implement `Commands` for re
 
 **Model:** `AccountInfo`, `AccountBalance` (`BigDecimal` amounts -- available vs current), `Transaction` (amount always positive, `TransactionDirection` DEBIT/CREDIT), `AccountType`, `TransactionStatus`.
 
-**No live provider yet.** The SPI is designed for Open Banking (TrueLayer/Yapily) and aggregator (Plaid) providers. PSD2 consent management is a documented future concern.
+**Live provider:** `bank-truelayer` implements AISP (account information) and PISP (payment initiation) via TrueLayer Open Banking, including PSD2 consent lifecycle management.
 
 ### Email Platform Architecture
 
@@ -128,6 +129,24 @@ To add Commands support to a new `ChatPlatform`: (1) implement `Commands` for re
 **Attachment content:** Retrieved separately via `getAttachmentContent()` -- `EmailAttachment` record carries metadata only (id, filename, contentType, size). `EmailAttachment.id` is the unique part identifier (IMAP section number, Gmail attachment ID); `filename` is nullable.
 
 **Correlation with EmailInboundConnector:** RFC 2822 `Message-ID` on `EmailMessage.messageId` / `EmailSummary.messageId` matches `InboundMessage.metadata["message-id"]`. Nullable -- messages with null `messageId` cannot be deduplicated across poll/push paths.
+
+### Voice Platform Architecture
+
+**`VoicePlatform` SPI** (`voice-spi`) -- 2 capability sub-interfaces: `SpeechToText` (transcribe `byte[]` or `Path` audio to `TranscriptionResult` with text, language, confidence, and optional `PhonemeTiming` list), `TextToSpeech` (synthesise text to `SynthesisResult` with audio bytes, format, and optional `PhonemeTiming` for lip-sync). `supports(Class<?>)` introspection. `NoOpVoicePlatform` (`@DefaultBean`). `VoicePlatformService` routing. Annotated with `@SimulationEligible(name = "voice-platform")`.
+
+**`ReferenceVoicePlatform`** (`voice-ref`, ID `"ref"`) -- text round-trip encoding. TTS wraps text in a minimal valid WAV container (44-byte RIFF/PCM header + text as data section). STT detects WAV header and extracts text from the data section; also handles raw byte inputs for backwards compatibility. Returns canned confidence (0.95) and language ("en").
+
+**`voice-pipeline-steps`** -- `@Plugin(streaming=true)` records for YAML playbook integration: `SttTranscribePlugin` (input: `byte[]`, output: `TranscriptionResult`) and `TtsSynthesisePlugin` (input: `String`, output: `SynthesisResult`). Both resolve `VoicePlatform` from the `ServiceRegistry` at step creation time. APT generates JSON manifests to `META-INF/yaml-plugins/`. Known issue: `AptPluginSource` cannot load `byte[]` as a class name (platform#776).
+
+### Gmail Push Inbound Architecture
+
+**`GmailPushInboundConnector`** (`email-google-inbound`) -- `WebhookInboundConnector` receiving Google Cloud Pub/Sub push messages. Validates JWT bearer tokens in the `Authorization` header. Decodes the Base64 Pub/Sub `data` field to extract `emailAddress` and `historyId`. Uses `GmailHistoryClient` to fetch new message IDs since the last known history ID, then creates `InboundMessage` records for each.
+
+**`GmailHistoryClient`** -- fetches Gmail History API (`history.list`) with `historyTypes=messageAdded`. Resolves per-user OAuth2 credentials via `GoogleCredentialResolver`. Returns a list of new message IDs.
+
+**`GmailWatchManager`** -- handles Gmail watch registration lifecycle. Calls `users.watch` with the configured Pub/Sub topic and label filter. Watches expire after 7 days; re-registration is the caller's responsibility.
+
+**`HistoryStore` SPI** -- tracks per-user `historyId` for incremental delta processing. `InMemoryHistoryStore` (`@DefaultBean`) provides a `ConcurrentHashMap`-backed implementation for dev/test.
 
 **`LocationPlatform` SPI** (`location-spi`) -- nested capability sub-interfaces: `PlaceSearch` (text/nearby/category search with `Page<Place>`), `PlaceDetails` (full place info), `Geocoding` (address↔coordinates), `Directions` (routing with `TravelMode`). User-scoped accessors (`placeSearch(userId)`), `supports(Class<?>)` introspection. Annotated with `@SimulationEligible(name = "location-platform")`.
 
@@ -156,7 +175,7 @@ All ref implementations with pre-loaded data use YAML seed files under `<module>
 | `travel-ref` | `transport.yaml`, `accommodation.yaml` | 8 UK transport options, 8 UK accommodations |
 | `project-ref` | `project-data.yaml` | Labels, milestones, issues, comments, board |
 
-`chat-ref` and `calendar-ref` start empty — no seed files.
+`chat-ref`, `calendar-ref`, and `voice-ref` start empty — no seed files. `voice-ref` uses inline text round-trip encoding instead of canned audio data.
 
 **Simulation corpus files** for interpretive capabilities (search, relevance ranking) live in the SPI modules under `<spi>/src/main/resources/simulation/<domain>/`. These follow the InvocationRecord format established by `chat-spi` and `bank-spi`.
 
@@ -465,6 +484,54 @@ Package: `io.casehub.connectors.project.github`.
 
 Depends on: `project-spi`, `github-client`, `quarkus-arc`.
 
+### voice-spi
+
+`VoicePlatform` SPI with `@SimulationEligible` and 2 capability sub-interfaces: `SpeechToText` (transcribe audio from `byte[]` or `Path`, returns `TranscriptionResult` with text, language, confidence, optional `PhonemeTiming`), `TextToSpeech` (synthesise text to `SynthesisResult` with audio bytes, format, optional `PhonemeTiming` for lip-sync, optional `withVocabularyHint`). `VoicePlatformService` routing, `NoOpVoicePlatform` `@DefaultBean` fallback. `StreamingSpeechToText` interface for chunked audio processing.
+
+Package: `io.casehub.connectors.voice.spi`, model records in `io.casehub.connectors.voice.model`.
+
+Depends on: `connectors-api`, `casehub-platform-simulation-api`, `quarkus-arc`.
+
+### voice-ref
+
+In-memory `VoicePlatform` reference implementation. `ReferenceVoicePlatform` (ID `"ref"`) -- text round-trip encoding: TTS wraps text in a 44-byte WAV container (RIFF/PCM header), STT extracts text from WAV data section. Both capabilities supported.
+
+Package: `io.casehub.connectors.voice.ref`.
+
+Depends on: `voice-spi`, `quarkus-arc`.
+
+### voice-pipeline-steps
+
+`@Plugin(streaming=true)` records for YAML playbook integration: `SttTranscribePlugin` (transcribe `byte[]` audio via `VoicePlatform`), `TtsSynthesisePlugin` (synthesise `String` text via `VoicePlatform`). APT processor generates JSON manifests to `META-INF/yaml-plugins/` and JSON Schema files for input validation. Both plugins resolve `VoicePlatform` from `ServiceRegistry` at step creation.
+
+Package: `io.casehub.connectors.voice.steps`.
+
+Depends on: `voice-spi`, `casehub-platform-yaml-plugin-api`, `casehub-platform-yaml-step-runtime` (APT processor).
+
+### email-google-inbound
+
+Gmail push inbound via Google Cloud Pub/Sub. `GmailPushInboundConnector` (`WebhookInboundConnector`) receives Pub/Sub push messages, validates JWT, fetches new message IDs via `GmailHistoryClient`, fires `InboundMessage` events. `GmailWatchManager` handles watch registration lifecycle. `HistoryStore` SPI with `InMemoryHistoryStore` `@DefaultBean` for per-user history ID tracking.
+
+Package: `io.casehub.connectors.email.google.inbound`.
+
+Depends on: `webhook`, `connectors-api`, `quarkus-arc`, `google-api-services-gmail`.
+
+### integration-tests
+
+Cross-module integration tests validating end-to-end flows: `VoiceRoundTripTest` (TTS→STT round-trip, `PluginScanner` wiring, YAML pipeline resolution), `WhatsAppMediaFlowTest` (media download via `DeferredDelivery`), `GmailPushFlowTest` (Pub/Sub→History→InboundMessage).
+
+Package: `io.casehub.connectors.it`.
+
+Depends on: `voice-spi`, `voice-ref`, `voice-pipeline-steps`, `email-google-inbound`, `webhook`, `casehub-platform-yaml-step-runtime`.
+
+### playbooks
+
+YAML playbook examples for connector platforms with integration tests. 6 playbook scenarios under `src/main/playbooks/voice-interaction-patterns/` (voice-echo, voice-agent, banking-assistant, whatsapp-banking-alert, email-voice-notification, joint-account-confirmation). Corresponding test files under `src/test/playbooks/`. `ConnectorPlaybookTest` (JUnit Jupiter `@TestFactory`) discovers test files via `YamlTestDiscovery`, wires services via `MapServiceRegistry`, and registers plugins via `PluginScanner`. No production Java code -- playbook YAML only.
+
+Package: `io.casehub.connectors.playbook`.
+
+Depends on: `voice-spi`, `voice-ref`, `voice-pipeline-steps`, `bank-spi`, `bank-ref`, `chat-spi`, `email-spi`, `email-ref`, `casehub-platform-yaml-test`, `casehub-platform-yaml-step-runtime`.
+
 ---
 
 ## Cross-Repo Integration
@@ -491,7 +558,7 @@ These are NOT modules in this repo but are relevant for understanding the ecosys
 
 ## Current State
 
-- 16 active modules in pom.xml
+- 55 active modules in pom.xml
 - `chat-demo` directory still exists on disk but is excluded from pom.xml modules -- migrated to `casehubio/chat-app`
 - Published to GitHub Packages at `0.2-SNAPSHOT`, GroupId `io.casehub`
 - Not yet wired into casehub-engine or casehub-work escalation paths

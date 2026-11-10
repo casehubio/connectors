@@ -1,0 +1,11 @@
+name: voice-tts-stt-chain
+description: TTS then STT — two streaming steps proving YAML pipeline data flow
+
+steps:
+  - step: synthesise
+    tts-synthesise:
+      language: en
+
+  - step: transcribe
+    stt-transcribe:
+      language: en

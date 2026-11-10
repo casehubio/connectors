@@ -1,0 +1,69 @@
+name: Joint account verbal confirmation
+description: Register voices, receive confirmations, denoise, identify speakers, join and send to compliance
+steps:
+  # 1. Register voiceprints from sample audio
+  - tts-synthesise:
+      text: Hello, I am Alice
+      voice: af_heart
+    capture: aliceSample
+
+  - speaker register:
+      name: Alice Smith
+      audio: ${aliceSample.audio-data}
+
+  - tts-synthesise:
+      text: Hello, I am Bob
+      voice: bm_daniel
+    capture: bobSample
+
+  - speaker register:
+      name: Bob Smith
+      audio: ${bobSample.audio-data}
+
+  # 2. Receive confirmation messages
+  - tts-synthesise:
+      text: I, Alice Smith, confirm this transaction of 500 pounds
+      voice: af_heart
+    capture: aliceMessage
+
+  - tts-synthesise:
+      text: I, Bob Smith, confirm this transaction of 500 pounds
+      voice: bm_daniel
+    capture: bobMessage
+
+  # 3. Denoise each recording
+  - audio-denoise:
+      audio: ${aliceMessage.audio-data}
+    capture: aliceClean
+
+  - audio-denoise:
+      audio: ${bobMessage.audio-data}
+    capture: bobClean
+
+  # 4. Identify speakers
+  - speaker identify:
+      audio: ${aliceClean.audio-data}
+    capture: aliceId
+
+  - speaker identify:
+      audio: ${bobClean.audio-data}
+    capture: bobId
+
+  # 5. Join into single compliance recording
+  - audio join:
+      first: ${aliceClean.audio-data}
+      second: ${bobClean.audio-data}
+    capture: combinedRecording
+
+  # 6. Transcribe combined recording
+  - stt-transcribe: ${combinedRecording.audio-data}
+    capture: fullTranscript
+
+  # 7. Send to compliance with identification and audio
+  - chat-send:
+      channel: compliance
+      message: "We have identified ${aliceId.name} and ${bobId.name} by voice, and they have both authorised the payment. Transcript: ${fullTranscript.text}"
+      attachment: ${combinedRecording.audio-data}
+      attachment-type: audio/wav
+      attachment-name: joint-authorisation.wav
+    capture: auditRecord

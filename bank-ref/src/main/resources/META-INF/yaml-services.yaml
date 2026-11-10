@@ -1,0 +1,1 @@
+io.casehub.connectors.bank.spi.BankPlatform: io.casehub.connectors.bank.ref.RefBankPlatform
