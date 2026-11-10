@@ -18,6 +18,24 @@ public class RoutingVoicePlatformService {
     private final Map<String, VoiceAliasDeclaration> aliases;
     private final VoiceManifestDefaults defaults;
 
+
+    public RoutingVoicePlatformService() {
+        var platforms = discoverPlatforms();
+        this.platformService = new VoicePlatformService(platforms);
+        var registry  = new InMemoryVoiceRegistry();
+        var loader    = new io.casehub.connectors.voice.config.VoiceManifestLoader();
+        var manifest  = loader.load(null, null);
+        var processor = new io.casehub.connectors.voice.config.VoiceManifestProcessor(registry);
+        var result    = processor.process(manifest);
+        this.voiceRegistry = registry;
+        this.aliases       = result.aliases() != null ? java.util.Map.copyOf(result.aliases()) : java.util.Map.of();
+        this.defaults      = manifest.defaults();
+        LOG.infof("Voice router initialized (classpath discovery): %d voices, %d aliases, tts=%s, stt=%s",
+                  voiceRegistry.all().size(), this.aliases.size(),
+                  defaults != null ? defaults.ttsVendor() : "(none)",
+                  defaults != null ? defaults.sttVendor() : "(none)");
+    }
+
     public RoutingVoicePlatformService(VoicePlatformService platformService,
                                        VoiceRegistry voiceRegistry,
                                        Map<String, VoiceAliasDeclaration> aliases,
@@ -109,4 +127,30 @@ public class RoutingVoicePlatformService {
             .capability(alias.capability())
             .build();
     }
+
+    private static List<VoicePlatform> discoverPlatforms() {
+        var platforms = new java.util.ArrayList<VoicePlatform>();
+        try {
+            var mapper = new com.fasterxml.jackson.databind.ObjectMapper(
+                    new com.fasterxml.jackson.dataformat.yaml.YAMLFactory());
+            var cl   = Thread.currentThread().getContextClassLoader();
+            var urls = cl.getResources("META-INF/yaml-services.yaml");
+            while (urls.hasMoreElements()) {
+                try (var stream = urls.nextElement().openStream()) {
+                    @SuppressWarnings("unchecked")
+                    var mappings = (java.util.Map<String, String>) mapper.readValue(stream, java.util.Map.class);
+                    if (mappings == null) {continue;}
+                    var implName = mappings.get(VoicePlatform.class.getName());
+                    if (implName != null) {
+                        platforms.add((VoicePlatform) Class.forName(implName, true, cl)
+                                                           .getDeclaredConstructor().newInstance());
+                    }
+                }
+            }
+        } catch (Exception e) {
+            LOG.warnf("Failed to discover VoicePlatform implementations: %s", e.getMessage());
+        }
+        return platforms;
+    }
+
 }

@@ -2,3 +2,4 @@ io.casehub.connectors.voice.spi.VoicePlatform: io.casehub.connectors.voice.ref.R
 io.casehub.connectors.voice.spi.SpeechDenoiser: io.casehub.connectors.voice.ref.RefSpeechDenoiser
 io.casehub.connectors.voice.spi.SpeakerEmbeddingExtractor: io.casehub.connectors.voice.ref.RefSpeakerEmbeddingExtractor
 io.casehub.connectors.voice.spi.SpeakerRegistry: io.casehub.connectors.voice.ref.RefSpeakerRegistry
+io.casehub.connectors.voice.spi.RoutingVoicePlatformService: io.casehub.connectors.voice.spi.RoutingVoicePlatformService
