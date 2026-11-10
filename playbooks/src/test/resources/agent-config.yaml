@@ -1,0 +1,17 @@
+defaults:
+  backend: ollama
+
+models:
+  - id: classifier
+    backend: ollama
+    vendor: ollama
+    family: llama
+    tier: FAST
+    capabilities: [TEXT]
+
+pools:
+  - name: classifier-pool
+    agent-id: classifier
+    backend: ollama
+    min-active: 0
+    max-active: 5

@@ -7,8 +7,10 @@ steps:
   - stt-transcribe: ${inputAudio.audio-data}
     capture: transcript
 
-  - agent-session-open classifier:
+  - agent-session-open:
+      session: classifier
       system: You are a request classifier. Respond with exactly one word — BALANCE, TRANSFER, or SUPPORT.
+      model: classifier
 
   - agent-query classifier:
       user: ${transcript.text}

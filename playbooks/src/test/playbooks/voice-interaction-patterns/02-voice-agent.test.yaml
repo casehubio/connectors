@@ -1,8 +1,9 @@
 name: Voice agent tests
 simulate:
   agent:
-    - prompt: balance
-      response: BALANCE
+    corpus:
+      - prompt: balance
+        response: BALANCE
 tests:
   - name: agent classifies transcribed voice input
     steps:
