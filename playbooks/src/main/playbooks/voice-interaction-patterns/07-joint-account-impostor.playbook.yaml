@@ -1,0 +1,99 @@
+name: Joint account impostor detection
+description: Register Alice and Bob, but Alice tries to confirm as both — speaker ID catches the duplicate voice
+steps:
+  # 1. Register voiceprints from legitimate account holders
+  - tts-synthesise:
+      text: Hello, I am Alice Smith, joint account holder
+      voice: af_heart
+    capture: aliceSample
+
+  - speaker register:
+      name: Alice Smith
+      audio: ${aliceSample.audio-data}
+
+  - tts-synthesise:
+      text: Hello, I am Bob Smith, joint account holder
+      voice: bm_daniel
+    capture: bobSample
+
+  - speaker register:
+      name: Bob Smith
+      audio: ${bobSample.audio-data}
+
+  # 2. Alice confirms legitimately as herself
+  - tts-synthesise:
+      text: I, Alice Smith, confirm this transaction of 5000 pounds
+      voice: af_heart
+    capture: aliceMessage
+
+  # 3. Alice tries to also confirm as Bob (same voice, different claim)
+  - tts-synthesise:
+      text: I, Bob Smith, confirm this transaction of 5000 pounds
+      voice: af_heart
+    capture: impostorMessage
+
+  # 4. Denoise
+  - audio-denoise:
+      audio: ${aliceMessage.audio-data}
+    capture: aliceClean
+
+  - audio-denoise:
+      audio: ${impostorMessage.audio-data}
+    capture: impostorClean
+
+  # 5. Identify speakers
+  - speaker identify:
+      audio: ${aliceClean.audio-data}
+    capture: aliceId
+
+  - speaker identify:
+      audio: ${impostorClean.audio-data}
+    capture: impostorId
+
+  # 6. Join and transcribe for audit trail
+  - audio join:
+      first: ${aliceClean.audio-data}
+      second: ${impostorClean.audio-data}
+    capture: combinedRecording
+
+  - stt-transcribe: ${combinedRecording.audio-data}
+    capture: fullTranscript
+
+  # 7. Check both identified — but second speaker is Alice not Bob
+  - if: ${aliceId.identified}
+    then:
+      - if: ${impostorId.identified}
+        then:
+          - chat-send:
+              channel: security
+              message: "ALERT: Duplicate voice detected on joint account authorisation. Both confirmations matched ${aliceId.name}. Second speaker claimed to be Bob Smith but voice matched ${impostorId.name}. Transaction of 5000 GBP blocked. Transcript: ${fullTranscript.text}"
+            capture: securityAlert
+          - chat-send:
+              channel: compliance
+              message: "Joint authorisation REJECTED — same voice used for both confirmations. Matched: ${impostorId.name}. Audio preserved."
+              attachment: ${combinedRecording.audio-data}
+              attachment-type: audio/wav
+              attachment-name: duplicate-voice-evidence.wav
+            capture: auditRecord
+          - chat-send:
+              channel: family
+              message: "Your joint account transaction of 5000 GBP requires confirmation from both account holders using different voices. Please visit your branch."
+            capture: participantNotice
+        else:
+          - chat-send:
+              channel: security
+              message: "ALERT: Second speaker not identified on joint account authorisation. First speaker verified as ${aliceId.name}. Transaction blocked."
+            capture: securityAlert
+          - chat-send:
+              channel: family
+              message: "Your joint account transaction has been blocked — voice verification failed for the second speaker."
+            capture: participantNotice
+    else:
+      - chat-send:
+          channel: security
+          message: "ALERT: First speaker not identified on joint account authorisation. Transaction blocked."
+        capture: securityAlert
+      - chat-send:
+          channel: family
+          message: "Your joint account transaction has been blocked — voice verification failed."
+        capture: participantNotice

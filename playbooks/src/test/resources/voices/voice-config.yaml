@@ -20,6 +20,15 @@ voices:
     quality: 4.3
     languages: [en-GB]
     capability: tts
+  af_bella:
+    vendor: kokoro
+    voice-id: af_bella
+    name: Bella
+    gender: female
+    accent: american
+    quality: 4.2
+    languages: [en-US]
+    capability: tts
 defaults:
   tts-vendor: kokoro
   stt-vendor: whisper

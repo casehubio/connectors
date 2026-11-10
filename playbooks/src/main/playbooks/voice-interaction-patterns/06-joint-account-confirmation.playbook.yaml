@@ -1,5 +1,5 @@
 name: Joint account verbal confirmation
-description: Register voices, receive confirmations, denoise, identify speakers, join and send to compliance
+description: Register voices, receive confirmations, denoise, identify speakers — gate on identification before sending to compliance
 steps:
   # 1. Register voiceprints from sample audio
   - tts-synthesise:
@@ -49,21 +49,42 @@ steps:
       audio: ${bobClean.audio-data}
     capture: bobId
 
-  # 5. Join into single compliance recording
+  # 5. Join and transcribe (always — needed for audit either way)
   - audio join:
       first: ${aliceClean.audio-data}
       second: ${bobClean.audio-data}
     capture: combinedRecording
 
-  # 6. Transcribe combined recording
   - stt-transcribe: ${combinedRecording.audio-data}
     capture: fullTranscript
 
-  # 7. Send to compliance with identification and audio
-  - chat-send:
-      channel: compliance
-      message: "We have identified ${aliceId.name} and ${bobId.name} by voice, and they have both authorised the payment. Transcript: ${fullTranscript.text}"
-      attachment: ${combinedRecording.audio-data}
-      attachment-type: audio/wav
-      attachment-name: joint-authorisation.wav
-    capture: auditRecord
+  # 6. Gate on identification — both must be verified before compliance
+  - if: ${aliceId.identified}
+    then:
+      - if: ${bobId.identified}
+        then:
+          - chat-send:
+              channel: compliance
+              message: "Both ${aliceId.name} and ${bobId.name} identified by voice and authorised the payment. Transcript: ${fullTranscript.text}"
+              attachment: ${combinedRecording.audio-data}
+              attachment-type: audio/wav
+              attachment-name: joint-authorisation.wav
+            capture: auditRecord
+        else:
+          - chat-send:
+              channel: compliance
+              message: "Voice identification failed for second speaker — authorisation incomplete. Transcript preserved: ${fullTranscript.text}"
+            capture: auditRecord
+          - chat-send:
+              channel: family
+              message: "Your joint account authorisation could not be completed — voice identification failed. Please contact your branch."
+            capture: participantNotice
+    else:
+      - chat-send:
+          channel: compliance
+          message: "Voice identification failed for first speaker — authorisation incomplete. Transcript preserved: ${fullTranscript.text}"
+        capture: auditRecord
+      - chat-send:
+          channel: family
+          message: "Your joint account authorisation could not be completed — voice identification failed. Please contact your branch."
+        capture: participantNotice
