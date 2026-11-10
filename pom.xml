@@ -83,6 +83,22 @@ Zero heavy dependencies — HTTP-based connectors use java.net.http only.</descr
     <module>playbooks</module>
   </modules>
 
+  <profiles>
+    <profile>
+      <id>jdk22+</id>
+      <activation>
+        <jdk>[22,)</jdk>
+      </activation>
+      <modules>
+        <module>voice-sherpa-native-osx-arm64</module>
+        <module>voice-sherpa-native-osx-x64</module>
+        <module>voice-sherpa-native-linux-x64</module>
+        <module>voice-sherpa-native-linux-arm64</module>
+        <module>voice-sherpa-native-win-x64</module>
+      </modules>
+    </profile>
+  </profiles>
+
   <properties>
     <quarkus.version>${quarkus.platform.version}</quarkus.version>
     <quarkus-mcp-server.version>1.11.1</quarkus-mcp-server.version>
