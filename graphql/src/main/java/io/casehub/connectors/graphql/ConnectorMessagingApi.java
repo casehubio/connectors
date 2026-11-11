@@ -4,6 +4,7 @@ import io.casehub.connectors.ConnectorMeshBridge;
 import io.casehub.connectors.ConnectorMessage;
 import io.casehub.connectors.ConnectorService;
 import io.casehub.connectors.graphql.dto.OperationResult;
+import io.casehub.platform.api.mcp.GeneratePlugin;
 import io.casehub.platform.api.mcp.McpDomain;
 import io.casehub.platform.api.mcp.PlatformMutation;
 import io.casehub.platform.api.mcp.RestPath;
@@ -17,6 +18,7 @@ public class ConnectorMessagingApi {
     @Inject ConnectorService connectorService;
     @Inject ConnectorMeshBridge meshBridge;
 
+    @GeneratePlugin(exclude = true)
     @PlatformMutation("Send an SMS message via Twilio")
     @RestPath("/sms")
     public OperationResult sendSms(String to, String body) {
@@ -29,6 +31,7 @@ public class ConnectorMessagingApi {
         }
     }
 
+    @GeneratePlugin(exclude = true)
     @PlatformMutation("Send a WhatsApp message")
     @RestPath("/whatsapp")
     public OperationResult sendWhatsApp(String to, String body,
@@ -48,6 +51,7 @@ public class ConnectorMessagingApi {
         }
     }
 
+    @GeneratePlugin(exclude = true)
     @PlatformMutation("Send an email via SMTP")
     @RestPath("/email")
     public OperationResult sendEmail(String to, String subject, String body) {
@@ -61,6 +65,7 @@ public class ConnectorMessagingApi {
         }
     }
 
+    @GeneratePlugin(exclude = true)
     @PlatformMutation("Send a message to a Slack webhook")
     @RestPath("/slack")
     public OperationResult sendSlack(String webhookUrl, String title, String body) {
@@ -74,6 +79,7 @@ public class ConnectorMessagingApi {
         }
     }
 
+    @GeneratePlugin(exclude = true)
     @PlatformMutation("Send a message to a Microsoft Teams webhook")
     @RestPath("/teams")
     public OperationResult sendTeams(String webhookUrl, String title, String body) {

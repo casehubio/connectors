@@ -16,6 +16,7 @@ import io.casehub.connectors.voice.spi.VoicePlatformService;
 import io.casehub.connectors.voice.spi.VoiceRegistry;
 import io.casehub.platform.api.mcp.DefaultValue;
 import io.casehub.platform.api.mcp.McpCapabilityException;
+import io.casehub.platform.api.mcp.GeneratePlugin;
 import io.casehub.platform.api.mcp.McpDomain;
 import io.casehub.platform.api.mcp.PlatformMutation;
 import io.casehub.platform.api.mcp.PlatformQuery;
@@ -38,6 +39,7 @@ public class ConnectorVoiceApi {
     @Inject VoicePlatformService platformService;
     @Inject VoiceRegistry voiceRegistry;
 
+    @GeneratePlugin(spi = VoicePlatform.class)
     @PlatformMutation("Synthesise text to speech audio")
     @RestPath("/speak")
     public VoiceSynthesisResult speak(
@@ -66,6 +68,7 @@ public class ConnectorVoiceApi {
                 result.phonemes());
     }
 
+    @GeneratePlugin(spi = VoicePlatform.class)
     @PlatformMutation("Transcribe audio to text")
     @RestPath("/transcribe")
     public TranscriptionResult transcribe(
@@ -84,6 +87,7 @@ public class ConnectorVoiceApi {
         return p.speechToText().transcribe(audio, options);
     }
 
+    @GeneratePlugin(spi = VoicePlatform.class)
     @PlatformQuery("List available voices with optional filters")
     @RestPath("/voices")
     public List<VoiceDescriptor> listVoices(
