@@ -1,0 +1,26 @@
+- id: msg_001
+  from: "+441234567001"
+  to: "+449876543210"
+  body: "Your appointment is confirmed for tomorrow at 2pm."
+  status: DELIVERED
+  direction: OUTBOUND
+  channel: SMS
+  timestamp: "2026-11-01T09:00:00Z"
+
+- id: msg_002
+  from: "+449876543210"
+  to: "+441234567001"
+  body: "Thank you, see you then!"
+  status: RECEIVED
+  direction: INBOUND
+  channel: SMS
+  timestamp: "2026-11-01T09:05:00Z"
+
+- id: msg_003
+  from: "+441234567001"
+  to: "+449876543210"
+  body: "Reminder: your booking is in 1 hour."
+  status: DELIVERED
+  direction: OUTBOUND
+  channel: WHATSAPP
+  timestamp: "2026-11-02T13:00:00Z"

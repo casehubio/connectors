@@ -1,0 +1,15 @@
+- id: vm_001
+  from: "+441234567002"
+  to: "+441234567001"
+  durationSeconds: 15
+  timestamp: "2026-11-01T10:30:00Z"
+  audioFormat: wav
+  transcription: null
+
+- id: vm_002
+  from: "+449876543210"
+  to: "+441234567001"
+  durationSeconds: 8
+  timestamp: "2026-11-02T14:15:00Z"
+  audioFormat: wav
+  transcription: null

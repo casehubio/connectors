@@ -1,0 +1,20 @@
+- id: pn_ref_001
+  number: "+441234567001"
+  capabilities:
+    - SMS
+    - VOICE
+    - WHATSAPP
+  status: READY
+
+- id: pn_ref_002
+  number: "+441234567002"
+  capabilities:
+    - SMS
+    - VOICE
+  status: READY
+
+- id: pn_ref_003
+  number: "+441234567003"
+  capabilities:
+    - SMS
+  status: READY

@@ -1,0 +1,60 @@
+- pattern: "book a table"
+  turns:
+    - speaker: AGENT
+      text: "Hello, I'd like to book a table please."
+      startMs: 0
+      endMs: 3000
+    - speaker: HUMAN
+      text: "Of course! How many guests and what time?"
+      startMs: 3500
+      endMs: 6000
+    - speaker: AGENT
+      text: "Table for 2 at 7pm tonight, please. The name is Smith."
+      startMs: 6500
+      endMs: 10000
+    - speaker: HUMAN
+      text: "Perfect, table for 2 at 7pm for Smith. That's confirmed. See you tonight!"
+      startMs: 10500
+      endMs: 14000
+    - speaker: AGENT
+      text: "Thank you very much. Goodbye!"
+      startMs: 14500
+      endMs: 16000
+
+- pattern: "make an appointment"
+  turns:
+    - speaker: AGENT
+      text: "Hello, I'm calling to make an appointment."
+      startMs: 0
+      endMs: 3000
+    - speaker: HUMAN
+      text: "Sure, when would you like to come in?"
+      startMs: 3500
+      endMs: 5500
+    - speaker: AGENT
+      text: "Tomorrow morning if possible, around 10am."
+      startMs: 6000
+      endMs: 8500
+    - speaker: HUMAN
+      text: "10am tomorrow is available. I've booked you in."
+      startMs: 9000
+      endMs: 11500
+    - speaker: AGENT
+      text: "Perfect, thank you. Goodbye."
+      startMs: 12000
+      endMs: 13500
+
+- pattern: "default"
+  turns:
+    - speaker: AGENT
+      text: "Hello, how can I help?"
+      startMs: 0
+      endMs: 2000
+    - speaker: HUMAN
+      text: "I'm not sure what you're calling about."
+      startMs: 2500
+      endMs: 4500
+    - speaker: AGENT
+      text: "I apologise for the confusion. Goodbye."
+      startMs: 5000
+      endMs: 7000
