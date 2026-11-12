@@ -65,6 +65,7 @@ class ConnectorOperationsImplTest {
                 commercePlatformService,
                 new TravelPlatformService(List.of()),
                 new LocationPlatformService(List.of()),
+                new io.casehub.connectors.mobile.spi.MobilePlatformService(List.of()),
                 List.of(connector), List.of(), java.util.Optional.empty(), null);
     }
 
@@ -183,6 +184,7 @@ class ConnectorOperationsImplTest {
                 new CommercePlatformService(List.of()),
                 new TravelPlatformService(List.of()),
                 new LocationPlatformService(List.of()),
+                new io.casehub.connectors.mobile.spi.MobilePlatformService(List.of()),
                 List.of(), List.of(), java.util.Optional.empty(), null);
 
         var result = ops.connectorsReport("bank");
@@ -210,6 +212,7 @@ class ConnectorOperationsImplTest {
                 new CommercePlatformService(List.of()),
                 new TravelPlatformService(List.of()),
                 new LocationPlatformService(List.of()),
+                new io.casehub.connectors.mobile.spi.MobilePlatformService(List.of()),
                 List.of(), List.of(), java.util.Optional.empty(), null);
 
         var result = ops.connectorsReport("bank");
@@ -245,6 +248,7 @@ class ConnectorOperationsImplTest {
                 new CommercePlatformService(List.of()),
                 new TravelPlatformService(List.of()),
                 new LocationPlatformService(List.of()),
+                new io.casehub.connectors.mobile.spi.MobilePlatformService(List.of()),
                 List.of(), List.of(), java.util.Optional.empty(), null);
 
         var result = ops.connectorsReport("document");
@@ -273,6 +277,7 @@ class ConnectorOperationsImplTest {
                 commerceService,
                 new TravelPlatformService(List.of()),
                 new LocationPlatformService(List.of()),
+                new io.casehub.connectors.mobile.spi.MobilePlatformService(List.of()),
                 List.of(), List.of(), java.util.Optional.empty(), null);
 
         var result = ops.connectorsReport("commerce");
@@ -301,6 +306,7 @@ class ConnectorOperationsImplTest {
                 commerceService,
                 new TravelPlatformService(List.of()),
                 new LocationPlatformService(List.of()),
+                new io.casehub.connectors.mobile.spi.MobilePlatformService(List.of()),
                 List.of(), List.of(), java.util.Optional.empty(), null);
 
         var result = ops.connectorsReport("commerce");
@@ -327,6 +333,7 @@ class ConnectorOperationsImplTest {
                 new CommercePlatformService(List.of()),
                 travelService,
                 new LocationPlatformService(List.of()),
+                new io.casehub.connectors.mobile.spi.MobilePlatformService(List.of()),
                 List.of(), List.of(), java.util.Optional.empty(), null);
 
         var result = ops.connectorsReport("travel");
@@ -356,6 +363,7 @@ class ConnectorOperationsImplTest {
                 new CommercePlatformService(List.of()),
                 travelService,
                 new LocationPlatformService(List.of()),
+                new io.casehub.connectors.mobile.spi.MobilePlatformService(List.of()),
                 List.of(), List.of(), java.util.Optional.empty(), null);
 
         var result = ops.connectorsReport("travel");

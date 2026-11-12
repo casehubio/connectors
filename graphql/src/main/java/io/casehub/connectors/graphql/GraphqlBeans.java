@@ -41,6 +41,7 @@ public class GraphqlBeans {
             CommercePlatformService commercePlatformService,
             TravelPlatformService travelPlatformService,
             LocationPlatformService locationPlatformService,
+            io.casehub.connectors.mobile.spi.MobilePlatformService mobilePlatformService,
             @All List<Connector> connectors,
             @All List<WebhookInboundConnector> webhookConnectors,
             Instance<SentMessageCapture> sentMessageCapture,
@@ -53,6 +54,7 @@ public class GraphqlBeans {
                 commercePlatformService,
                 travelPlatformService,
                 locationPlatformService,
+                mobilePlatformService,
                 connectors, webhookConnectors,
                 sentMessageCapture.isResolvable()
                 ? Optional.of(sentMessageCapture.get())

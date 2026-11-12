@@ -89,6 +89,11 @@ sendNotification, connectorStatus, sentMessages.</description>
     </dependency>
     <dependency>
       <groupId>io.casehub</groupId>
+      <artifactId>casehub-connectors-mobile-spi</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.casehub</groupId>
       <artifactId>casehub-platform-yaml-step-runtime</artifactId>
     </dependency>
     <dependency>

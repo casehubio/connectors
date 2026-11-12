@@ -28,6 +28,8 @@ import io.casehub.connectors.commerce.spi.CommercePlatform;
 import io.casehub.connectors.commerce.spi.CommercePlatformService;
 import io.casehub.connectors.location.spi.LocationPlatform;
 import io.casehub.connectors.location.spi.LocationPlatformService;
+import io.casehub.connectors.mobile.spi.MobilePlatform;
+import io.casehub.connectors.mobile.spi.MobilePlatformService;
 import io.casehub.connectors.travel.spi.TravelPlatform;
 import io.casehub.connectors.travel.spi.TravelPlatformService;
 import io.casehub.connectors.contacts.spi.ContactsPlatform;
@@ -75,12 +77,13 @@ public class ConnectorOperationsImpl {
     private final CommercePlatformService commercePlatformService;
     private final TravelPlatformService  travelPlatformService;
     private final LocationPlatformService locationPlatformService;
+    private final MobilePlatformService  mobilePlatformService;
 
     private final List<Connector> connectors;
     private final List<WebhookInboundConnector> webhookConnectors;
     private final Optional<SentMessageCapture> sentMessageCapture;
     private final CurrentPrincipal currentPrincipal;
-    private static final Set<String> ALL_SCOPES = Set.of("chat", "calendar", "bank", "email", "document", "contacts", "project", "commerce", "travel", "location");
+    private static final Set<String> ALL_SCOPES = Set.of("chat", "calendar", "bank", "email", "document", "contacts", "project", "commerce", "travel", "location", "mobile");
 
 
     public ConnectorOperationsImpl(
@@ -96,6 +99,7 @@ public class ConnectorOperationsImpl {
             final CommercePlatformService commercePlatformService,
             final TravelPlatformService travelPlatformService,
             final LocationPlatformService locationPlatformService,
+            final MobilePlatformService mobilePlatformService,
             final List<Connector> connectors,
             final List<WebhookInboundConnector> webhookConnectors,
             final Optional<SentMessageCapture> sentMessageCapture,
@@ -112,6 +116,7 @@ public class ConnectorOperationsImpl {
         this.commercePlatformService = commercePlatformService;
         this.travelPlatformService   = travelPlatformService;
         this.locationPlatformService = locationPlatformService;
+        this.mobilePlatformService   = mobilePlatformService;
         this.connectors              = connectors;
         this.webhookConnectors       = webhookConnectors;
         this.sentMessageCapture      = sentMessageCapture;
@@ -315,6 +320,21 @@ public class ConnectorOperationsImpl {
                 if (lp.supports(LocationPlatform.Geocoding.class)) caps.add("Geocoding");
                 if (lp.supports(LocationPlatform.Directions.class)) caps.add("Directions");
                 platforms.put("location", new PlatformInfo(id, "CONNECTED", List.copyOf(caps)));
+                break;
+            }
+        }
+
+        if (scopes.contains("mobile")) {
+            for (String id : mobilePlatformService.ids()) {
+                MobilePlatform mp = mobilePlatformService.platform(id);
+                var caps = new ArrayList<String>();
+                if (mp.supports(MobilePlatform.Sms.class)) caps.add("Sms");
+                if (mp.supports(MobilePlatform.VoiceCall.class)) caps.add("VoiceCall");
+                if (mp.supports(MobilePlatform.VoiceCallControl.class)) caps.add("VoiceCallControl");
+                if (mp.supports(MobilePlatform.Voicemail.class)) caps.add("Voicemail");
+                if (mp.supports(MobilePlatform.Messaging.class)) caps.add("Messaging");
+                if (mp.supports(MobilePlatform.NumberInfo.class)) caps.add("NumberInfo");
+                platforms.put("mobile", new PlatformInfo(id, "CONNECTED", List.copyOf(caps)));
                 break;
             }
         }

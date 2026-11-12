@@ -1,10 +1,10 @@
 package io.casehub.connectors.mobile.spi;
 
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.enterprise.inject.Instance;
 import jakarta.inject.Inject;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -14,7 +14,7 @@ public class MobilePlatformService {
     private final Map<String, MobilePlatform> platforms;
 
     @Inject
-    public MobilePlatformService(Instance<MobilePlatform> all) {
+    public MobilePlatformService(List<MobilePlatform> all) {
         var map = new LinkedHashMap<String, MobilePlatform>();
         for (var p : all) {
             if (!"none".equals(p.id())) {

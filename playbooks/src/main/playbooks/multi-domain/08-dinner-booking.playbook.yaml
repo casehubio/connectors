@@ -1,5 +1,5 @@
-name: Dinner booking — find, call, confirm, notify
-description: Find nearby Thai restaurant, voice-call to book, email confirmation, SMS notification
+name: Dinner out — find restaurant, get directions, notify
+description: Find nearby Thai restaurant, get walking directions, send details via SMS and chat
 steps:
   # 1. Find Thai restaurants nearby (London coordinates)
   - location-search-nearby:
@@ -15,47 +15,25 @@ steps:
       placeId: ${restaurants.items[0].placeId}
     capture: restaurant
 
-  # 3. Get walking directions from our location
+  # 3. Get walking directions
   - location-directions:
       origin: "51.5074,-0.1278"
       destination: ${restaurant.address}
       mode: WALKING
     capture: directions
 
-  # 4. Voice call — request a booking (our voice)
-  - tts-synthesise:
-      text: "Hello, I'd like to book a table for two at 7pm this evening please. The name is Smith."
-      voice: bm_daniel
-    capture: bookingRequest
+  # 4. SMS the details to ourselves
+  - mobile-send-sms:
+      to: "+447700900000"
+      body: >
+        Found: ${restaurant.name}, ${restaurant.address}.
+        Walk time: ${directions.duration}. Phone: ${restaurant.phone}.
+    capture: smsNotification
 
-  # 5. Simulated restaurant host response (different voice)
-  - tts-synthesise:
-      text: "Yes of course, table for two at 7pm for Smith. We'll have that ready for you. Could you send a confirmation email to bookings at our restaurant?"
-      voice: af_heart
-    capture: hostResponse
-
-  # 6. Transcribe the host's response to check confirmation
-  - stt-transcribe: ${hostResponse.audio-data}
-    capture: transcript
-
-  # 7. Check if booking was confirmed
-  - if: ${transcript.text}
-    then:
-      # 8. Send confirmation email to restaurant
-      - messaging-send-email:
-          to: bookings@thai-garden.example.com
-          subject: "Booking confirmation — Smith, 2 guests, 7pm tonight"
-          body: "This confirms our booking: Name: Smith, Guests: 2, Time: 7pm tonight. Thank you for accommodating us. We look forward to dining with you."
-        capture: emailConfirmation
-
-      # 9. Send SMS to ourselves with booking details
-      - messaging-send-sms:
-          to: "+447700900000"
-          body: "Booking confirmed at ${restaurant.name}, ${restaurant.address}. Table for 2 at 7pm. Walking: ${directions.duration}. Bon appetit!"
-        capture: smsNotification
-
-      # 10. Send chat confirmation with full details
-      - chat-send:
-          channel: personal
-          message: "Dinner tonight sorted. ${restaurant.name} — table for 2 at 7pm. ${restaurant.address}. Walk time: ${directions.duration}."
-        capture: chatNotification
+  # 5. Chat notification
+  - chat-send:
+      channel: personal
+      message: >
+        Dinner option found. ${restaurant.name} —
+        ${restaurant.address}. ${directions.duration} walk.
+    capture: chatNotification

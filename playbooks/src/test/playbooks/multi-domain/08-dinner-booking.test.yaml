@@ -1,6 +1,6 @@
-name: Dinner booking tests
+name: Dinner out tests
 tests:
-  - name: find restaurant, voice-call, email confirm, SMS notify
+  - name: find restaurant, get directions, SMS and chat notify
     steps:
       - run-playbook: ../../../main/playbooks/multi-domain/08-dinner-booking.playbook.yaml
         capture: result
@@ -12,15 +12,9 @@ tests:
       # Directions calculated
       - assertThat: result.captures.directions.duration
         not-null: true
-      # Voice booking call — real TTS produced audio
-      - assertThat: result.captures.bookingRequest.audio-format
-        equals: wav
-      # Host response — different voice
-      - assertThat: result.captures.hostResponse.audio-format
-        equals: wav
-      # Transcript captured
-      - assertThat: result.captures.transcript.text
-        contains: table for two
-      # Notifications sent
+      # SMS sent
+      - assertThat: result.captures.smsNotification.ok
+        equals: true
+      # Chat notification sent
       - assertThat: result.captures.chatNotification.ok
         equals: true
