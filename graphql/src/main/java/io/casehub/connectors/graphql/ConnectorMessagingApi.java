@@ -4,7 +4,6 @@ import io.casehub.connectors.ConnectorMeshBridge;
 import io.casehub.connectors.ConnectorMessage;
 import io.casehub.connectors.ConnectorService;
 import io.casehub.connectors.graphql.dto.OperationResult;
-import io.casehub.platform.api.mcp.GeneratePlugin;
 import io.casehub.platform.api.mcp.McpDomain;
 import io.casehub.platform.api.mcp.PlatformMutation;
 import io.casehub.platform.api.mcp.RestPath;
@@ -32,8 +31,8 @@ public class ConnectorMessagingApi {
 
     @PlatformMutation("Send a WhatsApp message")
     @RestPath("/whatsapp")
-    public OperationResult sendWhatsApp(String to, String body,
-                                    String templateName, String templateLanguage) {
+    public OperationResult sendWhatsapp(String to, String body,
+                                        String templateName, String templateLanguage) {
         try {
             var msg = new ConnectorMessage(to, body);
             if (templateName != null) {

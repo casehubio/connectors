@@ -38,7 +38,7 @@ public class ConnectorContactsApi {
 
     @PlatformQuery("List contacts from a provider")
     @RestPath("/contacts")
-    public Page<Contact> listContacts(
+    public Page<Contact> list(
             @QueryParam("platform") String platformId,
             @QueryParam("cursor") String cursor,
             @QueryParam("pageSize") Integer pageSize) {
@@ -50,7 +50,7 @@ public class ConnectorContactsApi {
 
     @PlatformQuery("Incremental sync of contacts")
     @RestPath("/contacts/sync")
-    public SyncResult<Contact> syncContacts(
+    public SyncResult<Contact> sync(
             @QueryParam("platform") String platformId,
             @QueryParam("syncToken") String syncToken,
             @QueryParam("pageSize") Integer pageSize) {
@@ -75,7 +75,7 @@ public class ConnectorContactsApi {
 
     @PlatformQuery("Search contacts by query")
     @RestPath("/contacts/search")
-    public Page<Contact> searchContacts(
+    public Page<Contact> search(
             @QueryParam("platform") String platformId,
             @QueryParam("query") String query,
             @QueryParam("cursor") String cursor,

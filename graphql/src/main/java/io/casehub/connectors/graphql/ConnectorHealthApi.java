@@ -60,7 +60,7 @@ public class ConnectorHealthApi {
 
     @PlatformQuery("Search providers by name")
     @RestPath("/providers/search")
-    public Page<Provider> searchProvidersByName(
+    public Page<Provider> findProvider(
             @QueryParam("platform") String platform,
             @QueryParam("query") String query,
             @QueryParam("cursor") String cursor,

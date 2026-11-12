@@ -9,7 +9,6 @@ import io.casehub.connectors.document.model.DocumentSummary;
 import io.casehub.connectors.document.model.Folder;
 import io.casehub.connectors.document.spi.DocumentPlatform;
 import io.casehub.connectors.document.spi.DocumentPlatformService;
-import io.casehub.connectors.graphql.dto.OperationResult;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -118,11 +117,11 @@ class ConnectorDocumentApiTest {
     }
 
     @Test
-    void syncDocumentsDelegatesToPlatform() {
+    void syncDelegatesToPlatform() {
         when(fileOps.listSync(any()))
             .thenReturn(new SyncResult<>(List.of(), List.of("d1"), "token-2", false));
 
-        var result = api.syncDocuments("test", "token-1", 50);
+        var result = api.sync("test", "token-1", 50);
 
         assertThat(result.deletedIds()).containsExactly("d1");
         assertThat(result.syncToken()).isEqualTo("token-2");
@@ -159,12 +158,12 @@ class ConnectorDocumentApiTest {
     }
 
     @Test
-    void searchDocumentsDelegatesToPlatform() {
+    void searchDelegatesToPlatform() {
         var doc = testDoc("f-found");
         when(searchOps.search(eq("report"), any(PageRequest.class)))
             .thenReturn(new Page<>(List.of(doc), null, false));
 
-        var result = api.searchDocuments("test", "report", null, null);
+        var result = api.search("test", "report", null, null);
 
         assertThat(result.items()).hasSize(1);
         assertThat(result.items().getFirst().id()).isEqualTo("f-found");

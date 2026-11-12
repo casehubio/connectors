@@ -55,32 +55,32 @@ class ConnectorMessagingApiTest {
     }
 
     @Test
-    void sendWhatsApp_dispatchesToWhatsapp() {
+    void sendWhatsapp_dispatchesToWhatsapp() {
         when(connectorService.send(eq("whatsapp"), any(ConnectorMessage.class))).thenReturn(true);
 
-        var result = api.sendWhatsApp("+447700900000", "Hello", null, null);
+        var result = api.sendWhatsapp("+447700900000", "Hello", null, null);
 
         assertThat(result.dispatched()).isTrue();
         assertThat(result.connector()).isEqualTo("whatsapp");
     }
 
     @Test
-    void sendWhatsApp_withTemplate_dispatchesToWhatsapp() {
+    void sendWhatsapp_withTemplate_dispatchesToWhatsapp() {
         when(connectorService.send(eq("whatsapp"), any(ConnectorMessage.class))).thenReturn(true);
 
-        var result = api.sendWhatsApp("+447700900000", "Hello",
-                "welcome_template", "en");
+        var result = api.sendWhatsapp("+447700900000", "Hello",
+                                      "welcome_template", "en");
 
         assertThat(result.dispatched()).isTrue();
         assertThat(result.connector()).isEqualTo("whatsapp");
     }
 
     @Test
-    void sendWhatsApp_failureReturnsNotDispatched() {
+    void sendWhatsapp_failureReturnsNotDispatched() {
         when(connectorService.send(eq("whatsapp"), any(ConnectorMessage.class)))
                 .thenThrow(new RuntimeException("WhatsApp API error"));
 
-        var result = api.sendWhatsApp("+447700900000", "Hello", null, null);
+        var result = api.sendWhatsapp("+447700900000", "Hello", null, null);
 
         assertThat(result.dispatched()).isFalse();
         assertThat(result.detail()).isEqualTo("WhatsApp API error");

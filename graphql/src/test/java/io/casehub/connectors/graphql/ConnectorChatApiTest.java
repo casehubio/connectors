@@ -13,7 +13,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class ConnectorChatApiTest {
 
     @Test
-    void listChatChannelsThrowsWhenDiscoveryUnsupported() {
+    void listPlatformChannelsThrowsWhenDiscoveryUnsupported() {
         var platform = ChatPlatform.builder("messaging-only")
                                    .messaging((ch, content) -> null)
                                    .build();
@@ -21,7 +21,7 @@ class ConnectorChatApiTest {
         var api     = new ConnectorChatApi();
         api.chatPlatformService = service;
 
-        assertThatThrownBy(() -> api.listChatChannels("messaging-only"))
+        assertThatThrownBy(() -> api.listPlatformChannels("messaging-only"))
                 .isInstanceOf(UnsupportedCapabilityException.class)
                 .satisfies(ex -> {
                     var uce = (UnsupportedCapabilityException) ex;

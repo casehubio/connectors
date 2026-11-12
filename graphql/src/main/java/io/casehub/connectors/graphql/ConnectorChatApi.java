@@ -8,7 +8,6 @@ import io.casehub.connectors.chat.model.ChatChannelRef;
 import io.casehub.connectors.chat.model.ChatContent;
 import io.casehub.connectors.graphql.dto.ChannelInfo;
 import io.casehub.connectors.graphql.dto.OperationResult;
-import io.casehub.platform.api.mcp.GeneratePlugin;
 import io.casehub.platform.api.mcp.McpDomain;
 import io.casehub.platform.api.mcp.PlatformMutation;
 import io.casehub.platform.api.mcp.PlatformQuery;
@@ -33,7 +32,7 @@ public class ConnectorChatApi {
 
     @PlatformMutation("Send a message to a chat platform channel")
     @RestPath("/send")
-    public OperationResult sendChat(String platform, String channel, String text) {
+    public OperationResult send(String platform, String channel, String text) {
         if (!chatPlatformService.supports(platform)) {
             return new OperationResult(false, platform, channel,
                                        "Unknown platform. Available: " + chatPlatformService.ids());
@@ -51,7 +50,7 @@ public class ConnectorChatApi {
 
     @PlatformQuery("List channels available on a chat platform")
     @RestPath("/channels")
-    public List<ChannelInfo> listChatChannels(String platform) {
+    public List<ChannelInfo> listPlatformChannels(String platform) {
         if (!chatPlatformService.supports(platform)) {
             return List.of();
         }

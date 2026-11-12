@@ -101,10 +101,10 @@ class ConnectorHealthApiTest {
     }
 
     @Test
-    void searchProvidersByNameDelegatesWhenSupported() {
+    void findProviderDelegatesWhenSupported() {
         var api = apiWith(fullService());
 
-        var result = api.searchProvidersByName("full-health", "Test", null, null);
+        var result = api.findProvider("full-health", "Test", null, null);
 
         assertThat(result.items()).hasSize(1);
         assertThat(result.items().getFirst().name()).isEqualTo("Test Medical Centre");

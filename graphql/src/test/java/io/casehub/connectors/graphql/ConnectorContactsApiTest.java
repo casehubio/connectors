@@ -55,23 +55,23 @@ class ConnectorContactsApiTest {
     }
 
     @Test
-    void listContactsDelegatesToPlatform() {
+    void listDelegatesToPlatform() {
         var contact = testContact("c1");
         when(contactRead.list(any(PageRequest.class)))
             .thenReturn(new Page<>(List.of(contact), null, false));
 
-        var result = api.listContacts("test", null, null);
+        var result = api.list("test", null, null);
 
         assertThat(result.items()).hasSize(1);
         assertThat(result.items().getFirst().id()).isEqualTo("c1");
     }
 
     @Test
-    void syncContactsDelegatesToPlatform() {
+    void syncDelegatesToPlatform() {
         when(contactRead.listSync(any()))
             .thenReturn(new SyncResult<>(List.of(), List.of("d1"), "token-2", false));
 
-        var result = api.syncContacts("test", "token-1", 50);
+        var result = api.sync("test", "token-1", 50);
 
         assertThat(result.deletedIds()).containsExactly("d1");
         assertThat(result.syncToken()).isEqualTo("token-2");

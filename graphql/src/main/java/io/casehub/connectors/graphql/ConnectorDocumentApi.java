@@ -94,7 +94,7 @@ public class ConnectorDocumentApi {
 
     @PlatformQuery("Incremental sync of documents")
     @RestPath("/sync")
-    public SyncResult<DocumentSummary> syncDocuments(
+    public SyncResult<DocumentSummary> sync(
             @QueryParam("platform") String platformId,
             @QueryParam("syncToken") String syncToken,
             @QueryParam("pageSize") Integer pageSize) {
@@ -146,7 +146,7 @@ public class ConnectorDocumentApi {
 
     @PlatformQuery("Search documents by query")
     @RestPath("/search")
-    public Page<DocumentSummary> searchDocuments(
+    public Page<DocumentSummary> search(
             @QueryParam("platform") String platformId,
             @QueryParam("query") String query,
             @QueryParam("cursor") String cursor,
