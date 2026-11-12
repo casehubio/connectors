@@ -39,7 +39,6 @@ public class ConnectorVoiceApi {
     @Inject VoicePlatformService platformService;
     @Inject VoiceRegistry voiceRegistry;
 
-    @GeneratePlugin(spi = VoicePlatform.class)
     @PlatformMutation("Synthesise text to speech audio")
     @RestPath("/speak")
     public VoiceSynthesisResult speak(
@@ -68,7 +67,6 @@ public class ConnectorVoiceApi {
                 result.phonemes());
     }
 
-    @GeneratePlugin(spi = VoicePlatform.class)
     @PlatformMutation("Transcribe audio to text")
     @RestPath("/transcribe")
     public TranscriptionResult transcribe(
@@ -87,7 +85,6 @@ public class ConnectorVoiceApi {
         return p.speechToText().transcribe(audio, options);
     }
 
-    @GeneratePlugin(spi = VoicePlatform.class)
     @PlatformQuery("List available voices with optional filters")
     @RestPath("/voices")
     public List<VoiceDescriptor> listVoices(

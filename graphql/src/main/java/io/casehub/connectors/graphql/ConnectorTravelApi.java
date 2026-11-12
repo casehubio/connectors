@@ -40,7 +40,6 @@ public class ConnectorTravelApi {
         return identity.getPrincipal().getName();
     }
 
-    @GeneratePlugin(spi = TravelPlatform.class)
     @PlatformQuery("Search transport options between two locations")
     @RestPath("/transport")
     public Page<TransportOption> searchTransport(

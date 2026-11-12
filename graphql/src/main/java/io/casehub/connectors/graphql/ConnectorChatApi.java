@@ -67,7 +67,6 @@ public class ConnectorChatApi {
         }
     }
 
-    @GeneratePlugin(exclude = true)
     @PlatformQuery("Discover channels across all connectors")
     @RestPath("/discover")
     public List<ChannelInfo> listChannels() {
