@@ -4,6 +4,8 @@ tests:
     steps:
       - run-playbook: ../../../main/playbooks/voice-interaction-patterns/07-joint-account-impostor.playbook.yaml
         capture: result
+      - assertThat: result.error
+        equals: ""
       - assertThat: result.succeeded
         equals: true
       # Alice identified correctly

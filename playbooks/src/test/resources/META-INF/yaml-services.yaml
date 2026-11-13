@@ -1,0 +1,2 @@
+io.casehub.connectors.graphql.ConnectorLocationApi: io.casehub.connectors.graphql.PlaybookApiServices$Location
+io.casehub.connectors.graphql.ConnectorMobileApi: io.casehub.connectors.graphql.PlaybookApiServices$Mobile

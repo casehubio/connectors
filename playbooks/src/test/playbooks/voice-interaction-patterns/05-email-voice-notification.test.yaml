@@ -4,6 +4,8 @@ tests:
     steps:
       - run-playbook: ../../../main/playbooks/voice-interaction-patterns/05-email-voice-notification.playbook.yaml
         capture: result
+      - assertThat: result.error
+        equals: ""
       - assertThat: result.succeeded
         equals: true
       - assertThat: result.captures.inbox.count
