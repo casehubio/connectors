@@ -4,6 +4,8 @@ tests:
     steps:
       - run-playbook: ../../../main/playbooks/multi-domain/08-dinner-booking.playbook.yaml
         capture: result
+      - assertThat: result.error
+        equals: ""
       - assertThat: result.succeeded
         equals: true
       # Restaurant found
@@ -16,5 +18,5 @@ tests:
       - assertThat: result.captures.smsNotification.ok
         equals: true
       # Chat notification sent
-      - assertThat: result.captures.chatNotification.dispatched
+      - assertThat: result.captures.chatNotification.ok
         equals: true

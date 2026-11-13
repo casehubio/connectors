@@ -17,19 +17,19 @@ final class SeedLoader {
     }
 
     static List<SeedNumber> loadNumbers() {
-        return load("/seed/numbers.yaml", new TypeReference<>() {});
+        return load("/io/casehub/connectors/mobile/ref/seed/numbers.yaml", new TypeReference<>() {});
     }
 
     static List<SeedConversation> loadConversations() {
-        return load("/seed/conversations.yaml", new TypeReference<>() {});
+        return load("/io/casehub/connectors/mobile/ref/seed/conversations.yaml", new TypeReference<>() {});
     }
 
     static List<SeedVoicemail> loadVoicemails() {
-        return load("/seed/voicemails.yaml", new TypeReference<>() {});
+        return load("/io/casehub/connectors/mobile/ref/seed/voicemails.yaml", new TypeReference<>() {});
     }
 
     static List<SeedMessage> loadMessages() {
-        return load("/seed/messages.yaml", new TypeReference<>() {});
+        return load("/io/casehub/connectors/mobile/ref/seed/messages.yaml", new TypeReference<>() {});
     }
 
     private static <T> List<T> load(String resource, TypeReference<List<T>> type) {

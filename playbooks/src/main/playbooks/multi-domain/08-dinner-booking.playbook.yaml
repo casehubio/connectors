@@ -3,23 +3,26 @@ description: Find nearby restaurant, get walking directions, send details via SM
 steps:
   # 1. Find restaurants nearby (Balham coordinates — matches location-ref seed data)
   - location-search-by-category:
+      platform: ref
       category: restaurant
       lat: 51.4430
       lng: -0.1525
-      radiusMeters: 2000
+      radius-meters: 2000
     capture: restaurants
 
   # 2. Get details of the top result
   - location-place-details:
-      placeId: ${restaurants.items[0].id}
+      platform: ref
+      place-id: ${restaurants.items[0].id}
     capture: restaurant
 
   # 3. Get walking directions from Balham station
   - location-directions:
-      originLat: 51.4432
-      originLng: -0.1522
-      destLat: ${restaurant.location.lat}
-      destLng: ${restaurant.location.lng}
+      platform: ref
+      origin-lat: 51.4432
+      origin-lng: -0.1522
+      dest-lat: ${restaurant.location.lat}
+      dest-lng: ${restaurant.location.lng}
       mode: WALKING
     capture: directions
 
@@ -35,7 +38,7 @@ steps:
   # 5. Chat notification
   - chat-send:
       channel: personal
-      text: >
+      message: >
         Dinner option: ${restaurant.name} —
         ${restaurant.formattedAddress}. ${directions.duration.text} walk.
     capture: chatNotification
