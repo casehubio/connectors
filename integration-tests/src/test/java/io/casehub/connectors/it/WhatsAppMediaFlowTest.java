@@ -11,7 +11,7 @@ import javax.crypto.spec.SecretKeySpec;
 import io.casehub.connectors.HttpMethod;
 import io.casehub.connectors.WebhookRequest;
 import io.casehub.connectors.WebhookResult;
-import io.casehub.connectors.webhook.WhatsAppInboundConnector;
+import io.casehub.connectors.mobile.twilio.TwilioWhatsAppBridge;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -23,7 +23,7 @@ class WhatsAppMediaFlowTest {
 
     @Test
     void textOnlyMessageReturnsDelivered() {
-        var connector = new WhatsAppInboundConnector(SECRET, VERIFY_TOKEN, "");
+        var connector = new TwilioWhatsAppBridge(SECRET, VERIFY_TOKEN, "");
         var body = textMessage("15551234", "15559999", "Hello integration test");
         var request = signedPost(body);
 
@@ -39,7 +39,7 @@ class WhatsAppMediaFlowTest {
 
     @Test
     void audioMessageReturnsDeferredDeliveryWithEmptyImmediate() {
-        var connector = new WhatsAppInboundConnector(SECRET, VERIFY_TOKEN, "test-api-token");
+        var connector = new TwilioWhatsAppBridge(SECRET, VERIFY_TOKEN, "test-api-token");
         var body = mediaMessage("15551234", "audio", "media-audio-001", "audio/ogg");
         var request = signedPost(body);
 
@@ -52,7 +52,7 @@ class WhatsAppMediaFlowTest {
 
     @Test
     void mixedTextAndMediaSplitsCorrectly() {
-        var connector = new WhatsAppInboundConnector(SECRET, VERIFY_TOKEN, "test-api-token");
+        var connector = new TwilioWhatsAppBridge(SECRET, VERIFY_TOKEN, "test-api-token");
         var body = mixedMessage("15551234", "Hello text", "media-img-001", "image/jpeg");
         var request = signedPost(body);
 
@@ -66,7 +66,7 @@ class WhatsAppMediaFlowTest {
 
     @Test
     void locationMessagePreservedAsImmediateWithMetadata() {
-        var connector = new WhatsAppInboundConnector(SECRET, VERIFY_TOKEN, "");
+        var connector = new TwilioWhatsAppBridge(SECRET, VERIFY_TOKEN, "");
         var body = locationMessage("15551234");
         var request = signedPost(body);
 
@@ -81,7 +81,7 @@ class WhatsAppMediaFlowTest {
 
     @Test
     void invalidSignatureReturnsUnauthorized() {
-        var connector = new WhatsAppInboundConnector(SECRET, VERIFY_TOKEN, "");
+        var connector = new TwilioWhatsAppBridge(SECRET, VERIFY_TOKEN, "");
         var body = textMessage("15551234", "15559999", "test");
         var request = new WebhookRequest(body,
                 Map.of("x-hub-signature-256", List.of("sha256=invalid")),
@@ -92,7 +92,7 @@ class WhatsAppMediaFlowTest {
 
     @Test
     void getChallengeWithCorrectTokenReturnsChallenged() {
-        var connector = new WhatsAppInboundConnector(SECRET, VERIFY_TOKEN, "");
+        var connector = new TwilioWhatsAppBridge(SECRET, VERIFY_TOKEN, "");
         var request = new WebhookRequest("",
                 Map.of(), Map.of("hub.mode", "subscribe", "hub.verify_token", VERIFY_TOKEN,
                         "hub.challenge", "challenge-value"),
@@ -106,7 +106,7 @@ class WhatsAppMediaFlowTest {
 
     @Test
     void deferredSupplierDeliversFailureMetadataWhenDownloadFails() {
-        var connector = new WhatsAppInboundConnector(SECRET, VERIFY_TOKEN, "bad-token");
+        var connector = new TwilioWhatsAppBridge(SECRET, VERIFY_TOKEN, "bad-token");
         var body = mediaMessage("15551234", "audio", "media-999", "audio/ogg");
         var request = signedPost(body);
 

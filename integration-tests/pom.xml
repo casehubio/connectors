@@ -68,6 +68,26 @@
       <scope>test</scope>
     </dependency>
 
+    <!-- Mobile -->
+    <dependency>
+      <groupId>io.casehub</groupId>
+      <artifactId>casehub-connectors-mobile-spi</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.casehub</groupId>
+      <artifactId>casehub-connectors-mobile-ref</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.casehub</groupId>
+      <artifactId>casehub-connectors-mobile-twilio</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+
     <!-- Shared -->
     <dependency>
       <groupId>io.casehub</groupId>

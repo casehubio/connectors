@@ -72,10 +72,6 @@ public class TwilioClient {
         return postForm("/Accounts/" + accountSid + "/Calls/" + callSid + ".json", formBody);
     }
 
-    public JsonNode listRecordings(String callSid) {
-        return get("/Accounts/" + accountSid + "/Calls/" + callSid + "/Recordings.json");
-    }
-
     public JsonNode listIncomingPhoneNumbers() {
         return get("/Accounts/" + accountSid + "/IncomingPhoneNumbers.json");
     }

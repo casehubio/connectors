@@ -111,8 +111,8 @@ connectorService.send("slack", new ConnectorMessage(webhookUrl, "Title", "Body")
 |-------------|-------|--------|------|-------|
 | `slack` | `SlackConnector` | core | Webhook URL in `destination` | No config needed -- webhook URL is the credential |
 | `teams` | `TeamsConnector` | core | Webhook URL in `destination` | Renders as Adaptive Card (v1.4) |
-| `twilio-sms` | `TwilioSmsConnector` | core | Account SID + Auth Token + From number in MP Config | `channelType()` returns `"sms"`. E.164 phone number in `destination` |
-| `whatsapp` | `WhatsAppConnector` | core | API Token + Phone Number ID in MP Config | Template messages via `attributes("templateName")` + `attributes("templateLanguage")` (default `en_US`) |
+| ~~`twilio-sms`~~ | ~~`TwilioSmsConnector`~~ | ~~core~~ | Absorbed into `mobile-twilio` | Use `MobilePlatform.sms()` instead |
+| ~~`whatsapp`~~ | ~~`WhatsAppConnector`~~ | ~~core~~ | Absorbed into `mobile-twilio` | Use `MobilePlatform.messaging()` instead |
 | `signal` | `SignalConnector` | core | signal-cli-rest-api URL + sender number in MP Config | Backed by external `signal-cli-rest-api` Docker container |
 | `email` | `EmailConnector` | `email` | SMTP via `quarkus-mailer` config | Supports `format=html` attribute for HTML rendering via `Mail.withHtml()` |
 
@@ -464,6 +464,42 @@ public interface VoicePlatform {
 <dependency>
     <groupId>io.casehub</groupId>
     <artifactId>casehub-connectors-voice-spi</artifactId>
+    <version>${casehub.version}</version>
+</dependency>
+```
+
+### MobilePlatform SPI
+
+Phone-number-based communication -- SMS, voice calls, voicemail, WhatsApp/iMessage/RCS messaging, and number management. Unifies all telephony under one platform with six capability sub-interfaces.
+
+**Capabilities:** `Sms`, `VoiceCall`, `VoiceCallControl`, `Voicemail`, `Messaging`, `NumberInfo`
+
+**Quick start:**
+
+```java
+@Inject MobilePlatformService mobilePlatformService;
+
+// Send SMS
+var platform = mobilePlatformService.platform("ref"); // or "dial", "twilio"
+var result = platform.sms().send("+447700900000", "Your booking is confirmed.");
+
+// Make a voice call (provider-managed -- provider's AI handles conversation)
+var call = platform.voiceCall().initiate("+447700900000",
+    "Book a table for 2 at 7pm tonight for Smith.");
+
+// Check number capabilities
+var caps = platform.numberInfo().lookup("+447700900000");
+// caps.capabilities() → {SMS, VOICE}
+```
+
+**Provider modules:** `mobile-ref` (in-memory, CI-safe), `mobile-dial` (Dial getdial.ai), `mobile-twilio` (Twilio, absorbs legacy SMS/WhatsApp connectors)
+
+**Dependency:**
+
+```xml
+<dependency>
+    <groupId>io.casehub</groupId>
+    <artifactId>casehub-connectors-mobile-spi</artifactId>
     <version>${casehub.version}</version>
 </dependency>
 ```

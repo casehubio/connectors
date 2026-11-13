@@ -225,6 +225,34 @@ class TwilioMobilePlatformTest {
         assertThat(TwilioMobilePlatform.mapNumberType(input)).isEqualTo(expected);
     }
 
+    @Test
+    void transferThrowsUnsupportedCapability() {
+        var platform = createPlatform();
+        assertThatThrownBy(() -> platform.voiceCallControl().transfer("CA123", "+447700900000"))
+                .isInstanceOf(UnsupportedCapabilityException.class);
+    }
+
+    @Test
+    void mapCallParsesRfc2822Dates() throws Exception {
+        var json = MAPPER.readTree("""
+                {
+                  "sid": "CA_RFC",
+                  "to": "+449876543210",
+                  "from": "+441234567001",
+                  "status": "completed",
+                  "duration": 30,
+                  "start_time": "Sun, 01 Nov 2026 10:00:00 +0000",
+                  "end_time": "Sun, 01 Nov 2026 10:00:30 +0000"
+                }
+                """);
+
+        var call = TwilioMobilePlatform.mapCall(json);
+
+        assertThat(call.startedAt()).isNotNull();
+        assertThat(call.endedAt()).isNotNull();
+        assertThat(call.startedAt().toString()).isEqualTo("2026-11-01T10:00:00Z");
+    }
+
     private TwilioMobilePlatform createPlatform() {
         return new TwilioMobilePlatform(
                 new TwilioClient("test-sid", "test-token", "http://localhost:0"),

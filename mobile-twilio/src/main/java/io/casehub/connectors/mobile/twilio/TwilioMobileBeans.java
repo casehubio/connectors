@@ -43,6 +43,18 @@ public class TwilioMobileBeans {
 
     @Produces
     @ApplicationScoped
+    TwilioSmsConnectorBridge twilioSmsConnectorBridge(TwilioMobilePlatform platform) {
+        return new TwilioSmsConnectorBridge(platform);
+    }
+
+    @Produces
+    @ApplicationScoped
+    TwilioWhatsAppConnectorBridge twilioWhatsAppConnectorBridge(TwilioMobilePlatform platform) {
+        return new TwilioWhatsAppConnectorBridge(platform);
+    }
+
+    @Produces
+    @ApplicationScoped
     TwilioWhatsAppBridge twilioWhatsAppBridge(StaticCredentialStore credentialStore) {
         var record = credentialStore.find("system", "whatsapp", "default");
         if (record.isEmpty()) {

@@ -4,6 +4,7 @@ import io.casehub.connectors.Page;
 import io.casehub.connectors.PageRequest;
 import io.casehub.connectors.mobile.model.Call;
 import io.casehub.connectors.mobile.model.CallOptions;
+import io.casehub.connectors.mobile.model.CallStatus;
 import io.casehub.connectors.mobile.model.ConversationHandler;
 import io.casehub.connectors.mobile.model.MessagingOptions;
 import io.casehub.connectors.mobile.model.NumberCapabilities;
@@ -19,6 +20,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import org.jboss.logging.Logger;
 
 import java.util.List;
+import java.util.Set;
 
 @DefaultBean
 @ApplicationScoped
@@ -49,7 +51,7 @@ public class NoOpMobilePlatform implements MobilePlatform {
         @Override
         public Call initiate(String to, String instruction) {
             LOG.warnf("NoOp voice call to %s — %s", to, NO_PLATFORM);
-            return null;
+            return new Call("noop", to, null, CallStatus.FAILED, null, List.of(), null, null, null, NO_PLATFORM);
         }
 
         @Override
@@ -60,7 +62,7 @@ public class NoOpMobilePlatform implements MobilePlatform {
         @Override
         public Call initiate(String to, ConversationHandler handler) {
             LOG.warnf("NoOp voice call (handler) to %s — %s", to, NO_PLATFORM);
-            return null;
+            return new Call("noop", to, null, CallStatus.FAILED, null, List.of(), null, null, null, NO_PLATFORM);
         }
 
         @Override
@@ -139,7 +141,7 @@ public class NoOpMobilePlatform implements MobilePlatform {
 
         @Override
         public NumberCapabilities lookup(String phoneNumber) {
-            return null;
+            return new NumberCapabilities(phoneNumber, null, Set.of(), null, null);
         }
     };
 

@@ -2,6 +2,7 @@ package io.casehub.connectors.mobile.dial;
 
 import io.casehub.connectors.Page;
 import io.casehub.connectors.PageRequest;
+import io.casehub.connectors.UnsupportedCapabilityException;
 import io.casehub.connectors.mobile.dial.model.DialCall;
 import io.casehub.connectors.mobile.dial.model.DialLookupResult;
 import io.casehub.connectors.mobile.dial.model.DialMessage;
@@ -38,10 +39,8 @@ import java.util.Set;
 public class DialMobilePlatform implements MobilePlatform {
 
     private final MobilePlatform delegate;
-    private final DialWebSocket webSocket;
 
     DialMobilePlatform(DialClient client, DialWebSocket webSocket) {
-        this.webSocket = webSocket;
         this.delegate = MobilePlatform.builder("dial")
                 .sms(new DialSms(client))
                 .voiceCall(new DialVoiceCall(client, webSocket))
@@ -126,7 +125,8 @@ public class DialMobilePlatform implements MobilePlatform {
 
         @Override
         public void transfer(String callId, String transferTo) {
-            client.stopCall(callId);
+            throw new UnsupportedCapabilityException("transfer", "VoiceCallControl.Transfer",
+                    "dial", List.of("Sms", "VoiceCall", "VoiceCallControl.HangUp", "Messaging", "NumberInfo"));
         }
     }
 

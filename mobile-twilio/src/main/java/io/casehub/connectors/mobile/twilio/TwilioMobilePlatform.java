@@ -8,7 +8,6 @@ import io.casehub.connectors.mobile.model.Call;
 import io.casehub.connectors.mobile.model.CallOptions;
 import io.casehub.connectors.mobile.model.CallStatus;
 import io.casehub.connectors.mobile.model.ConversationHandler;
-import io.casehub.connectors.mobile.model.MediaAttachment;
 import io.casehub.connectors.mobile.model.MessageDirection;
 import io.casehub.connectors.mobile.model.MessageStatus;
 import io.casehub.connectors.mobile.model.MessagingChannel;
@@ -22,16 +21,16 @@ import io.casehub.connectors.mobile.model.RichMessage;
 import io.casehub.connectors.mobile.model.SendResult;
 import io.casehub.connectors.mobile.model.SmsMessage;
 import io.casehub.connectors.mobile.model.SmsOptions;
-import io.casehub.connectors.mobile.model.TranscriptTurn;
 import io.casehub.connectors.mobile.spi.MobilePlatform;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 
 public class TwilioMobilePlatform implements MobilePlatform {
 
@@ -57,8 +56,6 @@ public class TwilioMobilePlatform implements MobilePlatform {
     @Override public Voicemail voicemail() { return delegate.voicemail(); }
     @Override public Messaging messaging() { return delegate.messaging(); }
     @Override public NumberInfo numberInfo() { return delegate.numberInfo(); }
-
-    String channelType() { return "sms"; }
 
     private record TwilioSms(TwilioClient client, String defaultFrom) implements Sms {
         @Override
@@ -146,7 +143,9 @@ public class TwilioMobilePlatform implements MobilePlatform {
 
         @Override
         public void transfer(String callId, String transferTo) {
-            client.updateCall(callId, "completed");
+            throw new UnsupportedCapabilityException("transfer", "VoiceCallControl.Transfer",
+                    "twilio", List.of("Sms", "VoiceCall.ProviderManaged", "VoiceCallControl.HangUp",
+                            "Messaging", "NumberInfo"));
         }
     }
 
@@ -302,12 +301,19 @@ public class TwilioMobilePlatform implements MobilePlatform {
         };
     }
 
+    private static final DateTimeFormatter RFC_2822 = DateTimeFormatter.ofPattern(
+            "EEE, dd MMM yyyy HH:mm:ss Z", Locale.ENGLISH);
+
     private static Instant parseInstant(String timestamp) {
         if (timestamp == null || timestamp.isBlank()) return null;
         try {
             return Instant.parse(timestamp);
         } catch (Exception e) {
-            return null;
+            try {
+                return ZonedDateTime.parse(timestamp, RFC_2822).toInstant();
+            } catch (Exception e2) {
+                return null;
+            }
         }
     }
 

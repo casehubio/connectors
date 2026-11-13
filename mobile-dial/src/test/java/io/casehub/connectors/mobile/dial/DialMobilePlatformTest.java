@@ -1,5 +1,6 @@
 package io.casehub.connectors.mobile.dial;
 
+import io.casehub.connectors.UnsupportedCapabilityException;
 import io.casehub.connectors.mobile.dial.model.DialCall;
 import io.casehub.connectors.mobile.dial.model.DialLookupResult;
 import io.casehub.connectors.mobile.dial.model.DialMediaAttachment;
@@ -24,6 +25,7 @@ import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class DialMobilePlatformTest {
 
@@ -261,6 +263,13 @@ class DialMobilePlatformTest {
     void doesNotSupportVoicemail() {
         var platform = createPlatform();
         assertThat(platform.supports(MobilePlatform.Voicemail.class)).isFalse();
+    }
+
+    @Test
+    void transferThrowsUnsupportedCapabilityException() {
+        var platform = createPlatform();
+        assertThatThrownBy(() -> platform.voiceCallControl().transfer("call_1", "+447700900000"))
+                .isInstanceOf(UnsupportedCapabilityException.class);
     }
 
     private DialMobilePlatform createPlatform() {

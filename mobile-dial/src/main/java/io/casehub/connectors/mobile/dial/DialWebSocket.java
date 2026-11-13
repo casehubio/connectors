@@ -13,15 +13,15 @@ import io.casehub.connectors.mobile.model.TranscriptTurn;
 
 import java.net.URI;
 import java.net.http.WebSocket;
-import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -46,15 +46,13 @@ class DialWebSocket {
         var callId = "call_ws_" + System.nanoTime();
         var from = options.fromNumberId();
         var startedAt = Instant.now();
-        var turns = new ArrayList<TranscriptTurn>();
+        var turns = new CopyOnWriteArrayList<TranscriptTurn>();
         var latch = new CountDownLatch(1);
-        var failureRef = new String[]{null};
-        var statusRef = new CallStatus[]{CallStatus.QUEUED};
+        var failureRef = new AtomicReference<String>(null);
+        var statusRef = new AtomicReference<>(CallStatus.QUEUED);
+        var wsRef = new AtomicReference<WebSocket>(null);
 
         try {
-            handler.onCallConnected();
-            statusRef[0] = CallStatus.IN_PROGRESS;
-
             var hmac = HttpHelper.hmacSha256Hex(callId, apiKey);
             var wsUri = URI.create(baseWsUrl + "/calls/" + callId + "?auth=" + hmac);
 
@@ -63,6 +61,10 @@ class DialWebSocket {
 
                 @Override
                 public void onOpen(WebSocket ws) {
+                    wsRef.set(ws);
+                    statusRef.set(CallStatus.IN_PROGRESS);
+                    handler.onCallConnected();
+
                     var initJson = "{\"type\":\"init\",\"to\":" + DialClient.q(to)
                             + (options.language() != null ? ",\"language\":" + DialClient.q(options.language()) : "")
                             + (options.maxDurationSeconds() != null ? ",\"maxDurationSeconds\":" + options.maxDurationSeconds() : "")
@@ -89,20 +91,20 @@ class DialWebSocket {
                         switch (type) {
                             case "response_required" -> handleResponseRequired(ws, node, handler, turns);
                             case "call_ended" -> {
-                                statusRef[0] = CallStatus.COMPLETED;
+                                statusRef.set(CallStatus.COMPLETED);
                                 latch.countDown();
                             }
                             case "error" -> {
-                                failureRef[0] = node.path("message").asText("Unknown error");
-                                statusRef[0] = CallStatus.FAILED;
+                                failureRef.set(node.path("message").asText("Unknown error"));
+                                statusRef.set(CallStatus.FAILED);
                                 latch.countDown();
                             }
                             default -> LOG.fine("Unknown Dial WS message type: " + type);
                         }
                     } catch (Exception e) {
                         LOG.log(Level.WARNING, "Error processing Dial WS message", e);
-                        failureRef[0] = e.getMessage();
-                        statusRef[0] = CallStatus.FAILED;
+                        failureRef.set(e.getMessage());
+                        statusRef.set(CallStatus.FAILED);
                         latch.countDown();
                     }
 
@@ -112,9 +114,7 @@ class DialWebSocket {
 
                 @Override
                 public CompletionStage<?> onClose(WebSocket ws, int statusCode, String reason) {
-                    if (statusRef[0] == CallStatus.IN_PROGRESS) {
-                        statusRef[0] = CallStatus.COMPLETED;
-                    }
+                    statusRef.compareAndSet(CallStatus.IN_PROGRESS, CallStatus.COMPLETED);
                     latch.countDown();
                     return CompletableFuture.completedFuture(null);
                 }
@@ -122,8 +122,8 @@ class DialWebSocket {
                 @Override
                 public void onError(WebSocket ws, Throwable error) {
                     LOG.log(Level.WARNING, "Dial WebSocket error", error);
-                    failureRef[0] = error.getMessage();
-                    statusRef[0] = CallStatus.FAILED;
+                    failureRef.set(error.getMessage());
+                    statusRef.set(CallStatus.FAILED);
                     latch.countDown();
                 }
             };
@@ -138,18 +138,25 @@ class DialWebSocket {
 
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            failureRef[0] = "Call interrupted";
-            statusRef[0] = CallStatus.CANCELLED;
+            failureRef.set("Call interrupted");
+            statusRef.set(CallStatus.CANCELLED);
         } catch (Exception e) {
-            failureRef[0] = e.getMessage();
-            statusRef[0] = CallStatus.FAILED;
+            failureRef.set(e.getMessage());
+            statusRef.set(CallStatus.FAILED);
+        } finally {
+            var ws = wsRef.get();
+            if (ws != null) {
+                try {
+                    ws.sendClose(WebSocket.NORMAL_CLOSURE, "done");
+                } catch (Exception ignored) {}
+            }
         }
 
         var endedAt = Instant.now();
         var duration = Duration.between(startedAt, endedAt);
         var transcript = buildTranscript(turns);
-        var call = new Call(callId, to, from, statusRef[0], transcript, List.copyOf(turns),
-                duration, startedAt, endedAt, failureRef[0]);
+        var call = new Call(callId, to, from, statusRef.get(), transcript, List.copyOf(turns),
+                duration, startedAt, endedAt, failureRef.get());
 
         handler.onCallEnded(call);
         return call;

@@ -12,6 +12,7 @@ import io.casehub.connectors.mobile.dial.model.DialMessage;
 import io.casehub.connectors.mobile.dial.model.DialNumber;
 
 import java.net.URI;
+import java.net.URLEncoder;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
@@ -79,7 +80,7 @@ public class DialClient {
     }
 
     public DialLookupResult lookupNumber(String number) {
-        return get("/lookup/number?number=" + HttpHelper.jsonEscape(number), DialLookupResult.class);
+        return get("/lookup/number?number=" + URLEncoder.encode(number, StandardCharsets.UTF_8), DialLookupResult.class);
     }
 
     private <T> T post(String path, String json, Class<T> type) {

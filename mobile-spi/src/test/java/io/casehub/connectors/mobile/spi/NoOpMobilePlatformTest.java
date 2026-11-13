@@ -1,6 +1,7 @@
 package io.casehub.connectors.mobile.spi;
 
 import io.casehub.connectors.PageRequest;
+import io.casehub.connectors.mobile.model.CallStatus;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -54,8 +55,32 @@ class NoOpMobilePlatformTest {
     }
 
     @Test
+    void numberInfoLookup_returnsEmptyCapabilities() {
+        var caps = platform.numberInfo().lookup("+44123");
+        assertThat(caps).isNotNull();
+        assertThat(caps.number()).isEqualTo("+44123");
+        assertThat(caps.capabilities()).isEmpty();
+    }
+
+    @Test
     void voicemailTranscribe_returnsEmptyResult() {
         var result = platform.voicemail().transcribe("vm_001");
         assertThat(result.text()).isEmpty();
+    }
+
+    @Test
+    void voiceCallInitiate_returnsFailedCall() {
+        var call = platform.voiceCall().initiate("+44123", "test instruction");
+        assertThat(call).isNotNull();
+        assertThat(call.status()).isEqualTo(CallStatus.FAILED);
+        assertThat(call.failureReason()).contains("No MobilePlatform configured");
+    }
+
+    @Test
+    void voiceCallInitiateWithHandler_returnsFailedCall() {
+        var call = platform.voiceCall().initiate("+44123", (text, transcript) -> null);
+        assertThat(call).isNotNull();
+        assertThat(call.status()).isEqualTo(CallStatus.FAILED);
+        assertThat(call.failureReason()).contains("No MobilePlatform configured");
     }
 }

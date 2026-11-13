@@ -221,7 +221,7 @@ All ref implementations with pre-loaded data use YAML seed files under `<module>
 
 **Constants:** `InboundConnectorIds`, `InboundConnectorTypes`, `HttpMethod`
 
-**Outbound implementations:** `SlackConnector` (ID `"slack"`), `TeamsConnector` (ID `"teams"`), `TwilioSmsConnector` (ID `"twilio-sms"`, channelType `"sms"`), `WhatsAppConnector` (ID `"whatsapp"`)
+**Outbound implementations:** `SlackConnector` (ID `"slack"`), `TeamsConnector` (ID `"teams"`). SMS and WhatsApp absorbed into `mobile-twilio` — use `MobilePlatform` SPI instead.
 
 **Utilities:** `HttpHelper` (shared `HttpClient` with 5s connect timeout, `postJson`, `jsonQuote`, `jsonEscape`), `NoOpConnectorMeshBridge` (`@DefaultBean @Unremovable`)
 
@@ -231,7 +231,7 @@ All ref implementations with pre-loaded data use YAML seed files under `<module>
 
 **JAX-RS router:** `WebhookRouter` (`@Path("/connectors")`) dispatching `GET|POST /connectors/{id}/webhook`
 
-**Webhook connectors:** `SlackInboundConnector`, `TeamsInboundConnector`, `WhatsAppInboundConnector`, `TwilioSmsInboundConnector`
+**Webhook connectors:** `SlackInboundConnector`, `TeamsInboundConnector`. SMS and WhatsApp inbound connectors absorbed into `mobile-twilio` as `TwilioSmsBridge` and `TwilioWhatsAppBridge`.
 
 **Utilities:** `SigHelper` (HMAC signature verification with constant-time comparison)
 
@@ -508,6 +508,38 @@ Package: `io.casehub.connectors.voice.steps`.
 
 Depends on: `voice-spi`, `casehub-platform-yaml-plugin-api`, `casehub-platform-yaml-step-runtime` (APT processor).
 
+### mobile-spi
+
+MobilePlatform SPI for phone-number-based communication. Six inner capability interfaces: `Sms`, `VoiceCall`, `VoiceCallControl`, `Voicemail`, `Messaging`, `NumberInfo`. Hybrid composition pattern: inner interfaces (TravelPlatform style) with Builder + graceful degradation (ChatPlatform style). Two voice call modes: provider-managed (instruction-based, fire-and-forget) and platform-managed (`ConversationHandler` callback with sealed `ConversationAction` hierarchy: Hold/Transfer/HangUp). `NoOpMobilePlatform` (`@DefaultBean`) for degradation defaults. `MobilePlatformService` registry.
+
+Package: `io.casehub.connectors.mobile.spi`, `io.casehub.connectors.mobile.model`.
+
+Depends on: `connectors-api`, `casehub-platform-simulation-api`, `quarkus-arc`.
+
+### mobile-ref
+
+In-memory reference MobilePlatform. `InMemoryMobileBackend` loads seed data from YAML (numbers, conversations, voicemails, messages). Provider-managed calls match instruction against canned conversation patterns. Platform-managed calls invoke `ConversationHandler` with canned human responses. All six capabilities supported.
+
+Package: `io.casehub.connectors.mobile.ref`.
+
+Depends on: `mobile-spi`, `jackson-dataformat-yaml`, `quarkus-arc`.
+
+### mobile-dial
+
+Dial (getdial.ai) provider. `DialClient` REST client (Bearer auth, `HttpHelper.CLIENT`). `DialWebSocket` self-hosted LLM WebSocket for platform-managed calls. Five capabilities (no Voicemail — Dial doesn't support it natively).
+
+Package: `io.casehub.connectors.mobile.dial`.
+
+Depends on: `mobile-spi`, `connectors-api`, `casehub-platform-api`, `quarkus-arc`, `jackson-databind`.
+
+### mobile-twilio
+
+Twilio provider. `TwilioClient` REST client (Basic auth). Provider-managed calls use TwiML `<Say>`. Platform-managed calls fail fast with `UnsupportedCapabilityException` (needs server-side Media Streams WebSocket — future work). Five capabilities (no Voicemail). Absorbs legacy `TwilioSmsConnector` and `WhatsAppInboundConnector`: `TwilioSmsBridge` (HMAC-SHA1 verification, connectorId `"twilio-sms-inbound"`) and `TwilioWhatsAppBridge` (HMAC-SHA256 verification, DeferredDelivery for media download, connectorId `"whatsapp-inbound"`).
+
+Package: `io.casehub.connectors.mobile.twilio`.
+
+Depends on: `mobile-spi`, `connectors-api`, `casehub-platform-api`, `quarkus-arc`, `jackson-databind`, `jakarta.json-api`.
+
 ### email-google-inbound
 
 Gmail push inbound via Google Cloud Pub/Sub. `GmailPushInboundConnector` (`WebhookInboundConnector`) receives Pub/Sub push messages, validates JWT, fetches new message IDs via `GmailHistoryClient`, fires `InboundMessage` events. `GmailWatchManager` handles watch registration lifecycle. `HistoryStore` SPI with `InMemoryHistoryStore` `@DefaultBean` for per-user history ID tracking.
@@ -518,7 +550,7 @@ Depends on: `webhook`, `connectors-api`, `quarkus-arc`, `google-api-services-gma
 
 ### integration-tests
 
-Cross-module integration tests validating end-to-end flows: `VoiceRoundTripTest` (TTS→STT round-trip, `PluginScanner` wiring, YAML pipeline resolution), `WhatsAppMediaFlowTest` (media download via `DeferredDelivery`), `GmailPushFlowTest` (Pub/Sub→History→InboundMessage).
+Cross-module integration tests validating end-to-end flows: `VoiceRoundTripTest` (TTS→STT round-trip, `PluginScanner` wiring, YAML pipeline resolution), `WhatsAppMediaFlowTest` (media download via `DeferredDelivery`, now using `TwilioWhatsAppBridge`), `GmailPushFlowTest` (Pub/Sub→History→InboundMessage), `MobileRefIntegrationTest` (SMS round-trip, voice call lifecycle, voicemail CRUD, ConversationHandler interaction, NumberInfo queries).
 
 Package: `io.casehub.connectors.it`.
 

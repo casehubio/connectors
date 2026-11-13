@@ -9,8 +9,10 @@ package io.casehub.connectors;
  * messages to the correct implementation.
  *
  * <p>
- * Built-in implementations: {@code "slack"}, {@code "teams"}, {@code "twilio-sms"},
- * {@code "whatsapp"}. The {@code connectors-email} module provides {@code "email"}.
+ * Built-in implementations: {@code "slack"}, {@code "teams"}.
+ * The {@code connectors-email} module provides {@code "email"}.
+ * SMS ({@code "twilio-sms"}) and WhatsApp ({@code "whatsapp"}) are provided
+ * by {@code mobile-twilio} bridge connectors.
  *
  * <h2>Contract</h2>
  * <ul>

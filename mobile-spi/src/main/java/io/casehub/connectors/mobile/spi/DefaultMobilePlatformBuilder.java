@@ -1,6 +1,7 @@
 package io.casehub.connectors.mobile.spi;
 
 import java.util.HashSet;
+import java.util.Set;
 
 final class DefaultMobilePlatformBuilder implements MobilePlatform.Builder {
 
@@ -64,7 +65,7 @@ final class DefaultMobilePlatformBuilder implements MobilePlatform.Builder {
 
         return new BuiltMobilePlatform(
                 id,
-                supported,
+                Set.copyOf(supported),
                 sms != null ? sms : NoOpMobilePlatform.NO_OP_SMS,
                 voiceCall != null ? voiceCall : NoOpMobilePlatform.NO_OP_VOICE_CALL,
                 voiceCallControl != null ? voiceCallControl : NoOpMobilePlatform.NO_OP_VOICE_CALL_CONTROL,

@@ -155,4 +155,16 @@ class RefMobilePlatformTest {
         assertThat(caps).isNotNull();
         assertThat(caps.capabilities()).isEmpty();
     }
+
+    @Test
+    void hangUp_doesNotThrow() {
+        var call = platform.voiceCall().initiate("+441234567002", "book a table");
+        platform.voiceCallControl().hangUp(call.id());
+    }
+
+    @Test
+    void transfer_doesNotThrow() {
+        var call = platform.voiceCall().initiate("+441234567002", "book a table");
+        platform.voiceCallControl().transfer(call.id(), "+449876543210");
+    }
 }
