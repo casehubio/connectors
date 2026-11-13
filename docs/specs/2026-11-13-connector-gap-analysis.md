@@ -358,6 +358,22 @@ Beyond standard meeting management (create, join, record), MeetingsPlatform enab
 
 The VoicePlatform and MobilePlatform work already provides the STT/TTS foundation. The meeting-specific additions are join/leave, share controls, and audio stream routing. Avatar rendering is an external service integration, not a platform capability.
 
+### TranscriptionPlatform — Cross-Cutting Audio Intelligence (long-term)
+
+Transcription is a service any voice or video interaction can route through — meetings, phone calls, voicemails, uploaded recordings. Distinct from VoicePlatform's `SpeechToText` (single clip, single speaker) in that it handles long-form audio with **speaker diarisation** (who said what), timestamps, and streaming.
+
+| Capability | Description |
+|---|---|
+| **BatchTranscribe** | Submit audio file → transcript with speaker labels, timestamps, confidence |
+| **StreamTranscribe** | Real-time partial results from live audio stream |
+| **Diarisation** | Speaker identification and labelling ("Speaker 1", or matched to known participants) |
+| **LanguageDetection** | Auto-detect spoken language, multi-language support |
+| **Summary** | Auto-generated summaries, chapters, key topics (provider-dependent) |
+
+Providers: Deepgram, AssemblyAI, Rev.ai, OpenAI Whisper, Google Speech-to-Text, Azure Speech Services.
+
+Consumers: MeetingsPlatform (live meeting transcription), MobilePlatform (call transcription), VoicePlatform (upgraded from simple STT), any playbook processing recorded audio.
+
 ## POC Plan — Prove the Patterns
 
 Four POC integrations, each exercising a distinct integration axis. After these, every future integration is a subtype of a proven pattern.
