@@ -67,6 +67,7 @@ Zero heavy dependencies — HTTP-based connectors use java.net.http only.</descr
     <module>project-spi</module>
     <module>project-ref</module>
     <module>github-client</module>
+    <module>microsoft-graph-client</module>
     <module>project-github</module>
     <module>health-spi</module>
     <module>health-ref</module>
