@@ -38,19 +38,24 @@ There are 36 active modules in the build (pom.xml `<modules>`):
 | `chat-slack` | Slack `ChatPlatform` (9 native capabilities -- most complete), RichCard-to-Block Kit translation |
 | `signal-cli` | `SignalClient` HTTP client + `SignalWebSocket` WebSocket client for `signal-cli-rest-api`. Pure `java.net.http` -- no AGPL dependencies |
 | `chat-signal` | Signal `ChatPlatform` (6 native capabilities: Messaging, Discovery, Members, Reactions, ChannelManagement, MemberManagement), `SignalInboundConnector` (WebSocket-based), `SignalInboundTranslator` |
+| `chat-teams` | Teams `ChatPlatform` (8 native capabilities: Messaging, Threading, Discovery, Presence, Members, ChannelManagement, MemberManagement, MessageHistory). Dual delegated/application token model. Compound `teamId:channelId` channel IDs. Config: `ServiceConnectionProvider` with providers `"microsoft"` (delegated) and `"microsoft-app"` (application) |
+| `microsoft-graph-client` | Shared Microsoft Graph REST API v1.0 HTTP client (`MicrosoftGraphClient`) — OData pagination with `@odata.nextLink`/`@odata.deltaLink`, `GraphErrorHandler` for Graph-specific error mapping, `TokenRetry` for 401 re-resolve. Used by `email-microsoft`, `calendar-microsoft`, `document-microsoft`, `chat-teams` |
 | `notification-bridge` | Bridges platform notification delivery system to connector SPI. `NotificationBridgeStartup`, `ConnectorNotificationDeliverer`, `DigestFormatter` SPI, `ConfigDestinationResolver` |
 | `calendar-spi` | `CalendarPlatform` SPI with `@SimulationEligible`, `CalendarPlatformService` routing, `NoOpCalendarPlatform` `@DefaultBean` fallback, model records (`CalendarEvent`, `CalendarInfo`, `EventDetails`), sealed `EventTiming` (Timed/AllDay with Jackson `@JsonTypeInfo`), incremental sync via `SyncResult`/`SyncRequest` |
 | `calendar-ref` | In-memory reference `CalendarPlatform` for testing (`RefCalendarPlatform`) |
 | `calendar-google` | Google Calendar API provider with per-user OAuth2 credential resolution via `GoogleCredentialResolver`, paginated `listEvents`, incremental sync via syncToken |
+| `calendar-microsoft` | Microsoft Graph Outlook Calendar provider (`MicrosoftCalendarPlatform`, id `"microsoft"`) — delta sync via `@odata.deltaLink`, per-user OAuth2 via `ServiceConnectionProvider`. Config: `ServiceConnectionProvider` with provider `"microsoft"` |
 | `bank-spi` | `BankPlatform` SPI with `@SimulationEligible`, model records (`AccountInfo`, `AccountBalance`, `Transaction`), `BankPlatformService` routing, `NoOpBankPlatform` `@DefaultBean` fallback |
 | `bank-ref` | In-memory reference `BankPlatform` for testing (`RefBankPlatform`) — 3 UK accounts, 12 transactions, payment lifecycle simulation |
 | `email-spi` | `EmailPlatform` SPI with `@SimulationEligible`, model records (`Mailbox`, `EmailSummary`, `EmailMessage`, `EmailAttachment`), `EmailPlatformService` routing. Complements `email` (outbound) and `email-inbound` (push) |
 | `email-ref` | In-memory reference `EmailPlatform` for testing (`RefEmailPlatform`) — 3 mailboxes (Inbox/Sent/Archive), 9 messages with attachments, cursor-based pagination |
 | `email-google` | Gmail `EmailPlatform` provider (`GoogleEmailPlatform`) — OAuth2 refresh token auth, label→mailbox mapping, paginated message listing, MIME body parsing, attachment download. Config: `casehub.connectors.email.google.{client-id,client-secret,refresh-token}` |
+| `email-microsoft` | Microsoft Graph Outlook Mail provider (`MicrosoftEmailPlatform`, id `"microsoft"`) — folder→mailbox mapping, OData pagination, HTML body extraction. Config: `ServiceConnectionProvider` with provider `"microsoft"` |
 | `email-google-inbound` | Gmail push notifications via Cloud Pub/Sub (`GmailPushInboundConnector`) — JWT-validated push, Gmail History API for new message IDs, `HistoryStore` SPI for per-user history tracking, `GmailWatchManager` for watch registration lifecycle |
 | `document-spi` | `DocumentPlatform` SPI with `@SimulationEligible` and capability sub-interfaces (`FileOperations` incl. incremental sync, `FolderOperations`, `SearchOperations`, `SharingOperations`), `supports(Class<?>)` introspection, `DocumentPlatformService` routing |
 | `document-ref` | In-memory reference `DocumentPlatform` for testing (`RefDocumentPlatform`) — 3 folders, 7 files, all 4 capabilities including upload/download round-trip, search, sharing, monotonic version tracking for sync |
 | `document-google` | Google Drive `DocumentPlatform` provider (`GoogleDocumentPlatform`) — OAuth2 refresh token auth, file CRUD with direct upload, folder management, full-text search, share links, incremental sync via `changes.list`. Config: `casehub.connectors.document.google.{client-id,client-secret,refresh-token}` |
+| `document-microsoft` | Microsoft Graph OneDrive/SharePoint provider — two CDI beans: `microsoft-onedrive` (`/me/drive`) and `microsoft-sharepoint` (`/sites/{siteId}/drive`). All 4 capabilities, SSRF defense on download redirects, resumable upload for >4MB, delta sync. Config: `casehub.connectors.sharepoint.site-id` (SharePoint only), `ServiceConnectionProvider` with provider `"microsoft"` |
 | `location-spi` | `LocationPlatform` SPI with `@SimulationEligible` and capability sub-interfaces (`PlaceSearch`, `PlaceDetails`, `Geocoding`, `Directions`), user-scoped accessors, `supports(Class<?>)` introspection, `LocationPlatformService` routing |
 | `location-ref` | In-memory reference `LocationPlatform` for testing (`RefLocationPlatform`) — 8 pre-loaded London places with reviews, photos, geocoding entries |
 | `location-google` | Google Maps `LocationPlatform` provider (`GoogleLocationPlatform`) — Places API for search/details, Geocoding API, Directions API |
@@ -287,6 +292,7 @@ Supports `CommandResponse.Immediate` (synchronous) and `CommandResponse.Deferred
 | `DiscordChatPlatform` | `discord` | 9 (all except MemberManagement; Commands conditional on `application-id` config) |
 | `SlackChatPlatform` | `slack` | 10 (most complete; Commands via manifest, endpoint receives slash commands) |
 | `SignalChatPlatform` | `signal` | 6 (Messaging, Discovery, Members, Reactions, ChannelManagement, MemberManagement) |
+| `TeamsChatPlatform` | `microsoft-teams` | 8 (Messaging, Threading, Discovery, Presence, Members, ChannelManagement, MemberManagement, MessageHistory; dual delegated/application tokens) |
 
 ### CalendarPlatform SPI
 
@@ -317,6 +323,7 @@ public interface CalendarPlatform {
 |----------------|------------|-------|
 | `RefCalendarPlatform` | `ref` | In-memory reference for testing with monotonic version tracking for sync |
 | `GoogleCalendarPlatform` | `google` | Google Calendar API with per-user OAuth2 credential resolution via `GoogleCredentialResolver`, paginated listEvents (max 20 pages), incremental sync via syncToken |
+| `MicrosoftCalendarPlatform` | `microsoft` | Microsoft Graph Outlook Calendar API with delta sync via `@odata.deltaLink` |
 
 ### BankPlatform SPI
 

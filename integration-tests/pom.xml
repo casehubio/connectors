@@ -88,6 +88,38 @@
       <scope>test</scope>
     </dependency>
 
+    <!-- Microsoft Graph -->
+    <dependency>
+      <groupId>io.casehub</groupId>
+      <artifactId>casehub-connectors-microsoft-graph-client</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.casehub</groupId>
+      <artifactId>casehub-connectors-email-microsoft</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.casehub</groupId>
+      <artifactId>casehub-connectors-calendar-microsoft</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.casehub</groupId>
+      <artifactId>casehub-connectors-document-microsoft</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.casehub</groupId>
+      <artifactId>casehub-connectors-chat-teams</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+
     <!-- Shared -->
     <dependency>
       <groupId>io.casehub</groupId>
