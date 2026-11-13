@@ -184,7 +184,7 @@ sendNotification, connectorStatus, sentMessages.</description>
             </path>
           </annotationProcessorPaths>
           <compilerArgs>
-            <arg>-AdomainFilter=connectors,connectors/messaging,connectors/chat,connectors/calendar,connectors/bank,connectors/email,connectors/contacts,connectors/project,connectors/commerce,connectors/travel,connectors/location,connectors/documents,connectors/health,connectors/voice</arg>
+            <arg>-AdomainFilter=connectors,connectors/messaging,connectors/chat,connectors/calendar,connectors/bank,connectors/email,connectors/contacts,connectors/project,connectors/commerce,connectors/travel,connectors/location,connectors/documents,connectors/health,connectors/voice,connectors/mobile</arg>
             <arg>-AgenerateGraphQL=false</arg>
             <arg>-AgeneratePlugins=true</arg>
           </compilerArgs>

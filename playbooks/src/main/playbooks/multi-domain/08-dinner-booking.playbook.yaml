@@ -1,39 +1,41 @@
 name: Dinner out — find restaurant, get directions, notify
-description: Find nearby Thai restaurant, get walking directions, send details via SMS and chat
+description: Find nearby restaurant, get walking directions, send details via SMS and chat
 steps:
-  # 1. Find Thai restaurants nearby (London coordinates)
-  - location-search-nearby:
-      latitude: 51.5074
-      longitude: -0.1278
+  # 1. Find restaurants nearby (Balham coordinates — matches location-ref seed data)
+  - location-search-by-category:
       category: restaurant
-      keyword: thai
-      radius: 1000
+      lat: 51.4430
+      lng: -0.1525
+      radiusMeters: 2000
     capture: restaurants
 
   # 2. Get details of the top result
   - location-place-details:
-      placeId: ${restaurants.items[0].placeId}
+      placeId: ${restaurants.items[0].id}
     capture: restaurant
 
-  # 3. Get walking directions
+  # 3. Get walking directions from Balham station
   - location-directions:
-      origin: "51.5074,-0.1278"
-      destination: ${restaurant.address}
+      originLat: 51.4432
+      originLng: -0.1522
+      destLat: ${restaurant.location.lat}
+      destLng: ${restaurant.location.lng}
       mode: WALKING
     capture: directions
 
-  # 4. SMS the details to ourselves
+  # 4. SMS the details
   - mobile-send-sms:
+      platform: ref
       to: "+447700900000"
       body: >
-        Found: ${restaurant.name}, ${restaurant.address}.
-        Walk time: ${directions.duration}. Phone: ${restaurant.phone}.
+        Found: ${restaurant.name}, ${restaurant.formattedAddress}.
+        Walk: ${directions.duration.text}. Phone: ${restaurant.formattedPhoneNumber}.
     capture: smsNotification
 
   # 5. Chat notification
   - chat-send:
       channel: personal
-      message: >
-        Dinner option found. ${restaurant.name} —
-        ${restaurant.address}. ${directions.duration} walk.
+      text: >
+        Dinner option: ${restaurant.name} —
+        ${restaurant.formattedAddress}. ${directions.duration.text} walk.
     capture: chatNotification
