@@ -9,8 +9,6 @@ import io.casehub.connectors.NoOpConnectorMeshBridge;
 import io.casehub.connectors.SentMessage;
 import io.casehub.connectors.slack.SlackConnector;
 import io.casehub.connectors.teams.TeamsConnector;
-import io.casehub.connectors.twilio.TwilioSmsConnector;
-import io.casehub.connectors.whatsapp.WhatsAppConnector;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -69,18 +67,5 @@ public class ConnectorsAutoConfiguration {
         return new TeamsConnector();
     }
 
-    @Bean
-    public WhatsAppConnector whatsAppConnector(
-            @Value("${casehub.connectors.whatsapp.api-token:}") String apiToken,
-            @Value("${casehub.connectors.whatsapp.phone-number-id:}") String phoneNumberId) {
-        return new WhatsAppConnector(apiToken, phoneNumberId);
-    }
 
-    @Bean
-    public TwilioSmsConnector twilioSmsConnector(
-            @Value("${casehub.connectors.twilio.account-sid:}") String accountSid,
-            @Value("${casehub.connectors.twilio.auth-token:}") String authToken,
-            @Value("${casehub.connectors.twilio.from:}") String from) {
-        return new TwilioSmsConnector(accountSid, authToken, from);
-    }
 }

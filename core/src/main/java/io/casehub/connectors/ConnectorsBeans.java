@@ -2,8 +2,6 @@ package io.casehub.connectors;
 
 import io.casehub.connectors.slack.SlackConnector;
 import io.casehub.connectors.teams.TeamsConnector;
-import io.casehub.connectors.twilio.TwilioSmsConnector;
-import io.casehub.connectors.whatsapp.WhatsAppConnector;
 import io.quarkus.arc.All;
 import io.quarkus.arc.DefaultBean;
 import io.quarkus.arc.Unremovable;
@@ -13,7 +11,6 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.event.Event;
 import jakarta.enterprise.event.Observes;
 import jakarta.enterprise.inject.Produces;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import java.util.List;
 import java.util.logging.Level;
@@ -76,20 +73,5 @@ public class ConnectorsBeans {
         return new TeamsConnector();
     }
 
-    @Produces
-    @ApplicationScoped
-    public WhatsAppConnector whatsAppConnector(
-            @ConfigProperty(name = "casehub.connectors.whatsapp.api-token", defaultValue = "") String apiToken,
-            @ConfigProperty(name = "casehub.connectors.whatsapp.phone-number-id", defaultValue = "") String phoneNumberId) {
-        return new WhatsAppConnector(apiToken, phoneNumberId);
-    }
 
-    @Produces
-    @ApplicationScoped
-    public TwilioSmsConnector twilioSmsConnector(
-            @ConfigProperty(name = "casehub.connectors.twilio.account-sid", defaultValue = "") String accountSid,
-            @ConfigProperty(name = "casehub.connectors.twilio.auth-token", defaultValue = "") String authToken,
-            @ConfigProperty(name = "casehub.connectors.twilio.from", defaultValue = "") String from) {
-        return new TwilioSmsConnector(accountSid, authToken, from);
-    }
 }

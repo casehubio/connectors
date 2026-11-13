@@ -21,19 +21,5 @@ public class WebhookBeans {
         return new TeamsInboundConnector(sharedSecret);
     }
 
-    @Produces
-    @ApplicationScoped
-    public WhatsAppInboundConnector whatsAppInboundConnector(
-            @ConfigProperty(name = "casehub.connectors.whatsapp-inbound.app-secret", defaultValue = "") String appSecret,
-            @ConfigProperty(name = "casehub.connectors.whatsapp-inbound.verify-token", defaultValue = "") String verifyToken,
-            @ConfigProperty(name = "casehub.connectors.whatsapp.api-token", defaultValue = "") String apiToken) {
-        return new WhatsAppInboundConnector(appSecret, verifyToken, apiToken);
-    }
 
-    @Produces
-    @ApplicationScoped
-    public TwilioSmsInboundConnector twilioSmsInboundConnector(
-            @ConfigProperty(name = "casehub.connectors.twilio-sms-inbound.auth-token", defaultValue = "") String authToken) {
-        return new TwilioSmsInboundConnector(authToken);
-    }
 }

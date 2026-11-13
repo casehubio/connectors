@@ -17,37 +17,6 @@ public class ConnectorMessagingApi {
     @Inject ConnectorService connectorService;
     @Inject ConnectorMeshBridge meshBridge;
 
-    @PlatformMutation("Send an SMS message via Twilio")
-    @RestPath("/sms")
-    public OperationResult sendSms(String to, String body) {
-        try {
-            connectorService.send("twilio-sms", new ConnectorMessage(to, body));
-            meshBridge.notifyDelivered("twilio-sms", to, sanitize(body));
-            return new OperationResult(true, "twilio-sms", to, "Dispatched");
-        } catch (Exception e) {
-            return new OperationResult(false, "twilio-sms", to, e.getMessage());
-        }
-    }
-
-    @PlatformMutation("Send a WhatsApp message")
-    @RestPath("/whatsapp")
-    public OperationResult sendWhatsapp(String to, String body,
-                                        String templateName, String templateLanguage) {
-        try {
-            var msg = new ConnectorMessage(to, body);
-            if (templateName != null) {
-                msg = new ConnectorMessage(to, templateName, body,
-                    java.util.Map.of("templateLanguage",
-                        templateLanguage != null ? templateLanguage : "en"));
-            }
-            connectorService.send("whatsapp", msg);
-            meshBridge.notifyDelivered("whatsapp", to, sanitize(body));
-            return new OperationResult(true, "whatsapp", to, "Dispatched");
-        } catch (Exception e) {
-            return new OperationResult(false, "whatsapp", to, e.getMessage());
-        }
-    }
-
     @PlatformMutation("Send an email via SMTP")
     @RestPath("/email")
     public OperationResult sendEmail(String to, String subject, String body) {

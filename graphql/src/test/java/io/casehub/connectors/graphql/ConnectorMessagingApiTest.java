@@ -32,61 +32,6 @@ class ConnectorMessagingApiTest {
     }
 
     @Test
-    void sendSms_dispatchesToTwilioSms() {
-        when(connectorService.send(eq("twilio-sms"), any(ConnectorMessage.class))).thenReturn(true);
-
-        var result = api.sendSms("+447700900000", "Hello");
-
-        assertThat(result.dispatched()).isTrue();
-        assertThat(result.connector()).isEqualTo("twilio-sms");
-        assertThat(result.destination()).isEqualTo("+447700900000");
-    }
-
-    @Test
-    void sendSms_failureReturnsNotDispatched() {
-        when(connectorService.send(eq("twilio-sms"), any(ConnectorMessage.class)))
-                .thenThrow(new RuntimeException("SMS gateway down"));
-
-        var result = api.sendSms("+447700900000", "Hello");
-
-        assertThat(result.dispatched()).isFalse();
-        assertThat(result.connector()).isEqualTo("twilio-sms");
-        assertThat(result.detail()).isEqualTo("SMS gateway down");
-    }
-
-    @Test
-    void sendWhatsapp_dispatchesToWhatsapp() {
-        when(connectorService.send(eq("whatsapp"), any(ConnectorMessage.class))).thenReturn(true);
-
-        var result = api.sendWhatsapp("+447700900000", "Hello", null, null);
-
-        assertThat(result.dispatched()).isTrue();
-        assertThat(result.connector()).isEqualTo("whatsapp");
-    }
-
-    @Test
-    void sendWhatsapp_withTemplate_dispatchesToWhatsapp() {
-        when(connectorService.send(eq("whatsapp"), any(ConnectorMessage.class))).thenReturn(true);
-
-        var result = api.sendWhatsapp("+447700900000", "Hello",
-                                      "welcome_template", "en");
-
-        assertThat(result.dispatched()).isTrue();
-        assertThat(result.connector()).isEqualTo("whatsapp");
-    }
-
-    @Test
-    void sendWhatsapp_failureReturnsNotDispatched() {
-        when(connectorService.send(eq("whatsapp"), any(ConnectorMessage.class)))
-                .thenThrow(new RuntimeException("WhatsApp API error"));
-
-        var result = api.sendWhatsapp("+447700900000", "Hello", null, null);
-
-        assertThat(result.dispatched()).isFalse();
-        assertThat(result.detail()).isEqualTo("WhatsApp API error");
-    }
-
-    @Test
     void sendEmail_dispatchesToEmail() {
         when(connectorService.send(eq("email"), any(ConnectorMessage.class))).thenReturn(true);
 
