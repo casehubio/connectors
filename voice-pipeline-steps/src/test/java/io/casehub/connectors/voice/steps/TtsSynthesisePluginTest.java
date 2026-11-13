@@ -1,13 +1,17 @@
 package io.casehub.connectors.voice.steps;
 
-import io.casehub.connectors.voice.config.VoiceManifestLoader;
-import io.casehub.connectors.voice.config.VoiceManifestProcessor;
+import io.casehub.connectors.voice.config.VoiceManifestDefaults;
 import io.casehub.connectors.voice.model.SynthesisResult;
+import io.casehub.connectors.voice.model.VoiceCapability;
+import io.casehub.connectors.voice.model.VoiceDescriptor;
 import io.casehub.connectors.voice.ref.ReferenceVoicePlatform;
 import io.casehub.connectors.voice.spi.InMemoryVoiceRegistry;
 import io.casehub.connectors.voice.spi.RoutingVoicePlatformService;
 import io.casehub.connectors.voice.spi.VoicePlatformService;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -42,13 +46,12 @@ class TtsSynthesisePluginTest {
 
     static RoutingVoicePlatformService buildRouting() {
         var platform        = new ReferenceVoicePlatform();
-        var platformService = new VoicePlatformService(java.util.List.of(platform));
+        var platformService = new VoicePlatformService(List.of(platform));
         var registry        = new InMemoryVoiceRegistry();
-        var loader          = new VoiceManifestLoader();
-        var manifest        = loader.load(null, null);
-        var processor       = new VoiceManifestProcessor(registry);
-        var result          = processor.process(manifest);
+        registry.replaceSource("test", 0, List.of(new VoiceDescriptor(
+                "af_heart", platform.id(), "af_heart", "Heart", "female", "american",
+                4.5, List.of("en-US"), null, null, null, null, VoiceCapability.TTS, Map.of())));
         return new RoutingVoicePlatformService(
-                platformService, registry, result.aliases(), manifest.defaults());
+                platformService, registry, Map.of(), new VoiceManifestDefaults(platform.id(), platform.id()));
     }
 }
