@@ -245,7 +245,7 @@ Surfaced by cross-referencing Zapier (business categories) with n8n (developer c
 | **MarketingPlatform** | Mailchimp #10 overall; 1,255 apps | — | Mailchimp or SendGrid | Campaigns, Audiences, Templates, Sends, Analytics | SendGrid (transactional) vs Mailchimp (campaigns) may be two sub-interfaces |
 | **WeatherPlatform** | — | 5.0K | OpenWeatherMap | CurrentConditions, Forecast, Alerts, Historical | Multiple providers (OWM, AccuWeather, Tomorrow.io, Open-Meteo) |
 | **HrPlatform** | BambooHR #20 premium; 315 apps | — | BambooHR | Employees, TimeOff, Directory, Onboarding | Enterprise category, barely exists in n8n |
-| **MeetingsPlatform** | — | — | Microsoft Teams or Zoom | Meetings, Participants, Recordings, Transcripts | Teams meetings via Graph SDK (#211), Zoom, Google Meet, Webex |
+| **MeetingsPlatform** | — | — | Microsoft Teams or Zoom | Meetings, Participants, Recordings, Transcripts, LLM Participation (see below) | Teams meetings via Graph SDK (#211), Zoom, Google Meet, Webex |
 | **CmsPlatform** | WordPress in top 22; 263 apps | 43.0K | WordPress | Posts, Pages, Media, Categories, Tags | WordPress, Webflow, Ghost, Strapi |
 
 ### Coverage Heat Map — Before and After
@@ -342,6 +342,21 @@ Second providers for new SPIs, plus broader protocol coverage.
 **Enterprise (on demand):** SAP, FHIR, FIX, PLC4X
 
 **Estimated coverage after Phase 3: ~95+ services across ~30+ SPIs**
+
+## MeetingsPlatform — LLM Participation Model
+
+Beyond standard meeting management (create, join, record), MeetingsPlatform enables LLM agents to participate in meetings as active attendees. Real-time video understanding isn't practical, but meaningful participation is achievable through existing platform capabilities:
+
+| Capability | What the LLM does | Builds on |
+|---|---|---|
+| **Join/Leave** | Connect to meeting via provider API | MeetingsPlatform core |
+| **Listen** | STT on meeting audio stream | VoicePlatform (STT) |
+| **Speak** | TTS output routed to meeting audio, via synthetic avatar | VoicePlatform (TTS) + avatar service (HeyGen, D-ID, Synthesia) |
+| **Present** | Screen share with controlled content (slides, dashboards, docs) | Meeting API share controls |
+| **Observe** | Periodic frame capture from video feed → vision model analysis | Screenshot + LLM vision |
+| **Read** | Consume live meeting transcript | Provider-native transcription (Teams/Zoom built-in) |
+
+The VoicePlatform and MobilePlatform work already provides the STT/TTS foundation. The meeting-specific additions are join/leave, share controls, and audio stream routing. Avatar rendering is an external service integration, not a platform capability.
 
 ## POC Plan — Prove the Patterns
 
