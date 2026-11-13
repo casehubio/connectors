@@ -2,11 +2,11 @@ package io.casehub.connectors.microsoft;
 
 import io.casehub.connectors.Page;
 import io.casehub.connectors.http.HttpHelper;
-
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
+
 import java.io.StringReader;
 import java.net.URI;
 import java.net.http.HttpRequest;
@@ -14,7 +14,6 @@ import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @ApplicationScoped
@@ -25,7 +24,7 @@ public class MicrosoftGraphClient {
     private static final Logger LOG = Logger.getLogger(MicrosoftGraphClient.class.getName());
 
     @FunctionalInterface
-    interface HttpSender {
+    public interface HttpSender {
         HttpResponse<String> send(HttpRequest request) throws Exception;
     }
 
@@ -36,7 +35,7 @@ public class MicrosoftGraphClient {
                 HttpResponse.BodyHandlers.ofString());
     }
 
-    MicrosoftGraphClient(HttpSender sender) {
+    public MicrosoftGraphClient(HttpSender sender) {
         this.sender = sender;
     }
 
@@ -138,8 +137,8 @@ public class MicrosoftGraphClient {
 
     public <T> Page<T> getPage(String path, String accessToken,
             Function<JsonObject, T> mapper, String cursor) {
-        String url = (cursor != null) ? cursor : BASE_URL + path;
-        var request = HttpRequest.newBuilder(URI.create(url))
+        URI uri = (cursor != null) ? URI.create(cursor) : toUri(BASE_URL + path);
+        var request = HttpRequest.newBuilder(uri)
                 .header("Authorization", "Bearer " + accessToken)
                 .header("Accept", "application/json")
                 .GET().build();
@@ -161,7 +160,7 @@ public class MicrosoftGraphClient {
     }
 
     private HttpRequest.Builder jsonRequest(String path, String accessToken) {
-        return HttpRequest.newBuilder(URI.create(BASE_URL + path))
+        return HttpRequest.newBuilder(toUri(BASE_URL + path))
                 .header("Authorization", "Bearer " + accessToken)
                 .header("Accept", "application/json");
     }
@@ -189,6 +188,17 @@ public class MicrosoftGraphClient {
             return reader.readObject();
         }
     }
+
+    private static URI toUri(String rawUrl) {
+        try {
+            var parsed = new java.net.URL(rawUrl);
+            return new URI(parsed.getProtocol(), parsed.getAuthority(),
+                           parsed.getPath(), parsed.getQuery(), parsed.getRef());
+        } catch (Exception e) {
+            return URI.create(rawUrl);
+        }
+    }
+
 
     private static RuntimeException ProviderErrorFromBytes(HttpResponse<byte[]> response) {
         String body = new String(response.body());

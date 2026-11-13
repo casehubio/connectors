@@ -46,6 +46,7 @@ Zero heavy dependencies — HTTP-based connectors use java.net.http only.</descr
     <module>email-spi</module>
     <module>email-ref</module>
     <module>email-google</module>
+    <module>email-microsoft</module>
     <module>email-google-inbound</module>
     <module>document-spi</module>
     <module>document-ref</module>
