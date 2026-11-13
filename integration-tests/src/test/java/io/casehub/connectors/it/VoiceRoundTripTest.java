@@ -1,5 +1,6 @@
 package io.casehub.connectors.it;
 
+import io.casehub.connectors.voice.config.VoiceManifestDefaults;
 import io.casehub.connectors.voice.model.SynthesisOptions;
 import io.casehub.connectors.voice.model.SynthesisResult;
 import io.casehub.connectors.voice.model.TranscriptionOptions;
@@ -230,11 +231,7 @@ class VoiceRoundTripTest {
     private RoutingVoicePlatformService buildRouting() {
         var platformService = new VoicePlatformService(List.of(platform));
         var registry        = new io.casehub.connectors.voice.spi.InMemoryVoiceRegistry();
-        var loader          = new io.casehub.connectors.voice.config.VoiceManifestLoader();
-        var manifest        = loader.load(null, null);
-        var processor       = new io.casehub.connectors.voice.config.VoiceManifestProcessor(registry);
-        var result          = processor.process(manifest);
         return new RoutingVoicePlatformService(
-                platformService, registry, result.aliases(), manifest.defaults());
+                platformService, registry, Map.of(), new VoiceManifestDefaults(platform.id(), platform.id()));
     }
 }
