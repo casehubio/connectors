@@ -31,7 +31,7 @@ public class DialClient {
     private final String apiKey;
 
     public DialClient(String apiKey) {
-        this(apiKey, "https://api.getdial.ai/v1");
+        this(apiKey, "https://api.getdial.ai/api/v1");
     }
 
     DialClient(String apiKey, String baseUrl) {
@@ -72,7 +72,12 @@ public class DialClient {
     }
 
     public void stopCall(String callId) {
-        post("/calls/" + URLEncoder.encode(callId, StandardCharsets.UTF_8) + "/stop", "{}", Void.class);
+        delete("/calls/" + URLEncoder.encode(callId, StandardCharsets.UTF_8));
+    }
+
+    public void transferCall(String callId, String transferTo) {
+        var json = "{\"to\":" + q(transferTo) + "}";
+        post("/calls/" + URLEncoder.encode(callId, StandardCharsets.UTF_8) + "/transfer", json, Void.class);
     }
 
     public List<DialNumber> listNumbers() {
@@ -104,6 +109,24 @@ public class DialClient {
             throw e;
         } catch (Exception e) {
             throw new RuntimeException("Dial API POST failed: " + path + " — " + e.getMessage(), e);
+        }
+    }
+
+    private void delete(String path) {
+        try {
+            var request = HttpRequest.newBuilder()
+                    .uri(URI.create(baseUrl + path))
+                    .timeout(Duration.ofSeconds(10))
+                    .header("Authorization", "Bearer " + apiKey)
+                    .DELETE()
+                    .build();
+
+            var response = HttpHelper.CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+            checkStatus(path, response);
+        } catch (RuntimeException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RuntimeException("Dial API DELETE failed: " + path + " — " + e.getMessage(), e);
         }
     }
 

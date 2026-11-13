@@ -125,8 +125,7 @@ public class DialMobilePlatform implements MobilePlatform {
 
         @Override
         public void transfer(String callId, String transferTo) {
-            throw new UnsupportedCapabilityException("transfer", "VoiceCallControl.Transfer",
-                    "dial", List.of("Sms", "VoiceCall", "VoiceCallControl.HangUp", "Messaging", "NumberInfo"));
+            client.transferCall(callId, transferTo);
         }
     }
 
