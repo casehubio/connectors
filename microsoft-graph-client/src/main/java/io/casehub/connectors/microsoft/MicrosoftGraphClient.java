@@ -156,7 +156,10 @@ public class MicrosoftGraphClient {
         }
         String nextLink = json.containsKey("@odata.nextLink")
                 ? json.getString("@odata.nextLink") : null;
-        return new Page<>(List.copyOf(items), nextLink, nextLink != null);
+        String deltaLink = json.containsKey("@odata.deltaLink")
+                ? json.getString("@odata.deltaLink") : null;
+        String resultCursor = nextLink != null ? nextLink : deltaLink;
+        return new Page<>(List.copyOf(items), resultCursor, nextLink != null);
     }
 
     private HttpRequest.Builder jsonRequest(String path, String accessToken) {

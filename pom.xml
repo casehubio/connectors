@@ -40,6 +40,7 @@ Zero heavy dependencies — HTTP-based connectors use java.net.http only.</descr
     <module>calendar-spi</module>
     <module>calendar-ref</module>
     <module>calendar-google</module>
+    <module>calendar-microsoft</module>
     <module>bank-spi</module>
     <module>bank-ref</module>
     <module>bank-truelayer</module>
