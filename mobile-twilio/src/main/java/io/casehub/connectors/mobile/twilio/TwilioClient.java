@@ -28,15 +28,19 @@ public class TwilioClient {
     private final String credentials;
 
     public TwilioClient(String accountSid, String authToken) {
-        this(accountSid, authToken, "https://api.twilio.com/2010-04-01");
+        this(accountSid, accountSid, authToken, "https://api.twilio.com/2010-04-01");
     }
 
-    TwilioClient(String accountSid, String authToken, String baseUrl) {
+    public TwilioClient(String accountSid, String authUser, String authSecret) {
+        this(accountSid, authUser, authSecret, "https://api.twilio.com/2010-04-01");
+    }
+
+    TwilioClient(String accountSid, String authUser, String authSecret, String baseUrl) {
         this.accountSid = accountSid;
-        this.authToken = authToken;
+        this.authToken = authSecret;
         this.baseUrl = baseUrl;
         this.credentials = Base64.getEncoder()
-                .encodeToString((accountSid + ":" + authToken).getBytes(StandardCharsets.UTF_8));
+                .encodeToString((authUser + ":" + authSecret).getBytes(StandardCharsets.UTF_8));
     }
 
     public JsonNode sendMessage(String to, String from, String body) {

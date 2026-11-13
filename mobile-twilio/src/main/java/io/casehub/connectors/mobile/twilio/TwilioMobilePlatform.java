@@ -226,9 +226,9 @@ public class TwilioMobilePlatform implements MobilePlatform {
     static PhoneNumber mapPhoneNumber(JsonNode node) {
         var caps = EnumSet.noneOf(NumberCapability.class);
         var capabilities = node.path("capabilities");
-        if (capabilities.path("sms").asBoolean(false)) caps.add(NumberCapability.SMS);
+        if (capabilities.path("SMS").asBoolean(capabilities.path("sms").asBoolean(false))) caps.add(NumberCapability.SMS);
         if (capabilities.path("voice").asBoolean(false)) caps.add(NumberCapability.VOICE);
-        if (capabilities.path("mms").asBoolean(false)) caps.add(NumberCapability.SMS);
+        if (capabilities.path("MMS").asBoolean(capabilities.path("mms").asBoolean(false))) caps.add(NumberCapability.SMS);
         return new PhoneNumber(
                 node.path("sid").asText(null),
                 node.path("phone_number").asText(null),
