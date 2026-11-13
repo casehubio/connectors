@@ -222,13 +222,14 @@ public class DiscordGateway {
                 .setSsl(ssl)
                 .setURI(path);
 
-        webSocket = httpClient.webSocket(opts)
-                .toCompletionStage().toCompletableFuture().join();
-
-        WebSocket ws = webSocket;
-        ws.textMessageHandler(this::handleMessage);
-        ws.closeHandler(v -> closeFuture.complete(null));
-        ws.exceptionHandler(err -> closeFuture.completeExceptionally(err));
+        httpClient.webSocket(opts).map(ws -> {
+            // Install handlers on the event loop before the server can deliver HELLO.
+            webSocket = ws;
+            ws.textMessageHandler(this::handleMessage);
+            ws.closeHandler(v -> closeFuture.complete(null));
+            ws.exceptionHandler(err -> closeFuture.completeExceptionally(err));
+            return ws;
+        }).toCompletionStage().toCompletableFuture().join();
 
         // Block until connection closes
         try {

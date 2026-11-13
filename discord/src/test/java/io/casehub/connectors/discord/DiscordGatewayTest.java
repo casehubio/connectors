@@ -18,6 +18,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.RepeatedTest;
 
 import io.casehub.connectors.discord.test.EmbeddedDiscordGateway;
 import org.junit.jupiter.api.Timeout;
@@ -51,7 +52,7 @@ class DiscordGatewayTest {
         server.stop();
     }
 
-    @Test
+    @RepeatedTest(5)
     void connectAndIdentify() throws Exception {
         CountDownLatch readyLatch = new CountDownLatch(1);
         AtomicReference<String> readyEventType = new AtomicReference<>();
