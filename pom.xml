@@ -79,6 +79,7 @@ Zero heavy dependencies — HTTP-based connectors use java.net.http only.</descr
     <module>voice-pipeline-steps</module>
     <module>mobile-spi</module>
     <module>mobile-ref</module>
+    <module>mobile-dial</module>
     <module>graphql</module>
     <module>connectors-spring</module>
     <module>integration-tests</module>
