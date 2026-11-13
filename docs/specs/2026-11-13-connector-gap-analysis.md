@@ -245,6 +245,7 @@ Surfaced by cross-referencing Zapier (business categories) with n8n (developer c
 | **MarketingPlatform** | Mailchimp #10 overall; 1,255 apps | — | Mailchimp or SendGrid | Campaigns, Audiences, Templates, Sends, Analytics | SendGrid (transactional) vs Mailchimp (campaigns) may be two sub-interfaces |
 | **WeatherPlatform** | — | 5.0K | OpenWeatherMap | CurrentConditions, Forecast, Alerts, Historical | Multiple providers (OWM, AccuWeather, Tomorrow.io, Open-Meteo) |
 | **HrPlatform** | BambooHR #20 premium; 315 apps | — | BambooHR | Employees, TimeOff, Directory, Onboarding | Enterprise category, barely exists in n8n |
+| **MeetingsPlatform** | — | — | Microsoft Teams or Zoom | Meetings, Participants, Recordings, Transcripts | Teams meetings via Graph SDK (#211), Zoom, Google Meet, Webex |
 | **CmsPlatform** | WordPress in top 22; 263 apps | 43.0K | WordPress | Posts, Pages, Media, Categories, Tags | WordPress, Webflow, Ghost, Strapi |
 
 ### Coverage Heat Map — Before and After
@@ -279,6 +280,7 @@ Surfaced by cross-referencing Zapier (business categories) with n8n (developer c
 | Weather | **RED** | — |
 | HR | **RED** | — |
 | CMS | **RED** | — |
+| Meetings/Video | **RED** | — |
 
 **After Phase 1 — One provider per red category + second provider for yellows:**
 
