@@ -19,7 +19,7 @@ import java.util.logging.Logger;
 @ApplicationScoped
 public class MicrosoftGraphClient {
 
-    static final String BASE_URL = "https://graph.microsoft.com/v1.0";
+    public static final String BASE_URL = "https://graph.microsoft.com/v1.0";
     private static final int MAX_PAGES = 50;
     private static final Logger LOG = Logger.getLogger(MicrosoftGraphClient.class.getName());
 
@@ -104,6 +104,11 @@ public class MicrosoftGraphClient {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+
+    public HttpResponse<String> send(HttpRequest request) {
+        return doSend(request);
     }
 
     public HttpResponse<byte[]> getRaw(String path, String accessToken) {
