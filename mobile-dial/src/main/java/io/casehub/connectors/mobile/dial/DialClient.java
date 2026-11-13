@@ -64,7 +64,7 @@ public class DialClient {
     }
 
     public DialCall getCall(String callId) {
-        return get("/calls/" + callId, DialCall.class);
+        return get("/calls/" + URLEncoder.encode(callId, StandardCharsets.UTF_8), DialCall.class);
     }
 
     public List<DialCall> listCalls() {
@@ -72,7 +72,7 @@ public class DialClient {
     }
 
     public void stopCall(String callId) {
-        post("/calls/" + callId + "/stop", "{}", Void.class);
+        post("/calls/" + URLEncoder.encode(callId, StandardCharsets.UTF_8) + "/stop", "{}", Void.class);
     }
 
     public List<DialNumber> listNumbers() {

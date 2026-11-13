@@ -64,7 +64,7 @@ public class TwilioClient {
     }
 
     public JsonNode getCall(String callSid) {
-        return get("/Accounts/" + accountSid + "/Calls/" + callSid + ".json");
+        return get("/Accounts/" + accountSid + "/Calls/" + enc(callSid) + ".json");
     }
 
     public JsonNode listCalls() {
@@ -73,7 +73,7 @@ public class TwilioClient {
 
     public JsonNode updateCall(String callSid, String status) {
         var formBody = "Status=" + enc(status);
-        return postForm("/Accounts/" + accountSid + "/Calls/" + callSid + ".json", formBody);
+        return postForm("/Accounts/" + accountSid + "/Calls/" + enc(callSid) + ".json", formBody);
     }
 
     public JsonNode listIncomingPhoneNumbers() {
