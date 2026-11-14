@@ -12,11 +12,12 @@ import io.casehub.connectors.commerce.model.ProductDetail;
 import io.casehub.connectors.commerce.model.ProductReview;
 import io.casehub.connectors.commerce.model.ShoppingCart;
 import io.casehub.platform.api.confirmation.RequiresConfirmation;
+import io.casehub.connectors.PlatformExtensible;
 import io.casehub.platform.simulation.SimulationEligible;
 
 @SimulationEligible(name = "commerce-platform",
     capabilities = {"productSearch", "productDetails", "cart", "checkout", "orderTracking"})
-public interface CommercePlatform {
+public interface CommercePlatform extends PlatformExtensible {
 
     String id();
 

@@ -8,13 +8,14 @@ import io.casehub.connectors.document.model.DocumentMetadata;
 import io.casehub.connectors.document.model.DocumentSummary;
 import io.casehub.connectors.document.model.Folder;
 import io.casehub.platform.api.confirmation.RequiresConfirmation;
+import io.casehub.connectors.PlatformExtensible;
 import io.casehub.platform.simulation.SimulationEligible;
 
 import java.util.List;
 
 @SimulationEligible(name = "document-platform",
     capabilities = {"fileOperations", "folderOperations", "searchOperations", "sharingOperations"})
-public interface DocumentPlatform {
+public interface DocumentPlatform extends PlatformExtensible {
 
     String id();
 

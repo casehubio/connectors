@@ -13,6 +13,8 @@
     <file url="file://$PROJECT_DIR$/bank-truelayer/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/calendar-google/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/calendar-google/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/calendar-microsoft/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/calendar-microsoft/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/calendar-ref/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/calendar-ref/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/calendar-spi/src/main/java" charset="UTF-8" />
@@ -29,6 +31,8 @@
     <file url="file://$PROJECT_DIR$/chat-slack/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/chat-spi/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/chat-spi/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/chat-teams/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/chat-teams/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/commerce-amazon/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/commerce-amazon/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/commerce-ref/src/main/java" charset="UTF-8" />
@@ -59,6 +63,8 @@
     <file url="file://$PROJECT_DIR$/discord/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/document-google/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/document-google/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/document-microsoft/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/document-microsoft/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/document-ref/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/document-ref/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/document-spi/src/main/java" charset="UTF-8" />
@@ -69,6 +75,8 @@
     <file url="file://$PROJECT_DIR$/email-google/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/email-inbound/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/email-inbound/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/email-microsoft/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/email-microsoft/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/email-ref/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/email-ref/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/email-spi/src/main/java" charset="UTF-8" />
@@ -93,6 +101,16 @@
     <file url="file://$PROJECT_DIR$/location-spi/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/mcp/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/mcp/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/microsoft-graph-client/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/microsoft-graph-client/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/mobile-dial/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/mobile-dial/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/mobile-ref/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/mobile-ref/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/mobile-spi/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/mobile-spi/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/mobile-twilio/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/mobile-twilio/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/notification-bridge/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/notification-bridge/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/playbooks/src/main/java" charset="UTF-8" />
@@ -519,6 +537,9 @@
     <file url="file://$PROJECT_DIR$/../platform/mcp-spring/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/mcp-spring/src/main/playbooks" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/mcp-spring/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/mcp-standalone-test/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/mcp-standalone-test/src/main/playbooks" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/mcp-standalone-test/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/mcp/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/mcp/src/main/playbooks" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/mcp/src/main/resources" charset="UTF-8" />

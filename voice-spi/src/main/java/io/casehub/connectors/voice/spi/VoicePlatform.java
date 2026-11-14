@@ -1,10 +1,11 @@
 package io.casehub.connectors.voice.spi;
 
+import io.casehub.connectors.PlatformExtensible;
 import io.casehub.platform.simulation.SimulationEligible;
 
 @SimulationEligible(name = "voice-platform",
     capabilities = {"speechToText", "textToSpeech"})
-public interface VoicePlatform {
+public interface VoicePlatform extends PlatformExtensible {
 
     String id();
 

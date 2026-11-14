@@ -14,13 +14,14 @@ import io.casehub.connectors.mobile.model.SmsMessage;
 import io.casehub.connectors.mobile.model.SmsOptions;
 import io.casehub.connectors.mobile.model.TranscriptionResult;
 import io.casehub.connectors.mobile.model.VoicemailMessage;
+import io.casehub.connectors.PlatformExtensible;
 import io.casehub.platform.simulation.SimulationEligible;
 
 import java.util.List;
 
 @SimulationEligible(name = "mobile-platform",
         capabilities = {"sms", "voiceCall", "voiceCallControl", "voicemail", "messaging", "numberInfo"})
-public interface MobilePlatform {
+public interface MobilePlatform extends PlatformExtensible {
 
     String id();
 

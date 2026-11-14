@@ -12,11 +12,12 @@ import io.casehub.connectors.travel.model.TransportBookingConfirmation;
 import io.casehub.connectors.travel.model.TransportBookingRequest;
 import io.casehub.connectors.travel.model.TransportMode;
 import io.casehub.connectors.travel.model.TransportOption;
+import io.casehub.connectors.PlatformExtensible;
 import io.casehub.platform.simulation.SimulationEligible;
 
 @SimulationEligible(name = "travel-platform",
     capabilities = {"transportSearch", "transportBooking", "accommodationSearch", "accommodationBooking"})
-public interface TravelPlatform {
+public interface TravelPlatform extends PlatformExtensible {
 
     String id();
 

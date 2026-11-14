@@ -11,11 +11,12 @@ import io.casehub.connectors.project.model.Milestone;
 import io.casehub.connectors.project.model.OwnerRepo;
 import io.casehub.connectors.project.model.ProjectBoard;
 import io.casehub.connectors.project.model.ProjectColumn;
+import io.casehub.connectors.PlatformExtensible;
 import io.casehub.platform.simulation.SimulationEligible;
 
 @SimulationEligible(name = "project-platform",
     capabilities = {"issues", "labels", "milestones", "comments", "boards"})
-public interface ProjectPlatform {
+public interface ProjectPlatform extends PlatformExtensible {
 
     String id();
 

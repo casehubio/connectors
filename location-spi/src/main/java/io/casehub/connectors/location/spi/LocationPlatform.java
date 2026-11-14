@@ -10,11 +10,12 @@ import io.casehub.connectors.location.model.Place;
 import io.casehub.connectors.location.model.PlaceDetail;
 import io.casehub.connectors.location.model.Route;
 import io.casehub.connectors.location.model.TravelMode;
+import io.casehub.connectors.PlatformExtensible;
 import io.casehub.platform.simulation.SimulationEligible;
 
 @SimulationEligible(name = "location-platform",
     capabilities = {"placeSearch", "placeDetails", "geocoding", "directions"})
-public interface LocationPlatform {
+public interface LocationPlatform extends PlatformExtensible {
 
     String id();
 

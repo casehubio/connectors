@@ -9,11 +9,12 @@ import io.casehub.connectors.SyncResult;
 import io.casehub.connectors.contacts.model.Contact;
 import io.casehub.connectors.contacts.model.Group;
 import io.casehub.platform.api.confirmation.RequiresConfirmation;
+import io.casehub.connectors.PlatformExtensible;
 import io.casehub.platform.simulation.SimulationEligible;
 
 @SimulationEligible(name = "contacts-platform",
     capabilities = {"contactRead", "groupRead", "contactWrite"})
-public interface ContactsPlatform {
+public interface ContactsPlatform extends PlatformExtensible {
 
     String id();
 

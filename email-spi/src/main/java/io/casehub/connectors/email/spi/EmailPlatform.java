@@ -8,10 +8,11 @@ import io.casehub.connectors.PageRequest;
 import io.casehub.connectors.email.model.EmailMessage;
 import io.casehub.connectors.email.model.EmailSummary;
 import io.casehub.connectors.email.model.Mailbox;
+import io.casehub.connectors.PlatformExtensible;
 import io.casehub.platform.simulation.SimulationEligible;
 
 @SimulationEligible(name = "email-platform")
-public interface EmailPlatform {
+public interface EmailPlatform extends PlatformExtensible {
 
     String id();
 

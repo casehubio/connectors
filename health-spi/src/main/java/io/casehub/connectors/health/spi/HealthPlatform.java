@@ -12,11 +12,12 @@ import io.casehub.connectors.health.model.MedicalRecord;
 import io.casehub.connectors.health.model.Provider;
 import io.casehub.connectors.health.model.ProviderId;
 import io.casehub.connectors.health.model.RecordType;
+import io.casehub.connectors.PlatformExtensible;
 import io.casehub.platform.simulation.SimulationEligible;
 
 @SimulationEligible(name = "health-platform",
     capabilities = {"providerSearch", "appointmentBooking", "medicalRecords"})
-public interface HealthPlatform {
+public interface HealthPlatform extends PlatformExtensible {
 
     String id();
 

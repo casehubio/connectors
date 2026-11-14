@@ -6,6 +6,7 @@ import io.casehub.connectors.web.model.FetchResult;
 import io.casehub.connectors.web.model.ImageProcessingResult;
 import io.casehub.connectors.web.model.InterventionRequest;
 import io.casehub.connectors.web.model.ParseResult;
+import io.casehub.connectors.PlatformExtensible;
 import io.casehub.platform.simulation.SimulationEligible;
 
 import java.util.List;
@@ -13,7 +14,7 @@ import java.util.List;
 @SimulationEligible(name = "web-platform",
     capabilities = {"fetch", "parse", "imageCapture", "documentParsing",
         "interventionManagement", "sessionTransfer"})
-public interface WebPlatform {
+public interface WebPlatform extends PlatformExtensible {
 
     String id();
 
