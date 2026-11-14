@@ -452,6 +452,7 @@ Full protocol docs: `docs/protocols/connectors/`
 | Connector Infrastructure | End-to-end message transport for the casehubio platform — outbound delivery, inbound reception, MCP agent access, CloudEvent bridging | 6 | ✅ Complete |
 | Chat Platform | Structured interaction with chat systems — capability-composed SPI, graceful degradation, implementations for Slack/Discord/IRC, unified MCP surface, demo UI | 4 | 🟢 Active |
 | Voice & Real-time Inbound | Voice processing SPI, real-time inbound channels (Gmail push, WhatsApp media), YAML playbook integration tests | 1 | 🟢 Active |
+| Microsoft Graph Providers | Shared Graph client, four platform SPI implementations (Email, Calendar, Document, Chat) backed by Microsoft 365 | 1 | ✅ Complete |
 
 ### §9.2 Chapter Index
 
@@ -468,6 +469,7 @@ Full protocol docs: `docs/protocols/connectors/`
 | 9 | [Slack ChatPlatform + MCP Consolidation](#chapter-9--slack-chatplatform--mcp-consolidation) | Chat Platform | + L9, L10; L5 High, L7 Low | High | ✅ |
 | 10 | [Chat Demo](#chapter-10--chat-demo) | Chat Platform | + L11; L7 Low | High | ✅ |
 | 11 | [Voice Platform + Real-time Inbound + Playbooks](#chapter-11--voice-platform--real-time-inbound--playbooks) | Voice & Real-time Inbound | + L15, L16, L17; L2 Medium | High | ✅ |
+| 12 | [Microsoft Graph Providers](#chapter-12--microsoft-graph-providers) | Microsoft Graph Providers | + L18, L19, L20, L21, L22; L7 Low | High | ✅ |
 
 **Layer × Chapter Matrix**
 
@@ -495,6 +497,7 @@ Full protocol docs: `docs/protocols/connectors/`
 - C7 before C8: Discord ChatPlatform implements the SPI established in C7; `discord` HTTP client is new but `chat-discord` depends on `chat-spi`
 - C7+C8 before C9: Slack ChatPlatform + MCP consolidation required chat-spi (C7) and motivated by feature parity with Discord (C8); MCP tools unified across all platforms
 - C7 before C10: Chat Demo depends on `chat-spi` and `chat-ref` (C7) for its backend
+- C7 before C12: Microsoft Graph providers implement platform SPIs (ChatPlatform, EmailPlatform, CalendarPlatform, DocumentPlatform) established in or adjacent to C7's patterns
 
 ```mermaid
 flowchart LR
@@ -507,6 +510,7 @@ flowchart LR
   C7 --> C8["C8: Discord\n+L8"]
   C7 --> C10["C10: Chat Demo\n+L11"]
   C8 --> C9["C9: Slack+MCP\n+L9,L10"]
+  C7 --> C12["C12: MS Graph\n+L18-L22"]
   style C1 fill:#90EE90,color:#000
   style C2 fill:#90EE90,color:#000
   style C3 fill:#90EE90,color:#000
@@ -517,6 +521,7 @@ flowchart LR
   style C8 fill:#90EE90,color:#000
   style C9 fill:#90EE90,color:#000
   style C10 fill:#90EE90,color:#000
+  style C12 fill:#90EE90,color:#000
 ```
 
 ---
@@ -728,6 +733,42 @@ Profile-gated demo chat service with SQLite persistence, REST/WebSocket endpoint
 |---|---|
 | L7 — Chat Platform SPI | Low (demo validates SPI contract from consumer perspective) |
 | L11 — Chat Demo | High |
+
+---
+
+#### Chapter 12 — Microsoft Graph Providers
+
+**Journey:** Microsoft Graph Providers | **Sequence:** 1 of 1 | **Status:** ✅
+**Delivered:** 2026-11-13 | **Issues:** #211 | **Blog:** `blog/2026-11-13-mdp02-one-client-four-platforms.md`
+
+**What this delivers**
+Four platform SPI implementations backed by Microsoft Graph REST API v1.0, sharing a single `MicrosoftGraphClient` foundation module. Email (Outlook Mail), Calendar (Outlook Calendar with delta sync), Document (OneDrive + SharePoint with two CDI beans, SSRF defense, resumable upload), and Chat (Teams with 8 native capabilities and dual delegated/application token model).
+
+- **MicrosoftGraphClient** (`microsoft-graph-client`) — raw HTTP via `HttpHelper.CLIENT`; `HttpSender` interface for test injection; OData pagination with `@odata.nextLink`/`@odata.deltaLink`; `GraphErrorHandler` for Graph-specific 403/429 mapping; `TokenRetry` for 401 re-resolve
+- **Email-Microsoft** (`email-microsoft`) — `MicrosoftEmailPlatform` implements EmailPlatform SPI against Graph Mail API; folder→mailbox mapping; OData pagination; HTML body extraction
+- **Calendar-Microsoft** (`calendar-microsoft`) — `MicrosoftCalendarPlatform` implements CalendarPlatform SPI; delta sync via `@odata.deltaLink` stored in `Page.nextCursor`; `CalendarMapper` maps Graph event→CalendarEvent with `EventTiming.Timed`/`AllDay` discrimination
+- **Document-Microsoft** (`document-microsoft`) — `MicrosoftDrivePlatform` implements DocumentPlatform SPI with all 4 capability sub-interfaces; two CDI beans via `DocumentMicrosoftBeans`: `microsoft-onedrive` (`/me/drive`) and `microsoft-sharepoint` (`/sites/{siteId}/drive`, degraded when unconfigured); SSRF defense on download 302 redirects via configurable CDN allow-list; resumable upload for files >4MB; delta sync via `@odata.deltaLink`
+- **Chat-Teams** (`chat-teams`) — `TeamsChatPlatform` with 8 native capabilities (Messaging, Threading, Discovery, Presence, Members, ChannelManagement, MemberManagement, MessageHistory); Reactions and Commands auto-degraded via Builder; dual delegated/application token model; compound `teamId:channelId` channel IDs; configurable default team for channel creation; markdown→HTML and RichCard→Adaptive Card in message body
+
+**Key decisions**
+
+- **Shared client, not shared base class** — all four platform implementations compose `MicrosoftGraphClient` rather than extending a common abstract class; follows the composition pattern established by ChatPlatform.Builder
+- **Two CDI beans for Document** — `microsoft-onedrive` and `microsoft-sharepoint` are separate named beans from one module; SharePoint degrades gracefully when `site-id` is not configured
+- **Dual token model for Teams** — delegated tokens for user-scoped operations (listJoinedTeams, presence), application tokens for tenant-scoped operations (sendMessage, messageHistory); `resolveApplicationToken` uses `APPLICATION_ACTOR` sentinel
+- **`HttpSender` interface for testability** — `MicrosoftGraphClient` accepts an `HttpSender` functional interface; all tests use `StubHttpResponse` stubs via this interface; no mocking frameworks required
+- **OData `@odata.deltaLink` for incremental sync** — Calendar and Document platforms store delta links in `Page.nextCursor`/`SyncResult.syncToken`; Graph API returns 410 → `SyncTokenExpiredException` for expired tokens
+
+**Key files**
+
+- `microsoft-graph-client/src/main/java/.../MicrosoftGraphClient.java` — shared Graph HTTP client
+- `microsoft-graph-client/src/main/java/.../GraphErrorHandler.java` — status code → exception mapping
+- `microsoft-graph-client/src/main/java/.../TokenRetry.java` — 401 retry with token re-resolve
+- `email-microsoft/src/main/java/.../MicrosoftEmailPlatform.java` — EmailPlatform implementation
+- `calendar-microsoft/src/main/java/.../MicrosoftCalendarPlatform.java` — CalendarPlatform with delta sync
+- `document-microsoft/src/main/java/.../MicrosoftDrivePlatform.java` — DocumentPlatform (4 capabilities)
+- `document-microsoft/src/main/java/.../DocumentMicrosoftBeans.java` — OneDrive + SharePoint CDI producer
+- `chat-teams/src/main/java/.../TeamsChatPlatform.java` — 8-capability ChatPlatform
+- `chat-teams/src/main/java/.../TeamsMapper.java` — markdown→HTML, RichCard→Adaptive Card
 
 ---
 
