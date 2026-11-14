@@ -598,6 +598,20 @@ All MCP tools call `ConnectorMeshBridge.notifyDelivered()` after successful deli
 
 `McpContentSanitizer` strips ASCII control characters and truncates to 500 chars before passing content to `ConnectorMeshBridge`.
 
+### Vendor Extensions -- `PlatformExtensible`
+
+All platform SPIs extend `PlatformExtensible`, which provides a type-safe `as()` method for accessing vendor-specific capabilities that don't belong in the general SPI:
+
+```java
+documentPlatform.as(MicrosoftDriveExtensions.class).ifPresent(msft ->
+    msft.sharePoint().listSites()
+);
+```
+
+`as()` returns `Optional.empty()` for providers that don't implement the extension. It works correctly through CDI proxies and simulation wrappers -- no `instanceof` checks needed.
+
+Extension interfaces live in provider modules (e.g. `document-microsoft`), not in the SPI module. Consumers depend on the provider module only when they need vendor-specific features.
+
 ---
 
 ## Configuration

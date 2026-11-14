@@ -566,6 +566,30 @@ Depends on: `voice-spi`, `voice-ref`, `voice-pipeline-steps`, `bank-spi`, `bank-
 
 ---
 
+## Creating Vendor Extensions
+
+When a provider exposes capabilities beyond the general SPI (e.g. SharePoint site discovery on Microsoft, Focused Inbox on Outlook), use the `PlatformExtensible.as()` pattern rather than adding vendor-specific methods to the SPI.
+
+1. Define an extension interface in the provider module:
+   ```java
+   public interface MicrosoftDriveExtensions {
+       SharePointOperations sharePoint();
+   }
+   ```
+
+2. Implement both the SPI and the extension on the provider class:
+   ```java
+   public class MicrosoftDocumentPlatform implements DocumentPlatform, MicrosoftDriveExtensions {
+       // SPI methods + extension methods
+   }
+   ```
+
+Consumers access extensions via `platform.as(ExtensionType.class)`. The `as()` default method on `PlatformExtensible` uses `isInstance(this)` -- works through CDI proxies and simulation decorators (the processor generates correct delegation for inherited methods).
+
+Extension interfaces never go in the SPI module. If both Google and Microsoft support a capability, it belongs as a capability sub-interface on the SPI itself (separate issue).
+
+---
+
 ## Cross-Repo Integration
 
 These are NOT modules in this repo but are relevant for understanding the ecosystem:
