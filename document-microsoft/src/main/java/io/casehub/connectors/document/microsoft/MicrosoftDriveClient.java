@@ -211,11 +211,10 @@ class MicrosoftDriveClient {
         if (host == null) {
             throw new IllegalStateException("Blocked redirect to URL with no host: " + url);
         }
-        host = host.toLowerCase();
-        String  h       = host;
-        boolean allowed = allowedCdnSuffixes.stream().anyMatch(h::endsWith);
+        String lowerHost = host.toLowerCase();
+        boolean allowed = allowedCdnSuffixes.stream().anyMatch(lowerHost::endsWith);
         if (!allowed) {
-            throw new IllegalStateException("Blocked redirect to untrusted host: " + host);
+            throw new IllegalStateException("Blocked redirect to untrusted host: " + lowerHost);
         }
     }
 

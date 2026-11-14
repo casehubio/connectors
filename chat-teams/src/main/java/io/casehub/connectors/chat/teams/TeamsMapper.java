@@ -137,9 +137,9 @@ final class TeamsMapper {
     }
 
     private static String escapeHtml(String text) {
-        return text.replace("&", "&")
-                   .replace("<", "<")
-                   .replace(">", ">");
+        return text.replace("&", "&amp;")
+                   .replace("<", "&lt;")
+                   .replace(">", "&gt;");
     }
 
     private static String toAdaptiveCardJson(RichCard card) {

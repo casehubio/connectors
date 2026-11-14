@@ -167,7 +167,7 @@ class TeamsMapperTest {
         var content = new ChatContent("fallback", "Use <div> & \"quotes\"", List.of(), List.of());
         var body    = TeamsMapper.toMessageBody(content);
         var html    = body.getJsonObject("body").getString("content");
-        assertThat(html).contains("<div>").contains("&");
+        assertThat(html).contains("&lt;div&gt;").contains("&amp;");
     }
 
     @Test
