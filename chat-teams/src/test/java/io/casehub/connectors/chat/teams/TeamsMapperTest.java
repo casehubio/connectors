@@ -1,13 +1,16 @@
 package io.casehub.connectors.chat.teams;
 
+import io.casehub.connectors.chat.model.ChatContent;
 import io.casehub.connectors.chat.model.PresenceStatus;
+import io.casehub.connectors.chat.model.RichCard;
 import jakarta.json.Json;
-import jakarta.json.JsonObject;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
+import java.util.List;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class TeamsMapperTest {
 
@@ -111,6 +114,74 @@ class TeamsMapperTest {
         assertThatThrownBy(() -> TeamsMapper.parseTeamAndChannel("no-colon"))
                 .isInstanceOf(IllegalArgumentException.class);
     }
+
+    @Test
+    void toMessageBodyPlainText() {
+        var content = new ChatContent("Hello world");
+        var body    = TeamsMapper.toMessageBody(content);
+        assertThat(body.getJsonObject("body").getString("contentType")).isEqualTo("text");
+        assertThat(body.getJsonObject("body").getString("content")).isEqualTo("Hello world");
+        assertThat(body.containsKey("attachments")).isFalse();
+    }
+
+    @Test
+    void toMessageBodyWithMarkdown() {
+        var content = new ChatContent("fallback", "**bold** and *italic*", List.of(), List.of());
+        var body    = TeamsMapper.toMessageBody(content);
+        assertThat(body.getJsonObject("body").getString("contentType")).isEqualTo("html");
+        assertThat(body.getJsonObject("body").getString("content"))
+                .contains("<strong>bold</strong>")
+                .contains("<em>italic</em>");
+    }
+
+    @Test
+    void toMessageBodyWithRichCard() {
+        var card = RichCard.builder()
+                           .title("Deploy Report")
+                           .description("All services healthy")
+                           .url("https://example.com/report")
+                           .fields(List.of(
+                                   new RichCard.Field("Status", "Green", true),
+                                   new RichCard.Field("Region", "EU-West", true)))
+                           .build();
+        var content = new ChatContent("fallback", null, List.of(), List.of(card));
+        var body    = TeamsMapper.toMessageBody(content);
+        assertThat(body.getJsonObject("body").getString("contentType")).isEqualTo("html");
+        assertThat(body.getJsonObject("body").getString("content"))
+                .contains("<attachment id=\"card-0\">");
+        var attachments = body.getJsonArray("attachments");
+        assertThat(attachments).hasSize(1);
+        assertThat(attachments.getJsonObject(0).getString("contentType"))
+                .isEqualTo("application/vnd.microsoft.card.adaptive");
+        String cardJson = attachments.getJsonObject(0).getString("content");
+        assertThat(cardJson)
+                .contains("AdaptiveCard")
+                .contains("Deploy Report")
+                .contains("All services healthy")
+                .contains("FactSet")
+                .contains("Action.OpenUrl");
+    }
+
+    @Test
+    void toMessageBodyMarkdownEscapesHtml() {
+        var content = new ChatContent("fallback", "Use <div> & \"quotes\"", List.of(), List.of());
+        var body    = TeamsMapper.toMessageBody(content);
+        var html    = body.getJsonObject("body").getString("content");
+        assertThat(html).contains("<div>").contains("&");
+    }
+
+    @Test
+    void markdownToHtmlConvertsLinks() {
+        String result = TeamsMapper.markdownToHtml("[click here](https://example.com)");
+        assertThat(result).isEqualTo("<a href=\"https://example.com\">click here</a>");
+    }
+
+    @Test
+    void markdownToHtmlConvertsCodeAndNewlines() {
+        String result = TeamsMapper.markdownToHtml("run `npm install`\nthen start");
+        assertThat(result).contains("<code>npm install</code>").contains("<br>");
+    }
+
 
     private static PresenceStatus presence(String availability) {
         var json = Json.createObjectBuilder()
