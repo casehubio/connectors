@@ -4,10 +4,12 @@ import io.casehub.connectors.PageRequest;
 import io.casehub.connectors.SyncRequest;
 import io.casehub.connectors.document.spi.DocumentPlatform;
 import io.casehub.connectors.microsoft.MicrosoftGraphClient;
-import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+
+import java.net.http.HttpRequest;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
@@ -209,6 +211,137 @@ class MicrosoftDrivePlatformTest {
             assertThat(link).isEqualTo("https://1drv.ms/b/s!shared-link");
         }
     }
+
+    @Nested
+    class ResumableUploadTest {
+
+        @Test
+        void singleChunkResumableUpload() {
+            var requests = new java.util.ArrayList<HttpRequest>();
+            var graph = new MicrosoftGraphClient(request -> {
+                requests.add(request);
+                String uri = request.uri().toString();
+                if (uri.contains("createUploadSession") && request.method().equals("POST")) {
+                    return new StubHttpResponse(200, """
+                                                     {"uploadUrl":"https://upload.example.com/session-1"}""");
+                }
+                if (uri.equals("https://upload.example.com/session-1") && request.method().equals("PUT")) {
+                    return new StubHttpResponse(200,
+                                                fileItemJson("file-big", "large.bin", "folder-1",
+                                                             "application/octet-stream", 4194305));
+                }
+                return new StubHttpResponse(500, "unexpected request");
+            });
+
+            var    client  = new MicrosoftDriveClient(graph, "/me/drive");
+            byte[] content = new byte[MicrosoftDriveClient.SIMPLE_UPLOAD_LIMIT + 1];
+            var result = client.upload("folder-1", "large.bin",
+                                       "application/octet-stream", content, "test-token");
+
+            assertThat(result.getString("id")).isEqualTo("file-big");
+
+            var sessionReqs = requests.stream()
+                                      .filter(r -> r.uri().toString().contains("createUploadSession")).toList();
+            assertThat(sessionReqs).hasSize(1);
+            assertThat(sessionReqs.get(0).method()).isEqualTo("POST");
+
+            var chunkReqs = requests.stream()
+                                    .filter(r -> r.uri().toString().equals("https://upload.example.com/session-1")).toList();
+            assertThat(chunkReqs).hasSize(1);
+            assertThat(chunkReqs.get(0).headers().firstValue("Content-Range"))
+                    .hasValue("bytes 0-" + (content.length - 1) + "/" + content.length);
+        }
+
+        @Test
+        void multiChunkResumableUpload() {
+            int chunkSize   = 16 * 320 * 1024;
+            int totalSize   = chunkSize + 1;
+            var chunkRanges = new java.util.ArrayList<String>();
+            var graph = new MicrosoftGraphClient(request -> {
+                String uri = request.uri().toString();
+                if (uri.contains("createUploadSession")) {
+                    return new StubHttpResponse(200, """
+                                                     {"uploadUrl":"https://upload.example.com/session-2"}""");
+                }
+                if (uri.equals("https://upload.example.com/session-2")) {
+                    request.headers().firstValue("Content-Range").ifPresent(chunkRanges::add);
+                    int     endByte = totalSize - 1;
+                    String  range   = request.headers().firstValue("Content-Range").orElse("");
+                    boolean isFinal = range.contains("-" + endByte + "/");
+                    if (isFinal) {
+                        return new StubHttpResponse(200,
+                                                    fileItemJson("file-big", "huge.bin", "folder-1",
+                                                                 "application/octet-stream", totalSize));
+                    }
+                    return new StubHttpResponse(202, """
+                                                     {"nextExpectedRanges":["5242880-"]}""");
+                }
+                return new StubHttpResponse(500, "unexpected");
+            });
+
+            var    client  = new MicrosoftDriveClient(graph, "/me/drive");
+            byte[] content = new byte[totalSize];
+            var result = client.upload("folder-1", "huge.bin",
+                                       "application/octet-stream", content, "test-token");
+
+            assertThat(result.getString("id")).isEqualTo("file-big");
+            assertThat(chunkRanges).hasSize(2);
+            assertThat(chunkRanges.get(0)).isEqualTo("bytes 0-" + (chunkSize - 1) + "/" + totalSize);
+            assertThat(chunkRanges.get(1)).isEqualTo("bytes " + chunkSize + "-" + (totalSize - 1) + "/" + totalSize);
+        }
+
+        @Test
+        void resumableUploadPropagatesChunkError() {
+            var graph = new MicrosoftGraphClient(request -> {
+                String uri = request.uri().toString();
+                if (uri.contains("createUploadSession")) {
+                    return new StubHttpResponse(200, """
+                                                     {"uploadUrl":"https://upload.example.com/session-3"}""");
+                }
+                if (uri.equals("https://upload.example.com/session-3")) {
+                    return new StubHttpResponse(500, """
+                                                     {"error":{"code":"generalException","message":"Upload failed"}}""");
+                }
+                return new StubHttpResponse(500, "unexpected");
+            });
+
+            var    client  = new MicrosoftDriveClient(graph, "/me/drive");
+            byte[] content = new byte[MicrosoftDriveClient.SIMPLE_UPLOAD_LIMIT + 1];
+            assertThatThrownBy(() -> client.upload("folder-1", "fail.bin",
+                                                   "application/octet-stream", content, "test-token"))
+                    .isInstanceOf(RuntimeException.class);
+        }
+
+        @Test
+        void resumableUploadEncodesFilename() {
+            var requests = new java.util.ArrayList<HttpRequest>();
+            var graph = new MicrosoftGraphClient(request -> {
+                requests.add(request);
+                String uri = request.uri().toString();
+                if (uri.contains("createUploadSession")) {
+                    return new StubHttpResponse(200, """
+                                                     {"uploadUrl":"https://upload.example.com/session-4"}""");
+                }
+                if (uri.equals("https://upload.example.com/session-4")) {
+                    return new StubHttpResponse(200,
+                                                fileItemJson("file-enc", "my file.bin", "folder-1",
+                                                             "application/octet-stream", 4194305));
+                }
+                return new StubHttpResponse(500, "unexpected");
+            });
+
+            var    client  = new MicrosoftDriveClient(graph, "/me/drive");
+            byte[] content = new byte[MicrosoftDriveClient.SIMPLE_UPLOAD_LIMIT + 1];
+            client.upload("folder-1", "my file.bin",
+                          "application/octet-stream", content, "test-token");
+
+            var sessionUri = requests.stream()
+                                     .filter(r -> r.uri().toString().contains("createUploadSession"))
+                                     .findFirst().orElseThrow().uri().toString();
+            assertThat(sessionUri).doesNotContain("my file.bin");
+        }
+    }
+
 
     @Test
     void validateCdnHostAcceptsAllowedHosts() {
