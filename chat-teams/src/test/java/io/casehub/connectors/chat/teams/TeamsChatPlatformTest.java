@@ -24,7 +24,8 @@ import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 
 class TeamsChatPlatformTest {
 
@@ -195,6 +196,28 @@ class TeamsChatPlatformTest {
                     "New Channel", null, "A new channel", false);
             assertThat(channel.name()).isEqualTo("General");
         }
+
+        @Test
+        void createUsesConfiguredTeamId() {
+            var requestUris = new java.util.ArrayList<String>();
+            var graph = new MicrosoftGraphClient(request -> {
+                requestUris.add(request.uri().toString());
+                String uri = request.uri().toString();
+                if (uri.contains("/teams/configured-team/channels") && request.method().equals("POST")) {
+                    return new StubHttpResponse(201, channelJson());
+                }
+                return new StubHttpResponse(200, """
+                                                 {"value":[]}""");
+            });
+            var configured = new TeamsChatPlatform(new TeamsClient(graph), null,
+                                                   "configured-team").build();
+            var channel = configured.channelManagement().create(
+                    "New Channel", null, "desc", false);
+            assertThat(channel.name()).isEqualTo("General");
+            assertThat(requestUris).noneMatch(u -> u.contains("/me/joinedTeams"));
+            assertThat(requestUris).anyMatch(u -> u.contains("/teams/configured-team/channels"));
+        }
+
 
         @Test
         void deleteDoesNotThrow() {

@@ -28,15 +28,24 @@ public class TeamsChatPlatform {
 
     private final TeamsClient client;
     private final ServiceConnectionProvider connectionProvider;
+    private final String                    defaultTeamId;
+
 
     public TeamsChatPlatform(TeamsClient client,
-            ServiceConnectionProvider connectionProvider) {
-        this.client = client;
-        this.connectionProvider = connectionProvider;
+                             ServiceConnectionProvider connectionProvider) {
+        this(client, connectionProvider, "");
     }
 
+    public TeamsChatPlatform(TeamsClient client,
+                             ServiceConnectionProvider connectionProvider, String defaultTeamId) {
+        this.client             = client;
+        this.connectionProvider = connectionProvider;
+        this.defaultTeamId      = defaultTeamId == null ? "" : defaultTeamId;
+    }
+
+
     TeamsChatPlatform(TeamsClient client) {
-        this(client, null);
+        this(client, null, "");
     }
 
     public ChatPlatform build() {
@@ -139,19 +148,24 @@ public class TeamsChatPlatform {
     private class TeamsChannelManagement implements ChannelManagement {
         @Override
         public Channel create(String name, String topic, String description,
-                boolean isPrivate) {
+                              boolean isPrivate) {
             return TokenRetry.withTokenRetry(
                     TeamsChatPlatform.this::resolveDelegatedToken,
                     token -> {
-                        var teams = client.listJoinedTeams(token);
-                        if (teams.isEmpty()) {
-                            throw new IllegalStateException("No teams available");
+                        String teamId;
+                        if (!defaultTeamId.isEmpty()) {
+                            teamId = defaultTeamId;
+                        } else {
+                            var teams = client.listJoinedTeams(token);
+                            if (teams.isEmpty()) {
+                                throw new IllegalStateException("No teams available");
+                            }
+                            teamId = teams.get(0).getString("id");
                         }
-                        String teamId = teams.get(0).getString("id");
                         var body = jakarta.json.Json.createObjectBuilder()
-                                .add("displayName", name)
-                                .add("membershipType",
-                                        isPrivate ? "private" : "standard");
+                                                    .add("displayName", name)
+                                                    .add("membershipType",
+                                                         isPrivate ? "private" : "standard");
                         if (description != null) {
                             body.add("description", description);
                         }
