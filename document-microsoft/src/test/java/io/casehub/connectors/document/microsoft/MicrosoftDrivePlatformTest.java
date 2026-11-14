@@ -4,11 +4,14 @@ import io.casehub.connectors.PageRequest;
 import io.casehub.connectors.SyncRequest;
 import io.casehub.connectors.document.spi.DocumentPlatform;
 import io.casehub.connectors.microsoft.MicrosoftGraphClient;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class MicrosoftDrivePlatformTest {
 
@@ -209,24 +212,40 @@ class MicrosoftDrivePlatformTest {
 
     @Test
     void validateCdnHostAcceptsAllowedHosts() {
-        assertThatCode(() -> MicrosoftDriveClient.validateCdnHost(
+        var client = new MicrosoftDriveClient(null, "/me/drive");
+        assertThatCode(() -> client.validateCdnHost(
                 "https://my-tenant.sharepoint.com/download/file"))
                 .doesNotThrowAnyException();
-        assertThatCode(() -> MicrosoftDriveClient.validateCdnHost(
+        assertThatCode(() -> client.validateCdnHost(
                 "https://abc.1drv.com/file"))
                 .doesNotThrowAnyException();
-        assertThatCode(() -> MicrosoftDriveClient.validateCdnHost(
+        assertThatCode(() -> client.validateCdnHost(
                 "https://storage.blob.core.windows.net/container/blob"))
                 .doesNotThrowAnyException();
     }
 
     @Test
     void validateCdnHostRejectsUnknownHosts() {
-        assertThatThrownBy(() -> MicrosoftDriveClient.validateCdnHost(
+        var client = new MicrosoftDriveClient(null, "/me/drive");
+        assertThatThrownBy(() -> client.validateCdnHost(
                 "https://evil.example.com/steal"))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("untrusted host");
     }
+
+    @Test
+    void validateCdnHostAcceptsCustomHosts() {
+        var client = new MicrosoftDriveClient(null, "/me/drive",
+                                              Set.of(".custom-cdn.example.com"));
+        assertThatCode(() -> client.validateCdnHost(
+                "https://files.custom-cdn.example.com/download"))
+                .doesNotThrowAnyException();
+        assertThatThrownBy(() -> client.validateCdnHost(
+                "https://my-tenant.sharepoint.com/download/file"))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("untrusted host");
+    }
+
 
     private static String fileItemJson(String id, String name, String parentId,
             String mimeType, long size) {

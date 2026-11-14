@@ -4,15 +4,15 @@ import io.casehub.connectors.Page;
 import io.casehub.connectors.PageRequest;
 import io.casehub.connectors.microsoft.GraphErrorHandler;
 import io.casehub.connectors.microsoft.MicrosoftGraphClient;
-
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
+
 import java.io.StringReader;
 import java.net.URI;
-import java.net.http.HttpRequest;
-import java.util.ArrayList;
 import java.net.URLEncoder;
+import java.net.http.HttpRequest;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -22,16 +22,24 @@ class MicrosoftDriveClient {
 
     static final int SIMPLE_UPLOAD_LIMIT = 4 * 1024 * 1024;
     private static final int CHUNK_SIZE = 16 * 320 * 1024;
-    private static final Set<String> ALLOWED_CDN_SUFFIXES = Set.of(
+    static final Set<String> DEFAULT_CDN_SUFFIXES = Set.of(
             ".sharepoint.com", ".1drv.com", ".blob.core.windows.net");
 
     private final MicrosoftGraphClient graph;
     private final String basePath;
+    private final Set<String> allowedCdnSuffixes;
+
 
     MicrosoftDriveClient(MicrosoftGraphClient graph, String basePath) {
-        this.graph = graph;
-        this.basePath = basePath;
+        this(graph, basePath, DEFAULT_CDN_SUFFIXES);
     }
+
+    MicrosoftDriveClient(MicrosoftGraphClient graph, String basePath, Set<String> allowedCdnSuffixes) {
+        this.graph              = graph;
+        this.basePath           = basePath;
+        this.allowedCdnSuffixes = allowedCdnSuffixes;
+    }
+
 
     Page<JsonObject> listChildren(String folderId, PageRequest pagination, String token) {
         String path = basePath + "/items/" + folderId + "/children?$top=" + pagination.pageSize();
@@ -198,13 +206,14 @@ class MicrosoftDriveClient {
         return result;
     }
 
-    static void validateCdnHost(String url) {
+    void validateCdnHost(String url) {
         String host = URI.create(url).getHost();
         if (host == null) {
             throw new IllegalStateException("Blocked redirect to URL with no host: " + url);
         }
         host = host.toLowerCase();
-        boolean allowed = ALLOWED_CDN_SUFFIXES.stream().anyMatch(host::endsWith);
+        String  h       = host;
+        boolean allowed = allowedCdnSuffixes.stream().anyMatch(h::endsWith);
         if (!allowed) {
             throw new IllegalStateException("Blocked redirect to untrusted host: " + host);
         }
