@@ -16,47 +16,46 @@ import java.util.List;
 @ApplicationScoped
 public class NoOpCalendarPlatform implements CalendarPlatform {
 
+    private static final CalendarOperations NOOP = new CalendarOperations() {
+        @Override
+        public List<CalendarInfo> listCalendars()                             {return List.of();}
+
+        @Override
+        public List<CalendarEvent> listEvents(String c, Instant f, Instant t) {return List.of();}
+
+        @Override
+        public CalendarEvent getEvent(String c, String e) {
+            throw new UnsupportedOperationException("No calendar provider configured");
+        }
+
+        @Override
+        public CalendarEvent createEvent(String c, EventDetails d) {
+            throw new UnsupportedOperationException("No calendar provider configured");
+        }
+
+        @Override
+        public CalendarEvent updateEvent(String c, String e, EventDetails d) {
+            throw new UnsupportedOperationException("No calendar provider configured");
+        }
+
+        @Override
+        public void deleteEvent(String c, String e) {
+            throw new UnsupportedOperationException("No calendar provider configured");
+        }
+
+        @Override
+        public SyncResult<CalendarEvent> listEventsSync(String c, SyncRequest r) {
+            throw new UnsupportedOperationException("No calendar provider configured");
+        }
+    };
+
     @Override
     public String id() {
         return "none";
     }
 
     @Override
-    public List<CalendarInfo> listCalendars() {
-        return List.of();
+    public CalendarOperations calendarOps(String userId) {
+        return NOOP;
     }
-
-    @Override
-    public List<CalendarEvent> listEvents(final String calendarId,
-            final Instant from, final Instant to) {
-        return List.of();
-    }
-
-    @Override
-    public CalendarEvent getEvent(final String calendarId, final String eventId) {
-        throw new UnsupportedOperationException("No calendar provider configured");
-    }
-
-    @Override
-    public CalendarEvent createEvent(final String calendarId, final EventDetails details) {
-        throw new UnsupportedOperationException("No calendar provider configured");
-    }
-
-    @Override
-    public CalendarEvent updateEvent(final String calendarId, final String eventId,
-            final EventDetails details) {
-        throw new UnsupportedOperationException("No calendar provider configured");
-    }
-
-    @Override
-    public void deleteEvent(final String calendarId, final String eventId) {
-        throw new UnsupportedOperationException("No calendar provider configured");
-    }
-
-    @Override
-    public SyncResult<CalendarEvent> listEventsSync(final String calendarId,
-                                                    final SyncRequest request) {
-        throw new UnsupportedOperationException("No calendar provider configured");
-    }
-
 }

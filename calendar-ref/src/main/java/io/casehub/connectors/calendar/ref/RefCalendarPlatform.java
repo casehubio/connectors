@@ -24,43 +24,50 @@ public class RefCalendarPlatform implements CalendarPlatform {
     }
 
     @Override
-    public List<CalendarInfo> listCalendars() {
-        return backend.listCalendars();
+    public CalendarOperations calendarOps(String userId) {
+        return new RefCalendarOperations();
     }
 
-    @Override
-    public List<CalendarEvent> listEvents(String calendarId, Instant from, Instant to) {
-        return backend.listEvents(calendarId, from, to);
-    }
+    private class RefCalendarOperations implements CalendarOperations {
 
-    @Override
-    public CalendarEvent getEvent(String calendarId, String eventId) {
-        return backend.getEvent(calendarId, eventId);
-    }
+        @Override
+        public List<CalendarInfo> listCalendars() {
+            return backend.listCalendars();
+        }
 
-    @Override
-    public CalendarEvent createEvent(String calendarId, EventDetails details) {
-        return backend.createEvent(calendarId, details);
-    }
+        @Override
+        public List<CalendarEvent> listEvents(String calendarId, Instant from, Instant to) {
+            return backend.listEvents(calendarId, from, to);
+        }
 
-    @Override
-    public CalendarEvent updateEvent(String calendarId, String eventId, EventDetails details) {
-        return backend.updateEvent(calendarId, eventId, details);
-    }
+        @Override
+        public CalendarEvent getEvent(String calendarId, String eventId) {
+            return backend.getEvent(calendarId, eventId);
+        }
 
-    @Override
-    public void deleteEvent(String calendarId, String eventId) {
-        backend.deleteEvent(calendarId, eventId);
-    }
+        @Override
+        public CalendarEvent createEvent(String calendarId, EventDetails details) {
+            return backend.createEvent(calendarId, details);
+        }
 
-    @Override
-    public SyncResult<CalendarEvent> listEventsSync(String calendarId, SyncRequest request) {
-        long sinceVersion = request.syncToken() != null
-                            ? Long.parseLong(request.syncToken()) : 0;
-        var changed = backend.changedSince(calendarId, sinceVersion);
-        var deleted = backend.deletedSince(calendarId, sinceVersion);
-        return new SyncResult<>(changed, deleted,
-                                String.valueOf(backend.currentVersion()), false);
-    }
+        @Override
+        public CalendarEvent updateEvent(String calendarId, String eventId, EventDetails details) {
+            return backend.updateEvent(calendarId, eventId, details);
+        }
 
+        @Override
+        public void deleteEvent(String calendarId, String eventId) {
+            backend.deleteEvent(calendarId, eventId);
+        }
+
+        @Override
+        public SyncResult<CalendarEvent> listEventsSync(String calendarId, SyncRequest request) {
+            long sinceVersion = request.syncToken() != null
+                                ? Long.parseLong(request.syncToken()) : 0;
+            var changed = backend.changedSince(calendarId, sinceVersion);
+            var deleted = backend.deletedSince(calendarId, sinceVersion);
+            return new SyncResult<>(changed, deleted,
+                                    String.valueOf(backend.currentVersion()), false);
+        }
+    }
 }

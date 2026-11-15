@@ -29,6 +29,9 @@ import java.util.List;
 public class ConnectorCalendarApi {
 
     @Inject CalendarPlatformService calendarService;
+    @Inject
+            io.casehub.platform.api.identity.CurrentPrincipal currentPrincipal;
+
 
     @PlatformQuery("List available calendars on a platform")
     @RestPath("/calendars")
@@ -36,7 +39,7 @@ public class ConnectorCalendarApi {
             @QueryParam("platform") String platform) {
         CalendarPlatform p = calendarService.platform(platform);
         if (p == null) return List.of();
-        return p.listCalendars();
+        return p.calendarOps(currentPrincipal.actorId()).listCalendars();
     }
 
     @PlatformQuery("List events in a calendar")
@@ -50,7 +53,7 @@ public class ConnectorCalendarApi {
         if (p == null) return List.of();
         Instant start = from != null ? Instant.parse(from) : Instant.now();
         Instant end = to != null ? Instant.parse(to) : start.plusSeconds(86400);
-        return p.listEvents(calendarId, start, end).stream()
+        return p.calendarOps(currentPrincipal.actorId()).listEvents(calendarId, start, end).stream()
             .map(this::toEventInfo).toList();
     }
 
@@ -62,7 +65,7 @@ public class ConnectorCalendarApi {
             @PathParam String eventId) {
         CalendarPlatform p = calendarService.platform(platform);
         if (p == null) return null;
-        CalendarEvent event = p.getEvent(calendarId, eventId);
+        CalendarEvent event = p.calendarOps(currentPrincipal.actorId()).getEvent(calendarId, eventId);
         return event != null ? toEventInfo(event) : null;
     }
 
@@ -78,7 +81,7 @@ public class ConnectorCalendarApi {
         EventDetails details = new EventDetails(request.summary(),
             request.description(), request.location(), timing,
             request.attendees());
-        CalendarEvent created = p.createEvent(calendarId, details);
+        CalendarEvent created = p.calendarOps(currentPrincipal.actorId()).createEvent(calendarId, details);
         return toEventInfo(created);
     }
 
@@ -95,7 +98,7 @@ public class ConnectorCalendarApi {
         EventDetails details = new EventDetails(request.summary(),
             request.description(), request.location(), timing,
             request.attendees());
-        CalendarEvent updated = p.updateEvent(calendarId, eventId, details);
+        CalendarEvent updated = p.calendarOps(currentPrincipal.actorId()).updateEvent(calendarId, eventId, details);
         return toEventInfo(updated);
     }
 
@@ -108,7 +111,7 @@ public class ConnectorCalendarApi {
         CalendarPlatform p = calendarService.platform(platform);
         if (p == null) return new OperationResult(false, platform, calendarId, "Unknown platform");
         try {
-            p.deleteEvent(calendarId, eventId);
+            p.calendarOps(currentPrincipal.actorId()).deleteEvent(calendarId, eventId);
             return new OperationResult(true, platform, calendarId, "Deleted " + eventId);
         } catch (Exception e) {
             return new OperationResult(false, platform, calendarId, e.getMessage());
@@ -128,7 +131,7 @@ public class ConnectorCalendarApi {
         var request = syncToken != null
                       ? new SyncRequest(syncToken, size)
                       : SyncRequest.initial(size);
-        var result = p.listEventsSync(calendarId, request);
+        var result = p.calendarOps(currentPrincipal.actorId()).listEventsSync(calendarId, request);
         var events = result.items().stream().map(this::toEventInfo).toList();
         return new SyncResult<>(events, result.deletedIds(), result.syncToken(), result.hasMore());
     }

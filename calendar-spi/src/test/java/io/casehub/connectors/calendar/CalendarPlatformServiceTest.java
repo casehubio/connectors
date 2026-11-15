@@ -16,18 +16,37 @@ class CalendarPlatformServiceTest {
 
     static class StubPlatform implements CalendarPlatform {
         private final String platformId;
-        StubPlatform(String id) { this.platformId = id; }
-        @Override public String id() { return platformId; }
-        @Override public List<CalendarInfo> listCalendars() { return List.of(); }
-        @Override public List<CalendarEvent> listEvents(String c, Instant f, Instant t) { return List.of(); }
-        @Override public CalendarEvent getEvent(String c, String e) { return null; }
-        @Override public CalendarEvent createEvent(String c, EventDetails d) { return null; }
-        @Override public CalendarEvent updateEvent(String c, String e, EventDetails d) { return null; }
-        @Override public void deleteEvent(String c, String e) {}
+
+        StubPlatform(String id) {this.platformId = id;}
 
         @Override
-        public io.casehub.connectors.SyncResult<CalendarEvent> listEventsSync(String c, io.casehub.connectors.SyncRequest r) {return null;}
+        public String id()      {return platformId;}
 
+        @Override
+        public CalendarOperations calendarOps(String userId) {
+            return new CalendarOperations() {
+                @Override
+                public List<CalendarInfo> listCalendars()                                                                            {return List.of();}
+
+                @Override
+                public List<CalendarEvent> listEvents(String c, Instant f, Instant t)                                                {return List.of();}
+
+                @Override
+                public CalendarEvent getEvent(String c, String e)                                                                    {return null;}
+
+                @Override
+                public CalendarEvent createEvent(String c, EventDetails d)                                                           {return null;}
+
+                @Override
+                public CalendarEvent updateEvent(String c, String e, EventDetails d)                                                 {return null;}
+
+                @Override
+                public void deleteEvent(String c, String e)                                                                          {}
+
+                @Override
+                public io.casehub.connectors.SyncResult<CalendarEvent> listEventsSync(String c, io.casehub.connectors.SyncRequest r) {return null;}
+            };
+        }
     }
 
     @Test

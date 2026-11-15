@@ -11,18 +11,22 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
 
+import io.casehub.connectors.calendar.spi.CalendarPlatform;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class RefCalendarPlatformTest {
 
     private RefCalendarPlatform platform;
+    private CalendarPlatform.CalendarOperations ops;
     private InMemoryCalendarBackend backend;
 
     @BeforeEach
     void setUp() {
         backend = new InMemoryCalendarBackend();
         platform = new RefCalendarPlatform(backend);
+        ops = platform.calendarOps("test-user");
     }
 
     @Test
@@ -31,8 +35,15 @@ class RefCalendarPlatformTest {
     }
 
     @Test
+    void calendarOpsReturnsOperations() {
+        var result = platform.calendarOps("user-1");
+        assertThat(result).isNotNull();
+        assertThat(result.listCalendars()).isNotNull();
+    }
+
+    @Test
     void listCalendars_returns3Calendars() {
-        var calendars = platform.listCalendars();
+        var calendars = ops.listCalendars();
         assertThat(calendars).hasSize(3);
         assertThat(calendars).extracting("id")
                              .containsExactly("cal-jonny", "cal-sarah", "cal-family");
@@ -41,7 +52,7 @@ class RefCalendarPlatformTest {
 
     @Test
     void seedEvents_accessibleViaListEvents() {
-        var jonnyEvents = platform.listEvents("cal-jonny",
+        var jonnyEvents = ops.listEvents("cal-jonny",
                                              Instant.parse("2026-10-26T00:00:00Z"),
                                              Instant.parse("2026-11-30T00:00:00Z"));
         assertThat(jonnyEvents).isNotEmpty();
@@ -51,7 +62,7 @@ class RefCalendarPlatformTest {
 
     @Test
     void seedEvents_familyCalendarHasAllDayEvents() {
-        var familyEvents = platform.listEvents("cal-family",
+        var familyEvents = ops.listEvents("cal-family",
                                                Instant.parse("2026-10-01T00:00:00Z"),
                                                Instant.parse("2027-09-01T00:00:00Z"));
         assertThat(familyEvents).isNotEmpty();
@@ -70,7 +81,7 @@ class RefCalendarPlatformTest {
                         ZoneId.of("Europe/London")),
                 List.of("alice@example.com"));
 
-        var event = platform.createEvent("primary", details);
+        var event = ops.createEvent("primary", details);
 
         assertThat(event.id()).isNotNull();
         assertThat(event.calendarId()).isEqualTo("primary");
@@ -87,7 +98,7 @@ class RefCalendarPlatformTest {
                         LocalDate.of(2026, 7, 28)),
                 List.of());
 
-        var event = platform.createEvent("primary", details);
+        var event = ops.createEvent("primary", details);
 
         assertThat(event.timing()).isInstanceOf(EventTiming.AllDay.class);
         var allDay = (EventTiming.AllDay) event.timing();
@@ -102,9 +113,9 @@ class RefCalendarPlatformTest {
                         Instant.parse("2026-07-26T11:00:00Z"),
                         ZoneId.of("UTC")),
                 List.of());
-        platform.createEvent("primary", details);
+        ops.createEvent("primary", details);
 
-        var events = platform.listEvents("primary",
+        var events = ops.listEvents("primary",
                 Instant.parse("2026-07-26T00:00:00Z"),
                 Instant.parse("2026-07-27T00:00:00Z"));
 
@@ -120,9 +131,9 @@ class RefCalendarPlatformTest {
                         Instant.parse("2026-07-28T11:00:00Z"),
                         ZoneId.of("UTC")),
                 List.of());
-        platform.createEvent("primary", details);
+        ops.createEvent("primary", details);
 
-        var events = platform.listEvents("primary",
+        var events = ops.listEvents("primary",
                 Instant.parse("2026-07-26T00:00:00Z"),
                 Instant.parse("2026-07-27T00:00:00Z"));
 
@@ -136,9 +147,9 @@ class RefCalendarPlatformTest {
                         LocalDate.of(2026, 7, 26),
                         LocalDate.of(2026, 7, 27)),
                 List.of());
-        platform.createEvent("primary", details);
+        ops.createEvent("primary", details);
 
-        var events = platform.listEvents("primary",
+        var events = ops.listEvents("primary",
                 Instant.parse("2026-07-26T00:00:00Z"),
                 Instant.parse("2026-07-27T00:00:00Z"));
 
@@ -153,15 +164,15 @@ class RefCalendarPlatformTest {
                         Instant.parse("2026-07-26T11:00:00Z"),
                         ZoneId.of("UTC")),
                 List.of());
-        var created = platform.createEvent("primary", details);
+        var created = ops.createEvent("primary", details);
 
-        var found = platform.getEvent("primary", created.id());
+        var found = ops.getEvent("primary", created.id());
         assertThat(found.summary()).isEqualTo("Find me");
     }
 
     @Test
     void getEvent_nonExistent_throws() {
-        assertThatThrownBy(() -> platform.getEvent("primary", "no-such-id"))
+        assertThatThrownBy(() -> ops.getEvent("primary", "no-such-id"))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -173,9 +184,9 @@ class RefCalendarPlatformTest {
                         Instant.parse("2026-07-26T11:00:00Z"),
                         ZoneId.of("UTC")),
                 List.of());
-        var created = platform.createEvent("primary", details);
+        var created = ops.createEvent("primary", details);
 
-        var updated = platform.updateEvent("primary", created.id(),
+        var updated = ops.updateEvent("primary", created.id(),
                 new EventDetails("Updated", "new desc", "Room 2",
                         details.timing(), List.of("bob@example.com")));
 
@@ -192,11 +203,11 @@ class RefCalendarPlatformTest {
                         Instant.parse("2026-07-26T11:00:00Z"),
                         ZoneId.of("UTC")),
                 List.of());
-        var created = platform.createEvent("primary", details);
+        var created = ops.createEvent("primary", details);
 
-        platform.deleteEvent("primary", created.id());
+        ops.deleteEvent("primary", created.id());
 
-        assertThatThrownBy(() -> platform.getEvent("primary", created.id()))
+        assertThatThrownBy(() -> ops.getEvent("primary", created.id()))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -208,9 +219,9 @@ class RefCalendarPlatformTest {
                         Instant.parse("2026-07-26T11:00:00Z"),
                         ZoneId.of("UTC")),
                 List.of());
-        platform.createEvent("cal-a", details);
+        ops.createEvent("cal-a", details);
 
-        var events = platform.listEvents("cal-b",
+        var events = ops.listEvents("cal-b",
                 Instant.parse("2026-07-26T00:00:00Z"),
                 Instant.parse("2026-07-27T00:00:00Z"));
         assertThat(events).isEmpty();
@@ -224,9 +235,9 @@ class RefCalendarPlatformTest {
                                                Instant.parse("2026-07-26T11:00:00Z"),
                                                ZoneId.of("UTC")),
                                        List.of());
-        platform.createEvent("primary", details);
+        ops.createEvent("primary", details);
 
-        var result = platform.listEventsSync("primary", SyncRequest.initial(100));
+        var result = ops.listEventsSync("primary", SyncRequest.initial(100));
 
         assertThat(result.items()).hasSize(1);
         assertThat(result.items().getFirst().summary()).isEqualTo("Sync me");
@@ -237,59 +248,59 @@ class RefCalendarPlatformTest {
 
     @Test
     void listEventsSync_incrementalSync_detectsNewEvents() {
-        platform.createEvent("primary", new EventDetails("Initial", null, null,
+        ops.createEvent("primary", new EventDetails("Initial", null, null,
                                                          new EventTiming.Timed(
                                                                  Instant.parse("2026-07-26T10:00:00Z"),
                                                                  Instant.parse("2026-07-26T11:00:00Z"),
                                                                  ZoneId.of("UTC")),
                                                          List.of()));
 
-        var fullSync = platform.listEventsSync("primary", SyncRequest.initial(100));
+        var fullSync = ops.listEventsSync("primary", SyncRequest.initial(100));
         var token    = fullSync.syncToken();
 
-        platform.createEvent("primary", new EventDetails("New event", null, null,
+        ops.createEvent("primary", new EventDetails("New event", null, null,
                                                          new EventTiming.Timed(
                                                                  Instant.parse("2026-07-27T10:00:00Z"),
                                                                  Instant.parse("2026-07-27T11:00:00Z"),
                                                                  ZoneId.of("UTC")),
                                                          List.of()));
 
-        var incrementalSync = platform.listEventsSync("primary", new SyncRequest(token, 100));
+        var incrementalSync = ops.listEventsSync("primary", new SyncRequest(token, 100));
         assertThat(incrementalSync.items()).hasSize(1);
         assertThat(incrementalSync.items().getFirst().summary()).isEqualTo("New event");
     }
 
     @Test
     void listEventsSync_incrementalSync_detectsDeletes() {
-        var created = platform.createEvent("primary", new EventDetails("Delete me", null, null,
+        var created = ops.createEvent("primary", new EventDetails("Delete me", null, null,
                                                                        new EventTiming.Timed(
                                                                                Instant.parse("2026-07-26T10:00:00Z"),
                                                                                Instant.parse("2026-07-26T11:00:00Z"),
                                                                                ZoneId.of("UTC")),
                                                                        List.of()));
 
-        var fullSync = platform.listEventsSync("primary", SyncRequest.initial(100));
+        var fullSync = ops.listEventsSync("primary", SyncRequest.initial(100));
         var token    = fullSync.syncToken();
 
-        platform.deleteEvent("primary", created.id());
+        ops.deleteEvent("primary", created.id());
 
-        var incrementalSync = platform.listEventsSync("primary", new SyncRequest(token, 100));
+        var incrementalSync = ops.listEventsSync("primary", new SyncRequest(token, 100));
         assertThat(incrementalSync.deletedIds()).contains(created.id());
     }
 
     @Test
     void listEventsSync_noChanges_returnsEmpty() {
-        platform.createEvent("primary", new EventDetails("Stable", null, null,
+        ops.createEvent("primary", new EventDetails("Stable", null, null,
                                                          new EventTiming.Timed(
                                                                  Instant.parse("2026-07-26T10:00:00Z"),
                                                                  Instant.parse("2026-07-26T11:00:00Z"),
                                                                  ZoneId.of("UTC")),
                                                          List.of()));
 
-        var fullSync = platform.listEventsSync("primary", SyncRequest.initial(100));
+        var fullSync = ops.listEventsSync("primary", SyncRequest.initial(100));
         var token    = fullSync.syncToken();
 
-        var incrementalSync = platform.listEventsSync("primary", new SyncRequest(token, 100));
+        var incrementalSync = ops.listEventsSync("primary", new SyncRequest(token, 100));
         assertThat(incrementalSync.items()).isEmpty();
         assertThat(incrementalSync.deletedIds()).isEmpty();
     }

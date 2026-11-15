@@ -115,8 +115,21 @@ class ConnectorCalendarApiTest {
 
     private ConnectorCalendarApi apiWith(CalendarPlatform platform) {
         var service = new CalendarPlatformService(List.of(platform));
-        var api = new ConnectorCalendarApi();
-        api.calendarService = service;
+        var api     = new ConnectorCalendarApi();
+        api.calendarService  = service;
+        api.currentPrincipal = new io.casehub.platform.api.identity.CurrentPrincipal() {
+            @Override
+            public String actorId()               {return "test-actor";}
+
+            @Override
+            public java.util.Set<String> groups() {return java.util.Set.of();}
+
+            @Override
+            public String tenancyId()             {return "default";}
+
+            @Override
+            public boolean isCrossTenantAdmin()   {return false;}
+        };
         return api;
     }
 
@@ -129,52 +142,61 @@ class ConnectorCalendarApiTest {
 
         StubCalendarPlatform() {
             events.add(new CalendarEvent("evt-1", "cal-1", "Team standup",
-                    "Daily sync", "Room A",
-                    new EventTiming.Timed(NOW, LATER, ZoneId.of("UTC")),
-                    List.of("bob@example.com"), null));
+                                         "Daily sync", "Room A",
+                                         new EventTiming.Timed(NOW, LATER, ZoneId.of("UTC")),
+                                         List.of("bob@example.com"), null));
         }
 
-        @Override public String id() { return "stub-cal"; }
+        @Override
+        public String id() {return "stub-cal";}
 
-        @Override public List<CalendarInfo> listCalendars() {
-            return List.of(new CalendarInfo("cal-1", "Work", "Work calendar", true));
-        }
+        @Override
+        public CalendarOperations calendarOps(String userId) {
+            return new CalendarOperations() {
+                @Override
+                public List<CalendarInfo> listCalendars() {
+                    return List.of(new CalendarInfo("cal-1", "Work", "Work calendar", true));
+                }
 
-        @Override public List<CalendarEvent> listEvents(String calendarId, Instant from, Instant to) {
-            return events.stream()
-                    .filter(e -> e.calendarId().equals(calendarId))
-                    .toList();
-        }
+                @Override
+                public List<CalendarEvent> listEvents(String calendarId, Instant from, Instant to) {
+                    return events.stream().filter(e -> e.calendarId().equals(calendarId)).toList();
+                }
 
-        @Override public CalendarEvent getEvent(String calendarId, String eventId) {
-            return events.stream()
-                    .filter(e -> e.id().equals(eventId))
-                    .findFirst().orElse(null);
-        }
+                @Override
+                public CalendarEvent getEvent(String calendarId, String eventId) {
+                    return events.stream().filter(e -> e.id().equals(eventId)).findFirst().orElse(null);
+                }
 
-        @Override public CalendarEvent createEvent(String calendarId, EventDetails details) {
-            var event = new CalendarEvent(UUID.randomUUID().toString(), calendarId,
-                    details.summary(), details.description(), details.location(),
-                    details.timing(), details.attendees(), null);
-            events.add(event);
-            return event;
-        }
+                @Override
+                public CalendarEvent createEvent(String calendarId, EventDetails details) {
+                    var event = new CalendarEvent(UUID.randomUUID().toString(), calendarId,
+                                                  details.summary(), details.description(), details.location(),
+                                                  details.timing(), details.attendees(), null);
+                    events.add(event);
+                    return event;
+                }
 
-        @Override public CalendarEvent updateEvent(String calendarId, String eventId, EventDetails details) {
-            var updated = new CalendarEvent(eventId, calendarId,
-                    details.summary(), details.description(), details.location(),
-                    details.timing(), details.attendees(), null);
-            events.removeIf(e -> e.id().equals(eventId));
-            events.add(updated);
-            return updated;
-        }
+                @Override
+                public CalendarEvent updateEvent(String calendarId, String eventId, EventDetails details) {
+                    var updated = new CalendarEvent(eventId, calendarId,
+                                                    details.summary(), details.description(), details.location(),
+                                                    details.timing(), details.attendees(), null);
+                    events.removeIf(e -> e.id().equals(eventId));
+                    events.add(updated);
+                    return updated;
+                }
 
-        @Override public void deleteEvent(String calendarId, String eventId) {
-            events.removeIf(e -> e.id().equals(eventId));
-        }
+                @Override
+                public void deleteEvent(String calendarId, String eventId) {
+                    events.removeIf(e -> e.id().equals(eventId));
+                }
 
-        @Override public SyncResult<CalendarEvent> listEventsSync(String calendarId, SyncRequest request) {
-            return new SyncResult<>(List.copyOf(events), List.of(), "1", false);
+                @Override
+                public SyncResult<CalendarEvent> listEventsSync(String calendarId, SyncRequest request) {
+                    return new SyncResult<>(List.copyOf(events), List.of(), "1", false);
+                }
+            };
         }
     }
 }

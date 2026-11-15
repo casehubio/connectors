@@ -63,7 +63,7 @@ class MicrosoftCalendarPlatformTest {
 
     @Test
     void listCalendarsReturnsMapped() {
-        var cals = platform.listCalendars();
+        var cals = platform.calendarOps("test-user").listCalendars();
         assertThat(cals).hasSize(1);
         assertThat(cals.get(0).summary()).isEqualTo("Calendar");
         assertThat(cals.get(0).primary()).isTrue();
@@ -71,7 +71,7 @@ class MicrosoftCalendarPlatformTest {
 
     @Test
     void listEventsReturnsMapped() {
-        var events = platform.listEvents("cal-1",
+        var events = platform.calendarOps("test-user").listEvents("cal-1",
                 Instant.parse("2026-11-01T00:00:00Z"),
                 Instant.parse("2026-11-30T00:00:00Z"));
         assertThat(events).hasSize(1);
@@ -81,7 +81,7 @@ class MicrosoftCalendarPlatformTest {
 
     @Test
     void getEventReturnsMapped() {
-        var event = platform.getEvent("cal-1", "evt-1");
+        var event = platform.calendarOps("test-user").getEvent("cal-1", "evt-1");
         assertThat(event.id()).isEqualTo("evt-1");
         assertThat(event.summary()).isEqualTo("Meeting");
     }
@@ -93,7 +93,7 @@ class MicrosoftCalendarPlatformTest {
                 Instant.parse("2026-11-13T15:00:00Z"),
                 ZoneId.of("UTC"));
         var details = new EventDetails("New Event", "desc", "Room", timing, List.of());
-        var event = platform.createEvent("cal-1", details);
+        var event = platform.calendarOps("test-user").createEvent("cal-1", details);
         assertThat(event.id()).isEqualTo("evt-new");
         assertThat(event.summary()).isEqualTo("New Event");
     }
@@ -105,19 +105,19 @@ class MicrosoftCalendarPlatformTest {
                 Instant.parse("2026-11-13T15:00:00Z"),
                 ZoneId.of("UTC"));
         var details = new EventDetails("Updated", "desc", "Room", timing, List.of());
-        var event = platform.updateEvent("cal-1", "evt-1", details);
+        var event = platform.calendarOps("test-user").updateEvent("cal-1", "evt-1", details);
         assertThat(event.summary()).isEqualTo("Updated");
     }
 
     @Test
     void deleteEventDoesNotThrow() {
-        assertThatCode(() -> platform.deleteEvent("cal-1", "evt-1"))
+        assertThatCode(() -> platform.calendarOps("test-user").deleteEvent("cal-1", "evt-1"))
                 .doesNotThrowAnyException();
     }
 
     @Test
     void listEventsSyncReturnsSyncResult() {
-        var result = platform.listEventsSync("cal-1", SyncRequest.initial(50));
+        var result = platform.calendarOps("test-user").listEventsSync("cal-1", SyncRequest.initial(50));
         assertThat(result.items()).hasSize(1);
         assertThat(result.syncToken()).contains("delta?token=abc");
         assertThat(result.deletedIds()).isEmpty();

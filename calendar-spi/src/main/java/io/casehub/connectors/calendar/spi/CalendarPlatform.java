@@ -1,11 +1,11 @@
 package io.casehub.connectors.calendar.spi;
 
+import io.casehub.connectors.PlatformExtensible;
 import io.casehub.connectors.SyncRequest;
 import io.casehub.connectors.SyncResult;
 import io.casehub.connectors.calendar.model.CalendarEvent;
 import io.casehub.connectors.calendar.model.CalendarInfo;
 import io.casehub.connectors.calendar.model.EventDetails;
-import io.casehub.connectors.PlatformExtensible;
 import io.casehub.platform.simulation.SimulationEligible;
 
 import java.time.Instant;
@@ -16,18 +16,21 @@ public interface CalendarPlatform extends PlatformExtensible {
 
     String id();
 
-    List<CalendarInfo> listCalendars();
+    CalendarOperations calendarOps(String userId);
 
-    List<CalendarEvent> listEvents(String calendarId, Instant from, Instant to);
+    interface CalendarOperations {
+        List<CalendarInfo> listCalendars();
 
-    CalendarEvent getEvent(String calendarId, String eventId);
+        List<CalendarEvent> listEvents(String calendarId, Instant from, Instant to);
 
-    CalendarEvent createEvent(String calendarId, EventDetails details);
+        CalendarEvent getEvent(String calendarId, String eventId);
 
-    CalendarEvent updateEvent(String calendarId, String eventId, EventDetails details);
+        CalendarEvent createEvent(String calendarId, EventDetails details);
 
-    void deleteEvent(String calendarId, String eventId);
+        CalendarEvent updateEvent(String calendarId, String eventId, EventDetails details);
 
-    SyncResult<CalendarEvent> listEventsSync(String calendarId, SyncRequest request);
+        void deleteEvent(String calendarId, String eventId);
 
+        SyncResult<CalendarEvent> listEventsSync(String calendarId, SyncRequest request);
+    }
 }

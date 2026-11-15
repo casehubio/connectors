@@ -83,7 +83,7 @@ class GoogleCalendarPlatformTest {
                                 }
                                 """)));
 
-        var calendars = platform.listCalendars();
+        var calendars = platform.calendarOps("test-user").listCalendars();
 
         assertThat(calendars).hasSize(2);
         assertThat(calendars.get(0).id()).isEqualTo("primary");
@@ -112,7 +112,7 @@ class GoogleCalendarPlatformTest {
                                 }
                                 """)));
 
-        var events = platform.listEvents("primary",
+        var events = platform.calendarOps("test-user").listEvents("primary",
                 Instant.parse("2026-07-26T00:00:00Z"),
                 Instant.parse("2026-07-27T00:00:00Z"));
 
@@ -161,7 +161,7 @@ class GoogleCalendarPlatformTest {
                                 }
                                 """)));
 
-        var events = platform.listEvents("primary",
+        var events = platform.calendarOps("test-user").listEvents("primary",
                 Instant.parse("2026-07-26T00:00:00Z"),
                 Instant.parse("2026-07-27T00:00:00Z"));
 
@@ -195,7 +195,7 @@ class GoogleCalendarPlatformTest {
                 .withQueryParam("pageToken", WireMock.equalTo("page2"))
                 .willReturn(aResponse().withStatus(500)));
 
-        var events = platform.listEvents("primary",
+        var events = platform.calendarOps("test-user").listEvents("primary",
                 Instant.parse("2026-07-26T00:00:00Z"),
                 Instant.parse("2026-07-27T00:00:00Z"));
 
@@ -222,7 +222,7 @@ class GoogleCalendarPlatformTest {
                                 }
                                 """)));
 
-        var events = platform.listEvents("primary",
+        var events = platform.calendarOps("test-user").listEvents("primary",
                 Instant.parse("2026-07-27T00:00:00Z"),
                 Instant.parse("2026-07-28T00:00:00Z"));
 
@@ -248,7 +248,7 @@ class GoogleCalendarPlatformTest {
                                 }
                                 """)));
 
-        var event = platform.getEvent("primary", "evt-1");
+        var event = platform.calendarOps("test-user").getEvent("primary", "evt-1");
 
         assertThat(event.summary()).isEqualTo("Found it");
         assertThat(event.attendees()).containsExactly("alice@example.com");
@@ -275,7 +275,7 @@ class GoogleCalendarPlatformTest {
                         ZoneId.of("Europe/London")),
                 List.of());
 
-        var event = platform.createEvent("primary", details);
+        var event = platform.calendarOps("test-user").createEvent("primary", details);
 
         assertThat(event.id()).isEqualTo("new-evt");
         assertThat(event.summary()).isEqualTo("Created");
@@ -303,7 +303,7 @@ class GoogleCalendarPlatformTest {
                         ZoneId.of("UTC")),
                 List.of());
 
-        var event = platform.updateEvent("primary", "evt-1", details);
+        var event = platform.calendarOps("test-user").updateEvent("primary", "evt-1", details);
 
         assertThat(event.summary()).isEqualTo("Updated");
         assertThat(event.description()).isEqualTo("New desc");
@@ -314,7 +314,7 @@ class GoogleCalendarPlatformTest {
         wireMock.stubFor(delete(urlPathEqualTo("/calendar/v3/calendars/primary/events/evt-1"))
                 .willReturn(aResponse().withStatus(204)));
 
-        platform.deleteEvent("primary", "evt-1");
+        platform.calendarOps("test-user").deleteEvent("primary", "evt-1");
 
         wireMock.verify(1, WireMock.deleteRequestedFor(
                 urlPathEqualTo("/calendar/v3/calendars/primary/events/evt-1")));
@@ -324,7 +324,7 @@ class GoogleCalendarPlatformTest {
     void requireClient_noClient_throwsIllegalState() {
         var unconfigured = new GoogleCalendarPlatform((Calendar) null);
 
-        assertThatThrownBy(() -> unconfigured.listCalendars())
+        assertThatThrownBy(() -> unconfigured.calendarOps("test-user"))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("not initialised");
     }
@@ -349,7 +349,7 @@ class GoogleCalendarPlatformTest {
                                                                }
                                                                """)));
 
-        var result = platform.listEventsSync("primary", io.casehub.connectors.SyncRequest.initial(100));
+        var result = platform.calendarOps("test-user").listEventsSync("primary", io.casehub.connectors.SyncRequest.initial(100));
 
         assertThat(result.items()).hasSize(1);
         assertThat(result.items().getFirst().summary()).isEqualTo("Standup");
@@ -382,7 +382,7 @@ class GoogleCalendarPlatformTest {
                                                                }
                                                                """)));
 
-        var result = platform.listEventsSync("primary",
+        var result = platform.calendarOps("test-user").listEventsSync("primary",
                                              new io.casehub.connectors.SyncRequest("sync-token-1", 100));
 
         assertThat(result.items()).hasSize(1);
@@ -401,7 +401,7 @@ class GoogleCalendarPlatformTest {
                                                                   {"error": {"code": 410, "message": "Sync token expired"}}
                                                                   """)));
 
-        assertThatThrownBy(() -> platform.listEventsSync("primary",
+        assertThatThrownBy(() -> platform.calendarOps("test-user").listEventsSync("primary",
                                                          new io.casehub.connectors.SyncRequest("expired-token", 100)))
                 .isInstanceOf(io.casehub.connectors.SyncTokenExpiredException.class);
     }
@@ -447,7 +447,7 @@ class GoogleCalendarPlatformTest {
                                                                }
                                                                """)));
 
-        var result = platform.listEventsSync("primary", io.casehub.connectors.SyncRequest.initial(100));
+        var result = platform.calendarOps("test-user").listEventsSync("primary", io.casehub.connectors.SyncRequest.initial(100));
 
         assertThat(result.items()).hasSize(2);
         assertThat(result.syncToken()).isEqualTo("sync-token-final");
@@ -485,7 +485,7 @@ class GoogleCalendarPlatformTest {
                                 }
                                 """)));
 
-        var events = platform.listEvents("primary",
+        var events = platform.calendarOps("test-user").listEvents("primary",
                 Instant.parse("2026-07-26T00:00:00Z"),
                 Instant.parse("2026-07-27T00:00:00Z"));
 
@@ -497,7 +497,7 @@ class GoogleCalendarPlatformTest {
         wireMock.stubFor(get(urlPathEqualTo("/calendar/v3/calendars/primary/events/bad"))
                 .willReturn(aResponse().withStatus(500)));
 
-        assertThatThrownBy(() -> platform.getEvent("primary", "bad"))
+        assertThatThrownBy(() -> platform.calendarOps("test-user").getEvent("primary", "bad"))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining("Failed to get event");
     }
