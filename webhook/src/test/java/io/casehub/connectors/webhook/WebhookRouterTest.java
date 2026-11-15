@@ -97,18 +97,6 @@ class WebhookRouterTest {
             .then().statusCode(200);
     }
 
-    // ── Teams — GET not supported ─────────────────────────────────────────────
-
-    @Test
-    void get_teamsConnector_returns200Ignored() throws InterruptedException {
-        given()
-            .when().get("/connectors/teams-inbound/webhook")
-            .then().statusCode(200);  // Ignored → 200
-
-        InboundMessage msg = capture.poll(200, TimeUnit.MILLISECONDS);
-        assertThat(msg).isNull();
-    }
-
     // ── Helpers ──────────────────────────────────────────────────────────────
 
     private static String nowTs() {

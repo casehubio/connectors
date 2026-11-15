@@ -11,13 +11,48 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 @ApplicationScoped
 public class TeamsBeans {
 
+
+    @Produces
+    @ApplicationScoped
+    TeamsCommands teamsCommands() {
+        return new TeamsCommands();
+    }
+
     @Produces
     @ApplicationScoped
     ChatPlatform teamsChatPlatform(MicrosoftGraphClient graph,
                                    ServiceConnectionProvider connectionProvider,
+                                   TeamsCommands teamsCommands,
                                    @ConfigProperty(name = "casehub.connectors.teams.default-team-id",
                                                    defaultValue = "") String defaultTeamId) {
         return new TeamsChatPlatform(new TeamsClient(graph), connectionProvider,
-                                     defaultTeamId).build();
+                                     defaultTeamId)
+                       .withCommands(teamsCommands)
+                       .build();
     }
+
+    @Produces
+    @ApplicationScoped
+    io.casehub.connectors.chat.spi.InboundTranslator teamsInboundTranslator() {
+        return new TeamsInboundTranslator();
+    }
+
+    @Produces
+    @ApplicationScoped
+    io.casehub.connectors.WebhookInboundConnector teamsInboundConnector(
+            @ConfigProperty(name = "casehub.connectors.teams-bot.app-id", defaultValue = "") String appId,
+            @ConfigProperty(name = "casehub.connectors.teams-bot.dev-mode", defaultValue = "false") boolean devMode,
+            @ConfigProperty(name = "casehub.connectors.teams-bot.service-url-allowlist",
+                            defaultValue = "*.botframework.com,smba.trafficmanager.net") String allowlist,
+            @ConfigProperty(name = "casehub.connectors.teams-bot.openid-metadata-url",
+                            defaultValue = "https://login.botframework.com/v1/.well-known/openidconfiguration") String metadataUrl,
+            @ConfigProperty(name = "casehub.connectors.teams-bot.issuer",
+                            defaultValue = "https://api.botframework.com") String issuer,
+            io.casehub.connectors.chat.command.CommandService commandService,
+            ServiceConnectionProvider connectionProvider) {
+        var auth   = new BotFrameworkAuth(appId, devMode, metadataUrl, issuer);
+        var client = new BotFrameworkClient(connectionProvider, allowlist);
+        return new TeamsInboundConnector(auth, client, commandService, appId);
+    }
+
 }

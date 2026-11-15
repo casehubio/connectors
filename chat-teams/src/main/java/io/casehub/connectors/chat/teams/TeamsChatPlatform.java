@@ -29,6 +29,7 @@ public class TeamsChatPlatform {
     private final TeamsClient client;
     private final ServiceConnectionProvider connectionProvider;
     private final String                    defaultTeamId;
+    private       io.casehub.connectors.chat.spi.Commands commands;
 
 
     public TeamsChatPlatform(TeamsClient client,
@@ -48,17 +49,26 @@ public class TeamsChatPlatform {
         this(client, null, "");
     }
 
+
+    public TeamsChatPlatform withCommands(io.casehub.connectors.chat.spi.Commands commands) {
+        this.commands = commands;
+        return this;
+    }
+
     public ChatPlatform build() {
-        return ChatPlatform.builder(PLATFORM_ID)
-                .messaging(this::sendMessage)
-                .threading(this::replyToMessage)
-                .discovery(this::listChannels)
-                .presence(new TeamsPresence())
-                .members(this::listMembers)
-                .channelManagement(new TeamsChannelManagement())
-                .memberManagement(new TeamsMemberManagement())
-                .messageHistory(this::listMessageHistory)
-                .build();
+        var builder = ChatPlatform.builder(PLATFORM_ID)
+                                  .messaging(this::sendMessage)
+                                  .threading(this::replyToMessage)
+                                  .discovery(this::listChannels)
+                                  .presence(new TeamsPresence())
+                                  .members(this::listMembers)
+                                  .channelManagement(new TeamsChannelManagement())
+                                  .memberManagement(new TeamsMemberManagement())
+                                  .messageHistory(this::listMessageHistory);
+        if (commands != null) {
+            builder.commands(commands);
+        }
+        return builder.build();
     }
 
     private SendResult sendMessage(ChatChannelRef channel, ChatContent content) {

@@ -14,12 +14,4 @@ public class WebhookBeans {
         return new SlackInboundConnector(signingSecret);
     }
 
-    @Produces
-    @ApplicationScoped
-    public TeamsInboundConnector teamsInboundConnector(
-            @ConfigProperty(name = "casehub.connectors.teams-inbound.shared-secret", defaultValue = "") String sharedSecret) {
-        return new TeamsInboundConnector(sharedSecret);
-    }
-
-
 }
