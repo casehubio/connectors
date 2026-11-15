@@ -177,6 +177,38 @@ class TeamsMapperTest {
     }
 
     @Test
+    void markdownToHtmlStripsJavascriptUrls() {
+        String result = TeamsMapper.markdownToHtml("[click](javascript:alert(1))");
+        assertThat(result).doesNotContain("javascript:");
+        assertThat(result).contains("click");
+    }
+
+    @Test
+    void markdownToHtmlStripsJavascriptUrlsCaseInsensitive() {
+        String result = TeamsMapper.markdownToHtml("[click](JaVaScRiPt:void(0))");
+        assertThat(result).doesNotContain("javascript:").doesNotContain("JaVaScRiPt:");
+    }
+
+    @Test
+    void markdownToHtmlEscapesDoubleQuotesInUrls() {
+        String result = TeamsMapper.markdownToHtml("[click](https://example.com/q?a=\"b\")");
+        assertThat(result).doesNotContain("href=\"https://example.com/q?a=\"");
+        assertThat(result).contains("&quot;");
+    }
+
+    @Test
+    void markdownToHtmlAllowsHttpUrls() {
+        String result = TeamsMapper.markdownToHtml("[site](https://example.com)");
+        assertThat(result).isEqualTo("<a href=\"https://example.com\">site</a>");
+    }
+
+    @Test
+    void markdownToHtmlAllowsMailtoUrls() {
+        String result = TeamsMapper.markdownToHtml("[email](mailto:user@example.com)");
+        assertThat(result).isEqualTo("<a href=\"mailto:user@example.com\">email</a>");
+    }
+
+    @Test
     void markdownToHtmlConvertsCodeAndNewlines() {
         String result = TeamsMapper.markdownToHtml("run `npm install`\nthen start");
         assertThat(result).contains("<code>npm install</code>").contains("<br>");

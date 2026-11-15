@@ -14,6 +14,9 @@ import io.casehub.connectors.chat.model.SendResult;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import java.time.Instant;
+import java.util.Locale;
+import java.util.regex.MatchResult;
+import java.util.regex.Pattern;
 
 final class TeamsMapper {
 
@@ -131,9 +134,22 @@ final class TeamsMapper {
         html = html.replaceAll("\\*\\*(.+?)\\*\\*", "<strong>$1</strong>");
         html = html.replaceAll("(?<!\\*)\\*(?!\\*)(.+?)(?<!\\*)\\*(?!\\*)", "<em>$1</em>");
         html = html.replaceAll("`(.+?)`", "<code>$1</code>");
-        html = html.replaceAll("\\[(.+?)]\\((.+?)\\)", "<a href=\"$2\">$1</a>");
+        html = LINK_PATTERN.matcher(html).replaceAll(TeamsMapper::sanitiseLink);
         html = html.replace("\n", "<br>");
         return html;
+    }
+
+    private static final Pattern LINK_PATTERN =
+            Pattern.compile("\\[(.+?)]\\((.+?)\\)");
+
+    private static String sanitiseLink(MatchResult m) {
+        String text = m.group(1);
+        String url = m.group(2);
+        if (url.toLowerCase(Locale.ROOT).startsWith("javascript:")) {
+            return text;
+        }
+        url = url.replace("\"", "&quot;");
+        return "<a href=\"" + url + "\">" + text + "</a>";
     }
 
     private static String escapeHtml(String text) {
