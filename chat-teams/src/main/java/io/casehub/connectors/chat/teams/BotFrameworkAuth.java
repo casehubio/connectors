@@ -14,6 +14,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Instant;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -67,7 +68,7 @@ class BotFrameworkAuth {
 
             if (!expectedIssuer.equals(claims.getIssuer())) return false;
 
-            java.util.List<String> audience = claims.getAudience();
+            List<String> audience = claims.getAudience();
             if (audience == null || !audience.contains(appId)) return false;
 
             Date expiration = claims.getExpirationTime();

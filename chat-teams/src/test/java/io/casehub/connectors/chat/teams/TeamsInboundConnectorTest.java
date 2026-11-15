@@ -1,18 +1,17 @@
 package io.casehub.connectors.chat.teams;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.List;
-import java.util.Map;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import io.casehub.connectors.HttpMethod;
 import io.casehub.connectors.InboundConnectorIds;
 import io.casehub.connectors.WebhookRequest;
 import io.casehub.connectors.WebhookResult;
 import io.casehub.connectors.chat.command.CommandService;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.util.List;
+import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class TeamsInboundConnectorTest {
 
@@ -154,6 +153,28 @@ class TeamsInboundConnectorTest {
         var req = postRequest(body);
         assertThat(connector.handle(req)).isInstanceOf(WebhookResult.Ignored.class);
     }
+
+    @Test
+    void blankAppId_doesNotFilterMessages() {
+        var auth = new BotFrameworkAuth("", true,
+                                        "https://login.botframework.com/v1/.well-known/openidconfiguration",
+                                        "https://api.botframework.com");
+        var client = new BotFrameworkClient(null,
+                                            "*.botframework.com,smba.trafficmanager.net");
+        var emptyAppConnector = new TeamsInboundConnector(auth, client,
+                                                          new CommandService(List.of(), List.of()), "");
+
+        String body = """
+                      {"type":"message","text":"Hello",\
+                      "from":{"id":"29:user-id","aadObjectId":"aad-user-1"},\
+                      "conversation":{"id":"conv-1","conversationType":"channel"},\
+                      "channelData":{"team":{"id":"team-1"},"channel":{"id":"ch-1"},"tenant":{"id":"t-1"}},\
+                      "serviceUrl":"https://smba.trafficmanager.net/teams/",\
+                      "id":"act-11","timestamp":"2026-11-15T10:00:00Z"}""";
+        var req = postRequest(body);
+        assertThat(emptyAppConnector.handle(req)).isInstanceOf(WebhookResult.Delivered.class);
+    }
+
 
     @Test
     void personalChat_usesPersonalPrefix() {

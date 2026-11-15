@@ -75,7 +75,7 @@ public class TeamsInboundConnector extends WebhookInboundConnector {
             var from = activity.getJsonObject("from");
             fromId = from.getString("id", "");
         }
-        if (appId.equals(fromId)) {
+        if (!appId.isBlank() && appId.equals(fromId)) {
             return new WebhookResult.Ignored();
         }
 
