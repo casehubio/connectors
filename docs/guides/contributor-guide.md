@@ -43,7 +43,7 @@ Two transport patterns converge into a single CDI event bus:
 | Connector | Algorithm | Notes |
 |-----------|-----------|-------|
 | `SlackInboundConnector` | HMAC-SHA256 | Signing secret; `url_verification` challenge handling; filters bot messages and subtypes (message_changed, message_deleted, channel_join) |
-| `TeamsInboundConnector` | HMAC-SHA256 | Base64-encoded shared secret |
+| `TeamsInboundConnector` | JWT/RS256 via `BotFrameworkAuth` | Azure AD JWKS; lives in `chat-teams` module (not `webhook`); embedded command dispatch |
 | `WhatsAppInboundConnector` | HMAC-SHA256 | GET challenge via `hub.mode` verify token |
 | `TwilioSmsInboundConnector` | HMAC-SHA1 | Twilio algorithm; form-encoded POST; signs full request URL |
 
@@ -92,7 +92,7 @@ public interface InboundTranslator {
 
 Platform-specific interaction endpoints (`DiscordInteractionEndpoint`, `SlackCommandEndpoint`) receive HTTP requests, verify signatures (Ed25519 for Discord, HMAC-SHA256 for Slack), deserialize to `CommandInvocation`, call `CommandService.dispatch()`, and serialize the `CommandResponse` back to the platform. `CommandResponse` is sealed: `Immediate` (synchronous reply within 3s) or `Deferred` (acknowledge immediately, send follow-up via webhook/response_url).
 
-To add Commands support to a new `ChatPlatform`: (1) implement `Commands` for registration, (2) create a JAX-RS endpoint for receiving invocations, (3) wire into `ChatPlatform.commands()`.
+To add Commands support to a new `ChatPlatform`: (1) implement `Commands` for registration, (2) create a JAX-RS endpoint for receiving invocations, (3) wire into `ChatPlatform.commands()`. **Exception:** platforms with unified webhook transport (e.g. Teams via Bot Framework) embed command dispatch directly in the `WebhookInboundConnector` rather than using a separate JAX-RS endpoint, since all activity types (messages, commands, reactions) arrive at the same webhook.
 
 ### Calendar Platform Architecture
 
