@@ -60,7 +60,7 @@ class GoogleFileOperationsTest {
                                 {"error":{"code":404,"message":"File not found",
                                  "errors":[{"reason":"notFound"}]}}""")));
 
-        assertThatThrownBy(() -> platform.files().download("missing"))
+        assertThatThrownBy(() -> platform.files("test-user").download("missing"))
                 .isInstanceOf(NoSuchElementException.class);
     }
 
@@ -73,7 +73,7 @@ class GoogleFileOperationsTest {
                                 {"error":{"code":401,"message":"Invalid Credentials",
                                  "errors":[{"reason":"authError"}]}}""")));
 
-        assertThatThrownBy(() -> platform.files().list("root", PageRequest.first(10)))
+        assertThatThrownBy(() -> platform.files("test-user").list("root", PageRequest.first(10)))
                 .isInstanceOf(ProviderAuthException.class)
                 .satisfies(ex -> assertThat(((ProviderAuthException) ex).reason())
                         .isEqualTo(AuthFailureReason.TOKEN_EXPIRED));
@@ -87,7 +87,7 @@ class GoogleFileOperationsTest {
                         .withBody("""
                                 {"error":{"code":429,"message":"Rate Limit Exceeded"}}""")));
 
-        assertThatThrownBy(() -> platform.files().get("file-1"))
+        assertThatThrownBy(() -> platform.files("test-user").get("file-1"))
                 .isInstanceOf(ProviderRateLimitedException.class);
     }
 
@@ -100,7 +100,7 @@ class GoogleFileOperationsTest {
                                 {"error":{"code":403,"message":"Insufficient Permission",
                                  "errors":[{"reason":"insufficientPermissions"}]}}""")));
 
-        assertThatThrownBy(() -> platform.files().delete("file-1"))
+        assertThatThrownBy(() -> platform.files("test-user").delete("file-1"))
                 .isInstanceOf(ProviderAuthException.class)
                 .satisfies(ex -> assertThat(((ProviderAuthException) ex).reason())
                         .isEqualTo(AuthFailureReason.INSUFFICIENT_SCOPE));
@@ -115,7 +115,7 @@ class GoogleFileOperationsTest {
                                 {"error":{"code":403,"message":"Domain Policy Block",
                                  "errors":[{"reason":"domainPolicy"}]}}""")));
 
-        assertThatThrownBy(() -> platform.files().delete("file-1"))
+        assertThatThrownBy(() -> platform.files("test-user").delete("file-1"))
                 .isInstanceOf(ProviderAuthException.class)
                 .satisfies(ex -> assertThat(((ProviderAuthException) ex).reason())
                         .isEqualTo(AuthFailureReason.FORBIDDEN));
@@ -129,7 +129,7 @@ class GoogleFileOperationsTest {
                         .withBody("""
                                 {"error":{"code":500,"message":"Internal Server Error"}}""")));
 
-        assertThatThrownBy(() -> platform.files().list("root", PageRequest.first(10)))
+        assertThatThrownBy(() -> platform.files("test-user").list("root", PageRequest.first(10)))
                 .isInstanceOf(ProviderApiException.class)
                 .satisfies(ex -> assertThat(((ProviderApiException) ex).statusCode())
                         .isEqualTo(500));
@@ -144,7 +144,7 @@ class GoogleFileOperationsTest {
                                 {"id":"file-1","name":"test.txt","mimeType":"text/plain",
                                  "size":"100","modifiedTime":"2026-01-01T00:00:00.000Z"}""")));
 
-        var metadata = platform.files().get("file-1");
+        var metadata = platform.files("test-user").get("file-1");
         assertThat(metadata).isNotNull();
         assertThat(metadata.id()).isEqualTo("file-1");
     }

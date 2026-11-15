@@ -73,7 +73,7 @@ class GoogleDocumentSyncTest {
                         .withBody("""
                                 {"error":{"code":500,"message":"Internal error"}}""")));
 
-        var result = platform.files().listSync(SyncRequest.initial(100));
+        var result = platform.files("test-user").listSync(SyncRequest.initial(100));
         assertThat(result.items()).hasSize(1);
         assertThat(result.items().get(0).id()).isEqualTo("f1");
         assertThat(result.syncToken()).isNull();
@@ -88,7 +88,7 @@ class GoogleDocumentSyncTest {
                                 {"error":{"code":404,"message":"Page token expired",
                                  "errors":[{"reason":"notFound"}]}}""")));
 
-        assertThatThrownBy(() -> platform.files().listSync(new SyncRequest("old-token", 100)))
+        assertThatThrownBy(() -> platform.files("test-user").listSync(new SyncRequest("old-token", 100)))
                 .isInstanceOf(SyncTokenExpiredException.class);
     }
 }

@@ -46,20 +46,16 @@ public class GoogleDocumentPlatform implements DocumentPlatform {
     private static final String DEFAULT_TENANCY = "default";
 
     private final ServiceConnectionProvider connectionProvider;
-    private Drive driveService;
-
-    private final FileOperations fileOps = new GoogleFileOperations();
-    private final FolderOperations folderOps = new GoogleFolderOperations();
-    private final SearchOperations searchOps = new GoogleSearchOperations();
-    private final SharingOperations sharingOps = new GoogleSharingOperations();
+    private final Drive overrideService;
 
     public GoogleDocumentPlatform(ServiceConnectionProvider connectionProvider) {
         this.connectionProvider = connectionProvider;
+        this.overrideService = null;
     }
 
     GoogleDocumentPlatform(Drive driveService) {
         this.connectionProvider = null;
-        this.driveService = driveService;
+        this.overrideService = driveService;
     }
 
     @Override
@@ -75,16 +71,35 @@ public class GoogleDocumentPlatform implements DocumentPlatform {
             || capability == SharingOperations.class;
     }
 
-    @Override public FileOperations files() { return fileOps; }
-    @Override public FolderOperations folders() { return folderOps; }
-    @Override public SearchOperations search() { return searchOps; }
-    @Override public SharingOperations sharing() { return sharingOps; }
+    @Override public FileOperations files(String userId) {
+        return new GoogleFileOperations(resolveService(userId));
+    }
+    @Override public FolderOperations folders(String userId) {
+        return new GoogleFolderOperations(resolveService(userId));
+    }
+    @Override public SearchOperations search(String userId) {
+        return new GoogleSearchOperations(resolveService(userId));
+    }
+    @Override public SharingOperations sharing(String userId) {
+        return new GoogleSharingOperations(resolveService(userId));
+    }
 
-    private void requireClient() {
-        if (driveService == null) {
+    private Drive resolveService(String userId) {
+        if (overrideService != null) return overrideService;
+        if (connectionProvider == null) {
             throw new IllegalStateException(
                     "Google Drive client not initialised — check credentials configuration");
         }
+        var token = connectionProvider.getAccessToken(userId, "google", DEFAULT_TENANCY);
+        var credentials = com.google.auth.oauth2.GoogleCredentials.create(
+            new com.google.auth.oauth2.AccessToken(token.accessToken(),
+                java.util.Date.from(token.expiresAt())));
+        return new Drive.Builder(
+                new com.google.api.client.http.javanet.NetHttpTransport(),
+                com.google.api.client.json.gson.GsonFactory.getDefaultInstance(),
+                new com.google.auth.http.HttpCredentialsAdapter(credentials))
+            .setApplicationName("casehub-connectors")
+            .build();
     }
 
     static DocumentMetadata toMetadata(File file) {
@@ -117,10 +132,12 @@ public class GoogleDocumentPlatform implements DocumentPlatform {
     }
 
     private class GoogleFileOperations implements FileOperations {
+        private final Drive driveService;
+        GoogleFileOperations(Drive driveService) { this.driveService = driveService; }
 
         @Override
         public Page<DocumentSummary> list(String folderId, PageRequest pagination) {
-            requireClient();
+
             try {
                 var request = driveService.files().list()
                         .setQ("'" + folderId + "' in parents and mimeType != '" + FOLDER_MIME + "' and trashed = false")
@@ -146,7 +163,7 @@ public class GoogleDocumentPlatform implements DocumentPlatform {
 
         @Override
         public DocumentMetadata get(String fileId) {
-            requireClient();
+
             try {
                 var file = driveService.files().get(fileId)
                         .setFields(FILE_FIELDS)
@@ -161,7 +178,7 @@ public class GoogleDocumentPlatform implements DocumentPlatform {
 
         @Override
         public byte[] download(String fileId) {
-            requireClient();
+
             try {
                 var out = new ByteArrayOutputStream();
                 driveService.files().get(fileId).executeMediaAndDownloadTo(out);
@@ -178,7 +195,7 @@ public class GoogleDocumentPlatform implements DocumentPlatform {
         @Override
         public DocumentMetadata upload(String folderId, String name,
                                        String contentType, byte[] content) {
-            requireClient();
+
             try {
                 var fileMetadata = new File()
                         .setName(name)
@@ -198,7 +215,7 @@ public class GoogleDocumentPlatform implements DocumentPlatform {
 
         @Override
         public void delete(String fileId) {
-            requireClient();
+
             try {
                 driveService.files().delete(fileId).execute();
             } catch (GoogleJsonResponseException e) {
@@ -210,7 +227,7 @@ public class GoogleDocumentPlatform implements DocumentPlatform {
 
         @Override
         public SyncResult<DocumentSummary> listSync(SyncRequest request) {
-            requireClient();
+
             if (request.syncToken() == null) {
                 return initialSync(request);
             }
@@ -311,10 +328,12 @@ public class GoogleDocumentPlatform implements DocumentPlatform {
     }
 
     private class GoogleFolderOperations implements FolderOperations {
+        private final Drive driveService;
+        GoogleFolderOperations(Drive driveService) { this.driveService = driveService; }
 
         @Override
         public List<Folder> list(String parentId) {
-            requireClient();
+
             try {
                 var response = driveService.files().list()
                         .setQ("'" + parentId + "' in parents and mimeType = '" + FOLDER_MIME + "' and trashed = false")
@@ -339,7 +358,7 @@ public class GoogleDocumentPlatform implements DocumentPlatform {
 
         @Override
         public Folder create(String parentId, String name) {
-            requireClient();
+
             try {
                 var fileMetadata = new File()
                         .setName(name)
@@ -361,7 +380,7 @@ public class GoogleDocumentPlatform implements DocumentPlatform {
 
         @Override
         public void move(String fileId, String targetFolderId) {
-            requireClient();
+
             try {
                 var file = driveService.files().get(fileId)
                         .setFields("parents")
@@ -380,10 +399,12 @@ public class GoogleDocumentPlatform implements DocumentPlatform {
     }
 
     private class GoogleSearchOperations implements SearchOperations {
+        private final Drive driveService;
+        GoogleSearchOperations(Drive driveService) { this.driveService = driveService; }
 
         @Override
         public Page<DocumentSummary> search(String query, PageRequest pagination) {
-            requireClient();
+
             try {
                 var request = driveService.files().list()
                         .setQ("fullText contains '" + query.replace("'", "\\'") + "' and trashed = false")
@@ -409,10 +430,12 @@ public class GoogleDocumentPlatform implements DocumentPlatform {
     }
 
     private class GoogleSharingOperations implements SharingOperations {
+        private final Drive driveService;
+        GoogleSharingOperations(Drive driveService) { this.driveService = driveService; }
 
         @Override
         public String getShareLink(String fileId) {
-            requireClient();
+
             try {
                 var permission = new Permission()
                         .setType("anyone")

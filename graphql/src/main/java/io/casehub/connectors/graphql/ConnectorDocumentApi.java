@@ -30,6 +30,9 @@ import java.util.List;
 public class ConnectorDocumentApi {
 
     @Inject DocumentPlatformService documentService;
+    @Inject
+            io.casehub.platform.api.identity.CurrentPrincipal currentPrincipal;
+
 
     @PlatformQuery("List files in a folder")
     @RestPath("/files")
@@ -41,7 +44,7 @@ public class ConnectorDocumentApi {
         var p = documentService.platform(platformId);
         requireCapability(p, DocumentPlatform.FileOperations.class, "listFiles");
         int size = pageSize != null ? pageSize : 20;
-        return p.files().list(folderId, new PageRequest(cursor, size));
+        return p.files(currentPrincipal.actorId()).list(folderId, new PageRequest(cursor, size));
     }
 
     @PlatformQuery("Get file metadata by ID")
@@ -51,7 +54,7 @@ public class ConnectorDocumentApi {
             @PathParam String fileId) {
         var p = documentService.platform(platformId);
         requireCapability(p, DocumentPlatform.FileOperations.class, "getFile");
-        return p.files().get(fileId);
+        return p.files(currentPrincipal.actorId()).get(fileId);
     }
 
     @PlatformQuery("Download file content")
@@ -61,7 +64,7 @@ public class ConnectorDocumentApi {
             @PathParam String fileId) {
         var p = documentService.platform(platformId);
         requireCapability(p, DocumentPlatform.FileOperations.class, "downloadFile");
-        return p.files().download(fileId);
+        return p.files(currentPrincipal.actorId()).download(fileId);
     }
 
     @PlatformMutation("Upload a file to a folder")
@@ -74,7 +77,7 @@ public class ConnectorDocumentApi {
             byte[] content) {
         var p = documentService.platform(platformId);
         requireCapability(p, DocumentPlatform.FileOperations.class, "uploadFile");
-        return p.files().upload(folderId, name, contentType, content);
+        return p.files(currentPrincipal.actorId()).upload(folderId, name, contentType, content);
     }
 
     @PlatformMutation("Delete a file")
@@ -85,7 +88,7 @@ public class ConnectorDocumentApi {
         var p = documentService.platform(platformId);
         requireCapability(p, DocumentPlatform.FileOperations.class, "deleteFile");
         try {
-            p.files().delete(fileId);
+            p.files(currentPrincipal.actorId()).delete(fileId);
             return new OperationResult(true, platformId, fileId, "Deleted " + fileId);
         } catch (Exception e) {
             return new OperationResult(false, platformId, fileId, e.getMessage());
@@ -104,7 +107,7 @@ public class ConnectorDocumentApi {
         var request = syncToken != null
             ? new SyncRequest(syncToken, size)
             : SyncRequest.initial(size);
-        return p.files().listSync(request);
+        return p.files(currentPrincipal.actorId()).listSync(request);
     }
 
     @PlatformQuery("List folders under a parent")
@@ -114,7 +117,7 @@ public class ConnectorDocumentApi {
             @QueryParam("parentId") String parentId) {
         var p = documentService.platform(platformId);
         requireCapability(p, DocumentPlatform.FolderOperations.class, "listFolders");
-        return p.folders().list(parentId);
+        return p.folders(currentPrincipal.actorId()).list(parentId);
     }
 
     @PlatformMutation("Create a folder")
@@ -125,7 +128,7 @@ public class ConnectorDocumentApi {
             @QueryParam("name") String name) {
         var p = documentService.platform(platformId);
         requireCapability(p, DocumentPlatform.FolderOperations.class, "createFolder");
-        return p.folders().create(parentId, name);
+        return p.folders(currentPrincipal.actorId()).create(parentId, name);
     }
 
     @PlatformMutation("Move a file to a different folder")
@@ -137,7 +140,7 @@ public class ConnectorDocumentApi {
         var p = documentService.platform(platformId);
         requireCapability(p, DocumentPlatform.FolderOperations.class, "moveFile");
         try {
-            p.folders().move(fileId, targetFolderId);
+            p.folders(currentPrincipal.actorId()).move(fileId, targetFolderId);
             return new OperationResult(true, platformId, fileId, "Moved to " + targetFolderId);
         } catch (Exception e) {
             return new OperationResult(false, platformId, fileId, e.getMessage());
@@ -154,7 +157,7 @@ public class ConnectorDocumentApi {
         var p = documentService.platform(platformId);
         requireCapability(p, DocumentPlatform.SearchOperations.class, "searchDocuments");
         int size = pageSize != null ? pageSize : 20;
-        return p.search().search(query, new PageRequest(cursor, size));
+        return p.search(currentPrincipal.actorId()).search(query, new PageRequest(cursor, size));
     }
 
     @PlatformQuery("Get a share link for a file")
@@ -164,7 +167,7 @@ public class ConnectorDocumentApi {
             @PathParam String fileId) {
         var p = documentService.platform(platformId);
         requireCapability(p, DocumentPlatform.SharingOperations.class, "getShareLink");
-        return p.sharing().getShareLink(fileId);
+        return p.sharing(currentPrincipal.actorId()).getShareLink(fileId);
     }
 
     private static void requireCapability(DocumentPlatform platform, Class<?> capability, String operation) {

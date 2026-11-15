@@ -54,7 +54,7 @@ class GoogleSearchSharingTest {
                         .withBody("""
                                 {"error":{"code":429,"message":"Rate Limit Exceeded"}}""")));
 
-        assertThatThrownBy(() -> platform.search().search("test", PageRequest.first(10)))
+        assertThatThrownBy(() -> platform.search("test-user").search("test", PageRequest.first(10)))
                 .isInstanceOf(ProviderRateLimitedException.class);
     }
 
@@ -67,7 +67,7 @@ class GoogleSearchSharingTest {
                                 {"error":{"code":401,"message":"Invalid Credentials",
                                  "errors":[{"reason":"authError"}]}}""")));
 
-        assertThatThrownBy(() -> platform.sharing().getShareLink("file-1"))
+        assertThatThrownBy(() -> platform.sharing("test-user").getShareLink("file-1"))
                 .isInstanceOf(ProviderAuthException.class);
     }
 }

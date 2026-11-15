@@ -65,7 +65,7 @@ class GoogleDocumentPlatformTest {
     @Test
     void requireClient_noClient_throwsIllegalState() {
         var unconfigured = new GoogleDocumentPlatform((Drive) null);
-        assertThatThrownBy(() -> unconfigured.files().list("root", PageRequest.first(10)))
+        assertThatThrownBy(() -> unconfigured.files("test-user").list("root", PageRequest.first(10)))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("not initialised");
     }
@@ -101,7 +101,7 @@ class GoogleDocumentPlatformTest {
                                 }
                                 """)));
 
-        var page = platform.files().list("folder-1", PageRequest.first(10));
+        var page = platform.files("test-user").list("folder-1", PageRequest.first(10));
 
         assertThat(page.items()).hasSize(1);
         var file = page.items().getFirst();
@@ -124,7 +124,7 @@ class GoogleDocumentPlatformTest {
                                 }
                                 """)));
 
-        var page = platform.files().list("root", PageRequest.first(1));
+        var page = platform.files("test-user").list("root", PageRequest.first(1));
 
         assertThat(page.items()).hasSize(1);
         assertThat(page.hasMore()).isTrue();
@@ -150,7 +150,7 @@ class GoogleDocumentPlatformTest {
                                 }
                                 """)));
 
-        var metadata = platform.files().get("file-1");
+        var metadata = platform.files("test-user").get("file-1");
 
         assertThat(metadata.id()).isEqualTo("file-1");
         assertThat(metadata.name()).isEqualTo("Design.md");
@@ -167,7 +167,7 @@ class GoogleDocumentPlatformTest {
                                 {"error": {"code": 404, "message": "File not found"}}
                                 """)));
 
-        assertThatThrownBy(() -> platform.files().get("nonexistent"))
+        assertThatThrownBy(() -> platform.files("test-user").get("nonexistent"))
                 .isInstanceOf(NoSuchElementException.class);
     }
 
@@ -188,7 +188,7 @@ class GoogleDocumentPlatformTest {
                                 }
                                 """)));
 
-        var metadata = platform.files().upload(
+        var metadata = platform.files("test-user").upload(
                 "folder-1", "uploaded.txt", "text/plain", "Hello, world!".getBytes());
 
         assertThat(metadata.id()).isEqualTo("new-file");
@@ -200,7 +200,7 @@ class GoogleDocumentPlatformTest {
         wireMock.stubFor(delete(urlPathEqualTo("/drive/v3/files/file-1"))
                 .willReturn(aResponse().withStatus(204)));
 
-        platform.files().delete("file-1");
+        platform.files("test-user").delete("file-1");
 
         wireMock.verify(1, WireMock.deleteRequestedFor(
                 urlPathEqualTo("/drive/v3/files/file-1")));
@@ -215,7 +215,7 @@ class GoogleDocumentPlatformTest {
                                 {"error": {"code": 404, "message": "File not found"}}
                                 """)));
 
-        assertThatThrownBy(() -> platform.files().delete("nonexistent"))
+        assertThatThrownBy(() -> platform.files("test-user").delete("nonexistent"))
                 .isInstanceOf(NoSuchElementException.class);
     }
 
@@ -235,7 +235,7 @@ class GoogleDocumentPlatformTest {
                                 }
                                 """)));
 
-        var folders = platform.folders().list("root");
+        var folders = platform.folders("test-user").list("root");
 
         assertThat(folders).hasSize(2);
         assertThat(folders).extracting("name").contains("Documents", "Reports");
@@ -255,7 +255,7 @@ class GoogleDocumentPlatformTest {
                                 }
                                 """)));
 
-        var folder = platform.folders().create("root", "New Folder");
+        var folder = platform.folders("test-user").create("root", "New Folder");
 
         assertThat(folder.id()).isEqualTo("new-folder");
         assertThat(folder.name()).isEqualTo("New Folder");
@@ -277,7 +277,7 @@ class GoogleDocumentPlatformTest {
                                 }
                                 """)));
 
-        var page = platform.search().search("quarterly", PageRequest.first(10));
+        var page = platform.search("test-user").search("quarterly", PageRequest.first(10));
 
         assertThat(page.items()).hasSize(1);
         assertThat(page.items().getFirst().name()).contains("Quarterly");
@@ -292,7 +292,7 @@ class GoogleDocumentPlatformTest {
                                 {"files": []}
                                 """)));
 
-        var page = platform.search().search("xyzzy", PageRequest.first(10));
+        var page = platform.search("test-user").search("xyzzy", PageRequest.first(10));
 
         assertThat(page.items()).isEmpty();
         assertThat(page.hasMore()).isFalse();
@@ -315,7 +315,7 @@ class GoogleDocumentPlatformTest {
                                 {"id": "file-1", "webViewLink": "https://drive.google.com/file/d/file-1/view?usp=sharing"}
                                 """)));
 
-        var link = platform.sharing().getShareLink("file-1");
+        var link = platform.sharing("test-user").getShareLink("file-1");
 
         assertThat(link).contains("file-1");
         assertThat(link).contains("sharing");
@@ -330,7 +330,7 @@ class GoogleDocumentPlatformTest {
                                 {"error": {"code": 404, "message": "File not found"}}
                                 """)));
 
-        assertThatThrownBy(() -> platform.sharing().getShareLink("nonexistent"))
+        assertThatThrownBy(() -> platform.sharing("test-user").getShareLink("nonexistent"))
                 .isInstanceOf(NoSuchElementException.class);
     }
 // --- Sync ---
@@ -361,7 +361,7 @@ class GoogleDocumentPlatformTest {
                                                                }
                                                                """)));
 
-        var result = platform.files().listSync(io.casehub.connectors.SyncRequest.initial(100));
+        var result = platform.files("test-user").listSync(io.casehub.connectors.SyncRequest.initial(100));
 
         assertThat(result.items()).hasSize(1);
         assertThat(result.items().getFirst().name()).isEqualTo("Doc.txt");
@@ -398,7 +398,7 @@ class GoogleDocumentPlatformTest {
                                                                }
                                                                """)));
 
-        var result = platform.files().listSync(new io.casehub.connectors.SyncRequest("page-token-1", 100));
+        var result = platform.files("test-user").listSync(new io.casehub.connectors.SyncRequest("page-token-1", 100));
 
         assertThat(result.items()).hasSize(1);
         assertThat(result.items().getFirst().name()).isEqualTo("NewDoc.txt");
@@ -416,7 +416,7 @@ class GoogleDocumentPlatformTest {
                                                                   {"error": {"code": 404, "message": "Page token expired"}}
                                                                   """)));
 
-        assertThatThrownBy(() -> platform.files().listSync(
+        assertThatThrownBy(() -> platform.files("test-user").listSync(
                 new io.casehub.connectors.SyncRequest("expired", 100)))
                 .isInstanceOf(io.casehub.connectors.SyncTokenExpiredException.class);
     }

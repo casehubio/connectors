@@ -119,7 +119,7 @@ class MicrosoftDrivePlatformTest {
     void degradedPlatformSupportsNothing() {
         var degraded = new MicrosoftDrivePlatform(null, "microsoft-sharepoint");
         assertThat(degraded.supports(DocumentPlatform.FileOperations.class)).isFalse();
-        assertThatThrownBy(degraded::files)
+        assertThatThrownBy(() -> degraded.files("test-user"))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("not configured");
     }
@@ -129,7 +129,7 @@ class MicrosoftDrivePlatformTest {
 
         @Test
         void listReturnsFiles() {
-            var page = platform.files().list("root", PageRequest.first(25));
+            var page = platform.files("test-user").list("root", PageRequest.first(25));
             assertThat(page.items()).hasSize(1);
             assertThat(page.items().get(0).name()).isEqualTo("report.pdf");
             assertThat(page.items().get(0).contentType()).isEqualTo("application/pdf");
@@ -137,7 +137,7 @@ class MicrosoftDrivePlatformTest {
 
         @Test
         void getReturnsMetadata() {
-            var meta = platform.files().get("file-1");
+            var meta = platform.files("test-user").get("file-1");
             assertThat(meta.id()).isEqualTo("file-1");
             assertThat(meta.name()).isEqualTo("report.pdf");
             assertThat(meta.owner()).isEqualTo("Alice");
@@ -145,7 +145,7 @@ class MicrosoftDrivePlatformTest {
 
         @Test
         void uploadReturnsMetadata() {
-            var meta = platform.files().upload("folder-1", "uploaded.txt",
+            var meta = platform.files("test-user").upload("folder-1", "uploaded.txt",
                     "text/plain", "hello".getBytes());
             assertThat(meta.id()).isEqualTo("file-new");
             assertThat(meta.name()).isEqualTo("uploaded.txt");
@@ -153,13 +153,13 @@ class MicrosoftDrivePlatformTest {
 
         @Test
         void deleteDoesNotThrow() {
-            assertThatCode(() -> platform.files().delete("file-1"))
+            assertThatCode(() -> platform.files("test-user").delete("file-1"))
                     .doesNotThrowAnyException();
         }
 
         @Test
         void listSyncReturnsDeltaResult() {
-            var result = platform.files().listSync(SyncRequest.initial(50));
+            var result = platform.files("test-user").listSync(SyncRequest.initial(50));
             assertThat(result.items()).hasSize(1);
             assertThat(result.items().get(0).id()).isEqualTo("file-1");
             assertThat(result.deletedIds()).containsExactly("del-1");
@@ -172,21 +172,21 @@ class MicrosoftDrivePlatformTest {
 
         @Test
         void listReturnsFolders() {
-            var folders = platform.folders().list("root");
+            var folders = platform.folders("test-user").list("root");
             assertThat(folders).hasSize(1);
             assertThat(folders.get(0).name()).isEqualTo("Documents");
         }
 
         @Test
         void createReturnsFolder() {
-            var folder = platform.folders().create("root", "New Folder");
+            var folder = platform.folders("test-user").create("root", "New Folder");
             assertThat(folder.id()).isEqualTo("folder-new");
             assertThat(folder.name()).isEqualTo("New Folder");
         }
 
         @Test
         void moveDoesNotThrow() {
-            assertThatCode(() -> platform.folders().move("file-1", "folder-1"))
+            assertThatCode(() -> platform.folders("test-user").move("file-1", "folder-1"))
                     .doesNotThrowAnyException();
         }
     }
@@ -196,7 +196,7 @@ class MicrosoftDrivePlatformTest {
 
         @Test
         void searchReturnsResults() {
-            var page = platform.search().search("report", PageRequest.first(25));
+            var page = platform.search("test-user").search("report", PageRequest.first(25));
             assertThat(page.items()).hasSize(1);
             assertThat(page.items().get(0).name()).isEqualTo("report.pdf");
         }
@@ -207,7 +207,7 @@ class MicrosoftDrivePlatformTest {
 
         @Test
         void getShareLinkReturnsUrl() {
-            var link = platform.sharing().getShareLink("file-1");
+            var link = platform.sharing("test-user").getShareLink("file-1");
             assertThat(link).isEqualTo("https://1drv.ms/b/s!shared-link");
         }
     }

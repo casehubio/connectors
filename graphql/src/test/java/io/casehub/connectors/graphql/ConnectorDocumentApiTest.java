@@ -40,10 +40,10 @@ class ConnectorDocumentApiTest {
         sharingOps = mock(DocumentPlatform.SharingOperations.class);
 
         when(platform.id()).thenReturn("test");
-        when(platform.files()).thenReturn(fileOps);
-        when(platform.folders()).thenReturn(folderOps);
-        when(platform.search()).thenReturn(searchOps);
-        when(platform.sharing()).thenReturn(sharingOps);
+        when(platform.files(org.mockito.ArgumentMatchers.any())).thenReturn(fileOps);
+        when(platform.folders(org.mockito.ArgumentMatchers.any())).thenReturn(folderOps);
+        when(platform.search(org.mockito.ArgumentMatchers.any())).thenReturn(searchOps);
+        when(platform.sharing(org.mockito.ArgumentMatchers.any())).thenReturn(sharingOps);
         when(platform.supports(DocumentPlatform.FileOperations.class)).thenReturn(true);
         when(platform.supports(DocumentPlatform.FolderOperations.class)).thenReturn(true);
         when(platform.supports(DocumentPlatform.SearchOperations.class)).thenReturn(true);
@@ -51,6 +51,12 @@ class ConnectorDocumentApiTest {
 
         api = new ConnectorDocumentApi();
         api.documentService = new DocumentPlatformService(List.of(platform));
+        api.currentPrincipal = new io.casehub.platform.api.identity.CurrentPrincipal() {
+            @Override public String actorId() { return "test-actor"; }
+            @Override public java.util.Set<String> groups() { return java.util.Set.of(); }
+            @Override public String tenancyId() { return "default"; }
+            @Override public boolean isCrossTenantAdmin() { return false; }
+        };
     }
 
     @Test
@@ -182,7 +188,7 @@ class ConnectorDocumentApiTest {
     void requireCapabilityThrowsWhenUnsupported() {
         var platform = mock(DocumentPlatform.class);
         when(platform.id()).thenReturn("limited");
-        when(platform.files()).thenReturn(fileOps);
+        when(platform.files(org.mockito.ArgumentMatchers.any())).thenReturn(fileOps);
         when(platform.supports(DocumentPlatform.FileOperations.class)).thenReturn(true);
         when(platform.supports(DocumentPlatform.FolderOperations.class)).thenReturn(false);
         when(platform.supports(DocumentPlatform.SearchOperations.class)).thenReturn(false);
@@ -190,6 +196,7 @@ class ConnectorDocumentApiTest {
 
         var limitedApi = new ConnectorDocumentApi();
         limitedApi.documentService = new DocumentPlatformService(List.of(platform));
+        limitedApi.currentPrincipal = api.currentPrincipal;
 
         assertThatThrownBy(() -> limitedApi.listFolders("limited", null))
             .isInstanceOf(UnsupportedCapabilityException.class)

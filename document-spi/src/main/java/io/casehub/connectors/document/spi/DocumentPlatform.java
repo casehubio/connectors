@@ -1,14 +1,14 @@
 package io.casehub.connectors.document.spi;
 
 import io.casehub.connectors.Page;
+import io.casehub.connectors.PageRequest;
+import io.casehub.connectors.PlatformExtensible;
 import io.casehub.connectors.SyncRequest;
 import io.casehub.connectors.SyncResult;
-import io.casehub.connectors.PageRequest;
 import io.casehub.connectors.document.model.DocumentMetadata;
 import io.casehub.connectors.document.model.DocumentSummary;
 import io.casehub.connectors.document.model.Folder;
 import io.casehub.platform.api.confirmation.RequiresConfirmation;
-import io.casehub.connectors.PlatformExtensible;
 import io.casehub.platform.simulation.SimulationEligible;
 
 import java.util.List;
@@ -21,13 +21,13 @@ public interface DocumentPlatform extends PlatformExtensible {
 
     boolean supports(Class<?> capability);
 
-    FileOperations files();
+    FileOperations files(String userId);
 
-    FolderOperations folders();
+    FolderOperations folders(String userId);
 
-    SearchOperations search();
+    SearchOperations search(String userId);
 
-    SharingOperations sharing();
+    SharingOperations sharing(String userId);
 
     interface FileOperations {
 

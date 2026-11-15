@@ -56,7 +56,7 @@ class GoogleFolderOperationsTest {
                                 {"error":{"code":404,"message":"File not found",
                                  "errors":[{"reason":"notFound"}]}}""")));
 
-        assertThatThrownBy(() -> platform.folders().move("file-1", "folder-2"))
+        assertThatThrownBy(() -> platform.folders("test-user").move("file-1", "folder-2"))
                 .isInstanceOf(NoSuchElementException.class);
     }
 
@@ -68,7 +68,7 @@ class GoogleFolderOperationsTest {
                         .withBody("""
                                 {"error":{"code":429,"message":"Rate Limit Exceeded"}}""")));
 
-        assertThatThrownBy(() -> platform.folders().create("root", "New Folder"))
+        assertThatThrownBy(() -> platform.folders("test-user").create("root", "New Folder"))
                 .isInstanceOf(ProviderRateLimitedException.class);
     }
 
@@ -81,7 +81,7 @@ class GoogleFolderOperationsTest {
                                 {"error":{"code":401,"message":"Invalid Credentials",
                                  "errors":[{"reason":"authError"}]}}""")));
 
-        assertThatThrownBy(() -> platform.folders().list("root"))
+        assertThatThrownBy(() -> platform.folders("test-user").list("root"))
                 .isInstanceOf(ProviderAuthException.class);
     }
 }

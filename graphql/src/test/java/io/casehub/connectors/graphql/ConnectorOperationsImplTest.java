@@ -410,16 +410,16 @@ class ConnectorOperationsImplTest {
                                         boolean supportsSearch,
                                         boolean supportsSharing) implements io.casehub.connectors.document.spi.DocumentPlatform {
         @Override
-        public FileOperations files()      {throw new UnsupportedOperationException();}
+        public FileOperations files(String userId)      {throw new UnsupportedOperationException();}
 
         @Override
-        public FolderOperations folders()  {throw new UnsupportedOperationException();}
+        public FolderOperations folders(String userId)  {throw new UnsupportedOperationException();}
 
         @Override
-        public SearchOperations search()   {throw new UnsupportedOperationException();}
+        public SearchOperations search(String userId)   {throw new UnsupportedOperationException();}
 
         @Override
-        public SharingOperations sharing() {throw new UnsupportedOperationException();}
+        public SharingOperations sharing(String userId) {throw new UnsupportedOperationException();}
 
         @Override
         public boolean supports(Class<?> capability) {

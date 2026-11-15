@@ -1,9 +1,9 @@
 package io.casehub.connectors.document.spi;
 
 import io.casehub.connectors.Page;
+import io.casehub.connectors.PageRequest;
 import io.casehub.connectors.SyncRequest;
 import io.casehub.connectors.SyncResult;
-import io.casehub.connectors.PageRequest;
 import io.casehub.connectors.document.model.DocumentMetadata;
 import io.casehub.connectors.document.model.DocumentSummary;
 import io.casehub.connectors.document.model.Folder;
@@ -29,22 +29,22 @@ public class NoOpDocumentPlatform implements DocumentPlatform {
     }
 
     @Override
-    public FileOperations files() {
+    public FileOperations files(String userId) {
         return NoOpFileOperations.INSTANCE;
     }
 
     @Override
-    public FolderOperations folders() {
+    public FolderOperations folders(String userId) {
         return NoOpFolderOperations.INSTANCE;
     }
 
     @Override
-    public SearchOperations search() {
+    public SearchOperations search(String userId) {
         return NoOpSearchOperations.INSTANCE;
     }
 
     @Override
-    public SharingOperations sharing() {
+    public SharingOperations sharing(String userId) {
         return NoOpSharingOperations.INSTANCE;
     }
 

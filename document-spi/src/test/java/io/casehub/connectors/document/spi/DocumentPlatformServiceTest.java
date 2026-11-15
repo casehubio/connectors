@@ -67,10 +67,10 @@ class DocumentPlatformServiceTest {
         return new DocumentPlatform() {
             @Override public String id() { return id; }
             @Override public boolean supports(Class<?> c) { return false; }
-            @Override public FileOperations files() { return null; }
-            @Override public FolderOperations folders() { return null; }
-            @Override public SearchOperations search() { return null; }
-            @Override public SharingOperations sharing() { return null; }
+            @Override public FileOperations files(String userId) { return null; }
+            @Override public FolderOperations folders(String userId) { return null; }
+            @Override public SearchOperations search(String userId) { return null; }
+            @Override public SharingOperations sharing(String userId) { return null; }
         };
     }
 }

@@ -45,27 +45,27 @@ public class MicrosoftDrivePlatform implements DocumentPlatform {
     }
 
     @Override
-    public FileOperations files() {
+    public FileOperations files(String userId) {
         requireConfigured();
-        return new MicrosoftFileOperations();
+        return new MicrosoftFileOperations(userId);
     }
 
     @Override
-    public FolderOperations folders() {
+    public FolderOperations folders(String userId) {
         requireConfigured();
-        return new MicrosoftFolderOperations();
+        return new MicrosoftFolderOperations(userId);
     }
 
     @Override
-    public SearchOperations search() {
+    public SearchOperations search(String userId) {
         requireConfigured();
-        return new MicrosoftSearchOperations();
+        return new MicrosoftSearchOperations(userId);
     }
 
     @Override
-    public SharingOperations sharing() {
+    public SharingOperations sharing(String userId) {
         requireConfigured();
-        return new MicrosoftSharingOperations();
+        return new MicrosoftSharingOperations(userId);
     }
 
     private void requireConfigured() {
@@ -74,17 +74,19 @@ public class MicrosoftDrivePlatform implements DocumentPlatform {
         }
     }
 
-    private String resolveToken() {
+    private String resolveToken(String userId) {
         if (connectionProvider == null) return "test-token";
-        return connectionProvider.getAccessToken(null, "microsoft", "default")
+        return connectionProvider.getAccessToken(userId, "microsoft", "default")
                 .accessToken();
     }
 
     private class MicrosoftFileOperations implements FileOperations {
+        private final String userId;
+        MicrosoftFileOperations(String userId) { this.userId = userId; }
 
         @Override
         public Page<DocumentSummary> list(String folderId, PageRequest pagination) {
-            return TokenRetry.withTokenRetry(MicrosoftDrivePlatform.this::resolveToken,
+            return TokenRetry.withTokenRetry(() -> resolveToken(userId),
                     token -> {
                         var page = client.listChildren(folderId, pagination, token);
                         return new Page<>(
@@ -95,33 +97,33 @@ public class MicrosoftDrivePlatform implements DocumentPlatform {
 
         @Override
         public DocumentMetadata get(String fileId) {
-            return TokenRetry.withTokenRetry(MicrosoftDrivePlatform.this::resolveToken,
+            return TokenRetry.withTokenRetry(() -> resolveToken(userId),
                     token -> DriveMapper.toMetadata(client.getItem(fileId, token)));
         }
 
         @Override
         public byte[] download(String fileId) {
-            return TokenRetry.withTokenRetry(MicrosoftDrivePlatform.this::resolveToken,
+            return TokenRetry.withTokenRetry(() -> resolveToken(userId),
                     token -> client.downloadContent(fileId, token));
         }
 
         @Override
         public DocumentMetadata upload(String folderId, String name,
                 String contentType, byte[] content) {
-            return TokenRetry.withTokenRetry(MicrosoftDrivePlatform.this::resolveToken,
+            return TokenRetry.withTokenRetry(() -> resolveToken(userId),
                     token -> DriveMapper.toMetadata(
                             client.upload(folderId, name, contentType, content, token)));
         }
 
         @Override
         public void delete(String fileId) {
-            TokenRetry.withTokenRetryVoid(MicrosoftDrivePlatform.this::resolveToken,
+            TokenRetry.withTokenRetryVoid(() -> resolveToken(userId),
                     token -> client.deleteItem(fileId, token));
         }
 
         @Override
         public SyncResult<DocumentSummary> listSync(SyncRequest request) {
-            return TokenRetry.withTokenRetry(MicrosoftDrivePlatform.this::resolveToken,
+            return TokenRetry.withTokenRetry(() -> resolveToken(userId),
                     token -> {
                         var delta = client.deltaSync(request.syncToken(), token);
                         return new SyncResult<>(
@@ -135,33 +137,37 @@ public class MicrosoftDrivePlatform implements DocumentPlatform {
     }
 
     private class MicrosoftFolderOperations implements FolderOperations {
+        private final String userId;
+        MicrosoftFolderOperations(String userId) { this.userId = userId; }
 
         @Override
         public List<Folder> list(String parentId) {
-            return TokenRetry.withTokenRetry(MicrosoftDrivePlatform.this::resolveToken,
+            return TokenRetry.withTokenRetry(() -> resolveToken(userId),
                     token -> client.listFolders(parentId, token).stream()
                             .map(DriveMapper::toFolder).toList());
         }
 
         @Override
         public Folder create(String parentId, String name) {
-            return TokenRetry.withTokenRetry(MicrosoftDrivePlatform.this::resolveToken,
+            return TokenRetry.withTokenRetry(() -> resolveToken(userId),
                     token -> DriveMapper.toFolder(
                             client.createFolder(parentId, name, token)));
         }
 
         @Override
         public void move(String fileId, String targetFolderId) {
-            TokenRetry.withTokenRetryVoid(MicrosoftDrivePlatform.this::resolveToken,
+            TokenRetry.withTokenRetryVoid(() -> resolveToken(userId),
                     token -> client.moveItem(fileId, targetFolderId, token));
         }
     }
 
     private class MicrosoftSearchOperations implements SearchOperations {
+        private final String userId;
+        MicrosoftSearchOperations(String userId) { this.userId = userId; }
 
         @Override
         public Page<DocumentSummary> search(String query, PageRequest pagination) {
-            return TokenRetry.withTokenRetry(MicrosoftDrivePlatform.this::resolveToken,
+            return TokenRetry.withTokenRetry(() -> resolveToken(userId),
                     token -> {
                         var page = client.search(query, pagination, token);
                         return new Page<>(
@@ -172,10 +178,12 @@ public class MicrosoftDrivePlatform implements DocumentPlatform {
     }
 
     private class MicrosoftSharingOperations implements SharingOperations {
+        private final String userId;
+        MicrosoftSharingOperations(String userId) { this.userId = userId; }
 
         @Override
         public String getShareLink(String fileId) {
-            return TokenRetry.withTokenRetry(MicrosoftDrivePlatform.this::resolveToken,
+            return TokenRetry.withTokenRetry(() -> resolveToken(userId),
                     token -> client.createShareLink(fileId, token));
         }
     }

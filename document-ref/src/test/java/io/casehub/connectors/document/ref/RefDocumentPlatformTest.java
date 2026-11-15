@@ -43,7 +43,7 @@ class RefDocumentPlatformTest {
 
     @Test
     void folders_list_returnsPreloadedFolders() {
-        var folders = platform.folders().list("root");
+        var folders = platform.folders("test-user").list("root");
         assertThat(folders).isNotEmpty();
         assertThat(folders).extracting("name")
                 .contains("Family Documents", "Financial");
@@ -51,7 +51,7 @@ class RefDocumentPlatformTest {
 
     @Test
     void folders_create_returnsNewFolder() {
-        var folder = platform.folders().create("root", "New Folder");
+        var folder = platform.folders("test-user").create("root", "New Folder");
         assertThat(folder.id()).isNotNull();
         assertThat(folder.name()).isEqualTo("New Folder");
         assertThat(folder.parentId()).isEqualTo("root");
@@ -59,14 +59,14 @@ class RefDocumentPlatformTest {
 
     @Test
     void folders_create_appearsInList() {
-        platform.folders().create("root", "Created");
-        var folders = platform.folders().list("root");
+        platform.folders("test-user").create("root", "Created");
+        var folders = platform.folders("test-user").list("root");
         assertThat(folders).extracting("name").contains("Created");
     }
 
     @Test
     void folders_list_unknownParent_returnsEmpty() {
-        var folders = platform.folders().list("nonexistent");
+        var folders = platform.folders("test-user").list("nonexistent");
         assertThat(folders).isEmpty();
     }
 
@@ -74,21 +74,21 @@ class RefDocumentPlatformTest {
 
     @Test
     void files_list_returnsPreloadedFiles() {
-        var folders = platform.folders().list("root");
+        var folders = platform.folders("test-user").list("root");
         var docsFolder = folders.stream()
                 .filter(f -> f.name().equals("Family Documents"))
                 .findFirst().orElseThrow();
-        var page = platform.files().list(docsFolder.id(), PageRequest.first(50));
+        var page = platform.files("test-user").list(docsFolder.id(), PageRequest.first(50));
         assertThat(page.items()).isNotEmpty();
     }
 
     @Test
     void files_list_pagination_respectsPageSize() {
-        var folders = platform.folders().list("root");
+        var folders = platform.folders("test-user").list("root");
         var docsFolder = folders.stream()
                 .filter(f -> f.name().equals("Family Documents"))
                 .findFirst().orElseThrow();
-        var firstPage = platform.files().list(docsFolder.id(), PageRequest.first(2));
+        var firstPage = platform.files("test-user").list(docsFolder.id(), PageRequest.first(2));
         assertThat(firstPage.items()).hasSize(2);
         assertThat(firstPage.hasMore()).isTrue();
         assertThat(firstPage.nextCursor()).isNotNull();
@@ -96,12 +96,12 @@ class RefDocumentPlatformTest {
 
     @Test
     void files_list_pagination_cursorFetchesNextPage() {
-        var folders = platform.folders().list("root");
+        var folders = platform.folders("test-user").list("root");
         var docsFolder = folders.stream()
                 .filter(f -> f.name().equals("Family Documents"))
                 .findFirst().orElseThrow();
-        var firstPage = platform.files().list(docsFolder.id(), PageRequest.first(2));
-        var secondPage = platform.files().list(docsFolder.id(),
+        var firstPage = platform.files("test-user").list(docsFolder.id(), PageRequest.first(2));
+        var secondPage = platform.files("test-user").list(docsFolder.id(),
                 new PageRequest(firstPage.nextCursor(), 2));
         assertThat(secondPage.items()).isNotEmpty();
         assertThat(secondPage.items()).extracting("id")
@@ -111,21 +111,21 @@ class RefDocumentPlatformTest {
 
     @Test
     void files_list_unknownFolder_returnsEmpty() {
-        var page = platform.files().list("nonexistent", PageRequest.first(50));
+        var page = platform.files("test-user").list("nonexistent", PageRequest.first(50));
         assertThat(page.items()).isEmpty();
         assertThat(page.hasMore()).isFalse();
     }
 
     @Test
     void files_get_returnsMetadata() {
-        var folders = platform.folders().list("root");
+        var folders = platform.folders("test-user").list("root");
         var docsFolder = folders.stream()
                 .filter(f -> f.name().equals("Family Documents"))
                 .findFirst().orElseThrow();
-        var files = platform.files().list(docsFolder.id(), PageRequest.first(1));
+        var files = platform.files("test-user").list(docsFolder.id(), PageRequest.first(1));
         var fileId = files.items().getFirst().id();
 
-        var metadata = platform.files().get(fileId);
+        var metadata = platform.files("test-user").get(fileId);
 
         assertThat(metadata.id()).isEqualTo(fileId);
         assertThat(metadata.name()).isNotNull();
@@ -135,41 +135,41 @@ class RefDocumentPlatformTest {
 
     @Test
     void files_get_unknown_throws() {
-        assertThatThrownBy(() -> platform.files().get("nonexistent"))
+        assertThatThrownBy(() -> platform.files("test-user").get("nonexistent"))
                 .isInstanceOf(NoSuchElementException.class);
     }
 
     @Test
     void files_download_returnsContent() {
-        var folders = platform.folders().list("root");
+        var folders = platform.folders("test-user").list("root");
         var docsFolder = folders.stream()
                 .filter(f -> f.name().equals("Family Documents"))
                 .findFirst().orElseThrow();
-        var files = platform.files().list(docsFolder.id(), PageRequest.first(1));
+        var files = platform.files("test-user").list(docsFolder.id(), PageRequest.first(1));
         var fileId = files.items().getFirst().id();
 
-        var content = platform.files().download(fileId);
+        var content = platform.files("test-user").download(fileId);
 
         assertThat(content).isNotEmpty();
-        var metadata = platform.files().get(fileId);
+        var metadata = platform.files("test-user").get(fileId);
         assertThat(content).hasSize((int) metadata.size());
     }
 
     @Test
     void files_download_unknown_throws() {
-        assertThatThrownBy(() -> platform.files().download("nonexistent"))
+        assertThatThrownBy(() -> platform.files("test-user").download("nonexistent"))
                 .isInstanceOf(NoSuchElementException.class);
     }
 
     @Test
     void files_upload_returnsMetadata() {
-        var folders = platform.folders().list("root");
+        var folders = platform.folders("test-user").list("root");
         var docsFolder = folders.stream()
                 .filter(f -> f.name().equals("Family Documents"))
                 .findFirst().orElseThrow();
 
         byte[] content = "Hello, world!".getBytes();
-        var metadata = platform.files().upload(
+        var metadata = platform.files("test-user").upload(
                 docsFolder.id(), "test.txt", "text/plain", content);
 
         assertThat(metadata.id()).isNotNull();
@@ -181,52 +181,52 @@ class RefDocumentPlatformTest {
 
     @Test
     void files_upload_appearsInList() {
-        var folders = platform.folders().list("root");
+        var folders = platform.folders("test-user").list("root");
         var docsFolder = folders.stream()
                 .filter(f -> f.name().equals("Family Documents"))
                 .findFirst().orElseThrow();
 
-        platform.files().upload(docsFolder.id(), "uploaded.pdf",
+        platform.files("test-user").upload(docsFolder.id(), "uploaded.pdf",
                 "application/pdf", new byte[1024]);
 
-        var page = platform.files().list(docsFolder.id(), PageRequest.first(50));
+        var page = platform.files("test-user").list(docsFolder.id(), PageRequest.first(50));
         assertThat(page.items()).extracting("name").contains("uploaded.pdf");
     }
 
     @Test
     void files_upload_downloadRoundTrip() {
-        var folders = platform.folders().list("root");
+        var folders = platform.folders("test-user").list("root");
         var docsFolder = folders.stream()
                 .filter(f -> f.name().equals("Family Documents"))
                 .findFirst().orElseThrow();
 
         byte[] original = "Round trip content".getBytes();
-        var metadata = platform.files().upload(
+        var metadata = platform.files("test-user").upload(
                 docsFolder.id(), "round.txt", "text/plain", original);
 
-        byte[] downloaded = platform.files().download(metadata.id());
+        byte[] downloaded = platform.files("test-user").download(metadata.id());
         assertThat(downloaded).isEqualTo(original);
     }
 
     @Test
     void files_delete_removesFile() {
-        var folders = platform.folders().list("root");
+        var folders = platform.folders("test-user").list("root");
         var docsFolder = folders.stream()
                 .filter(f -> f.name().equals("Family Documents"))
                 .findFirst().orElseThrow();
 
-        var metadata = platform.files().upload(
+        var metadata = platform.files("test-user").upload(
                 docsFolder.id(), "delete-me.txt", "text/plain", "temp".getBytes());
 
-        platform.files().delete(metadata.id());
+        platform.files("test-user").delete(metadata.id());
 
-        assertThatThrownBy(() -> platform.files().get(metadata.id()))
+        assertThatThrownBy(() -> platform.files("test-user").get(metadata.id()))
                 .isInstanceOf(NoSuchElementException.class);
     }
 
     @Test
     void files_delete_unknown_throws() {
-        assertThatThrownBy(() -> platform.files().delete("nonexistent"))
+        assertThatThrownBy(() -> platform.files("test-user").delete("nonexistent"))
                 .isInstanceOf(NoSuchElementException.class);
     }
 
@@ -234,7 +234,7 @@ class RefDocumentPlatformTest {
 
     @Test
     void folders_move_changesParent() {
-        var folders = platform.folders().list("root");
+        var folders = platform.folders("test-user").list("root");
         var docsFolder = folders.stream()
                 .filter(f -> f.name().equals("Family Documents"))
                 .findFirst().orElseThrow();
@@ -242,13 +242,13 @@ class RefDocumentPlatformTest {
                 .filter(f -> f.name().equals("Financial"))
                 .findFirst().orElseThrow();
 
-        var metadata = platform.files().upload(
+        var metadata = platform.files("test-user").upload(
                 docsFolder.id(), "moving.txt", "text/plain", "move me".getBytes());
 
-        platform.folders().move(metadata.id(), financialFolder.id());
+        platform.folders("test-user").move(metadata.id(), financialFolder.id());
 
-        var docsFiles = platform.files().list(docsFolder.id(), PageRequest.first(50));
-        var reportsFiles = platform.files().list(financialFolder.id(), PageRequest.first(50));
+        var docsFiles = platform.files("test-user").list(docsFolder.id(), PageRequest.first(50));
+        var reportsFiles = platform.files("test-user").list(financialFolder.id(), PageRequest.first(50));
         assertThat(docsFiles.items()).extracting("id").doesNotContain(metadata.id());
         assertThat(reportsFiles.items()).extracting("id").contains(metadata.id());
     }
@@ -257,13 +257,13 @@ class RefDocumentPlatformTest {
 
     @Test
     void search_findsMatchingFiles() {
-        var page = platform.search().search("passport", PageRequest.first(50));
+        var page = platform.search("test-user").search("passport", PageRequest.first(50));
         assertThat(page.items()).isNotEmpty();
     }
 
     @Test
     void search_noMatch_returnsEmpty() {
-        var page = platform.search().search("xyzzy-no-match-999", PageRequest.first(50));
+        var page = platform.search("test-user").search("xyzzy-no-match-999", PageRequest.first(50));
         assertThat(page.items()).isEmpty();
     }
 
@@ -271,14 +271,14 @@ class RefDocumentPlatformTest {
 
     @Test
     void sharing_getShareLink_returnsLink() {
-        var folders = platform.folders().list("root");
+        var folders = platform.folders("test-user").list("root");
         var docsFolder = folders.stream()
                 .filter(f -> f.name().equals("Family Documents"))
                 .findFirst().orElseThrow();
-        var files = platform.files().list(docsFolder.id(), PageRequest.first(1));
+        var files = platform.files("test-user").list(docsFolder.id(), PageRequest.first(1));
         var fileId = files.items().getFirst().id();
 
-        var link = platform.sharing().getShareLink(fileId);
+        var link = platform.sharing("test-user").getShareLink(fileId);
 
         assertThat(link).isNotNull();
         assertThat(link).contains(fileId);
@@ -286,7 +286,7 @@ class RefDocumentPlatformTest {
 
     @Test
     void sharing_getShareLink_unknown_throws() {
-        assertThatThrownBy(() -> platform.sharing().getShareLink("nonexistent"))
+        assertThatThrownBy(() -> platform.sharing("test-user").getShareLink("nonexistent"))
                 .isInstanceOf(NoSuchElementException.class);
     }
 
@@ -294,13 +294,13 @@ class RefDocumentPlatformTest {
 
     @Test
     void differentFolders_haveIsolatedFiles() {
-        var folders = platform.folders().list("root");
+        var folders = platform.folders("test-user").list("root");
         assertThat(folders.size()).isGreaterThanOrEqualTo(2);
         var first = folders.getFirst();
         var second = folders.get(1);
 
-        var firstFiles = platform.files().list(first.id(), PageRequest.first(50));
-        var secondFiles = platform.files().list(second.id(), PageRequest.first(50));
+        var firstFiles = platform.files("test-user").list(first.id(), PageRequest.first(50));
+        var secondFiles = platform.files("test-user").list(second.id(), PageRequest.first(50));
 
         var firstIds = firstFiles.items().stream().map(s -> s.id()).toList();
         var secondIds = secondFiles.items().stream().map(s -> s.id()).toList();
@@ -310,7 +310,7 @@ class RefDocumentPlatformTest {
 
     @Test
     void listSync_initialSync_returnsAllFilesWithToken() {
-        var result = platform.files().listSync(io.casehub.connectors.SyncRequest.initial(100));
+        var result = platform.files("test-user").listSync(io.casehub.connectors.SyncRequest.initial(100));
 
         assertThat(result.items()).hasSize(17);
         assertThat(result.syncToken()).isNotNull();
@@ -320,13 +320,13 @@ class RefDocumentPlatformTest {
 
     @Test
     void listSync_incrementalSync_detectsUploads() {
-        var fullSync = platform.files().listSync(io.casehub.connectors.SyncRequest.initial(100));
+        var fullSync = platform.files("test-user").listSync(io.casehub.connectors.SyncRequest.initial(100));
         var token    = fullSync.syncToken();
 
-        platform.files().upload("folder-family", "new-file.txt", "text/plain",
+        platform.files("test-user").upload("folder-family", "new-file.txt", "text/plain",
                                 "hello".getBytes());
 
-        var incrementalSync = platform.files().listSync(
+        var incrementalSync = platform.files("test-user").listSync(
                 new io.casehub.connectors.SyncRequest(token, 100));
         assertThat(incrementalSync.items()).hasSize(1);
         assertThat(incrementalSync.items().getFirst().name()).isEqualTo("new-file.txt");
@@ -334,22 +334,22 @@ class RefDocumentPlatformTest {
 
     @Test
     void listSync_incrementalSync_detectsDeletes() {
-        var fullSync = platform.files().listSync(io.casehub.connectors.SyncRequest.initial(100));
+        var fullSync = platform.files("test-user").listSync(io.casehub.connectors.SyncRequest.initial(100));
         var token    = fullSync.syncToken();
 
-        platform.files().delete("doc-001");
+        platform.files("test-user").delete("doc-001");
 
-        var incrementalSync = platform.files().listSync(
+        var incrementalSync = platform.files("test-user").listSync(
                 new io.casehub.connectors.SyncRequest(token, 100));
         assertThat(incrementalSync.deletedIds()).contains("doc-001");
     }
 
     @Test
     void listSync_noChanges_returnsEmpty() {
-        var fullSync = platform.files().listSync(io.casehub.connectors.SyncRequest.initial(100));
+        var fullSync = platform.files("test-user").listSync(io.casehub.connectors.SyncRequest.initial(100));
         var token    = fullSync.syncToken();
 
-        var incrementalSync = platform.files().listSync(
+        var incrementalSync = platform.files("test-user").listSync(
                 new io.casehub.connectors.SyncRequest(token, 100));
         assertThat(incrementalSync.items()).isEmpty();
         assertThat(incrementalSync.deletedIds()).isEmpty();
