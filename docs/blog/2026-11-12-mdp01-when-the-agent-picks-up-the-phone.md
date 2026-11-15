@@ -2,7 +2,7 @@
 layout: post
 title: "When the Agent Picks Up the Phone"
 date: 2026-11-12
-entry_type: article
+entry_type: note
 subtype: diary
 projects: [casehubio/connectors]
 tags: [mobile, telephony, spi, voice-calls, agent, architecture]

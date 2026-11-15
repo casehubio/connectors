@@ -2,7 +2,7 @@
 layout: post
 title: "Voice Providers That Compose"
 date: 2026-11-10
-entry_type: article
+entry_type: note
 subtype: diary
 projects: [casehubio/connectors]
 tags: [voice, spi, architecture, manifest, routing]
