@@ -17,18 +17,33 @@ class EmailPlatformServiceTest {
 
     static class StubPlatform implements EmailPlatform {
         private final String platformId;
-        StubPlatform(String id) { this.platformId = id; }
-        @Override public String id() { return platformId; }
-        @Override public List<Mailbox> listMailboxes() { return List.of(); }
-        @Override public Page<EmailSummary> listMessages(String m, Instant f,
-                Instant t, PageRequest p) { return Page.of(List.of()); }
-        @Override public EmailMessage getMessage(String m, String id) { return null; }
-        @Override public byte[] getAttachmentContent(String m, String mid,
-                String aid) { return new byte[0]; }
+
+        StubPlatform(String id) {this.platformId = id;}
 
         @Override
-        public Page<EmailSummary> search(String q, PageRequest p) {return Page.of(List.of());}
+        public String id()      {return platformId;}
 
+        @Override
+        public EmailOperations emailOps(String userId) {
+            return new EmailOperations() {
+                @Override
+                public List<Mailbox> listMailboxes() {return List.of();}
+
+                @Override
+                public Page<EmailSummary> listMessages(String m, Instant f,
+                                                       Instant t, PageRequest p) {return Page.of(List.of());}
+
+                @Override
+                public EmailMessage getMessage(String m, String id) {return null;}
+
+                @Override
+                public byte[] getAttachmentContent(String m, String mid,
+                                                   String aid) {return new byte[0];}
+
+                @Override
+                public Page<EmailSummary> search(String q, PageRequest p) {return Page.of(List.of());}
+            };
+        }
     }
 
     @Test

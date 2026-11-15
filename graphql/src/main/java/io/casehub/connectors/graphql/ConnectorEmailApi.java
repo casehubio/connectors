@@ -1,12 +1,12 @@
 package io.casehub.connectors.graphql;
 
-import io.casehub.connectors.email.spi.EmailPlatformService;
+import io.casehub.connectors.Page;
+import io.casehub.connectors.PageRequest;
 import io.casehub.connectors.email.model.EmailMessage;
 import io.casehub.connectors.email.model.EmailSummary;
 import io.casehub.connectors.email.model.Mailbox;
-import io.casehub.connectors.Page;
-import io.casehub.connectors.PageRequest;
 import io.casehub.connectors.email.spi.EmailPlatform;
+import io.casehub.connectors.email.spi.EmailPlatformService;
 import io.casehub.platform.api.mcp.McpDomain;
 import io.casehub.platform.api.mcp.PathParam;
 import io.casehub.platform.api.mcp.PlatformQuery;
@@ -24,13 +24,16 @@ import java.util.List;
 public class ConnectorEmailApi {
 
     @Inject EmailPlatformService emailService;
+    @Inject
+            io.casehub.platform.api.identity.CurrentPrincipal currentPrincipal;
+
 
     @PlatformQuery("List mailboxes on a platform")
     @RestPath("/mailboxes")
     public List<Mailbox> listMailboxes(@QueryParam("platform") String platform) {
         EmailPlatform p = emailService.platform(platform);
         if (p == null) return List.of();
-        return p.listMailboxes();
+        return p.emailOps(currentPrincipal.actorId()).listMailboxes();
     }
 
     @PlatformQuery("List email messages in a mailbox")
@@ -47,7 +50,7 @@ public class ConnectorEmailApi {
         Instant effectiveFrom = from != null ? from : Instant.now().minusSeconds(2592000);
         Instant effectiveTo = to != null ? to : Instant.now();
         int size = pageSize != null ? pageSize : 50;
-        return p.listMessages(mailboxId, effectiveFrom, effectiveTo,
+        return p.emailOps(currentPrincipal.actorId()).listMessages(mailboxId, effectiveFrom, effectiveTo,
             new PageRequest(cursor, size));
     }
 
@@ -59,7 +62,7 @@ public class ConnectorEmailApi {
             @PathParam String messageId) {
         EmailPlatform p = emailService.platform(platform);
         if (p == null) return null;
-        return p.getMessage(mailboxId, messageId);
+        return p.emailOps(currentPrincipal.actorId()).getMessage(mailboxId, messageId);
     }
 
     @PlatformQuery("Get email attachment content as base64")
@@ -71,7 +74,7 @@ public class ConnectorEmailApi {
             @PathParam String attachmentId) {
         EmailPlatform p = emailService.platform(platform);
         if (p == null) return null;
-        byte[] content = p.getAttachmentContent(mailboxId, messageId, attachmentId);
+        byte[] content = p.emailOps(currentPrincipal.actorId()).getAttachmentContent(mailboxId, messageId, attachmentId);
         return content != null ? Base64.getEncoder().encodeToString(content) : null;
     }
 }

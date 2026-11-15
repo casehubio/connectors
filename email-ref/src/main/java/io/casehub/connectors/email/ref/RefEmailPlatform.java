@@ -14,7 +14,6 @@ public class RefEmailPlatform implements EmailPlatform {
 
     private final EmailBackend backend;
 
-
     public RefEmailPlatform() {
         this(new InMemoryEmailBackend());
     }
@@ -27,20 +26,34 @@ public class RefEmailPlatform implements EmailPlatform {
     public String id() {return "ref";}
 
     @Override
-    public List<Mailbox> listMailboxes() {return backend.listMailboxes();}
+    public EmailOperations emailOps(String userId) {
+        return new RefEmailOperations();
+    }
 
-    @Override
-    public Page<EmailSummary> listMessages(String mailboxId, Instant from,
-                                           Instant to, PageRequest pagination) {return backend.listMessages(mailboxId, from, to, pagination);}
+    private class RefEmailOperations implements EmailOperations {
 
-    @Override
-    public EmailMessage getMessage(String mailboxId, String messageId) {return backend.getMessage(mailboxId, messageId);}
+        @Override
+        public List<Mailbox> listMailboxes() {return backend.listMailboxes();}
 
-    @Override
-    public byte[] getAttachmentContent(String mailboxId, String messageId,
-                                       String attachmentId) {return backend.getAttachmentContent(mailboxId, messageId, attachmentId);}
+        @Override
+        public Page<EmailSummary> listMessages(String mailboxId, Instant from,
+                                               Instant to, PageRequest pagination) {
+            return backend.listMessages(mailboxId, from, to, pagination);
+        }
 
-    @Override
-    public Page<EmailSummary> search(String query, PageRequest pagination) {return backend.search(query, pagination);}
+        @Override
+        public EmailMessage getMessage(String mailboxId, String messageId) {
+            return backend.getMessage(mailboxId, messageId);
+        }
 
+        @Override
+        public byte[] getAttachmentContent(String mailboxId, String messageId, String attachmentId) {
+            return backend.getAttachmentContent(mailboxId, messageId, attachmentId);
+        }
+
+        @Override
+        public Page<EmailSummary> search(String query, PageRequest pagination) {
+            return backend.search(query, pagination);
+        }
+    }
 }

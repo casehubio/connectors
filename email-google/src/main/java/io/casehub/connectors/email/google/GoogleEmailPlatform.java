@@ -50,15 +50,16 @@ public class GoogleEmailPlatform implements EmailPlatform {
     private static final String DEFAULT_TENANCY = "default";
 
     private final ServiceConnectionProvider connectionProvider;
-    private Gmail gmailService;
+    private final Gmail overrideService;
 
     public GoogleEmailPlatform(ServiceConnectionProvider connectionProvider) {
         this.connectionProvider = connectionProvider;
+        this.overrideService = null;
     }
 
     GoogleEmailPlatform(Gmail gmailService) {
         this.connectionProvider = null;
-        this.gmailService = gmailService;
+        this.overrideService = gmailService;
     }
 
     @Override
@@ -67,8 +68,37 @@ public class GoogleEmailPlatform implements EmailPlatform {
     }
 
     @Override
-    public List<Mailbox> listMailboxes() {
-        requireClient();
+    public EmailOperations emailOps(String userId) {
+        if (overrideService == null && connectionProvider == null) {
+            throw new IllegalStateException("Google Gmail client not initialised — check credentials configuration");
+        }
+        Gmail service = overrideService != null ? overrideService : buildService(userId);
+        return new GoogleEmailOperations(service);
+    }
+
+    private Gmail buildService(String actorId) {
+        var token = connectionProvider.getAccessToken(actorId, "google", DEFAULT_TENANCY);
+        var credentials = com.google.auth.oauth2.GoogleCredentials.create(
+            new com.google.auth.oauth2.AccessToken(token.accessToken(),
+                java.util.Date.from(token.expiresAt())));
+        return new Gmail.Builder(
+                new com.google.api.client.http.javanet.NetHttpTransport(),
+                com.google.api.client.json.gson.GsonFactory.getDefaultInstance(),
+                new com.google.auth.http.HttpCredentialsAdapter(credentials))
+            .setApplicationName("casehub-connectors")
+            .build();
+    }
+
+    private class GoogleEmailOperations implements EmailOperations {
+
+        private final Gmail gmailService;
+
+        GoogleEmailOperations(Gmail gmailService) {
+            this.gmailService = gmailService;
+        }
+
+        @Override
+        public List<Mailbox> listMailboxes() {
         try {
             var response = gmailService.users().labels().list(USER_ID).execute();
             if (response.getLabels() == null) {
@@ -91,7 +121,7 @@ public class GoogleEmailPlatform implements EmailPlatform {
     @Override
     public Page<EmailSummary> listMessages(String mailboxId, Instant from,
                                            Instant to, PageRequest pagination) {
-        requireClient();
+
         try {
             String query = buildDateQuery(from, to);
             var request = gmailService.users().messages().list(USER_ID)
@@ -132,7 +162,7 @@ public class GoogleEmailPlatform implements EmailPlatform {
 
     @Override
     public EmailMessage getMessage(String mailboxId, String messageId) {
-        requireClient();
+
         try {
             var message = gmailService.users().messages().get(USER_ID, messageId)
                     .setFormat("full")
@@ -148,7 +178,7 @@ public class GoogleEmailPlatform implements EmailPlatform {
     @Override
     public byte[] getAttachmentContent(String mailboxId, String messageId,
                                        String attachmentId) {
-        requireClient();
+
         try {
             var attachment = gmailService.users().messages().attachments()
                     .get(USER_ID, messageId, attachmentId)
@@ -163,7 +193,7 @@ public class GoogleEmailPlatform implements EmailPlatform {
 
     @Override
     public Page<EmailSummary> search(String query, PageRequest pagination) {
-        requireClient();
+
         try {
             var request = gmailService.users().messages().list(USER_ID)
                                       .setQ(query)
@@ -202,11 +232,6 @@ public class GoogleEmailPlatform implements EmailPlatform {
     }
 
 
-    private void requireClient() {
-        if (gmailService == null) {
-            throw new IllegalStateException(
-                    "Gmail client not initialised — check credentials configuration");
-        }
     }
 
     private static String buildDateQuery(Instant from, Instant to) {

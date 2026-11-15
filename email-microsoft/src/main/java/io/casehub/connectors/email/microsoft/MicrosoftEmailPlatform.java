@@ -14,12 +14,12 @@ import java.util.List;
 
 public class MicrosoftEmailPlatform implements EmailPlatform {
 
-    private final MicrosoftMailClient mailClient;
+    private final MicrosoftMailClient       mailClient;
     private final ServiceConnectionProvider connectionProvider;
 
     public MicrosoftEmailPlatform(MicrosoftMailClient mailClient,
-            ServiceConnectionProvider connectionProvider) {
-        this.mailClient = mailClient;
+                                  ServiceConnectionProvider connectionProvider) {
+        this.mailClient         = mailClient;
         this.connectionProvider = connectionProvider;
     }
 
@@ -28,57 +28,71 @@ public class MicrosoftEmailPlatform implements EmailPlatform {
     }
 
     @Override
-    public String id() { return "microsoft"; }
+    public String id() {return "microsoft";}
 
     @Override
-    public List<Mailbox> listMailboxes() {
-        return TokenRetry.withTokenRetry(this::resolveToken,
-                token -> mailClient.listMailFolders(token).stream()
-                        .map(MailMapper::toMailbox).toList());
+    public EmailOperations emailOps(String userId) {
+        return new MicrosoftEmailOperations(userId);
     }
 
-    @Override
-    public Page<EmailSummary> listMessages(String mailboxId, Instant from,
-            Instant to, PageRequest pagination) {
-        return TokenRetry.withTokenRetry(this::resolveToken,
-                token -> {
-                    var page = mailClient.listMessages(mailboxId, token,
-                            from, to, pagination.pageSize(), pagination.cursor());
-                    return new Page<>(page.items().stream()
-                            .map(json -> MailMapper.toEmailSummary(json, mailboxId)).toList(),
-                            page.nextCursor(), page.hasMore());
-                });
+    private String resolveToken(String userId) {
+        if (connectionProvider == null) {return "test-token";}
+        return connectionProvider.getAccessToken(userId, "microsoft", "default")
+                                 .accessToken();
     }
 
-    @Override
-    public EmailMessage getMessage(String mailboxId, String messageId) {
-        return TokenRetry.withTokenRetry(this::resolveToken,
-                token -> MailMapper.toEmailMessage(
-                        mailClient.getMessage(messageId, token), mailboxId));
-    }
+    private class MicrosoftEmailOperations implements EmailOperations {
 
-    @Override
-    public byte[] getAttachmentContent(String mailboxId, String messageId,
-            String attachmentId) {
-        return TokenRetry.withTokenRetry(this::resolveToken,
-                token -> mailClient.getAttachmentContent(messageId, attachmentId, token));
-    }
+        private final String userId;
 
-    @Override
-    public Page<EmailSummary> search(String query, PageRequest pagination) {
-        return TokenRetry.withTokenRetry(this::resolveToken,
-                token -> {
-                    var page = mailClient.searchMessages(query, token,
-                            pagination.pageSize(), pagination.cursor());
-                    return new Page<>(page.items().stream()
-                            .map(json -> MailMapper.toEmailSummary(json, "search")).toList(),
-                            page.nextCursor(), page.hasMore());
-                });
-    }
+        MicrosoftEmailOperations(String userId) {
+            this.userId = userId;
+        }
 
-    private String resolveToken() {
-        if (connectionProvider == null) return "test-token";
-        return connectionProvider.getAccessToken(null, "microsoft", "default")
-                .accessToken();
+        @Override
+        public List<Mailbox> listMailboxes() {
+            return TokenRetry.withTokenRetry(() -> resolveToken(userId),
+                                             token -> mailClient.listMailFolders(token).stream()
+                                                                .map(MailMapper::toMailbox).toList());
+        }
+
+        @Override
+        public Page<EmailSummary> listMessages(String mailboxId, Instant from,
+                                               Instant to, PageRequest pagination) {
+            return TokenRetry.withTokenRetry(() -> resolveToken(userId),
+                                             token -> {
+                                                 var page = mailClient.listMessages(mailboxId, token,
+                                                                                    from, to, pagination.pageSize(), pagination.cursor());
+                                                 return new Page<>(page.items().stream()
+                                                                       .map(json -> MailMapper.toEmailSummary(json, mailboxId)).toList(),
+                                                                   page.nextCursor(), page.hasMore());
+                                             });
+        }
+
+        @Override
+        public EmailMessage getMessage(String mailboxId, String messageId) {
+            return TokenRetry.withTokenRetry(() -> resolveToken(userId),
+                                             token -> MailMapper.toEmailMessage(
+                                                     mailClient.getMessage(messageId, token), mailboxId));
+        }
+
+        @Override
+        public byte[] getAttachmentContent(String mailboxId, String messageId,
+                                           String attachmentId) {
+            return TokenRetry.withTokenRetry(() -> resolveToken(userId),
+                                             token -> mailClient.getAttachmentContent(messageId, attachmentId, token));
+        }
+
+        @Override
+        public Page<EmailSummary> search(String query, PageRequest pagination) {
+            return TokenRetry.withTokenRetry(() -> resolveToken(userId),
+                                             token -> {
+                                                 var page = mailClient.searchMessages(query, token,
+                                                                                      pagination.pageSize(), pagination.cursor());
+                                                 return new Page<>(page.items().stream()
+                                                                       .map(json -> MailMapper.toEmailSummary(json, "search")).toList(),
+                                                                   page.nextCursor(), page.hasMore());
+                                             });
+        }
     }
 }

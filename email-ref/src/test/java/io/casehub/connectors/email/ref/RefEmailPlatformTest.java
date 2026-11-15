@@ -28,7 +28,7 @@ class RefEmailPlatformTest {
 
     @Test
     void listMailboxes_returnsPreloadedMailboxes() {
-        var mailboxes = platform.listMailboxes();
+        var mailboxes = platform.emailOps("test-user").listMailboxes();
         assertThat(mailboxes).isNotEmpty();
         assertThat(mailboxes).extracting("name")
                 .contains("Inbox", "Sent", "Archive");
@@ -36,7 +36,7 @@ class RefEmailPlatformTest {
 
     @Test
     void listMailboxes_inboxHasUnreadMessages() {
-        var inbox = platform.listMailboxes().stream()
+        var inbox = platform.emailOps("test-user").listMailboxes().stream()
                 .filter(m -> m.name().equals("Inbox"))
                 .findFirst().orElseThrow();
         assertThat(inbox.unreadCount()).isGreaterThan(0);
@@ -44,10 +44,10 @@ class RefEmailPlatformTest {
 
     @Test
     void listMessages_returnsMessagesInDateRange() {
-        var inbox = platform.listMailboxes().stream()
+        var inbox = platform.emailOps("test-user").listMailboxes().stream()
                 .filter(m -> m.name().equals("Inbox"))
                 .findFirst().orElseThrow();
-        var page = platform.listMessages(inbox.id(),
+        var page = platform.emailOps("test-user").listMessages(inbox.id(),
                 Instant.parse("2026-01-01T00:00:00Z"),
                 Instant.parse("2026-12-31T00:00:00Z"),
                 PageRequest.first(50));
@@ -61,10 +61,10 @@ class RefEmailPlatformTest {
 
     @Test
     void listMessages_filtersOutsideDateRange() {
-        var inbox = platform.listMailboxes().stream()
+        var inbox = platform.emailOps("test-user").listMailboxes().stream()
                 .filter(m -> m.name().equals("Inbox"))
                 .findFirst().orElseThrow();
-        var page = platform.listMessages(inbox.id(),
+        var page = platform.emailOps("test-user").listMessages(inbox.id(),
                 Instant.parse("2020-01-01T00:00:00Z"),
                 Instant.parse("2020-01-02T00:00:00Z"),
                 PageRequest.first(50));
@@ -73,7 +73,7 @@ class RefEmailPlatformTest {
 
     @Test
     void listMessages_unknownMailbox_returnsEmpty() {
-        var page = platform.listMessages("nonexistent",
+        var page = platform.emailOps("test-user").listMessages("nonexistent",
                 Instant.parse("2026-01-01T00:00:00Z"),
                 Instant.parse("2026-12-31T00:00:00Z"),
                 PageRequest.first(50));
@@ -83,10 +83,10 @@ class RefEmailPlatformTest {
 
     @Test
     void listMessages_pagination_respectsPageSize() {
-        var inbox = platform.listMailboxes().stream()
+        var inbox = platform.emailOps("test-user").listMailboxes().stream()
                 .filter(m -> m.name().equals("Inbox"))
                 .findFirst().orElseThrow();
-        var firstPage = platform.listMessages(inbox.id(),
+        var firstPage = platform.emailOps("test-user").listMessages(inbox.id(),
                 Instant.parse("2026-01-01T00:00:00Z"),
                 Instant.parse("2026-12-31T00:00:00Z"),
                 PageRequest.first(2));
@@ -97,14 +97,14 @@ class RefEmailPlatformTest {
 
     @Test
     void listMessages_pagination_cursorFetchesNextPage() {
-        var inbox = platform.listMailboxes().stream()
+        var inbox = platform.emailOps("test-user").listMailboxes().stream()
                 .filter(m -> m.name().equals("Inbox"))
                 .findFirst().orElseThrow();
-        var firstPage = platform.listMessages(inbox.id(),
+        var firstPage = platform.emailOps("test-user").listMessages(inbox.id(),
                 Instant.parse("2026-01-01T00:00:00Z"),
                 Instant.parse("2026-12-31T00:00:00Z"),
                 PageRequest.first(2));
-        var secondPage = platform.listMessages(inbox.id(),
+        var secondPage = platform.emailOps("test-user").listMessages(inbox.id(),
                 Instant.parse("2026-01-01T00:00:00Z"),
                 Instant.parse("2026-12-31T00:00:00Z"),
                 new PageRequest(firstPage.nextCursor(), 2));
@@ -117,10 +117,10 @@ class RefEmailPlatformTest {
 
     @Test
     void listMessages_mixOfReadAndUnread() {
-        var inbox = platform.listMailboxes().stream()
+        var inbox = platform.emailOps("test-user").listMailboxes().stream()
                 .filter(m -> m.name().equals("Inbox"))
                 .findFirst().orElseThrow();
-        var page = platform.listMessages(inbox.id(),
+        var page = platform.emailOps("test-user").listMessages(inbox.id(),
                 Instant.parse("2026-01-01T00:00:00Z"),
                 Instant.parse("2026-12-31T00:00:00Z"),
                 PageRequest.first(50));
@@ -132,16 +132,16 @@ class RefEmailPlatformTest {
 
     @Test
     void getMessage_returnsFullMessage() {
-        var inbox = platform.listMailboxes().stream()
+        var inbox = platform.emailOps("test-user").listMailboxes().stream()
                 .filter(m -> m.name().equals("Inbox"))
                 .findFirst().orElseThrow();
-        var summaries = platform.listMessages(inbox.id(),
+        var summaries = platform.emailOps("test-user").listMessages(inbox.id(),
                 Instant.parse("2026-01-01T00:00:00Z"),
                 Instant.parse("2026-12-31T00:00:00Z"),
                 PageRequest.first(50));
         var firstId = summaries.items().getFirst().id();
 
-        var message = platform.getMessage(inbox.id(), firstId);
+        var message = platform.emailOps("test-user").getMessage(inbox.id(), firstId);
 
         assertThat(message.id()).isEqualTo(firstId);
         assertThat(message.mailboxId()).isEqualTo(inbox.id());
@@ -153,50 +153,50 @@ class RefEmailPlatformTest {
 
     @Test
     void getMessage_unknownMessage_throws() {
-        var inbox = platform.listMailboxes().stream()
+        var inbox = platform.emailOps("test-user").listMailboxes().stream()
                 .filter(m -> m.name().equals("Inbox"))
                 .findFirst().orElseThrow();
-        assertThatThrownBy(() -> platform.getMessage(inbox.id(), "nonexistent"))
+        assertThatThrownBy(() -> platform.emailOps("test-user").getMessage(inbox.id(), "nonexistent"))
                 .isInstanceOf(NoSuchElementException.class);
     }
 
     @Test
     void getMessage_unknownMailbox_throws() {
-        assertThatThrownBy(() -> platform.getMessage("nonexistent", "msg-1"))
+        assertThatThrownBy(() -> platform.emailOps("test-user").getMessage("nonexistent", "msg-1"))
                 .isInstanceOf(NoSuchElementException.class);
     }
 
     @Test
     void getMessage_someMessagesHaveAttachments() {
-        var inbox = platform.listMailboxes().stream()
+        var inbox = platform.emailOps("test-user").listMailboxes().stream()
                 .filter(m -> m.name().equals("Inbox"))
                 .findFirst().orElseThrow();
-        var summaries = platform.listMessages(inbox.id(),
+        var summaries = platform.emailOps("test-user").listMessages(inbox.id(),
                 Instant.parse("2026-01-01T00:00:00Z"),
                 Instant.parse("2026-12-31T00:00:00Z"),
                 PageRequest.first(50));
         var hasAttachment = summaries.items().stream()
-                .map(s -> platform.getMessage(inbox.id(), s.id()))
+                .map(s -> platform.emailOps("test-user").getMessage(inbox.id(), s.id()))
                 .anyMatch(m -> !m.attachments().isEmpty());
         assertThat(hasAttachment).isTrue();
     }
 
     @Test
     void getAttachmentContent_returnsNonEmptyBytes() {
-        var inbox = platform.listMailboxes().stream()
+        var inbox = platform.emailOps("test-user").listMailboxes().stream()
                 .filter(m -> m.name().equals("Inbox"))
                 .findFirst().orElseThrow();
-        var summaries = platform.listMessages(inbox.id(),
+        var summaries = platform.emailOps("test-user").listMessages(inbox.id(),
                 Instant.parse("2026-01-01T00:00:00Z"),
                 Instant.parse("2026-12-31T00:00:00Z"),
                 PageRequest.first(50));
         var messageWithAttachment = summaries.items().stream()
-                .map(s -> platform.getMessage(inbox.id(), s.id()))
+                .map(s -> platform.emailOps("test-user").getMessage(inbox.id(), s.id()))
                 .filter(m -> !m.attachments().isEmpty())
                 .findFirst().orElseThrow();
         var attachment = messageWithAttachment.attachments().getFirst();
 
-        var content = platform.getAttachmentContent(
+        var content = platform.emailOps("test-user").getAttachmentContent(
                 inbox.id(), messageWithAttachment.id(), attachment.id());
 
         assertThat(content).isNotEmpty();
@@ -205,35 +205,35 @@ class RefEmailPlatformTest {
 
     @Test
     void getAttachmentContent_unknownAttachment_throws() {
-        var inbox = platform.listMailboxes().stream()
+        var inbox = platform.emailOps("test-user").listMailboxes().stream()
                 .filter(m -> m.name().equals("Inbox"))
                 .findFirst().orElseThrow();
-        var summaries = platform.listMessages(inbox.id(),
+        var summaries = platform.emailOps("test-user").listMessages(inbox.id(),
                 Instant.parse("2026-01-01T00:00:00Z"),
                 Instant.parse("2026-12-31T00:00:00Z"),
                 PageRequest.first(50));
         var firstId = summaries.items().getFirst().id();
         assertThatThrownBy(() ->
-                platform.getAttachmentContent(inbox.id(), firstId, "nonexistent"))
+                platform.emailOps("test-user").getAttachmentContent(inbox.id(), firstId, "nonexistent"))
                 .isInstanceOf(NoSuchElementException.class);
     }
 
     @Test
     void getAttachmentContent_unknownMessage_throws() {
-        var inbox = platform.listMailboxes().stream()
+        var inbox = platform.emailOps("test-user").listMailboxes().stream()
                 .filter(m -> m.name().equals("Inbox"))
                 .findFirst().orElseThrow();
         assertThatThrownBy(() ->
-                platform.getAttachmentContent(inbox.id(), "nonexistent", "att-1"))
+                platform.emailOps("test-user").getAttachmentContent(inbox.id(), "nonexistent", "att-1"))
                 .isInstanceOf(NoSuchElementException.class);
     }
 
     @Test
     void mailboxUnreadCount_matchesActualUnreadMessages() {
-        var inbox = platform.listMailboxes().stream()
+        var inbox = platform.emailOps("test-user").listMailboxes().stream()
                 .filter(m -> m.name().equals("Inbox"))
                 .findFirst().orElseThrow();
-        var page = platform.listMessages(inbox.id(),
+        var page = platform.emailOps("test-user").listMessages(inbox.id(),
                 Instant.parse("2026-01-01T00:00:00Z"),
                 Instant.parse("2026-12-31T00:00:00Z"),
                 PageRequest.first(50));
@@ -244,10 +244,10 @@ class RefEmailPlatformTest {
 
     @Test
     void sentMailbox_hasMessages() {
-        var sent = platform.listMailboxes().stream()
+        var sent = platform.emailOps("test-user").listMailboxes().stream()
                 .filter(m -> m.name().equals("Sent"))
                 .findFirst().orElseThrow();
-        var page = platform.listMessages(sent.id(),
+        var page = platform.emailOps("test-user").listMessages(sent.id(),
                 Instant.parse("2026-01-01T00:00:00Z"),
                 Instant.parse("2026-12-31T00:00:00Z"),
                 PageRequest.first(50));
@@ -256,16 +256,16 @@ class RefEmailPlatformTest {
 
     @Test
     void differentMailboxes_haveIsolatedMessages() {
-        var mailboxes = platform.listMailboxes();
+        var mailboxes = platform.emailOps("test-user").listMailboxes();
         assertThat(mailboxes.size()).isGreaterThanOrEqualTo(2);
         var first = mailboxes.getFirst();
         var second = mailboxes.get(1);
 
-        var firstMessages = platform.listMessages(first.id(),
+        var firstMessages = platform.emailOps("test-user").listMessages(first.id(),
                 Instant.parse("2026-01-01T00:00:00Z"),
                 Instant.parse("2026-12-31T00:00:00Z"),
                 PageRequest.first(50));
-        var secondMessages = platform.listMessages(second.id(),
+        var secondMessages = platform.emailOps("test-user").listMessages(second.id(),
                 Instant.parse("2026-01-01T00:00:00Z"),
                 Instant.parse("2026-12-31T00:00:00Z"),
                 PageRequest.first(50));
@@ -277,7 +277,7 @@ class RefEmailPlatformTest {
 
     @Test
     void search_matchesSubject() {
-        var page = platform.search("invoice", PageRequest.first(50));
+        var page = platform.emailOps("test-user").search("invoice", PageRequest.first(50));
         assertThat(page.items()).isNotEmpty();
         assertThat(page.items()).allSatisfy(s ->
                                                     assertThat(s.subject().toLowerCase()).contains("invoice"));
@@ -285,42 +285,42 @@ class RefEmailPlatformTest {
 
     @Test
     void search_matchesFrom() {
-        var allMessages = platform.listMessages("inbox",
+        var allMessages = platform.emailOps("test-user").listMessages("inbox",
                                                 Instant.parse("2026-01-01T00:00:00Z"),
                                                 Instant.parse("2026-12-31T00:00:00Z"),
                                                 PageRequest.first(50));
         var knownSender = allMessages.items().getFirst().from();
         var senderPart  = knownSender.split("@")[0];
 
-        var page = platform.search(senderPart, PageRequest.first(50));
+        var page = platform.emailOps("test-user").search(senderPart, PageRequest.first(50));
         assertThat(page.items()).isNotEmpty();
     }
 
     @Test
     void search_noMatch_returnsEmpty() {
-        var page = platform.search("xyznonexistentxyz", PageRequest.first(50));
+        var page = platform.emailOps("test-user").search("xyznonexistentxyz", PageRequest.first(50));
         assertThat(page.items()).isEmpty();
         assertThat(page.hasMore()).isFalse();
     }
 
     @Test
     void search_caseInsensitive() {
-        var lowerPage = platform.search("invoice", PageRequest.first(50));
-        var upperPage = platform.search("INVOICE", PageRequest.first(50));
+        var lowerPage = platform.emailOps("test-user").search("invoice", PageRequest.first(50));
+        var upperPage = platform.emailOps("test-user").search("INVOICE", PageRequest.first(50));
         assertThat(lowerPage.items()).hasSameSizeAs(upperPage.items());
     }
 
     @Test
     void search_pagination_respectsPageSize() {
-        var allResults = platform.search("", PageRequest.first(50));
+        var allResults = platform.emailOps("test-user").search("", PageRequest.first(50));
         if (allResults.items().size() <= 2) {return;}
 
-        var firstPage = platform.search("", PageRequest.first(2));
+        var firstPage = platform.emailOps("test-user").search("", PageRequest.first(2));
         assertThat(firstPage.items()).hasSize(2);
         assertThat(firstPage.hasMore()).isTrue();
         assertThat(firstPage.nextCursor()).isNotNull();
 
-        var secondPage = platform.search("", new PageRequest(firstPage.nextCursor(), 2));
+        var secondPage = platform.emailOps("test-user").search("", new PageRequest(firstPage.nextCursor(), 2));
         assertThat(secondPage.items()).isNotEmpty();
         assertThat(secondPage.items())
                 .extracting("id")
@@ -330,7 +330,7 @@ class RefEmailPlatformTest {
 
     @Test
     void search_spansAllMailboxes() {
-        var results = platform.search("", PageRequest.first(50));
+        var results = platform.emailOps("test-user").search("", PageRequest.first(50));
         var mailboxIds = results.items().stream()
                                 .map(s -> s.mailboxId())
                                 .distinct()

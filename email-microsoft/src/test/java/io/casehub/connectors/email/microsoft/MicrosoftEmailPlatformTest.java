@@ -32,7 +32,7 @@ class MicrosoftEmailPlatformTest {
 
     @Test
     void listMailboxesReturnsMappedFolders() {
-        var mailboxes = platform.listMailboxes();
+        var mailboxes = platform.emailOps("test-user").listMailboxes();
         assertThat(mailboxes).hasSize(2);
         assertThat(mailboxes.get(0).name()).isEqualTo("Inbox");
         assertThat(mailboxes.get(0).unreadCount()).isEqualTo(3);
@@ -41,7 +41,7 @@ class MicrosoftEmailPlatformTest {
 
     @Test
     void listMessagesReturnsSummaries() {
-        var page = platform.listMessages("inbox-id",
+        var page = platform.emailOps("test-user").listMessages("inbox-id",
                 Instant.parse("2026-11-01T00:00:00Z"),
                 Instant.parse("2026-11-14T00:00:00Z"),
                 PageRequest.first(10));
@@ -52,7 +52,7 @@ class MicrosoftEmailPlatformTest {
 
     @Test
     void getMessageReturnsFullMessage() {
-        var msg = platform.getMessage("inbox-id", "msg-1");
+        var msg = platform.emailOps("test-user").getMessage("inbox-id", "msg-1");
         assertThat(msg.id()).isEqualTo("msg-1");
         assertThat(msg.mailboxId()).isEqualTo("inbox-id");
         assertThat(msg.from()).isEqualTo("alice@example.com");
@@ -61,7 +61,7 @@ class MicrosoftEmailPlatformTest {
 
     @Test
     void searchReturnsSummaries() {
-        var page = platform.search("test", PageRequest.first(10));
+        var page = platform.emailOps("test-user").search("test", PageRequest.first(10));
         assertThat(page.items()).hasSize(1);
     }
 

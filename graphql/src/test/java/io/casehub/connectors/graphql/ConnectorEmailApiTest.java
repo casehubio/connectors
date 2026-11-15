@@ -25,6 +25,12 @@ class ConnectorEmailApiTest {
         var service = new EmailPlatformService(List.of(new StubEmailPlatform()));
         api = new ConnectorEmailApi();
         api.emailService = service;
+        api.currentPrincipal = new io.casehub.platform.api.identity.CurrentPrincipal() {
+            @Override public String actorId() { return "test-actor"; }
+            @Override public java.util.Set<String> groups() { return java.util.Set.of(); }
+            @Override public String tenancyId() { return "default"; }
+            @Override public boolean isCrossTenantAdmin() { return false; }
+        };
     }
 
     @Test
@@ -69,7 +75,8 @@ class ConnectorEmailApiTest {
     }
 
     static class StubEmailPlatform implements EmailPlatform {
-        private static final Instant MSG_TIME = Instant.parse("2026-10-15T10:00:00Z");
+
+        private static final Instant      MSG_TIME = Instant.parse("2026-10-15T10:00:00Z");
         private static final EmailMessage TEST_MSG = new EmailMessage(
                 "msg-001", "inbox", "<msg-001@test.com>",
                 "sender@test.com", List.of("recipient@test.com"), List.of(),
@@ -77,38 +84,44 @@ class ConnectorEmailApiTest {
                 MSG_TIME, true,
                 List.of(new EmailAttachment("att-001", "test.pdf", "application/pdf", 1024)));
 
-        @Override public String id() { return "stub-email"; }
+        @Override
+        public String id() {return "stub-email";}
 
         @Override
-        public List<Mailbox> listMailboxes() {
-            return List.of(
-                    new Mailbox("inbox", "Inbox", 1),
-                    new Mailbox("sent", "Sent", 0));
-        }
+        public EmailOperations emailOps(String userId) {
+            return new EmailOperations() {
+                @Override
+                public List<Mailbox> listMailboxes() {
+                    return List.of(
+                            new Mailbox("inbox", "Inbox", 1),
+                            new Mailbox("sent", "Sent", 0));
+                }
 
-        @Override
-        public Page<EmailSummary> listMessages(String mailboxId, Instant from,
-                                               Instant to, PageRequest pagination) {
-            if (!"inbox".equals(mailboxId)) return new Page<>(List.of(), null, false);
-            var summary = new EmailSummary("msg-001", "inbox", "<msg-001@test.com>",
-                    "sender@test.com", "Test subject", MSG_TIME, true);
-            return new Page<>(List.of(summary), null, false);
-        }
+                @Override
+                public Page<EmailSummary> listMessages(String mailboxId, Instant from,
+                                                       Instant to, PageRequest pagination) {
+                    if (!"inbox".equals(mailboxId)) {return new Page<>(List.of(), null, false);}
+                    var summary = new EmailSummary("msg-001", "inbox", "<msg-001@test.com>",
+                                                   "sender@test.com", "Test subject", MSG_TIME, true);
+                    return new Page<>(List.of(summary), null, false);
+                }
 
-        @Override
-        public EmailMessage getMessage(String mailboxId, String messageId) {
-            return TEST_MSG;
-        }
+                @Override
+                public EmailMessage getMessage(String mailboxId, String messageId) {
+                    return TEST_MSG;
+                }
 
-        @Override
-        public byte[] getAttachmentContent(String mailboxId, String messageId,
-                                           String attachmentId) {
-            return "test-content".getBytes(StandardCharsets.UTF_8);
-        }
+                @Override
+                public byte[] getAttachmentContent(String mailboxId, String messageId,
+                                                   String attachmentId) {
+                    return "test-content".getBytes(StandardCharsets.UTF_8);
+                }
 
-        @Override
-        public Page<EmailSummary> search(String query, PageRequest pagination) {
-            return new Page<>(List.of(), null, false);
+                @Override
+                public Page<EmailSummary> search(String query, PageRequest pagination) {
+                    return new Page<>(List.of(), null, false);
+                }
+            };
         }
     }
 }

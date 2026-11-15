@@ -16,7 +16,7 @@ public record EmailMessagesPlugin(@Required String mailbox) {
 
     @Execute
     public Result execute(EmailPlatform emailPlatform) {
-        var page = emailPlatform.listMessages(mailbox, Instant.EPOCH, Instant.now(),
+        var page = emailPlatform.emailOps(null).listMessages(mailbox, Instant.EPOCH, Instant.now(),
                 PageRequest.first(20));
         var items = page.items().stream()
                 .map(msg -> {

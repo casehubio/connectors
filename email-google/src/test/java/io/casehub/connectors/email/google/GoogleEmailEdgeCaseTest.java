@@ -55,7 +55,7 @@ class GoogleEmailEdgeCaseTest {
                                  "payload":{"mimeType":"text/plain",
                                             "body":{"data":"SGVsbG8="}}}""")));
 
-        var message = platform.getMessage("INBOX", "msg-1");
+        var message = platform.emailOps("test-user").getMessage("INBOX", "msg-1");
         assertThat(message).isNotNull();
         assertThat(message.id()).isEqualTo("msg-1");
     }
@@ -74,7 +74,7 @@ class GoogleEmailEdgeCaseTest {
                                    {"name":"Date","value":"Mon, 1 Jan 2026 00:00:00 +0000"}
                                  ],"body":{}}}""")));
 
-        var message = platform.getMessage("INBOX", "msg-2");
+        var message = platform.emailOps("test-user").getMessage("INBOX", "msg-2");
         assertThat(message).isNotNull();
     }
 
@@ -102,7 +102,7 @@ class GoogleEmailEdgeCaseTest {
                         .withBody("""
                                 {"error":{"code":500,"message":"Server error"}}""")));
 
-        var page = platform.listMessages("INBOX",
+        var page = platform.emailOps("test-user").listMessages("INBOX",
                 Instant.parse("2026-01-01T00:00:00Z"),
                 Instant.parse("2026-12-31T00:00:00Z"),
                 PageRequest.first(10));

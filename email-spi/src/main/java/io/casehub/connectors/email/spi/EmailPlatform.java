@@ -1,32 +1,32 @@
 package io.casehub.connectors.email.spi;
 
-import java.time.Instant;
-import java.util.List;
-
 import io.casehub.connectors.Page;
 import io.casehub.connectors.PageRequest;
+import io.casehub.connectors.PlatformExtensible;
 import io.casehub.connectors.email.model.EmailMessage;
 import io.casehub.connectors.email.model.EmailSummary;
 import io.casehub.connectors.email.model.Mailbox;
-import io.casehub.connectors.PlatformExtensible;
 import io.casehub.platform.simulation.SimulationEligible;
+
+import java.time.Instant;
+import java.util.List;
 
 @SimulationEligible(name = "email-platform")
 public interface EmailPlatform extends PlatformExtensible {
 
     String id();
 
-    List<Mailbox> listMailboxes();
+    EmailOperations emailOps(String userId);
 
-    Page<EmailSummary> listMessages(String mailboxId,
-                                    Instant from, Instant to,
-                                    PageRequest pagination);
+    interface EmailOperations {
+        List<Mailbox> listMailboxes();
 
-    EmailMessage getMessage(String mailboxId, String messageId);
+        Page<EmailSummary> listMessages(String mailboxId, Instant from, Instant to, PageRequest pagination);
 
-    byte[] getAttachmentContent(String mailboxId, String messageId,
-                                String attachmentId);
+        EmailMessage getMessage(String mailboxId, String messageId);
 
-    Page<EmailSummary> search(String query, PageRequest pagination);
+        byte[] getAttachmentContent(String mailboxId, String messageId, String attachmentId);
 
+        Page<EmailSummary> search(String query, PageRequest pagination);
+    }
 }

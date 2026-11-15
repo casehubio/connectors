@@ -56,7 +56,7 @@ class GoogleEmailPlatformTest {
     @Test
     void requireClient_noClient_throwsIllegalState() {
         var unconfigured = new GoogleEmailPlatform((Gmail) null);
-        assertThatThrownBy(unconfigured::listMailboxes)
+        assertThatThrownBy(() -> unconfigured.emailOps("test-user"))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("not initialised");
     }
@@ -88,7 +88,7 @@ class GoogleEmailPlatformTest {
                                 }
                                 """)));
 
-        var mailboxes = platform.listMailboxes();
+        var mailboxes = platform.emailOps("test-user").listMailboxes();
 
         assertThat(mailboxes).extracting("name")
                 .contains("Inbox", "Sent", "Drafts", "Projects");
@@ -152,7 +152,7 @@ class GoogleEmailPlatformTest {
                                 }
                                 """)));
 
-        var page = platform.listMessages("INBOX",
+        var page = platform.emailOps("test-user").listMessages("INBOX",
                 Instant.parse("2026-09-01T00:00:00Z"),
                 Instant.parse("2026-09-30T00:00:00Z"),
                 PageRequest.first(10));
@@ -201,7 +201,7 @@ class GoogleEmailPlatformTest {
                                 }
                                 """)));
 
-        var firstPage = platform.listMessages("INBOX",
+        var firstPage = platform.emailOps("test-user").listMessages("INBOX",
                 Instant.parse("2026-09-01T00:00:00Z"),
                 Instant.parse("2026-09-30T00:00:00Z"),
                 PageRequest.first(1));
@@ -222,7 +222,7 @@ class GoogleEmailPlatformTest {
                                 }
                                 """)));
 
-        var page = platform.listMessages("INBOX",
+        var page = platform.emailOps("test-user").listMessages("INBOX",
                 Instant.parse("2026-09-01T00:00:00Z"),
                 Instant.parse("2026-09-30T00:00:00Z"),
                 PageRequest.first(10));
@@ -267,7 +267,7 @@ class GoogleEmailPlatformTest {
                                 base64url("Hello, this is a test."),
                                 base64url("<html><body><p>Hello, this is a test.</p></body></html>")))));
 
-        var message = platform.getMessage("INBOX", "msg-1");
+        var message = platform.emailOps("test-user").getMessage("INBOX", "msg-1");
 
         assertThat(message.id()).isEqualTo("msg-1");
         assertThat(message.mailboxId()).isEqualTo("INBOX");
@@ -304,7 +304,7 @@ class GoogleEmailPlatformTest {
                                 }
                                 """.formatted(base64url("Just plain text.")))));
 
-        var message = platform.getMessage("INBOX", "msg-text");
+        var message = platform.emailOps("test-user").getMessage("INBOX", "msg-text");
 
         assertThat(message.bodyText()).isEqualTo("Just plain text.");
         assertThat(message.bodyHtml()).isNull();
@@ -344,7 +344,7 @@ class GoogleEmailPlatformTest {
                                 }
                                 """.formatted(base64url("See attached.")))));
 
-        var message = platform.getMessage("INBOX", "msg-att");
+        var message = platform.emailOps("test-user").getMessage("INBOX", "msg-att");
 
         assertThat(message.attachments()).hasSize(1);
         var att = message.attachments().getFirst();
@@ -363,7 +363,7 @@ class GoogleEmailPlatformTest {
                                 {"error": {"code": 404, "message": "Not Found"}}
                                 """)));
 
-        assertThatThrownBy(() -> platform.getMessage("INBOX", "nonexistent"))
+        assertThatThrownBy(() -> platform.emailOps("test-user").getMessage("INBOX", "nonexistent"))
                 .isInstanceOf(NoSuchElementException.class);
     }
 
@@ -383,7 +383,7 @@ class GoogleEmailPlatformTest {
                                 }
                                 """.formatted(originalContent.length, encoded))));
 
-        var content = platform.getAttachmentContent("INBOX", "msg-1", "att-123");
+        var content = platform.emailOps("test-user").getAttachmentContent("INBOX", "msg-1", "att-123");
 
         assertThat(content).isEqualTo(originalContent);
     }
@@ -394,7 +394,7 @@ class GoogleEmailPlatformTest {
                 .willReturn(aResponse().withStatus(500)));
 
         assertThatThrownBy(() ->
-                platform.getAttachmentContent("INBOX", "msg-1", "att-bad"))
+                platform.emailOps("test-user").getAttachmentContent("INBOX", "msg-1", "att-bad"))
                 .isInstanceOf(RuntimeException.class);
     }
 
@@ -432,7 +432,7 @@ class GoogleEmailPlatformTest {
                                                                }
                                                                """)));
 
-        var page = platform.search("invoice", PageRequest.first(10));
+        var page = platform.emailOps("test-user").search("invoice", PageRequest.first(10));
 
         assertThat(page.items()).hasSize(1);
         assertThat(page.items().getFirst().subject()).isEqualTo("Invoice #4821");
@@ -450,7 +450,7 @@ class GoogleEmailPlatformTest {
                                                                }
                                                                """)));
 
-        var page = platform.search("nonexistent", PageRequest.first(10));
+        var page = platform.emailOps("test-user").search("nonexistent", PageRequest.first(10));
 
         assertThat(page.items()).isEmpty();
         assertThat(page.hasMore()).isFalse();

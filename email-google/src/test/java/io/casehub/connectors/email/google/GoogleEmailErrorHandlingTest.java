@@ -57,7 +57,7 @@ class GoogleEmailErrorHandlingTest {
                                 {"error":{"code":401,"message":"Invalid Credentials",
                                  "errors":[{"reason":"authError","message":"Invalid Credentials"}]}}""")));
 
-        assertThatThrownBy(() -> platform.listMailboxes())
+        assertThatThrownBy(() -> platform.emailOps("test-user").listMailboxes())
                 .isInstanceOf(ProviderAuthException.class)
                 .satisfies(ex -> {
                     var auth = (ProviderAuthException) ex;
@@ -75,7 +75,7 @@ class GoogleEmailErrorHandlingTest {
                                 {"error":{"code":403,"message":"Insufficient Permission",
                                  "errors":[{"reason":"insufficientPermissions"}]}}""")));
 
-        assertThatThrownBy(() -> platform.listMailboxes())
+        assertThatThrownBy(() -> platform.emailOps("test-user").listMailboxes())
                 .isInstanceOf(ProviderAuthException.class)
                 .satisfies(ex -> {
                     var auth = (ProviderAuthException) ex;
@@ -92,7 +92,7 @@ class GoogleEmailErrorHandlingTest {
                                 {"error":{"code":403,"message":"Domain Policy",
                                  "errors":[{"reason":"domainPolicy"}]}}""")));
 
-        assertThatThrownBy(() -> platform.listMailboxes())
+        assertThatThrownBy(() -> platform.emailOps("test-user").listMailboxes())
                 .isInstanceOf(ProviderAuthException.class)
                 .satisfies(ex -> {
                     var auth = (ProviderAuthException) ex;
@@ -108,7 +108,7 @@ class GoogleEmailErrorHandlingTest {
                         .withBody("""
                                 {"error":{"code":429,"message":"Rate Limit Exceeded"}}""")));
 
-        assertThatThrownBy(() -> platform.listMailboxes())
+        assertThatThrownBy(() -> platform.emailOps("test-user").listMailboxes())
                 .isInstanceOf(ProviderRateLimitedException.class)
                 .satisfies(ex -> {
                     var rl = (ProviderRateLimitedException) ex;
@@ -125,7 +125,7 @@ class GoogleEmailErrorHandlingTest {
                         .withBody("""
                                 {"error":{"code":500,"message":"Internal Server Error"}}""")));
 
-        assertThatThrownBy(() -> platform.listMailboxes())
+        assertThatThrownBy(() -> platform.emailOps("test-user").listMailboxes())
                 .isInstanceOf(ProviderApiException.class)
                 .satisfies(ex -> {
                     var api = (ProviderApiException) ex;
@@ -143,7 +143,7 @@ class GoogleEmailErrorHandlingTest {
                                 {"error":{"code":401,"message":"Invalid Credentials",
                                  "errors":[{"reason":"authError"}]}}""")));
 
-        assertThatThrownBy(() -> platform.getMessage("INBOX", "msg-1"))
+        assertThatThrownBy(() -> platform.emailOps("test-user").getMessage("INBOX", "msg-1"))
                 .isInstanceOf(ProviderAuthException.class);
     }
 
@@ -155,7 +155,7 @@ class GoogleEmailErrorHandlingTest {
                         .withBody("""
                                 {"error":{"code":429,"message":"Rate Limit Exceeded"}}""")));
 
-        assertThatThrownBy(() -> platform.getMessage("INBOX", "msg-1"))
+        assertThatThrownBy(() -> platform.emailOps("test-user").getMessage("INBOX", "msg-1"))
                 .isInstanceOf(ProviderRateLimitedException.class);
     }
 
@@ -167,7 +167,7 @@ class GoogleEmailErrorHandlingTest {
                         .withBody("""
                                 {"error":{"code":429,"message":"Rate Limit Exceeded"}}""")));
 
-        assertThatThrownBy(() -> platform.search("test query", PageRequest.first(10)))
+        assertThatThrownBy(() -> platform.emailOps("test-user").search("test query", PageRequest.first(10)))
                 .isInstanceOf(ProviderRateLimitedException.class);
     }
 }
