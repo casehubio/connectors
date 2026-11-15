@@ -35,6 +35,11 @@ Uses Microsoft Graph REST API via MicrosoftGraphClient with dual permission mode
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-arc</artifactId>
     </dependency>
+    <dependency>
+      <groupId>com.nimbusds</groupId>
+      <artifactId>nimbus-jose-jwt</artifactId>
+      <version>10.3</version>
+    </dependency>
 
     <!-- Testing -->
     <dependency>
