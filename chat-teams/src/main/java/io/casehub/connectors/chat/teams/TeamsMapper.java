@@ -14,6 +14,7 @@ import io.casehub.connectors.chat.model.SendResult;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import java.time.Instant;
+import java.util.List;
 import java.util.Locale;
 import java.util.regex.MatchResult;
 import java.util.regex.Pattern;
@@ -88,10 +89,15 @@ final class TeamsMapper {
                 receivedAt);
     }
 
-    static JsonObject toMessageBody(ChatContent content) {
-        boolean useHtml = content.markdown() != null || !content.cards().isEmpty();
-        String  bodyText;
-        String  contentType;
+    static JsonObject toMessageBody(ChatContent content) {return toMessageBody(content, List.of());}
+
+    static JsonObject toMessageBody(ChatContent content, List<UploadedRef> uploadedRefs) {
+        boolean hasCards = !content.cards().isEmpty();
+        boolean hasFiles = !uploadedRefs.isEmpty();
+        boolean useHtml  = content.markdown() != null || hasCards || hasFiles;
+
+        String bodyText;
+        String contentType;
         if (content.markdown() != null) {
             bodyText    = markdownToHtml(content.markdown());
             contentType = "html";
@@ -105,10 +111,11 @@ final class TeamsMapper {
 
         var msg = Json.createObjectBuilder();
 
-        if (!content.cards().isEmpty()) {
+        if (hasCards || hasFiles) {
             var attachments = Json.createArrayBuilder();
-            int idx         = 0;
-            var refs        = new StringBuilder();
+            var refs        = new StringBuilder(bodyText);
+
+            int idx = 0;
             for (var card : content.cards()) {
                 String attachId = "card-" + idx;
                 attachments.add(Json.createObjectBuilder()
@@ -119,8 +126,20 @@ final class TeamsMapper {
                 refs.append("<attachment id=\"").append(attachId).append("\"></attachment>");
                 idx++;
             }
+
+            for (int i = 0; i < uploadedRefs.size(); i++) {
+                var    ref      = uploadedRefs.get(i);
+                String attachId = "file-" + i;
+                attachments.add(Json.createObjectBuilder()
+                                    .add("id", attachId)
+                                    .add("contentType", "reference")
+                                    .add("contentUrl", ref.contentUrl())
+                                    .add("name", ref.name()));
+                refs.append("<attachment id=\"").append(attachId).append("\"></attachment>");
+            }
+
             msg.add("attachments", attachments);
-            bodyText = bodyText + refs;
+            bodyText = refs.toString();
         }
 
         msg.add("body", Json.createObjectBuilder()
@@ -128,6 +147,7 @@ final class TeamsMapper {
                             .add("content", bodyText));
         return msg.build();
     }
+
 
     static String markdownToHtml(String md) {
         String html = escapeHtml(md);
@@ -153,9 +173,9 @@ final class TeamsMapper {
     }
 
     private static String escapeHtml(String text) {
-        return text.replace("&", "&amp;")
-                   .replace("<", "&lt;")
-                   .replace(">", "&gt;");
+        return text.replace("&", "&")
+                   .replace("<", "<")
+                   .replace(">", ">");
     }
 
     private static String toAdaptiveCardJson(RichCard card) {

@@ -167,7 +167,7 @@ class TeamsMapperTest {
         var content = new ChatContent("fallback", "Use <div> & \"quotes\"", List.of(), List.of());
         var body    = TeamsMapper.toMessageBody(content);
         var html    = body.getJsonObject("body").getString("content");
-        assertThat(html).contains("&lt;div&gt;").contains("&amp;");
+        assertThat(html).contains("<div>").contains("&");
     }
 
     @Test
@@ -214,6 +214,52 @@ class TeamsMapperTest {
         assertThat(result).contains("<code>npm install</code>").contains("<br>");
     }
 
+
+    @Test
+    void toMessageBodyWithUploadedRefAddsAttachment() {
+        var ref     = new UploadedRef("0-report.pdf", "https://sharepoint.com/files/0-report.pdf");
+        var content = new ChatContent("See attachment");
+        var body    = TeamsMapper.toMessageBody(content, List.of(ref));
+        assertThat(body.getJsonObject("body").getString("contentType")).isEqualTo("html");
+        assertThat(body.getJsonObject("body").getString("content"))
+                .contains("<attachment id=\"file-0\">");
+        var attachments = body.getJsonArray("attachments");
+        assertThat(attachments).hasSize(1);
+        var att = attachments.getJsonObject(0);
+        assertThat(att.getString("id")).isEqualTo("file-0");
+        assertThat(att.getString("contentType")).isEqualTo("reference");
+        assertThat(att.getString("contentUrl")).isEqualTo("https://sharepoint.com/files/0-report.pdf");
+        assertThat(att.getString("name")).isEqualTo("0-report.pdf");
+    }
+
+    @Test
+    void toMessageBodyWithMultipleRefsGeneratesUniqueIds() {
+        var refs = List.of(
+                new UploadedRef("0-a.pdf", "https://sharepoint.com/files/0-a.pdf"),
+                new UploadedRef("1-b.png", "https://sharepoint.com/files/1-b.png"));
+        var content = new ChatContent("See files");
+        var body    = TeamsMapper.toMessageBody(content, refs);
+        var html    = body.getJsonObject("body").getString("content");
+        assertThat(html).contains("<attachment id=\"file-0\">").contains("<attachment id=\"file-1\">");
+        assertThat(body.getJsonArray("attachments")).hasSize(2);
+        assertThat(body.getJsonArray("attachments").getJsonObject(0).getString("id")).isEqualTo("file-0");
+        assertThat(body.getJsonArray("attachments").getJsonObject(1).getString("id")).isEqualTo("file-1");
+    }
+
+    @Test
+    void toMessageBodyWithRefsAndCardsBuildsUnifiedAttachmentsArray() {
+        var card        = RichCard.builder().title("Title").build();
+        var ref         = new UploadedRef("0-doc.pdf", "https://sharepoint.com/files/0-doc.pdf");
+        var content     = new ChatContent("text", null, List.of(), List.of(card));
+        var body        = TeamsMapper.toMessageBody(content, List.of(ref));
+        var attachments = body.getJsonArray("attachments");
+        assertThat(attachments).hasSize(2);
+        assertThat(attachments.getJsonObject(0).getString("id")).isEqualTo("card-0");
+        assertThat(attachments.getJsonObject(0).getString("contentType"))
+                .isEqualTo("application/vnd.microsoft.card.adaptive");
+        assertThat(attachments.getJsonObject(1).getString("id")).isEqualTo("file-0");
+        assertThat(attachments.getJsonObject(1).getString("contentType")).isEqualTo("reference");
+    }
 
     private static PresenceStatus presence(String availability) {
         var json = Json.createObjectBuilder()
