@@ -33,6 +33,9 @@ public class TeamsChatPlatform {
     private       io.casehub.connectors.chat.spi.Commands commands;
     private       BotFrameworkClient                      botClient;
     private       String                                  defaultServiceUrl;
+    private       ConversationReferenceStore              conversationReferenceStore;
+    private       String                                  defaultTenantId;
+    private       String                                  botAppId;
 
 
     public TeamsChatPlatform(TeamsClient client,
@@ -64,6 +67,17 @@ public class TeamsChatPlatform {
         return this;
     }
 
+    public TeamsChatPlatform withConversationReferenceStore(ConversationReferenceStore store) {
+        this.conversationReferenceStore = store;
+        return this;
+    }
+
+    public TeamsChatPlatform withProactiveConfig(String defaultTenantId, String botAppId) {
+        this.defaultTenantId = defaultTenantId;
+        this.botAppId        = botAppId;
+        return this;
+    }
+
 
     public ChatPlatform build() {
         var builder = ChatPlatform.builder(PLATFORM_ID)
@@ -85,6 +99,9 @@ public class TeamsChatPlatform {
     private SendResult sendMessage(ChatChannelRef channel, ChatContent content) {
         if (isPersonalChannel(channel.id())) {
             return sendPersonalMessage(extractConversationId(channel.id()), content);
+        }
+        if (isUserChannel(channel.id())) {
+            return sendProactiveMessage(extractAadObjectId(channel.id()), content);
         }
         var tc = TeamsMapper.parseTeamAndChannel(channel.id());
         return TokenRetry.withTokenRetry(this::resolveApplicationToken,
@@ -208,6 +225,15 @@ public class TeamsChatPlatform {
         return channelId.substring("personal:".length());
     }
 
+    static boolean isUserChannel(String channelId) {
+        return channelId != null && channelId.startsWith("user:");
+    }
+
+    static String extractAadObjectId(String channelId) {
+        return channelId.substring("user:".length());
+    }
+
+
     private SendResult sendPersonalMessage(String conversationId, ChatContent content) {
         if (botClient == null) {
             throw new UnsupportedOperationException(
@@ -218,6 +244,52 @@ public class TeamsChatPlatform {
             throw new UnsupportedOperationException(
                     "Personal chat messaging requires a default service URL — set casehub.connectors.teams-bot.default-service-url");
         }
+        botClient.sendToConversation(serviceUrl, conversationId, content.text());
+        return new SendResult(true,
+                              new ChatMessageRef(new ChatChannelRef("personal:" + conversationId), ""),
+                              java.time.Instant.now(), null);
+    }
+
+    private SendResult sendProactiveMessage(String aadObjectId, ChatContent content) {
+        if (botClient == null) {
+            throw new UnsupportedOperationException(
+                    "Proactive messaging requires BotFrameworkClient — configure teams-bot properties");
+        }
+        String serviceUrl = defaultServiceUrl;
+        if (serviceUrl == null || serviceUrl.isBlank()) {
+            throw new UnsupportedOperationException(
+                    "Proactive messaging requires a default service URL — set casehub.connectors.teams-bot.default-service-url");
+        }
+
+        String conversationId;
+        String resolvedServiceUrl;
+
+        if (conversationReferenceStore != null) {
+            var existing = conversationReferenceStore.find(aadObjectId);
+            if (existing.isPresent()) {
+                conversationId     = existing.get().conversationId();
+                resolvedServiceUrl = existing.get().serviceUrl();
+                botClient.sendToConversation(resolvedServiceUrl, conversationId, content.text());
+                return new SendResult(true,
+                                      new ChatMessageRef(new ChatChannelRef("personal:" + conversationId), ""),
+                                      java.time.Instant.now(), null);
+            }
+        }
+
+        if (defaultTenantId == null || defaultTenantId.isBlank()
+            || botAppId == null || botAppId.isBlank()) {
+            throw new UnsupportedOperationException(
+                    "Proactive messaging cold-start requires default-tenant-id and app-id — "
+                    + "configure casehub.connectors.teams-bot properties");
+        }
+
+        conversationId = botClient.createConversation(serviceUrl, botAppId, aadObjectId, defaultTenantId);
+
+        if (conversationReferenceStore != null) {
+            conversationReferenceStore.store(
+                    new ConversationReference(aadObjectId, conversationId, serviceUrl, defaultTenantId));
+        }
+
         botClient.sendToConversation(serviceUrl, conversationId, content.text());
         return new SendResult(true,
                               new ChatMessageRef(new ChatChannelRef("personal:" + conversationId), ""),

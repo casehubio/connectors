@@ -484,4 +484,80 @@ class TeamsChatPlatformTest {
                ]}""";
     }
 
+
+    @Nested
+    class ProactiveMessagingTest {
+
+        private final java.util.List<String>             botCalls = new java.util.ArrayList<>();
+        private final InMemoryConversationReferenceStore store    = new InMemoryConversationReferenceStore();
+
+        private ChatPlatform buildProactivePlatform() {
+            var graph = new MicrosoftGraphClient(request ->
+                                                         new StubHttpResponse(200, """
+                                                                                   {"value":[]}"""));
+            var botClient = new BotFrameworkClient(null,
+                                                   "*.botframework.com,smba.trafficmanager.net") {
+                @Override
+                void sendToConversation(String serviceUrl, String conversationId, String text) {
+                    botCalls.add("send:" + conversationId + ":" + text);
+                }
+
+                @Override
+                String createConversation(String serviceUrl, String botAppId,
+                                          String aadObjectId, String tenantId) {
+                    botCalls.add("create:" + aadObjectId);
+                    return "created-conv-for-" + aadObjectId;
+                }
+            };
+            return new TeamsChatPlatform(new TeamsClient(graph))
+                           .withBotClient(botClient, "https://smba.trafficmanager.net/teams/")
+                           .withConversationReferenceStore(store)
+                           .withProactiveConfig("tenant-1", "bot-app-id")
+                           .build();
+        }
+
+        @Test
+        void userChannel_storeMiss_createsConversationThenSends() {
+            var p      = buildProactivePlatform();
+            var ref    = new ChatChannelRef("user:aad-user-1");
+            var result = p.messaging().send(ref, new ChatContent("Hello proactive"));
+            assertThat(result.ok()).isTrue();
+            assertThat(botCalls).containsExactly("create:aad-user-1",
+                                                 "send:created-conv-for-aad-user-1:Hello proactive");
+            assertThat(result.messageRef().channel().id()).startsWith("personal:");
+        }
+
+        @Test
+        void userChannel_storeHit_sendsDirect() {
+            store.store(new ConversationReference("aad-user-1", "existing-conv",
+                                                  "https://smba.trafficmanager.net/teams/", "tenant-1"));
+            var p      = buildProactivePlatform();
+            var ref    = new ChatChannelRef("user:aad-user-1");
+            var result = p.messaging().send(ref, new ChatContent("Hello again"));
+            assertThat(result.ok()).isTrue();
+            assertThat(botCalls).containsExactly("send:existing-conv:Hello again");
+        }
+
+        @Test
+        void userChannel_storeMiss_storesRefAfterCreate() {
+            var p = buildProactivePlatform();
+            p.messaging().send(new ChatChannelRef("user:aad-user-1"),
+                               new ChatContent("Hello"));
+            assertThat(store.find("aad-user-1")).isPresent();
+            assertThat(store.find("aad-user-1").get().conversationId())
+                    .isEqualTo("created-conv-for-aad-user-1");
+        }
+
+        @Test
+        void userChannel_noBotClient_throws() {
+            var graph = new MicrosoftGraphClient(request ->
+                                                         new StubHttpResponse(200, """
+                                                                                   {"value":[]}"""));
+            var p = new TeamsChatPlatform(new TeamsClient(graph)).build();
+            assertThatThrownBy(() ->
+                                       p.messaging().send(new ChatChannelRef("user:aad-user-1"),
+                                                          new ChatContent("Hello")))
+                    .isInstanceOf(UnsupportedOperationException.class);
+        }
+    }
 }

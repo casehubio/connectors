@@ -23,18 +23,27 @@ public class TeamsBeans {
     ChatPlatform teamsChatPlatform(MicrosoftGraphClient graph,
                                    ServiceConnectionProvider connectionProvider,
                                    TeamsCommands teamsCommands,
+                                   ConversationReferenceStore conversationReferenceStore,
                                    @ConfigProperty(name = "casehub.connectors.teams.default-team-id",
                                                    defaultValue = "") String defaultTeamId,
                                    @ConfigProperty(name = "casehub.connectors.teams-bot.service-url-allowlist",
                                                    defaultValue = "*.botframework.com,smba.trafficmanager.net") String allowlist,
                                    @ConfigProperty(name = "casehub.connectors.teams-bot.default-service-url",
-                                                   defaultValue = "") String defaultServiceUrl) {
+                                                   defaultValue = "") String defaultServiceUrl,
+                                   @ConfigProperty(name = "casehub.connectors.teams-bot.default-tenant-id",
+                                                   defaultValue = "") String defaultTenantId,
+                                   @ConfigProperty(name = "casehub.connectors.teams-bot.app-id",
+                                                   defaultValue = "") String appId) {
         var builder = new TeamsChatPlatform(new TeamsClient(graph), connectionProvider,
                                             defaultTeamId)
-                              .withCommands(teamsCommands);
+                              .withCommands(teamsCommands)
+                              .withConversationReferenceStore(conversationReferenceStore);
         if (!defaultServiceUrl.isBlank()) {
             var botClient = new BotFrameworkClient(connectionProvider, allowlist);
             builder.withBotClient(botClient, defaultServiceUrl);
+        }
+        if (!defaultTenantId.isBlank() && !appId.isBlank()) {
+            builder.withProactiveConfig(defaultTenantId, appId);
         }
         return builder.build();
     }
