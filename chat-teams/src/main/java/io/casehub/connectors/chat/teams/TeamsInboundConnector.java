@@ -35,19 +35,28 @@ public class TeamsInboundConnector extends WebhookInboundConnector {
     private final CommandService commandService;
     private final String appId;
     private final ConversationReferenceStore conversationReferenceStore;
+    private final InvokeService invokeService;
 
 
     TeamsInboundConnector(BotFrameworkAuth auth, BotFrameworkClient client,
-                          CommandService commandService, String appId) {this(auth, client, commandService, appId, null);}
+                          CommandService commandService, String appId) {this(auth, client, commandService, appId, null, null);}
 
     TeamsInboundConnector(BotFrameworkAuth auth, BotFrameworkClient client,
                           CommandService commandService, String appId,
                           ConversationReferenceStore conversationReferenceStore) {
+        this(auth, client, commandService, appId, conversationReferenceStore, null);
+    }
+
+    TeamsInboundConnector(BotFrameworkAuth auth, BotFrameworkClient client,
+                          CommandService commandService, String appId,
+                          ConversationReferenceStore conversationReferenceStore,
+                          InvokeService invokeService) {
         this.auth                       = auth;
         this.client                     = client;
         this.commandService             = commandService;
         this.appId                      = appId;
         this.conversationReferenceStore = conversationReferenceStore;
+        this.invokeService              = invokeService;
     }
 
 
@@ -92,6 +101,7 @@ public class TeamsInboundConnector extends WebhookInboundConnector {
             case "message" -> handleMessage(activity);
             case "messageReaction" -> handleMessageReaction(activity);
             case "conversationUpdate" -> handleConversationUpdate(activity);
+            case "invoke" -> handleInvoke(activity);
             default -> {
                 LOG.fine("teams-inbound: ignoring activity type: " + type);
                 yield new WebhookResult.Ignored();
@@ -210,6 +220,54 @@ public class TeamsInboundConnector extends WebhookInboundConnector {
                 tenantId
         );
         return new WebhookResult.Delivered(List.of(msg));
+    }
+
+    private WebhookResult handleInvoke(JsonObject activity) {
+        String invokeName = activity.getString("name", "");
+        JsonObject value = activity.containsKey("value") && !activity.isNull("value")
+                           ? activity.getJsonObject("value")
+                           : Json.createObjectBuilder().build();
+
+        Map<String, String> metadata = buildBaseMetadata(activity);
+        metadata.put("teams-activity-type", "invoke");
+        metadata.put("teams-invoke-name", invokeName);
+        metadata.put("teams-invoke-data", value.toString());
+        String fromName = extractFromName(activity);
+        if (fromName != null) {
+            metadata.put("teams-from-name", fromName);
+        }
+
+        String timestamp = activity.getString("timestamp", null);
+        Instant ts = timestamp != null ? Instant.parse(timestamp) : Instant.now();
+
+        var msg = new InboundMessage(
+                InboundConnectorIds.TEAMS_INBOUND,
+                InboundConnectorTypes.TEAMS,
+                extractSenderId(activity),
+                extractChannelRef(activity),
+                "",
+                List.of(),
+                ts,
+                metadata,
+                extractTenancyId(activity));
+
+        InvokeResponse response;
+        if (invokeService != null) {
+            var request = new InvokeRequest(invokeName, value,
+                    extractSenderId(activity), extractChannelRef(activity), metadata);
+            response = invokeService.dispatch(request);
+        } else {
+            response = new InvokeResponse.Accepted();
+        }
+
+        String responseJson;
+        try {
+            responseJson = InvokeResponseSerializer.toJson(response);
+        } catch (Exception e) {
+            LOG.log(Level.WARNING, "teams-invoke: response serialization failed for: " + invokeName, e);
+            responseJson = InvokeResponseSerializer.toJson(new InvokeResponse.Accepted());
+        }
+        return new WebhookResult.Responded(responseJson, "application/json", List.of(msg));
     }
 
     private boolean isBotMember(JsonObject member) {

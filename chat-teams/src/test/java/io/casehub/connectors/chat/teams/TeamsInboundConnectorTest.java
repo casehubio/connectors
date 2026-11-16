@@ -345,6 +345,125 @@ class TeamsInboundConnectorTest {
                 "https://test.example.com/connectors/teams-inbound/webhook");
     }
 
+    // ── Invoke activities ─────────────────────────────────────────────────────
+
+    @Test
+    void invokeActivity_withHandler_returnsRespondedWithHandlerResponse() {
+        var handler = new InvokeHandler() {
+            @Override public String name() { return "adaptiveCard/action"; }
+            @Override public InvokeResponse handle(InvokeRequest r) {
+                return new InvokeResponse.Message("Action received");
+            }
+        };
+        var invokeService = new InvokeService(List.of(handler));
+        var conn = connectorWithInvoke(invokeService);
+
+        String body = invokeActivity("adaptiveCard/action", "{\"actionVerb\":\"approve\"}");
+        WebhookResult result = conn.handle(postRequest(body));
+
+        assertThat(result).isInstanceOf(WebhookResult.Responded.class);
+        var responded = (WebhookResult.Responded) result;
+        assertThat(responded.contentType()).isEqualTo("application/json");
+        assertThat(responded.messages()).hasSize(1);
+
+        var msg = responded.messages().get(0);
+        assertThat(msg.metadata().get("teams-invoke-name")).isEqualTo("adaptiveCard/action");
+
+        var responseObj = parseJson(responded.responseBody());
+        assertThat(responseObj.getInt("statusCode")).isEqualTo(200);
+        assertThat(responseObj.getString("type"))
+                .isEqualTo("application/vnd.microsoft.activity.message");
+    }
+
+    @Test
+    void invokeActivity_noHandler_returnsRespondedWithAccept() {
+        var invokeService = new InvokeService(List.of());
+        var conn = connectorWithInvoke(invokeService);
+
+        String body = invokeActivity("unknown/type", "{}");
+        WebhookResult result = conn.handle(postRequest(body));
+
+        assertThat(result).isInstanceOf(WebhookResult.Responded.class);
+        var responded = (WebhookResult.Responded) result;
+        assertThat(responded.messages()).hasSize(1);
+
+        var responseObj = parseJson(responded.responseBody());
+        assertThat(responseObj.getInt("statusCode")).isEqualTo(200);
+        assertThat(responseObj.size()).isEqualTo(1);
+    }
+
+    @Test
+    void invokeActivity_nullInvokeService_returnsRespondedWithAccept() {
+        var conn = connectorWithInvoke(null);
+
+        String body = invokeActivity("adaptiveCard/action", "{\"actionVerb\":\"ok\"}");
+        WebhookResult result = conn.handle(postRequest(body));
+
+        assertThat(result).isInstanceOf(WebhookResult.Responded.class);
+        var responded = (WebhookResult.Responded) result;
+        assertThat(responded.messages()).hasSize(1);
+    }
+
+    @Test
+    void invokeActivity_selfMessage_returnsIgnored() {
+        var conn = connectorWithInvoke(null);
+
+        String body = invokeActivityFromBot("adaptiveCard/action", "{}", "test-app-id");
+        WebhookResult result = conn.handle(postRequest(body));
+
+        assertThat(result).isInstanceOf(WebhookResult.Ignored.class);
+    }
+
+    @Test
+    void invokeActivity_metadataContainsInvokeName() {
+        var invokeService = new InvokeService(List.of());
+        var conn = connectorWithInvoke(invokeService);
+
+        String body = invokeActivity("task/fetch", "{\"data\":\"test\"}");
+        WebhookResult result = conn.handle(postRequest(body));
+
+        var responded = (WebhookResult.Responded) result;
+        var msg = responded.messages().get(0);
+        assertThat(msg.metadata().get("teams-activity-type")).isEqualTo("invoke");
+        assertThat(msg.metadata().get("teams-invoke-name")).isEqualTo("task/fetch");
+        assertThat(msg.metadata().get("teams-invoke-data")).isEqualTo("{\"data\":\"test\"}");
+    }
+
+    private TeamsInboundConnector connectorWithInvoke(InvokeService invokeService) {
+        var auth = new BotFrameworkAuth("test-app-id", true,
+                "https://login.botframework.com/v1/.well-known/openidconfiguration",
+                "https://api.botframework.com");
+        var client = new BotFrameworkClient(null,
+                "*.botframework.com,smba.trafficmanager.net");
+        var commandService = new CommandService(List.of(), List.of());
+        return new TeamsInboundConnector(auth, client, commandService,
+                "test-app-id", null, invokeService);
+    }
+
+    private static String invokeActivity(String name, String valueJson) {
+        return """
+                {"type":"invoke","name":"%s","value":%s,\
+                "from":{"id":"user-aad-id","aadObjectId":"user-aad-id","name":"Test User"},\
+                "conversation":{"id":"conv-1"},\
+                "channelData":{"tenant":{"id":"tenant-1"}},\
+                "serviceUrl":"https://smba.trafficmanager.net/uk/",\
+                "timestamp":"2026-11-16T10:00:00Z","id":"act-1"}""".formatted(name, valueJson);
+    }
+
+    private static String invokeActivityFromBot(String name, String valueJson, String botId) {
+        return """
+                {"type":"invoke","name":"%s","value":%s,\
+                "from":{"id":"%s","aadObjectId":"%s","name":"Bot"},\
+                "conversation":{"id":"conv-1"},\
+                "channelData":{"tenant":{"id":"tenant-1"}},\
+                "serviceUrl":"https://smba.trafficmanager.net/uk/",\
+                "timestamp":"2026-11-16T10:00:00Z","id":"act-1"}""".formatted(name, valueJson, botId, botId);
+    }
+
+    private static jakarta.json.JsonObject parseJson(String json) {
+        return jakarta.json.Json.createReader(new java.io.StringReader(json)).readObject();
+    }
+
     @Test
     void messageWithAttachments_parsesAttachmentMetadata() {
         String body = """

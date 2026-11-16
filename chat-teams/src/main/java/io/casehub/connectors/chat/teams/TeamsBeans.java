@@ -56,6 +56,12 @@ public class TeamsBeans {
 
     @Produces
     @ApplicationScoped
+    InvokeService invokeService(@io.quarkus.arc.All java.util.List<InvokeHandler> handlers) {
+        return new InvokeService(handlers);
+    }
+
+    @Produces
+    @ApplicationScoped
     io.casehub.connectors.WebhookInboundConnector teamsInboundConnector(
             @ConfigProperty(name = "casehub.connectors.teams-bot.app-id", defaultValue = "") String appId,
             @ConfigProperty(name = "casehub.connectors.teams-bot.dev-mode", defaultValue = "false") boolean devMode,
@@ -67,10 +73,12 @@ public class TeamsBeans {
                             defaultValue = "https://api.botframework.com") String issuer,
             io.casehub.connectors.chat.command.CommandService commandService,
             ServiceConnectionProvider connectionProvider,
-            ConversationReferenceStore conversationReferenceStore) {
+            ConversationReferenceStore conversationReferenceStore,
+            InvokeService invokeService) {
         var auth   = new BotFrameworkAuth(appId, devMode, metadataUrl, issuer);
         var client = new BotFrameworkClient(connectionProvider, allowlist);
-        return new TeamsInboundConnector(auth, client, commandService, appId, conversationReferenceStore);
+        return new TeamsInboundConnector(auth, client, commandService, appId,
+                conversationReferenceStore, invokeService);
     }
 
 }
