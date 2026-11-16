@@ -24,11 +24,19 @@ public class TeamsBeans {
                                    ServiceConnectionProvider connectionProvider,
                                    TeamsCommands teamsCommands,
                                    @ConfigProperty(name = "casehub.connectors.teams.default-team-id",
-                                                   defaultValue = "") String defaultTeamId) {
-        return new TeamsChatPlatform(new TeamsClient(graph), connectionProvider,
-                                     defaultTeamId)
-                       .withCommands(teamsCommands)
-                       .build();
+                                                   defaultValue = "") String defaultTeamId,
+                                   @ConfigProperty(name = "casehub.connectors.teams-bot.service-url-allowlist",
+                                                   defaultValue = "*.botframework.com,smba.trafficmanager.net") String allowlist,
+                                   @ConfigProperty(name = "casehub.connectors.teams-bot.default-service-url",
+                                                   defaultValue = "") String defaultServiceUrl) {
+        var builder = new TeamsChatPlatform(new TeamsClient(graph), connectionProvider,
+                                            defaultTeamId)
+                              .withCommands(teamsCommands);
+        if (!defaultServiceUrl.isBlank()) {
+            var botClient = new BotFrameworkClient(connectionProvider, allowlist);
+            builder.withBotClient(botClient, defaultServiceUrl);
+        }
+        return builder.build();
     }
 
     @Produces

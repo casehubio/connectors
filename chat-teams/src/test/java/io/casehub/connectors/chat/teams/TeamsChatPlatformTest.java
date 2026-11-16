@@ -373,6 +373,85 @@ class TeamsChatPlatformTest {
         }
     }
 
+    @Nested
+    class PersonalChatTest {
+
+        private ChatPlatform           personalPlatform;
+        private java.util.List<String> capturedUrls;
+        private java.util.List<String> capturedBodies;
+
+        @BeforeEach
+        void setUp() {
+            capturedUrls   = new java.util.ArrayList<>();
+            capturedBodies = new java.util.ArrayList<>();
+
+            var graph = new MicrosoftGraphClient(request -> {
+                capturedUrls.add(request.uri().toString());
+                return new StubHttpResponse(200, "{\"value\":[]}");
+            });
+
+            var botClient = new BotFrameworkClient(null,
+                                                   "*.botframework.com,smba.trafficmanager.net");
+
+            personalPlatform = new TeamsChatPlatform(new TeamsClient(graph))
+                                       .withBotClient(botClient, "https://smba.trafficmanager.net/teams/")
+                                       .build();
+        }
+
+        @Test
+        void sendToPersonalChannel_doesNotUseGraphApi() {
+            var ref    = new ChatChannelRef("personal:conv-123");
+            var result = personalPlatform.messaging().send(ref, new ChatContent("Hello DM"));
+            assertThat(result.ok()).isTrue();
+            assertThat(result.messageRef().channel().id()).isEqualTo("personal:conv-123");
+            assertThat(capturedUrls).noneMatch(u -> u.contains("/teams/"));
+        }
+
+        @Test
+        void replyToPersonalMessage_doesNotUseGraphApi() {
+            var channelRef = new ChatChannelRef("personal:conv-123");
+            var parentRef  = new ChatMessageRef(channelRef, "act-1");
+            var result     = personalPlatform.threading().reply(parentRef, new ChatContent("Reply DM"));
+            assertThat(result.ok()).isTrue();
+            assertThat(capturedUrls).noneMatch(u -> u.contains("/teams/"));
+        }
+
+        @Test
+        void sendToTeamChannel_stillUsesGraphApi() {
+            var graph = new MicrosoftGraphClient(request -> {
+                String uri = request.uri().toString();
+                if (uri.contains("/messages") && request.method().equals("POST")) {
+                    return new StubHttpResponse(201, messageResponseJson("msg-1"));
+                }
+                return new StubHttpResponse(200, "{\"value\":[]}");
+            });
+            var teamPlatform = new TeamsChatPlatform(new TeamsClient(graph)).build();
+            var ref          = new ChatChannelRef("team-1:ch-1");
+            var result       = teamPlatform.messaging().send(ref, new ChatContent("Team msg"));
+            assertThat(result.ok()).isTrue();
+        }
+    }
+
+    @Test
+    void isPersonalChannel_detectsPrefix() {
+        assertThat(TeamsChatPlatform.isPersonalChannel("personal:conv-1")).isTrue();
+        assertThat(TeamsChatPlatform.isPersonalChannel("team-1:ch-1")).isFalse();
+        assertThat(TeamsChatPlatform.isPersonalChannel(null)).isFalse();
+    }
+
+    @Test
+    void extractConversationId_removesPrefix() {
+        assertThat(TeamsChatPlatform.extractConversationId("personal:conv-123"))
+                .isEqualTo("conv-123");
+    }
+
+    @Test
+    void sendPersonalWithoutBotClient_throwsUnsupported() {
+        var ref = new ChatChannelRef("personal:conv-1");
+        assertThatThrownBy(() -> platform.messaging().send(ref, new ChatContent("test")))
+                .isInstanceOf(UnsupportedOperationException.class);
+    }
+
 
     private static String channelJson() {
         return """

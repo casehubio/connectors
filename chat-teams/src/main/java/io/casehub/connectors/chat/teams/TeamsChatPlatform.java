@@ -31,6 +31,8 @@ public class TeamsChatPlatform {
     private final ServiceConnectionProvider connectionProvider;
     private final String                    defaultTeamId;
     private       io.casehub.connectors.chat.spi.Commands commands;
+    private       BotFrameworkClient                      botClient;
+    private       String                                  defaultServiceUrl;
 
 
     public TeamsChatPlatform(TeamsClient client,
@@ -56,6 +58,13 @@ public class TeamsChatPlatform {
         return this;
     }
 
+    public TeamsChatPlatform withBotClient(BotFrameworkClient botClient, String defaultServiceUrl) {
+        this.botClient         = botClient;
+        this.defaultServiceUrl = defaultServiceUrl;
+        return this;
+    }
+
+
     public ChatPlatform build() {
         var builder = ChatPlatform.builder(PLATFORM_ID)
                                   .messaging(this::sendMessage)
@@ -74,6 +83,9 @@ public class TeamsChatPlatform {
     }
 
     private SendResult sendMessage(ChatChannelRef channel, ChatContent content) {
+        if (isPersonalChannel(channel.id())) {
+            return sendPersonalMessage(extractConversationId(channel.id()), content);
+        }
         var tc = TeamsMapper.parseTeamAndChannel(channel.id());
         return TokenRetry.withTokenRetry(this::resolveApplicationToken,
                                          token -> {
@@ -86,6 +98,18 @@ public class TeamsChatPlatform {
     }
 
     private SendResult replyToMessage(ChatMessageRef parent, ChatContent content) {
+        if (isPersonalChannel(parent.channel().id())) {
+            if (botClient == null || defaultServiceUrl == null || defaultServiceUrl.isBlank()) {
+                throw new UnsupportedOperationException(
+                        "Personal chat reply requires BotFrameworkClient and default service URL");
+            }
+            String conversationId = extractConversationId(parent.channel().id());
+            botClient.replyToActivity(defaultServiceUrl, conversationId,
+                                      parent.messageId(), content.text());
+            return new SendResult(true,
+                                  new ChatMessageRef(parent.channel(), ""),
+                                  java.time.Instant.now(), null);
+        }
         var tc = TeamsMapper.parseTeamAndChannel(parent.channel().id());
         return TokenRetry.withTokenRetry(this::resolveApplicationToken,
                                          token -> {
@@ -175,6 +199,31 @@ public class TeamsChatPlatform {
         }
         return List.copyOf(refs);
     }
+
+    static boolean isPersonalChannel(String channelId) {
+        return channelId != null && channelId.startsWith("personal:");
+    }
+
+    static String extractConversationId(String channelId) {
+        return channelId.substring("personal:".length());
+    }
+
+    private SendResult sendPersonalMessage(String conversationId, ChatContent content) {
+        if (botClient == null) {
+            throw new UnsupportedOperationException(
+                    "Personal chat messaging requires BotFrameworkClient — configure teams-bot properties");
+        }
+        String serviceUrl = defaultServiceUrl;
+        if (serviceUrl == null || serviceUrl.isBlank()) {
+            throw new UnsupportedOperationException(
+                    "Personal chat messaging requires a default service URL — set casehub.connectors.teams-bot.default-service-url");
+        }
+        botClient.sendToConversation(serviceUrl, conversationId, content.text());
+        return new SendResult(true,
+                              new ChatMessageRef(new ChatChannelRef("personal:" + conversationId), ""),
+                              java.time.Instant.now(), null);
+    }
+
 
     private String resolveDelegatedToken() {
         if (connectionProvider == null) return "test-token";
