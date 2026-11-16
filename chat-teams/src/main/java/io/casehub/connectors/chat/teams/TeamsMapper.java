@@ -89,7 +89,9 @@ final class TeamsMapper {
                 receivedAt);
     }
 
-    static JsonObject toMessageBody(ChatContent content) {return toMessageBody(content, List.of());}
+    static JsonObject toMessageBody(ChatContent content) {
+        return toMessageBody(content, List.of());
+    }
 
     static JsonObject toMessageBody(ChatContent content, List<UploadedRef> uploadedRefs) {
         boolean hasCards = !content.cards().isEmpty();

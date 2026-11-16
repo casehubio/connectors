@@ -1,14 +1,24 @@
 package io.casehub.connectors.chat.teams;
 
+import io.casehub.connectors.microsoft.GraphErrorHandler;
 import io.casehub.connectors.microsoft.MicrosoftGraphClient;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
+import java.io.StringReader;
+import java.net.URI;
+import java.net.URLEncoder;
+import java.net.http.HttpRequest;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
 class TeamsClient {
+
+    private static final int SIMPLE_UPLOAD_LIMIT = 4 * 1024 * 1024;
+    private static final int CHUNK_SIZE          = 16 * 320 * 1024;
 
     private final MicrosoftGraphClient graph;
 
@@ -97,44 +107,41 @@ class TeamsClient {
         }
     }
 
-    private static final int SIMPLE_UPLOAD_LIMIT = 4 * 1024 * 1024;
-    private static final int CHUNK_SIZE          = 16 * 320 * 1024;
-
     JsonObject getChannelFilesFolder(String teamId, String channelId, String token) {
         return graph.get("/teams/" + teamId + "/channels/" + channelId + "/filesFolder", token);
     }
 
     JsonObject uploadToChannelFolder(String driveId, String folderId, String filename,
                                      String contentType, byte[] content, String token) {
-        String encodedName = java.net.URLEncoder.encode(filename, java.nio.charset.StandardCharsets.UTF_8)
-                                                .replace("+", "%20");
+        String encodedName = URLEncoder.encode(filename, StandardCharsets.UTF_8).replace("+", "%20");
         if (content.length <= SIMPLE_UPLOAD_LIMIT) {
             return uploadSimple(driveId, folderId, encodedName, contentType, content, token);
         }
-        return uploadResumable(driveId, folderId, encodedName, contentType, content, token);
+        return uploadResumable(driveId, folderId, filename, encodedName, contentType, content, token);
     }
 
     private JsonObject uploadSimple(String driveId, String folderId, String encodedName,
                                     String contentType, byte[] content, String token) {
-        var request = java.net.http.HttpRequest.newBuilder(
-                                  java.net.URI.create(io.casehub.connectors.microsoft.MicrosoftGraphClient.BASE_URL
-                                                      + "/drives/" + driveId + "/items/" + folderId
-                                                      + ":/" + encodedName + ":/content"))
-                                               .header("Authorization", "Bearer " + token)
-                                               .header("Content-Type", contentType)
-                                               .PUT(java.net.http.HttpRequest.BodyPublishers.ofByteArray(content))
-                                               .build();
+        var request = HttpRequest.newBuilder(
+                                         URI.create(MicrosoftGraphClient.BASE_URL
+                                                    + "/drives/" + driveId + "/items/" + folderId
+                                                    + ":/" + encodedName + ":/content"))
+                                 .header("Authorization", "Bearer " + token)
+                                 .header("Content-Type", contentType)
+                                 .PUT(HttpRequest.BodyPublishers.ofByteArray(content))
+                                 .build();
         var response = graph.send(request);
-        io.casehub.connectors.microsoft.GraphErrorHandler.handle(response, "microsoft");
+        GraphErrorHandler.handle(response, "microsoft");
         return parseJsonObject(response.body());
     }
 
-    private JsonObject uploadResumable(String driveId, String folderId, String encodedName,
+    private JsonObject uploadResumable(String driveId, String folderId,
+                                       String filename, String encodedName,
                                        String contentType, byte[] content, String token) {
         var sessionBody = Json.createObjectBuilder()
                               .add("item", Json.createObjectBuilder()
                                                .add("@microsoft.graph.conflictBehavior", "replace")
-                                               .add("name", encodedName))
+                                               .add("name", filename))
                               .build();
         var session = graph.post("/drives/" + driveId + "/items/" + folderId
                                  + ":/" + encodedName + ":/createUploadSession", sessionBody, token);
@@ -145,16 +152,16 @@ class TeamsClient {
         JsonObject result    = null;
         while (offset < totalSize) {
             int    end   = Math.min(offset + CHUNK_SIZE, totalSize);
-            byte[] chunk = java.util.Arrays.copyOfRange(content, offset, end);
-            var request = java.net.http.HttpRequest.newBuilder(java.net.URI.create(uploadUrl))
-                                                   .header("Content-Type", contentType)
-                                                   .header("Content-Range",
-                                                           "bytes " + offset + "-" + (end - 1) + "/" + totalSize)
-                                                   .PUT(java.net.http.HttpRequest.BodyPublishers.ofByteArray(chunk))
-                                                   .build();
+            byte[] chunk = Arrays.copyOfRange(content, offset, end);
+            var request = HttpRequest.newBuilder(URI.create(uploadUrl))
+                                     .header("Content-Type", contentType)
+                                     .header("Content-Range",
+                                             "bytes " + offset + "-" + (end - 1) + "/" + totalSize)
+                                     .PUT(HttpRequest.BodyPublishers.ofByteArray(chunk))
+                                     .build();
             var response = graph.send(request);
             if (response.statusCode() >= 300) {
-                io.casehub.connectors.microsoft.GraphErrorHandler.handle(response, "microsoft");
+                GraphErrorHandler.handle(response, "microsoft");
             }
             if (end >= totalSize) {
                 result = parseJsonObject(response.body());
@@ -165,7 +172,7 @@ class TeamsClient {
     }
 
     private static JsonObject parseJsonObject(String body) {
-        try (var reader = jakarta.json.Json.createReader(new java.io.StringReader(body))) {
+        try (var reader = Json.createReader(new StringReader(body))) {
             return reader.readObject();
         }
     }

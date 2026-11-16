@@ -1,5 +1,6 @@
 package io.casehub.connectors.chat.teams;
 
+import io.casehub.connectors.Attachment;
 import io.casehub.connectors.chat.model.Channel;
 import io.casehub.connectors.chat.model.ChatChannelRef;
 import io.casehub.connectors.chat.model.ChatContent;
@@ -133,7 +134,7 @@ public class TeamsChatPlatform {
     }
 
 
-    private static String safeAttachmentName(int index, io.casehub.connectors.Attachment attachment) {
+    private static String safeAttachmentName(int index, Attachment attachment) {
         String name = attachment.filename();
         if (name == null || name.isBlank()) {
             name = "attachment-" + index + extensionFromMimeType(attachment.contentType());
@@ -155,21 +156,23 @@ public class TeamsChatPlatform {
         };
     }
 
-    private java.util.List<UploadedRef> uploadAttachments(String teamId, String channelId,
-                                                          java.util.List<io.casehub.connectors.Attachment> attachments, String token) {
-        if (attachments.isEmpty()) {return java.util.List.of();}
+    private List<UploadedRef> uploadAttachments(String teamId, String channelId,
+            List<Attachment> attachments, String token) {
+        if (attachments.isEmpty()) {
+            return List.of();
+        }
         var    folder   = client.getChannelFilesFolder(teamId, channelId, token);
         String folderId = folder.getString("id");
         String driveId  = folder.getJsonObject("parentReference").getString("driveId");
-        var    refs     = new java.util.ArrayList<UploadedRef>();
+        var    refs     = new ArrayList<UploadedRef>();
         for (int i = 0; i < attachments.size(); i++) {
             var    att  = attachments.get(i);
             String name = safeAttachmentName(i, att);
-            var item = client.uploadToChannelFolder(
+            var    item = client.uploadToChannelFolder(
                     driveId, folderId, name, att.contentType(), att.content(), token);
-            refs.add(new UploadedRef(item.getString("name"), item.getString("webUrl")));
+            refs.add(new UploadedRef(name, item.getString("webUrl")));
         }
-        return java.util.List.copyOf(refs);
+        return List.copyOf(refs);
     }
 
     private String resolveDelegatedToken() {
