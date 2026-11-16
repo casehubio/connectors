@@ -96,4 +96,78 @@ class TeamsClient {
             }
         }
     }
+
+    private static final int SIMPLE_UPLOAD_LIMIT = 4 * 1024 * 1024;
+    private static final int CHUNK_SIZE          = 16 * 320 * 1024;
+
+    JsonObject getChannelFilesFolder(String teamId, String channelId, String token) {
+        return graph.get("/teams/" + teamId + "/channels/" + channelId + "/filesFolder", token);
+    }
+
+    JsonObject uploadToChannelFolder(String driveId, String folderId, String filename,
+                                     String contentType, byte[] content, String token) {
+        String encodedName = java.net.URLEncoder.encode(filename, java.nio.charset.StandardCharsets.UTF_8)
+                                                .replace("+", "%20");
+        if (content.length <= SIMPLE_UPLOAD_LIMIT) {
+            return uploadSimple(driveId, folderId, encodedName, contentType, content, token);
+        }
+        return uploadResumable(driveId, folderId, encodedName, contentType, content, token);
+    }
+
+    private JsonObject uploadSimple(String driveId, String folderId, String encodedName,
+                                    String contentType, byte[] content, String token) {
+        var request = java.net.http.HttpRequest.newBuilder(
+                                  java.net.URI.create(io.casehub.connectors.microsoft.MicrosoftGraphClient.BASE_URL
+                                                      + "/drives/" + driveId + "/items/" + folderId
+                                                      + ":/" + encodedName + ":/content"))
+                                               .header("Authorization", "Bearer " + token)
+                                               .header("Content-Type", contentType)
+                                               .PUT(java.net.http.HttpRequest.BodyPublishers.ofByteArray(content))
+                                               .build();
+        var response = graph.send(request);
+        io.casehub.connectors.microsoft.GraphErrorHandler.handle(response, "microsoft");
+        return parseJsonObject(response.body());
+    }
+
+    private JsonObject uploadResumable(String driveId, String folderId, String encodedName,
+                                       String contentType, byte[] content, String token) {
+        var sessionBody = Json.createObjectBuilder()
+                              .add("item", Json.createObjectBuilder()
+                                               .add("@microsoft.graph.conflictBehavior", "replace")
+                                               .add("name", encodedName))
+                              .build();
+        var session = graph.post("/drives/" + driveId + "/items/" + folderId
+                                 + ":/" + encodedName + ":/createUploadSession", sessionBody, token);
+        String uploadUrl = session.getString("uploadUrl");
+
+        int        totalSize = content.length;
+        int        offset    = 0;
+        JsonObject result    = null;
+        while (offset < totalSize) {
+            int    end   = Math.min(offset + CHUNK_SIZE, totalSize);
+            byte[] chunk = java.util.Arrays.copyOfRange(content, offset, end);
+            var request = java.net.http.HttpRequest.newBuilder(java.net.URI.create(uploadUrl))
+                                                   .header("Content-Type", contentType)
+                                                   .header("Content-Range",
+                                                           "bytes " + offset + "-" + (end - 1) + "/" + totalSize)
+                                                   .PUT(java.net.http.HttpRequest.BodyPublishers.ofByteArray(chunk))
+                                                   .build();
+            var response = graph.send(request);
+            if (response.statusCode() >= 300) {
+                io.casehub.connectors.microsoft.GraphErrorHandler.handle(response, "microsoft");
+            }
+            if (end >= totalSize) {
+                result = parseJsonObject(response.body());
+            }
+            offset = end;
+        }
+        return result;
+    }
+
+    private static JsonObject parseJsonObject(String body) {
+        try (var reader = jakarta.json.Json.createReader(new java.io.StringReader(body))) {
+            return reader.readObject();
+        }
+    }
+
 }
