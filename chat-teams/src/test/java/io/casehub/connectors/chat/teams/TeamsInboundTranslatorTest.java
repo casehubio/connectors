@@ -1,17 +1,16 @@
 package io.casehub.connectors.chat.teams;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import io.casehub.connectors.InboundConnectorIds;
+import io.casehub.connectors.InboundConnectorTypes;
+import io.casehub.connectors.InboundMessage;
+import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.jupiter.api.Test;
-
-import io.casehub.connectors.InboundConnectorIds;
-import io.casehub.connectors.InboundConnectorTypes;
-import io.casehub.connectors.InboundMessage;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class TeamsInboundTranslatorTest {
 
@@ -118,5 +117,112 @@ class TeamsInboundTranslatorTest {
         assertThatThrownBy(() -> translator.translate(msg))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("messageReaction");
+    }
+
+    @Test
+    void translate_htmlContent_setsMarkdownAndPlainText() {
+        var msg = new InboundMessage(
+                InboundConnectorIds.TEAMS_INBOUND,
+                InboundConnectorTypes.TEAMS,
+                "user-1",
+                "team-1:ch-1",
+                "<p>Hello <b>world</b> and <i>italic</i></p>",
+                List.of(),
+                Instant.now(),
+                Map.of(
+                        "teams-activity-id", "act-html",
+                        "teams-activity-type", "message",
+                        "teams-service-url", "https://smba.trafficmanager.net/teams/",
+                        "teams-conversation-id", "conv-1",
+                        "teams-conversation-type", "channel"),
+                null);
+
+        var result = translator.translate(msg);
+
+        assertThat(result.content().text()).isEqualTo("Hello world and italic");
+        assertThat(result.content().markdown()).isEqualTo("Hello **world** and *italic*");
+    }
+
+    @Test
+    void translate_plainTextContent_noMarkdown() {
+        var msg = new InboundMessage(
+                InboundConnectorIds.TEAMS_INBOUND,
+                InboundConnectorTypes.TEAMS,
+                "user-1",
+                "team-1:ch-1",
+                "Just plain text",
+                List.of(),
+                Instant.now(),
+                Map.of(
+                        "teams-activity-id", "act-plain",
+                        "teams-activity-type", "message",
+                        "teams-service-url", "https://smba.trafficmanager.net/teams/",
+                        "teams-conversation-id", "conv-1",
+                        "teams-conversation-type", "channel"),
+                null);
+
+        var result = translator.translate(msg);
+
+        assertThat(result.content().text()).isEqualTo("Just plain text");
+        assertThat(result.content().markdown()).isNull();
+    }
+
+    @Test
+    void translate_atMention_strippedFromBothFormats() {
+        var msg = new InboundMessage(
+                InboundConnectorIds.TEAMS_INBOUND,
+                InboundConnectorTypes.TEAMS,
+                "user-1",
+                "team-1:ch-1",
+                "<at>Bot</at> show me <b>orders</b>",
+                List.of(),
+                Instant.now(),
+                Map.of(
+                        "teams-activity-id", "act-mention",
+                        "teams-activity-type", "message",
+                        "teams-service-url", "https://smba.trafficmanager.net/teams/",
+                        "teams-conversation-id", "conv-1",
+                        "teams-conversation-type", "channel"),
+                null);
+
+        var result = translator.translate(msg);
+
+        assertThat(result.content().text()).isEqualTo("show me orders");
+        assertThat(result.content().markdown()).isEqualTo("show me **orders**");
+    }
+
+    @Test
+    void htmlToMarkdown_convertsLinksAndFormatting() {
+        String html = "<a href=\"https://example.com\">click</a> and <code>code</code>";
+        String md   = TeamsInboundTranslator.htmlToMarkdown(html);
+        assertThat(md).isEqualTo("[click](https://example.com) and `code`");
+    }
+
+    @Test
+    void htmlToMarkdown_convertsStrikethroughAndBreaks() {
+        String html = "line1<br/>line2 <strike>removed</strike>";
+        String md   = TeamsInboundTranslator.htmlToMarkdown(html);
+        assertThat(md).isEqualTo("line1\nline2 ~~removed~~");
+    }
+
+    @Test
+    void htmlToMarkdown_decodesHtmlEntities() {
+        String html = "A & B < C > D &quot;E&quot; F&#39;s";
+        String md   = TeamsInboundTranslator.htmlToMarkdown(html);
+        assertThat(md).isEqualTo("A & B < C > D \"E\" F's");
+    }
+
+    @Test
+    void htmlToPlainText_stripsAllTags() {
+        String html  = "<p><b>bold</b> and <a href=\"url\">link</a></p>";
+        String plain = TeamsInboundTranslator.htmlToPlainText(html);
+        assertThat(plain).isEqualTo("bold and link");
+    }
+
+    @Test
+    void containsHtml_detectsTags() {
+        assertThat(TeamsInboundTranslator.containsHtml("<b>yes</b>")).isTrue();
+        assertThat(TeamsInboundTranslator.containsHtml("no tags here")).isFalse();
+        assertThat(TeamsInboundTranslator.containsHtml(null)).isFalse();
     }
 }
