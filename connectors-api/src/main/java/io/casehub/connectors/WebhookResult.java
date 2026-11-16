@@ -18,6 +18,8 @@ import java.util.function.Supplier;
  *     (suppress automated platform retries — Slack retries for up to 30 days on non-2xx)
  * <li>{@code Unauthorized} from GET → 403 Forbidden
  *     (admin console setup failure — the admin needs a clear failure signal)
+ * <li>{@code Responded} → 200 OK with response body + events fired
+ *     (invoke activities that require both message delivery and a JSON response)
  * </ul>
  */
 public sealed interface WebhookResult {
