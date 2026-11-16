@@ -97,6 +97,24 @@ class WebhookRouterTest {
             .then().statusCode(200);
     }
 
+    // ── Responded ─────────────────────────────────────────────────────────────
+
+    @Test
+    void post_respondedConnector_returns200WithBodyAndFiresEvent() throws InterruptedException {
+        given()
+            .contentType("application/json")
+            .body("{}")
+            .when().post("/connectors/responded-test/webhook")
+            .then()
+            .statusCode(200)
+            .contentType("application/json")
+            .body(equalTo("{\"statusCode\":200}"));
+
+        InboundMessage msg = capture.poll(2, TimeUnit.SECONDS);
+        assertThat(msg).isNotNull();
+        assertThat(msg.content()).isEqualTo("invoke-event");
+    }
+
     // ── Helpers ──────────────────────────────────────────────────────────────
 
     private static String nowTs() {

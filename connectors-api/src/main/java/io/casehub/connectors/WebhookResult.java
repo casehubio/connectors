@@ -62,4 +62,14 @@ public sealed interface WebhookResult {
             List<InboundMessage> immediate,
             Supplier<List<InboundMessage>> deferred) implements WebhookResult {}
 
+    /**
+     * Messages are delivered AND a response body is returned to the caller.
+     *
+     * <p>Used for Bot Framework invoke activities (Adaptive Card actions, task modules)
+     * where the HTTP response body determines what happens in the client
+     * (card update, task module dialog, message display).
+     */
+    record Responded(String responseBody, String contentType,
+                     List<InboundMessage> messages) implements WebhookResult {}
+
 }

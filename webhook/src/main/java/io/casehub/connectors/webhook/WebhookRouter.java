@@ -105,6 +105,10 @@ public class WebhookRouter {
                     });
                     yield Response.ok().build();
                 }
+                case WebhookResult.Responded(var responseBody, var contentType, var msgs) -> {
+                    msgs.forEach(service::receive);
+                    yield Response.ok(responseBody).type(contentType).build();
+                }
                 case WebhookResult.Challenged(
                         var responseBody, var contentType
                 ) -> Response.ok(responseBody).type(contentType).build();
