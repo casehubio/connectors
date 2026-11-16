@@ -34,14 +34,22 @@ public class TeamsInboundConnector extends WebhookInboundConnector {
     private final BotFrameworkClient client;
     private final CommandService commandService;
     private final String appId;
+    private final ConversationReferenceStore conversationReferenceStore;
+
 
     TeamsInboundConnector(BotFrameworkAuth auth, BotFrameworkClient client,
-                          CommandService commandService, String appId) {
-        this.auth = auth;
-        this.client = client;
-        this.commandService = commandService;
-        this.appId = appId;
+                          CommandService commandService, String appId) {this(auth, client, commandService, appId, null);}
+
+    TeamsInboundConnector(BotFrameworkAuth auth, BotFrameworkClient client,
+                          CommandService commandService, String appId,
+                          ConversationReferenceStore conversationReferenceStore) {
+        this.auth                       = auth;
+        this.client                     = client;
+        this.commandService             = commandService;
+        this.appId                      = appId;
+        this.conversationReferenceStore = conversationReferenceStore;
     }
+
 
     @Override
     public String id() {
@@ -83,10 +91,7 @@ public class TeamsInboundConnector extends WebhookInboundConnector {
         return switch (type) {
             case "message" -> handleMessage(activity);
             case "messageReaction" -> handleMessageReaction(activity);
-            case "conversationUpdate" -> {
-                LOG.info("teams-inbound: conversationUpdate received");
-                yield new WebhookResult.Ignored();
-            }
+            case "conversationUpdate" -> handleConversationUpdate(activity);
             default -> {
                 LOG.fine("teams-inbound: ignoring activity type: " + type);
                 yield new WebhookResult.Ignored();
@@ -136,6 +141,82 @@ public class TeamsInboundConnector extends WebhookInboundConnector {
         }
         return new WebhookResult.Delivered(messages);
     }
+
+    private WebhookResult handleConversationUpdate(JsonObject activity) {
+        String serviceUrl     = activity.getString("serviceUrl", "");
+        String conversationId = extractConversationId(activity);
+        String tenantId       = extractTenancyId(activity);
+
+        var membersAdded = activity.containsKey("membersAdded")
+                           ? activity.getJsonArray("membersAdded") : null;
+        var membersRemoved = activity.containsKey("membersRemoved")
+                             ? activity.getJsonArray("membersRemoved") : null;
+
+        var addedIds = new ArrayList<String>();
+        if (membersAdded != null) {
+            for (var member : membersAdded) {
+                var    memberObj   = member.asJsonObject();
+                String aadObjectId = memberObj.getString("aadObjectId", "");
+                if (!aadObjectId.isBlank() && !isBotMember(memberObj)) {
+                    if (conversationReferenceStore != null) {
+                        try {
+                            conversationReferenceStore.store(
+                                    new ConversationReference(aadObjectId, conversationId, serviceUrl, tenantId));
+                        } catch (Exception e) {
+                            LOG.log(Level.WARNING, "teams-inbound: failed to store conversation reference for " + aadObjectId, e);
+                        }
+                    }
+                    addedIds.add(aadObjectId);
+                }
+            }
+        }
+
+        var removedIds = new ArrayList<String>();
+        if (membersRemoved != null) {
+            for (var member : membersRemoved) {
+                var    memberObj   = member.asJsonObject();
+                String aadObjectId = memberObj.getString("aadObjectId", "");
+                if (!aadObjectId.isBlank() && !isBotMember(memberObj)) {
+                    removedIds.add(aadObjectId);
+                }
+            }
+        }
+
+        var metadata = buildBaseMetadata(activity);
+        metadata.put("teams-activity-type", "conversationUpdate");
+        if (!addedIds.isEmpty()) {
+            metadata.put("teams-members-added", String.join(",", addedIds));
+        }
+        if (!removedIds.isEmpty()) {
+            metadata.put("teams-members-removed", String.join(",", removedIds));
+        }
+        String fromName = extractFromName(activity);
+        if (fromName != null) {
+            metadata.put("teams-from-name", fromName);
+        }
+
+        String  timestamp = activity.getString("timestamp", null);
+        Instant ts        = timestamp != null ? Instant.parse(timestamp) : Instant.now();
+
+        var msg = new InboundMessage(
+                InboundConnectorIds.TEAMS_INBOUND,
+                InboundConnectorTypes.TEAMS,
+                extractSenderId(activity),
+                extractChannelRef(activity),
+                "conversationUpdate",
+                List.of(),
+                ts,
+                metadata,
+                tenantId
+        );
+        return new WebhookResult.Delivered(List.of(msg));
+    }
+
+    private boolean isBotMember(JsonObject member) {
+        String id = member.getString("id", "");
+        return !appId.isBlank() && (id.equals("28:" + appId) || id.equals(appId));
+    }
+
 
     private String stripBotMention(String text, JsonObject activity) {
         if (!activity.containsKey("entities")) return text;

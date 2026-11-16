@@ -115,18 +115,109 @@ class TeamsInboundConnectorTest {
     }
 
     @Test
-    void conversationUpdateActivity_returnsIgnored() {
+    void conversationUpdateActivity_returnsDelivered() {
         String body = """
-                {"type":"conversationUpdate",\
-                "membersAdded":[{"id":"29:new-user"}],\
-                "from":{"id":"29:user-id","aadObjectId":"aad-user-1"},\
-                "conversation":{"id":"conv-1","conversationType":"channel"},\
-                "channelData":{"team":{"id":"team-1"},"channel":{"id":"ch-1"},"tenant":{"id":"t-1"}},\
-                "serviceUrl":"https://smba.trafficmanager.net/teams/",\
-                "id":"act-4","timestamp":"2026-11-15T10:00:00Z"}""";
-        var req = postRequest(body);
-        assertThat(connector.handle(req)).isInstanceOf(WebhookResult.Ignored.class);
+                      {"type":"conversationUpdate",\
+                      "membersAdded":[{"id":"29:new-user","aadObjectId":"aad-new-user"}],\
+                      "from":{"id":"29:user-id","aadObjectId":"aad-user-1"},\
+                      "conversation":{"id":"conv-1","conversationType":"channel"},\
+                      "channelData":{"team":{"id":"team-1"},"channel":{"id":"ch-1"},"tenant":{"id":"t-1"}},\
+                      "serviceUrl":"https://smba.trafficmanager.net/teams/",\
+                      "id":"act-4","timestamp":"2026-11-15T10:00:00Z"}""";
+        var req    = postRequest(body);
+        var result = connector.handle(req);
+        assertThat(result).isInstanceOf(WebhookResult.Delivered.class);
+        var delivered = (WebhookResult.Delivered) result;
+        assertThat(delivered.messages()).hasSize(1);
+        var msg = delivered.messages().get(0);
+        assertThat(msg.metadata().get("teams-activity-type")).isEqualTo("conversationUpdate");
+        assertThat(msg.metadata().get("teams-members-added")).isEqualTo("aad-new-user");
     }
+
+    @Test
+    void conversationUpdate_membersAdded_storesRefAndDelivers() {
+        var store = new InMemoryConversationReferenceStore();
+        var auth = new BotFrameworkAuth("test-app-id", true,
+                                        "https://login.botframework.com/v1/.well-known/openidconfiguration",
+                                        "https://api.botframework.com");
+        var client = new BotFrameworkClient(null,
+                                            "*.botframework.com,smba.trafficmanager.net");
+        var commandService = new io.casehub.connectors.chat.command.CommandService(List.of(), List.of());
+        var connectorWithStore = new TeamsInboundConnector(auth, client, commandService,
+                                                           "test-app-id", store);
+
+        String body = """
+                      {"type":"conversationUpdate",\
+                      "membersAdded":[{"id":"aad-user-1","aadObjectId":"aad-user-1"}],\
+                      "from":{"id":"29:bot-id","aadObjectId":"aad-bot"},\
+                      "conversation":{"id":"conv-new-1","conversationType":"personal"},\
+                      "channelData":{"tenant":{"id":"t-1"}},\
+                      "serviceUrl":"https://smba.trafficmanager.net/teams/",\
+                      "id":"act-cu-1","timestamp":"2026-11-16T10:00:00Z"}""";
+        var req    = postRequest(body);
+        var result = connectorWithStore.handle(req);
+
+        assertThat(result).isInstanceOf(WebhookResult.Delivered.class);
+        var delivered = (WebhookResult.Delivered) result;
+        assertThat(delivered.messages()).hasSize(1);
+        var msg = delivered.messages().get(0);
+        assertThat(msg.metadata().get("teams-activity-type")).isEqualTo("conversationUpdate");
+        assertThat(msg.metadata().get("teams-members-added")).isEqualTo("aad-user-1");
+
+        var storedRef = store.find("aad-user-1");
+        assertThat(storedRef).isPresent();
+        assertThat(storedRef.get().conversationId()).isEqualTo("conv-new-1");
+        assertThat(storedRef.get().serviceUrl()).isEqualTo("https://smba.trafficmanager.net/teams/");
+    }
+
+    @Test
+    void conversationUpdate_botOnlyAdded_storesNothingButDelivers() {
+        var store = new InMemoryConversationReferenceStore();
+        var auth = new BotFrameworkAuth("test-app-id", true,
+                                        "https://login.botframework.com/v1/.well-known/openidconfiguration",
+                                        "https://api.botframework.com");
+        var client = new BotFrameworkClient(null,
+                                            "*.botframework.com,smba.trafficmanager.net");
+        var commandService = new io.casehub.connectors.chat.command.CommandService(List.of(), List.of());
+        var connectorWithStore = new TeamsInboundConnector(auth, client, commandService,
+                                                           "test-app-id", store);
+
+        String body = """
+                      {"type":"conversationUpdate",\
+                      "membersAdded":[{"id":"28:test-app-id","aadObjectId":"test-app-id"}],\
+                      "from":{"id":"29:user-id","aadObjectId":"aad-user-1"},\
+                      "conversation":{"id":"conv-1","conversationType":"personal"},\
+                      "channelData":{"tenant":{"id":"t-1"}},\
+                      "serviceUrl":"https://smba.trafficmanager.net/teams/",\
+                      "id":"act-cu-2","timestamp":"2026-11-16T10:00:00Z"}""";
+        var req    = postRequest(body);
+        var result = connectorWithStore.handle(req);
+
+        assertThat(result).isInstanceOf(WebhookResult.Delivered.class);
+        assertThat(store.find("test-app-id")).isEmpty();
+    }
+
+    @Test
+    void conversationUpdate_membersRemoved_includesMetadata() {
+        String body = """
+                      {"type":"conversationUpdate",\
+                      "membersRemoved":[{"id":"aad-user-2","aadObjectId":"aad-user-2"}],\
+                      "from":{"id":"29:bot-id","aadObjectId":"aad-bot"},\
+                      "conversation":{"id":"conv-1","conversationType":"personal"},\
+                      "channelData":{"tenant":{"id":"t-1"}},\
+                      "serviceUrl":"https://smba.trafficmanager.net/teams/",\
+                      "id":"act-cu-4","timestamp":"2026-11-16T10:00:00Z"}""";
+        var req    = postRequest(body);
+        var result = connector.handle(req);
+
+        assertThat(result).isInstanceOf(WebhookResult.Delivered.class);
+        var delivered = (WebhookResult.Delivered) result;
+        var msg       = delivered.messages().get(0);
+        assertThat(msg.metadata().get("teams-activity-type")).isEqualTo("conversationUpdate");
+        assertThat(msg.metadata().get("teams-members-removed")).isEqualTo("aad-user-2");
+        assertThat(msg.metadata()).doesNotContainKey("teams-members-added");
+    }
+
 
     @Test
     void unknownActivityType_returnsIgnored() {

@@ -261,17 +261,14 @@ public class TeamsChatPlatform {
                     "Proactive messaging requires a default service URL — set casehub.connectors.teams-bot.default-service-url");
         }
 
-        String conversationId;
-        String resolvedServiceUrl;
-
         if (conversationReferenceStore != null) {
             var existing = conversationReferenceStore.find(aadObjectId);
             if (existing.isPresent()) {
-                conversationId     = existing.get().conversationId();
-                resolvedServiceUrl = existing.get().serviceUrl();
-                botClient.sendToConversation(resolvedServiceUrl, conversationId, content.text());
+                String resolvedServiceUrl = existing.get().serviceUrl();
+                String cachedConversationId = existing.get().conversationId();
+                botClient.sendToConversation(resolvedServiceUrl, cachedConversationId, content.text());
                 return new SendResult(true,
-                                      new ChatMessageRef(new ChatChannelRef("personal:" + conversationId), ""),
+                                      new ChatMessageRef(new ChatChannelRef("personal:" + cachedConversationId), ""),
                                       java.time.Instant.now(), null);
             }
         }
@@ -283,7 +280,7 @@ public class TeamsChatPlatform {
                     + "configure casehub.connectors.teams-bot properties");
         }
 
-        conversationId = botClient.createConversation(serviceUrl, botAppId, aadObjectId, defaultTenantId);
+        String conversationId = botClient.createConversation(serviceUrl, botAppId, aadObjectId, defaultTenantId);
 
         if (conversationReferenceStore != null) {
             conversationReferenceStore.store(

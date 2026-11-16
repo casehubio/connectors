@@ -66,10 +66,11 @@ public class TeamsBeans {
             @ConfigProperty(name = "casehub.connectors.teams-bot.issuer",
                             defaultValue = "https://api.botframework.com") String issuer,
             io.casehub.connectors.chat.command.CommandService commandService,
-            ServiceConnectionProvider connectionProvider) {
+            ServiceConnectionProvider connectionProvider,
+            ConversationReferenceStore conversationReferenceStore) {
         var auth   = new BotFrameworkAuth(appId, devMode, metadataUrl, issuer);
         var client = new BotFrameworkClient(connectionProvider, allowlist);
-        return new TeamsInboundConnector(auth, client, commandService, appId);
+        return new TeamsInboundConnector(auth, client, commandService, appId, conversationReferenceStore);
     }
 
 }
