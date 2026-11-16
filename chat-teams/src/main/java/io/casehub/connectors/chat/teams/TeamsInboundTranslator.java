@@ -76,12 +76,12 @@ public class TeamsInboundTranslator implements InboundTranslator {
         s = s.replaceAll("(?i)</?div>", "\n");
         s = s.replaceAll("(?i)<h([1-6])>([^<]*)</h\\1>", "\n$2\n");
         s = TAG_PATTERN.matcher(s).replaceAll("");
-        s = s.replaceAll("&", "&");
         s = s.replaceAll("<", "<");
         s = s.replaceAll(">", ">");
         s = s.replaceAll("&quot;", "\"");
         s = s.replaceAll("&#39;", "'");
         s = s.replaceAll("&nbsp;", " ");
+        s = s.replaceAll("&", "&");
         s = s.replaceAll("\n{3,}", "\n\n");
         return s.strip();
     }
@@ -94,12 +94,12 @@ public class TeamsInboundTranslator implements InboundTranslator {
         s = s.replaceAll("(?i)</?p>", "\n");
         s = s.replaceAll("(?i)</?div>", "\n");
         s = TAG_PATTERN.matcher(s).replaceAll("");
-        s = s.replaceAll("&", "&");
         s = s.replaceAll("<", "<");
         s = s.replaceAll(">", ">");
         s = s.replaceAll("&quot;", "\"");
         s = s.replaceAll("&#39;", "'");
         s = s.replaceAll("&nbsp;", " ");
+        s = s.replaceAll("&", "&");
         s = s.replaceAll("\n{3,}", "\n\n");
         return s.strip();
     }
