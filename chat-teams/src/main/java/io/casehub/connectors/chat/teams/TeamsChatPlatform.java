@@ -62,6 +62,7 @@ public class TeamsChatPlatform {
                                   .threading(this::replyToMessage)
                                   .discovery(this::listChannels)
                                   .presence(new TeamsPresence())
+                                  .reactions(new TeamsReactions())
                                   .members(this::listMembers)
                                   .channelManagement(new TeamsChannelManagement())
                                   .memberManagement(new TeamsMemberManagement())
@@ -273,4 +274,37 @@ public class TeamsChatPlatform {
                     token -> client.removeMember(tc[0], member.id(), token));
         }
     }
+
+    private class TeamsReactions implements io.casehub.connectors.chat.spi.Reactions {
+        @Override
+        public void add(ChatMessageRef message, String emoji) {
+            var tc = TeamsMapper.parseTeamAndChannel(message.channel().id());
+            TokenRetry.withTokenRetryVoid(TeamsChatPlatform.this::resolveApplicationToken,
+                                          token -> client.setReaction(tc[0], tc[1], message.messageId(), emoji, token));
+        }
+
+        @Override
+        public void remove(ChatMessageRef message, String emoji) {
+            var tc = TeamsMapper.parseTeamAndChannel(message.channel().id());
+            TokenRetry.withTokenRetryVoid(TeamsChatPlatform.this::resolveApplicationToken,
+                                          token -> client.unsetReaction(tc[0], tc[1], message.messageId(), emoji, token));
+        }
+
+        @Override
+        public List<String> list(ChatMessageRef message) {
+            var tc = TeamsMapper.parseTeamAndChannel(message.channel().id());
+            return TokenRetry.withTokenRetry(TeamsChatPlatform.this::resolveApplicationToken,
+                                             token -> {
+                                                 var msg = client.getMessage(tc[0], tc[1], message.messageId(), token);
+                                                 if (!msg.containsKey("reactions")) {
+                                                     return List.of();
+                                                 }
+                                                 return msg.getJsonArray("reactions").stream()
+                                                           .map(r -> r.asJsonObject().getString("reactionType"))
+                                                           .distinct()
+                                                           .toList();
+                                             });
+        }
+    }
+
 }

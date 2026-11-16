@@ -35,24 +35,26 @@ class TeamsChatPlatformTest {
     @BeforeEach
     void setUp() {
         var graph = new MicrosoftGraphClient(request -> {
-            String uri = request.uri().toString();
+            String uri    = request.uri().toString();
             String method = request.method();
 
             // List joined teams
             if (uri.contains("/me/joinedTeams")) {
                 return new StubHttpResponse(200, """
-                        {"value":[{"id":"team-1","displayName":"Engineering"}]}""");
+                                                 {"value":[{"id":"team-1","displayName":"Engineering"}]}""");
             }
 
             // List channels for a team
             if (uri.matches(".*\\/teams\\/[^/]+\\/channels$") && method.equals("GET")) {
                 return new StubHttpResponse(200, """
-                        {"value":[%s]}""".formatted(channelJson()));
+                                                 {"value":[%s]}""".formatted(channelJson()));
             }
 
             // Send message
             if (uri.contains("/messages") && method.equals("POST")
-                    && !uri.contains("/replies")) {
+                && !uri.contains("/replies")
+                && !uri.contains("/setReaction")
+                && !uri.contains("/unsetReaction")) {
                 return new StubHttpResponse(201, messageResponseJson("msg-new"));
             }
 
@@ -61,17 +63,27 @@ class TeamsChatPlatformTest {
                 return new StubHttpResponse(201, messageResponseJson("reply-1"));
             }
 
+            // setReaction / unsetReaction
+            if (uri.contains("/setReaction") || uri.contains("/unsetReaction")) {
+                return new StubHttpResponse(204, "");
+            }
+
+            // Get single message (for reactions list)
+            if (uri.matches(".*\\/messages\\/[^/]+$") && method.equals("GET")) {
+                return new StubHttpResponse(200, messageWithReactionsJson());
+            }
+
             // Get presence
             if (uri.contains("/presence")) {
                 return new StubHttpResponse(200, """
-                        {"availability":"Available","activity":"Available"}""");
+                                                 {"availability":"Available","activity":"Available"}""");
             }
 
             // List members
             if (uri.contains("/members") && method.equals("GET")) {
                 return new StubHttpResponse(200, """
-                        {"value":[{"id":"membership-1","userId":"user-1",\
-                        "displayName":"Alice","roles":["owner"]}]}""");
+                                                 {"value":[{"id":"membership-1","userId":"user-1",\
+                                                 "displayName":"Alice","roles":["owner"]}]}""");
             }
 
             // Create channel
@@ -92,20 +104,20 @@ class TeamsChatPlatformTest {
             // List messages (history)
             if (uri.contains("/messages") && method.equals("GET")) {
                 return new StubHttpResponse(200, """
-                        {"value":[%s]}""".formatted(historyMessageJson()));
+                                                 {"value":[%s]}""".formatted(historyMessageJson()));
             }
 
             // Add/remove member (POST/DELETE on members)
             if (uri.contains("/members") && method.equals("POST")) {
                 return new StubHttpResponse(201, """
-                        {"id":"membership-new"}""");
+                                                 {"id":"membership-new"}""");
             }
             if (uri.contains("/members") && method.equals("DELETE")) {
                 return new StubHttpResponse(204, "");
             }
 
             return new StubHttpResponse(200, """
-                    {"value":[]}""");
+                                             {"value":[]}""");
         });
 
         platform = new TeamsChatPlatform(new TeamsClient(graph)).build();
@@ -117,11 +129,12 @@ class TeamsChatPlatformTest {
     }
 
     @Test
-    void supportsEightCapabilities() {
+    void supportsNineCapabilities() {
         assertThat(platform.supports(Messaging.class)).isTrue();
         assertThat(platform.supports(Threading.class)).isTrue();
         assertThat(platform.supports(Discovery.class)).isTrue();
         assertThat(platform.supports(Presence.class)).isTrue();
+        assertThat(platform.supports(Reactions.class)).isTrue();
         assertThat(platform.supports(Members.class)).isTrue();
         assertThat(platform.supports(ChannelManagement.class)).isTrue();
         assertThat(platform.supports(MemberManagement.class)).isTrue();
@@ -129,8 +142,7 @@ class TeamsChatPlatformTest {
     }
 
     @Test
-    void reactionsAndCommandsDegraded() {
-        assertThat(platform.supports(Reactions.class)).isFalse();
+    void commandsDegraded() {
         assertThat(platform.supports(Commands.class)).isFalse();
     }
 
@@ -334,6 +346,34 @@ class TeamsChatPlatformTest {
         }
     }
 
+    @Nested
+    class ReactionsTest {
+        @Test
+        void addDoesNotThrow() {
+            var channel = new ChatChannelRef("team-1:19:ch@thread.tacv2");
+            var message = new ChatMessageRef(channel, "msg-1");
+            assertThatCode(() -> platform.reactions().add(message, "like"))
+                    .doesNotThrowAnyException();
+        }
+
+        @Test
+        void removeDoesNotThrow() {
+            var channel = new ChatChannelRef("team-1:19:ch@thread.tacv2");
+            var message = new ChatMessageRef(channel, "msg-1");
+            assertThatCode(() -> platform.reactions().remove(message, "like"))
+                    .doesNotThrowAnyException();
+        }
+
+        @Test
+        void listReturnsDistinctReactionTypes() {
+            var channel   = new ChatChannelRef("team-1:19:ch@thread.tacv2");
+            var message   = new ChatMessageRef(channel, "msg-1");
+            var reactions = platform.reactions().list(message);
+            assertThat(reactions).containsExactlyInAnyOrder("like", "heart");
+        }
+    }
+
+
     private static String channelJson() {
         return """
                 {"id":"19:general@thread.tacv2","displayName":"General",\
@@ -353,4 +393,16 @@ class TeamsChatPlatformTest {
                 "body":{"contentType":"text","content":"Hello world"},\
                 "from":{"user":{"id":"user-1","displayName":"Alice"}}}""";
     }
+
+    private static String messageWithReactionsJson() {
+        return """
+               {"id":"msg-1","createdDateTime":"2026-11-13T10:00:00Z",\
+               "body":{"contentType":"text","content":"Hello"},\
+               "reactions":[\
+               {"reactionType":"like","user":{"user":{"id":"user-1"}}},\
+               {"reactionType":"heart","user":{"user":{"id":"user-2"}}},\
+               {"reactionType":"like","user":{"user":{"id":"user-3"}}}\
+               ]}""";
+    }
+
 }

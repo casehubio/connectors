@@ -113,4 +113,45 @@ class TeamsClientTest {
         }
     }
 
+
+    @Test
+    void setReactionPostsToCorrectPath() {
+        var capturedUris = new ArrayList<String>();
+        var graph = new MicrosoftGraphClient(request -> {
+            capturedUris.add(request.uri().toString());
+            return new StubHttpResponse(204, "");
+        });
+        var client = new TeamsClient(graph);
+
+        client.setReaction("team-1", "ch-1", "msg-1", "like", "token");
+
+        assertThat(capturedUris).anyMatch(u ->
+                                                  u.contains("/teams/team-1/channels/ch-1/messages/msg-1/setReaction"));
+    }
+
+    @Test
+    void unsetReactionPostsToCorrectPath() {
+        var capturedUris = new ArrayList<String>();
+        var graph = new MicrosoftGraphClient(request -> {
+            capturedUris.add(request.uri().toString());
+            return new StubHttpResponse(204, "");
+        });
+        var client = new TeamsClient(graph);
+
+        client.unsetReaction("team-1", "ch-1", "msg-1", "heart", "token");
+
+        assertThat(capturedUris).anyMatch(u ->
+                                                  u.contains("/teams/team-1/channels/ch-1/messages/msg-1/unsetReaction"));
+    }
+
+    @Test
+    void getMessageReturnsMessageJson() {
+        var graph = new MicrosoftGraphClient(request -> new StubHttpResponse(200, """
+                                                                                  {"id":"msg-1","body":{"content":"Hello"}}"""));
+        var client = new TeamsClient(graph);
+
+        var result = client.getMessage("team-1", "ch-1", "msg-1", "token");
+
+        assertThat(result.getString("id")).isEqualTo("msg-1");
+    }
 }

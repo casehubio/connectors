@@ -107,6 +107,21 @@ class TeamsClient {
         }
     }
 
+
+    JsonObject getMessage(String teamId, String channelId, String messageId, String token) {
+        return graph.get("/teams/" + teamId + "/channels/" + channelId + "/messages/" + messageId, token);
+    }
+
+    void setReaction(String teamId, String channelId, String messageId, String reactionType, String token) {
+        var body = Json.createObjectBuilder().add("reactionType", reactionType).build();
+        graph.post("/teams/" + teamId + "/channels/" + channelId + "/messages/" + messageId + "/setReaction", body, token);
+    }
+
+    void unsetReaction(String teamId, String channelId, String messageId, String reactionType, String token) {
+        var body = Json.createObjectBuilder().add("reactionType", reactionType).build();
+        graph.post("/teams/" + teamId + "/channels/" + channelId + "/messages/" + messageId + "/unsetReaction", body, token);
+    }
+
     JsonObject getChannelFilesFolder(String teamId, String channelId, String token) {
         return graph.get("/teams/" + teamId + "/channels/" + channelId + "/filesFolder", token);
     }
