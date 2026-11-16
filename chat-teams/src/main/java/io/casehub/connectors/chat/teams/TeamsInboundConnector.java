@@ -207,8 +207,8 @@ public class TeamsInboundConnector extends WebhookInboundConnector {
     }
 
     private InboundMessage toInboundMessage(JsonObject activity, String content) {
-        Map<String, String> metadata = buildBaseMetadata(activity);
-        String replyToId = activity.getString("replyToId", null);
+        Map<String, String> metadata  = buildBaseMetadata(activity);
+        String              replyToId = activity.getString("replyToId", null);
         if (replyToId != null) {
             metadata.put("teams-reply-to-id", replyToId);
         }
@@ -217,17 +217,43 @@ public class TeamsInboundConnector extends WebhookInboundConnector {
             metadata.put("teams-from-name", fromName);
         }
 
+        List<io.casehub.connectors.Attachment> attachments = downloadAttachments(activity);
+
         return new InboundMessage(
                 InboundConnectorIds.TEAMS_INBOUND,
                 InboundConnectorTypes.TEAMS,
                 extractSenderId(activity),
                 extractChannelRef(activity),
                 content,
-                List.of(),
+                attachments,
                 Instant.parse(activity.getString("timestamp")),
                 metadata,
                 extractTenancyId(activity));
     }
+
+    private List<io.casehub.connectors.Attachment> downloadAttachments(JsonObject activity) {
+        if (!activity.containsKey("attachments")) {
+            return List.of();
+        }
+        JsonArray attachmentArray = activity.getJsonArray("attachments");
+        if (attachmentArray.isEmpty()) {
+            return List.of();
+        }
+        List<io.casehub.connectors.Attachment> result = new ArrayList<>();
+        for (JsonValue v : attachmentArray) {
+            JsonObject att        = v.asJsonObject();
+            String     contentUrl = att.getString("contentUrl", null);
+            if (contentUrl == null) {continue;}
+            String contentType = att.getString("contentType", "application/octet-stream");
+            String name        = att.getString("name", "attachment");
+            var    downloaded  = client.downloadAttachment(contentUrl, contentType, name);
+            if (downloaded != null) {
+                result.add(downloaded);
+            }
+        }
+        return List.copyOf(result);
+    }
+
 
     private InboundMessage toReactionMessage(JsonObject activity, String reactionType,
                                               String action, String replyToId) {

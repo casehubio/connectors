@@ -2,6 +2,7 @@ package io.casehub.connectors.chat.teams;
 
 import io.casehub.connectors.http.HttpHelper;
 import io.casehub.platform.api.authn.ServiceConnectionProvider;
+import jakarta.json.Json;
 
 import java.net.URI;
 import java.net.http.HttpRequest;
@@ -10,8 +11,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import jakarta.json.Json;
 
 class BotFrameworkClient {
 
@@ -47,6 +46,30 @@ class BotFrameworkClient {
                 .build().toString();
         postJson(url, body);
     }
+
+    io.casehub.connectors.Attachment downloadAttachment(String contentUrl, String contentType, String name) {
+        try {
+            URI    uri   = URI.create(contentUrl);
+            String token = resolveToken();
+            var request = HttpRequest.newBuilder()
+                                     .uri(uri)
+                                     .header("Authorization", "Bearer " + token)
+                                     .GET()
+                                     .build();
+            var response = HttpHelper.CLIENT.send(request,
+                                                  HttpResponse.BodyHandlers.ofByteArray());
+            if (response.statusCode() != 200) {
+                LOG.warning("teams-bot: attachment download failed: " + response.statusCode()
+                            + " " + contentUrl);
+                return null;
+            }
+            return new io.casehub.connectors.Attachment(name, contentType, response.body());
+        } catch (Exception e) {
+            LOG.log(Level.WARNING, "teams-bot: attachment download failed: " + contentUrl, e);
+            return null;
+        }
+    }
+
 
     void validateServiceUrl(String serviceUrl) {
         try {

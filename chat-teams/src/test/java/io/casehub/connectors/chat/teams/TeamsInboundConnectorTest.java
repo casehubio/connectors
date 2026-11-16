@@ -253,4 +253,41 @@ class TeamsInboundConnectorTest {
         return new WebhookRequest(body, Map.of(), Map.of(), HttpMethod.POST,
                 "https://test.example.com/connectors/teams-inbound/webhook");
     }
+
+    @Test
+    void messageWithAttachments_parsesAttachmentMetadata() {
+        String body = """
+                      {"type":"message","text":"See attached",\
+                      "attachments":[{"contentType":"image/png","contentUrl":"https://localhost:0/file.png","name":"photo.png"}],\
+                      "from":{"id":"29:user-id","aadObjectId":"aad-user-1"},\
+                      "conversation":{"id":"conv-1","conversationType":"channel"},\
+                      "channelData":{"team":{"id":"team-1"},"channel":{"id":"ch-1"},"tenant":{"id":"t-1"}},\
+                      "serviceUrl":"https://smba.trafficmanager.net/teams/",\
+                      "id":"act-att","timestamp":"2026-11-15T10:00:00Z"}""";
+        var req    = postRequest(body);
+        var result = connector.handle(req);
+
+        assertThat(result).isInstanceOf(WebhookResult.Delivered.class);
+        var delivered = (WebhookResult.Delivered) result;
+        assertThat(delivered.messages()).hasSize(1);
+        assertThat(delivered.messages().get(0).content()).isEqualTo("See attached");
+    }
+
+    @Test
+    void messageWithEmptyAttachments_returnsEmptyAttachmentList() {
+        String body = """
+                      {"type":"message","text":"No files",\
+                      "attachments":[],\
+                      "from":{"id":"29:user-id","aadObjectId":"aad-user-1"},\
+                      "conversation":{"id":"conv-1","conversationType":"channel"},\
+                      "channelData":{"team":{"id":"team-1"},"channel":{"id":"ch-1"},"tenant":{"id":"t-1"}},\
+                      "serviceUrl":"https://smba.trafficmanager.net/teams/",\
+                      "id":"act-noatt","timestamp":"2026-11-15T10:00:00Z"}""";
+        var req    = postRequest(body);
+        var result = connector.handle(req);
+
+        assertThat(result).isInstanceOf(WebhookResult.Delivered.class);
+        var delivered = (WebhookResult.Delivered) result;
+        assertThat(delivered.messages().get(0).attachments()).isEmpty();
+    }
 }
