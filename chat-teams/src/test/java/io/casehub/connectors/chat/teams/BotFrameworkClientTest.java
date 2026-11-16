@@ -1,9 +1,9 @@
 package io.casehub.connectors.chat.teams;
 
+import org.junit.jupiter.api.Test;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
-import org.junit.jupiter.api.Test;
 
 class BotFrameworkClientTest {
 
@@ -50,4 +50,32 @@ class BotFrameworkClientTest {
         var client = new BotFrameworkClient(null, DEFAULT_ALLOWLIST);
         client.validateServiceUrl("https://smba.trafficmanager.net/amer/v3/conversations");
     }
+
+    @Test
+    void createConversation_returnsConversationId() {
+        var client = new BotFrameworkClient(null, DEFAULT_ALLOWLIST) {
+            @Override
+            String postJsonWithResponse(String url, String body) {
+                assertThat(url).contains("/v3/conversations");
+                assertThat(body).contains("\"28:bot-app-id\"");
+                assertThat(body).contains("\"aad-user-1\"");
+                assertThat(body).contains("\"tenant-1\"");
+                return "{\"id\":\"new-conv-123\"}";
+            }
+        };
+        String convId = client.createConversation(
+                "https://smba.trafficmanager.net/teams/",
+                "bot-app-id", "aad-user-1", "tenant-1");
+        assertThat(convId).isEqualTo("new-conv-123");
+    }
+
+    @Test
+    void createConversation_blockedHost_throws() {
+        var client = new BotFrameworkClient(null, DEFAULT_ALLOWLIST);
+        assertThatThrownBy(() ->
+                                   client.createConversation("https://evil.example.com/",
+                                                             "bot-app-id", "aad-user-1", "tenant-1"))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
 }
