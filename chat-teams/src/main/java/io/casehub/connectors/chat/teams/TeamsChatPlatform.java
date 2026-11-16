@@ -74,21 +74,25 @@ public class TeamsChatPlatform {
     private SendResult sendMessage(ChatChannelRef channel, ChatContent content) {
         var tc = TeamsMapper.parseTeamAndChannel(channel.id());
         return TokenRetry.withTokenRetry(this::resolveApplicationToken,
-                token -> {
-                    var result = client.sendMessage(tc[0], tc[1],
-                            TeamsMapper.toMessageBody(content), token);
-                    return TeamsMapper.toSendResult(tc[0], tc[1], result);
-                });
+                                         token -> {
+                                             var uploadedRefs = uploadAttachments(tc[0], tc[1],
+                                                                                  content.attachments(), token);
+                                             var result = client.sendMessage(tc[0], tc[1],
+                                                                             TeamsMapper.toMessageBody(content, uploadedRefs), token);
+                                             return TeamsMapper.toSendResult(tc[0], tc[1], result);
+                                         });
     }
 
     private SendResult replyToMessage(ChatMessageRef parent, ChatContent content) {
         var tc = TeamsMapper.parseTeamAndChannel(parent.channel().id());
         return TokenRetry.withTokenRetry(this::resolveApplicationToken,
-                token -> {
-                    var result = client.replyToMessage(tc[0], tc[1],
-                            parent.messageId(), TeamsMapper.toMessageBody(content), token);
-                    return TeamsMapper.toSendResult(tc[0], tc[1], result);
-                });
+                                         token -> {
+                                             var uploadedRefs = uploadAttachments(tc[0], tc[1],
+                                                                                  content.attachments(), token);
+                                             var result = client.replyToMessage(tc[0], tc[1],
+                                                                                parent.messageId(), TeamsMapper.toMessageBody(content, uploadedRefs), token);
+                                             return TeamsMapper.toSendResult(tc[0], tc[1], result);
+                                         });
     }
 
     private List<Channel> listChannels() {
@@ -126,6 +130,46 @@ public class TeamsChatPlatform {
                         .map(msg -> TeamsMapper.toReceivedMessage(
                                 PLATFORM_ID, tc[0], tc[1], msg))
                         .toList());
+    }
+
+
+    private static String safeAttachmentName(int index, io.casehub.connectors.Attachment attachment) {
+        String name = attachment.filename();
+        if (name == null || name.isBlank()) {
+            name = "attachment-" + index + extensionFromMimeType(attachment.contentType());
+        }
+        return index + "-" + name;
+    }
+
+    private static String extensionFromMimeType(String contentType) {
+        if (contentType == null) {return ".bin";}
+        return switch (contentType) {
+            case "application/pdf" -> ".pdf";
+            case "image/png" -> ".png";
+            case "image/jpeg" -> ".jpg";
+            case "image/gif" -> ".gif";
+            case "text/plain" -> ".txt";
+            case "application/msword" -> ".doc";
+            case "application/vnd.openxmlformats-officedocument.wordprocessingml.document" -> ".docx";
+            default -> ".bin";
+        };
+    }
+
+    private java.util.List<UploadedRef> uploadAttachments(String teamId, String channelId,
+                                                          java.util.List<io.casehub.connectors.Attachment> attachments, String token) {
+        if (attachments.isEmpty()) {return java.util.List.of();}
+        var    folder   = client.getChannelFilesFolder(teamId, channelId, token);
+        String folderId = folder.getString("id");
+        String driveId  = folder.getJsonObject("parentReference").getString("driveId");
+        var    refs     = new java.util.ArrayList<UploadedRef>();
+        for (int i = 0; i < attachments.size(); i++) {
+            var    att  = attachments.get(i);
+            String name = safeAttachmentName(i, att);
+            var item = client.uploadToChannelFolder(
+                    driveId, folderId, name, att.contentType(), att.content(), token);
+            refs.add(new UploadedRef(item.getString("name"), item.getString("webUrl")));
+        }
+        return java.util.List.copyOf(refs);
     }
 
     private String resolveDelegatedToken() {

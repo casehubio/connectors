@@ -26,6 +26,7 @@ import java.time.Instant;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class TeamsChatPlatformTest {
 
@@ -245,6 +246,73 @@ class TeamsChatPlatformTest {
                     .doesNotThrowAnyException();
         }
     }
+
+    @Nested
+    class AttachmentTest {
+
+        @Test
+        void sendMessageWithAttachmentUploadsAndReferences() {
+            var requestedUris = new java.util.ArrayList<String>();
+            var graph = new MicrosoftGraphClient(request -> {
+                String uri    = request.uri().toString();
+                String method = request.method();
+                requestedUris.add(method + " " + uri);
+
+                if (uri.contains("/filesFolder")) {
+                    return new StubHttpResponse(200, """
+                                                     {"id":"folder-1","parentReference":{"driveId":"drive-1"}}""");
+                }
+                if (uri.contains("/items/folder-1:/")) {
+                    return new StubHttpResponse(201, """
+                                                     {"id":"item-1","name":"0-test.pdf",\
+                                                     "webUrl":"https://sharepoint.com/files/0-test.pdf"}""");
+                }
+                if (uri.contains("/messages") && method.equals("POST")) {
+                    return new StubHttpResponse(201, messageResponseJson("msg-with-att"));
+                }
+                return new StubHttpResponse(200, "{\"value\":[]}");
+            });
+            var platformWithAtt = new TeamsChatPlatform(new TeamsClient(graph)).build();
+
+            var att = new io.casehub.connectors.Attachment(
+                    "test.pdf", "application/pdf", new byte[]{1, 2, 3});
+            var content = new ChatContent("See attachment", null,
+                                          java.util.List.of(att), java.util.List.of());
+            var ref    = new ChatChannelRef("team-1:ch-1");
+            var result = platformWithAtt.messaging().send(ref, content);
+
+            assertThat(result.ok()).isTrue();
+            assertThat(requestedUris).anyMatch(u -> u.contains("/filesFolder"));
+            assertThat(requestedUris).anyMatch(u -> u.contains("/items/folder-1:/"));
+            assertThat(requestedUris).anyMatch(u -> u.startsWith("POST") && u.contains("/messages"));
+        }
+
+        @Test
+        void sendMessageUploadFailurePropagates() {
+            var graph = new MicrosoftGraphClient(request -> {
+                if (request.uri().toString().contains("/filesFolder")) {
+                    return new StubHttpResponse(200, """
+                                                     {"id":"folder-1","parentReference":{"driveId":"drive-1"}}""");
+                }
+                if (request.uri().toString().contains("/items/")) {
+                    return new StubHttpResponse(403,
+                                                "{\"error\":{\"code\":\"Forbidden\",\"message\":\"Access denied\"}}");
+                }
+                return new StubHttpResponse(200, "{\"value\":[]}");
+            });
+            var platformWithAtt = new TeamsChatPlatform(new TeamsClient(graph)).build();
+
+            var att = new io.casehub.connectors.Attachment(
+                    "secret.pdf", "application/pdf", new byte[]{1});
+            var content = new ChatContent("text", null,
+                                          java.util.List.of(att), java.util.List.of());
+            var ref = new ChatChannelRef("team-1:ch-1");
+
+            assertThatThrownBy(() -> platformWithAtt.messaging().send(ref, content))
+                    .isInstanceOf(io.casehub.connectors.ProviderApiException.class);
+        }
+    }
+
 
     @Nested
     class MessageHistoryTest {
