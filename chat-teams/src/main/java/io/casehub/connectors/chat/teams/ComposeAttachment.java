@@ -144,10 +144,11 @@ public final class ComposeAttachment {
         }
     }
 
-
     private static JsonObjectBuilder cardContent(String title, String subtitle, String imageUrl) {
         var content = Json.createObjectBuilder().add("title", title);
-        if (subtitle != null) {content.add("subtitle", subtitle);}
+        if (subtitle != null) {
+            content.add("subtitle", subtitle);
+        }
         if (imageUrl != null) {
             content.add("images", Json.createArrayBuilder()
                                       .add(Json.createObjectBuilder().add("url", imageUrl)));

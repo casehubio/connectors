@@ -117,6 +117,52 @@ class ComposeAttachmentTest {
     }
 
     @Test
+    void hero_roundTrip_throughInvokeResponseSerializer() {
+        String att = ComposeAttachment.hero("Product", "£29.99", "https://img.example.com/thumb.png")
+                                      .button("openUrl", "View", "https://example.com/product")
+                                      .tap("openUrl", "View", "https://example.com/product")
+                                      .build();
+
+        String serialized = InvokeResponseSerializer.toJson(
+                new InvokeResponse.ComposeResult("list", java.util.List.of(att)));
+
+        JsonObject obj = parse(serialized);
+        JsonObject ext = obj.getJsonObject("composeExtension");
+        assertThat(ext.getString("type")).isEqualTo("result");
+        assertThat(ext.getString("attachmentLayout")).isEqualTo("list");
+        assertThat(ext.getJsonArray("attachments")).hasSize(1);
+        JsonObject attachment = ext.getJsonArray("attachments").getJsonObject(0);
+        assertThat(attachment.getString("contentType")).isEqualTo("application/vnd.microsoft.card.hero");
+        JsonObject content = attachment.getJsonObject("content");
+        assertThat(content.getString("title")).isEqualTo("Product");
+        assertThat(content.getString("subtitle")).isEqualTo("£29.99");
+        assertThat(content.getJsonArray("images")).hasSize(1);
+        assertThat(content.getJsonArray("buttons")).hasSize(1);
+        assertThat(content.getJsonObject("tap").getString("type")).isEqualTo("openUrl");
+    }
+
+    @Test
+    void thumbnail_roundTrip_throughInvokeResponseSerializer() {
+        String att = ComposeAttachment.thumbnail("Search Result", "Found item", "https://img.example.com/icon.png")
+                                      .build();
+
+        String serialized = InvokeResponseSerializer.toJson(
+                new InvokeResponse.ComposeResult("grid", java.util.List.of(att)));
+
+        JsonObject obj = parse(serialized);
+        JsonObject ext = obj.getJsonObject("composeExtension");
+        assertThat(ext.getString("type")).isEqualTo("result");
+        assertThat(ext.getString("attachmentLayout")).isEqualTo("grid");
+        assertThat(ext.getJsonArray("attachments")).hasSize(1);
+        JsonObject attachment = ext.getJsonArray("attachments").getJsonObject(0);
+        assertThat(attachment.getString("contentType")).isEqualTo("application/vnd.microsoft.card.thumbnail");
+        JsonObject content = attachment.getJsonObject("content");
+        assertThat(content.getString("title")).isEqualTo("Search Result");
+        assertThat(content.getString("subtitle")).isEqualTo("Found item");
+        assertThat(content.getJsonArray("images")).hasSize(1);
+    }
+
+    @Test
     void preview_nullTitle_throwsNullPointerException() {
         var builder = ComposeAttachment.adaptive("{\"type\":\"AdaptiveCard\",\"body\":[]}");
         assertThatNullPointerException().isThrownBy(() -> builder.preview(null, "subtitle"));
