@@ -13,6 +13,15 @@ public final class ComposeAttachment {
         return new Builder(contentJson);
     }
 
+    public static CardBuilder hero(String title, String subtitle, String imageUrl) {
+        return new CardBuilder("application/vnd.microsoft.card.hero", title, subtitle, imageUrl);
+    }
+
+    public static CardBuilder thumbnail(String title, String subtitle, String imageUrl) {
+        return new CardBuilder("application/vnd.microsoft.card.thumbnail", title, subtitle, imageUrl);
+    }
+
+
     public static final class Builder {
         private final String contentJson;
         private String previewTitle;
@@ -61,4 +70,35 @@ public final class ComposeAttachment {
             return builder.build().toString();
         }
     }
+
+    public static final class CardBuilder {
+        private final String contentType;
+        private final String title;
+        private final String subtitle;
+        private final String imageUrl;
+
+        CardBuilder(String contentType, String title, String subtitle, String imageUrl) {
+            this.contentType = contentType;
+            this.title       = Objects.requireNonNull(title, "title");
+            this.subtitle    = subtitle;
+            this.imageUrl    = imageUrl;
+        }
+
+        public String build() {
+            var content = Json.createObjectBuilder()
+                              .add("title", title);
+            if (subtitle != null) {
+                content.add("subtitle", subtitle);
+            }
+            if (imageUrl != null) {
+                content.add("images", Json.createArrayBuilder()
+                                          .add(Json.createObjectBuilder().add("url", imageUrl)));
+            }
+            return Json.createObjectBuilder()
+                       .add("contentType", contentType)
+                       .add("content", content)
+                       .build().toString();
+        }
+    }
+
 }
