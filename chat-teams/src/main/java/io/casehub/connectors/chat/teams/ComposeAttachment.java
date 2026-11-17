@@ -48,6 +48,10 @@ public final class ComposeAttachment {
             this.contentJson = Objects.requireNonNull(contentJson, "contentJson");
         }
 
+        public Builder preview(String title) {
+            return preview(title, null);
+        }
+
         public Builder preview(String title, String subtitle) {
             this.previewTitle    = Objects.requireNonNull(title, "title");
             this.previewSubtitle = subtitle;

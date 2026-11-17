@@ -60,6 +60,30 @@ class ComposeAttachmentTest {
     }
 
     @Test
+    void adaptive_withPreviewTitleOnly_includesPreviewWithTitleOnly() {
+        String cardJson = "{\"type\":\"AdaptiveCard\",\"body\":[]}";
+
+        String result = ComposeAttachment.adaptive(cardJson)
+                                         .preview("Search Result")
+                                         .build();
+
+        JsonObject obj     = parse(result);
+        JsonObject preview = obj.getJsonObject("preview");
+        assertThat(preview.getString("contentType")).isEqualTo("application/vnd.microsoft.card.thumbnail");
+        JsonObject previewContent = preview.getJsonObject("content");
+        assertThat(previewContent.getString("title")).isEqualTo("Search Result");
+        assertThat(previewContent.containsKey("subtitle")).isFalse();
+        assertThat(previewContent.containsKey("images")).isFalse();
+    }
+
+    @Test
+    void preview_titleOnly_nullTitle_throwsNullPointerException() {
+        var builder = ComposeAttachment.adaptive("{\"type\":\"AdaptiveCard\",\"body\":[]}");
+        assertThatNullPointerException().isThrownBy(() -> builder.preview(null));
+    }
+
+
+    @Test
     void adaptive_preservesContentJsonVerbatim() {
         String cardJson = "{\"type\":\"AdaptiveCard\",\"$schema\":\"http://adaptivecards.io/schemas/adaptive-card.json\",\"version\":\"1.5\",\"body\":[{\"type\":\"TextBlock\",\"text\":\"Complex card\"},{\"type\":\"Image\",\"url\":\"https://img.example.com/photo.png\"}]}";
 
