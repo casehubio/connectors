@@ -155,6 +155,73 @@ class ComposeAttachmentTest {
         assertThatNullPointerException().isThrownBy(() -> ComposeAttachment.thumbnail(null, "sub", null));
     }
 
+    @Test
+    void hero_titleOnly_producesHeroCardWithTitleOnly() {
+        String result = ComposeAttachment.hero("Title Only").build();
+
+        JsonObject obj = parse(result);
+        assertThat(obj.getString("contentType")).isEqualTo("application/vnd.microsoft.card.hero");
+        JsonObject content = obj.getJsonObject("content");
+        assertThat(content.getString("title")).isEqualTo("Title Only");
+        assertThat(content.containsKey("subtitle")).isFalse();
+        assertThat(content.containsKey("images")).isFalse();
+    }
+
+    @Test
+    void hero_titleAndSubtitle_producesHeroCardWithoutImage() {
+        String result = ComposeAttachment.hero("Product", "£29.99").build();
+
+        JsonObject obj = parse(result);
+        assertThat(obj.getString("contentType")).isEqualTo("application/vnd.microsoft.card.hero");
+        JsonObject content = obj.getJsonObject("content");
+        assertThat(content.getString("title")).isEqualTo("Product");
+        assertThat(content.getString("subtitle")).isEqualTo("£29.99");
+        assertThat(content.containsKey("images")).isFalse();
+    }
+
+    @Test
+    void hero_titleOnly_nullTitle_throwsNullPointerException() {
+        assertThatNullPointerException().isThrownBy(() -> ComposeAttachment.hero((String) null));
+    }
+
+    @Test
+    void hero_titleAndSubtitle_nullTitle_throwsNullPointerException() {
+        assertThatNullPointerException().isThrownBy(() -> ComposeAttachment.hero(null, "sub"));
+    }
+
+    @Test
+    void thumbnail_titleOnly_producesThumbnailCardWithTitleOnly() {
+        String result = ComposeAttachment.thumbnail("Search Result").build();
+
+        JsonObject obj = parse(result);
+        assertThat(obj.getString("contentType")).isEqualTo("application/vnd.microsoft.card.thumbnail");
+        JsonObject content = obj.getJsonObject("content");
+        assertThat(content.getString("title")).isEqualTo("Search Result");
+        assertThat(content.containsKey("subtitle")).isFalse();
+        assertThat(content.containsKey("images")).isFalse();
+    }
+
+    @Test
+    void thumbnail_titleAndSubtitle_producesThumbnailCardWithoutImage() {
+        String result = ComposeAttachment.thumbnail("Search Result", "Found item").build();
+
+        JsonObject obj = parse(result);
+        assertThat(obj.getString("contentType")).isEqualTo("application/vnd.microsoft.card.thumbnail");
+        JsonObject content = obj.getJsonObject("content");
+        assertThat(content.getString("title")).isEqualTo("Search Result");
+        assertThat(content.getString("subtitle")).isEqualTo("Found item");
+        assertThat(content.containsKey("images")).isFalse();
+    }
+
+    @Test
+    void thumbnail_titleOnly_nullTitle_throwsNullPointerException() {
+        assertThatNullPointerException().isThrownBy(() -> ComposeAttachment.thumbnail((String) null));
+    }
+
+    @Test
+    void thumbnail_titleAndSubtitle_nullTitle_throwsNullPointerException() {
+        assertThatNullPointerException().isThrownBy(() -> ComposeAttachment.thumbnail(null, "sub"));
+    }
 
     private static JsonObject parse(String json) {
         return Json.createReader(new StringReader(json)).readObject();

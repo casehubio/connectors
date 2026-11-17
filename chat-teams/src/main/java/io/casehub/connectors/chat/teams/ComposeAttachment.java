@@ -13,8 +13,24 @@ public final class ComposeAttachment {
         return new Builder(contentJson);
     }
 
+    public static CardBuilder hero(String title) {
+        return hero(title, null, null);
+    }
+
+    public static CardBuilder hero(String title, String subtitle) {
+        return hero(title, subtitle, null);
+    }
+
     public static CardBuilder hero(String title, String subtitle, String imageUrl) {
         return new CardBuilder("application/vnd.microsoft.card.hero", title, subtitle, imageUrl);
+    }
+
+    public static CardBuilder thumbnail(String title) {
+        return thumbnail(title, null, null);
+    }
+
+    public static CardBuilder thumbnail(String title, String subtitle) {
+        return thumbnail(title, subtitle, null);
     }
 
     public static CardBuilder thumbnail(String title, String subtitle, String imageUrl) {
