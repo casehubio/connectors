@@ -82,7 +82,6 @@ class ComposeAttachmentTest {
         assertThatNullPointerException().isThrownBy(() -> builder.preview(null));
     }
 
-
     @Test
     void adaptive_preservesContentJsonVerbatim() {
         String cardJson = "{\"type\":\"AdaptiveCard\",\"$schema\":\"http://adaptivecards.io/schemas/adaptive-card.json\",\"version\":\"1.5\",\"body\":[{\"type\":\"TextBlock\",\"text\":\"Complex card\"},{\"type\":\"Image\",\"url\":\"https://img.example.com/photo.png\"}]}";
@@ -153,6 +152,77 @@ class ComposeAttachmentTest {
         assertThat(content.getString("title")).isEqualTo("Title Only");
         assertThat(content.containsKey("subtitle")).isFalse();
         assertThat(content.containsKey("images")).isFalse();
+    }
+
+    @Test
+    void hero_withButton_includesButtonsArray() {
+        String result = ComposeAttachment.hero("Product", "£29.99")
+                                         .button("openUrl", "View", "https://example.com/product")
+                                         .build();
+
+        JsonObject obj     = parse(result);
+        JsonObject content = obj.getJsonObject("content");
+        assertThat(content.getJsonArray("buttons")).hasSize(1);
+        JsonObject button = content.getJsonArray("buttons").getJsonObject(0);
+        assertThat(button.getString("type")).isEqualTo("openUrl");
+        assertThat(button.getString("title")).isEqualTo("View");
+        assertThat(button.getString("value")).isEqualTo("https://example.com/product");
+    }
+
+    @Test
+    void hero_withMultipleButtons_includesAllButtons() {
+        String result = ComposeAttachment.hero("Product", "£29.99")
+                                         .button("openUrl", "View", "https://example.com/product")
+                                         .button("imBack", "Buy", "buy-product-123")
+                                         .build();
+
+        JsonObject obj     = parse(result);
+        JsonObject content = obj.getJsonObject("content");
+        assertThat(content.getJsonArray("buttons")).hasSize(2);
+        assertThat(content.getJsonArray("buttons").getJsonObject(0).getString("type")).isEqualTo("openUrl");
+        assertThat(content.getJsonArray("buttons").getJsonObject(1).getString("type")).isEqualTo("imBack");
+    }
+
+    @Test
+    void hero_withoutButtons_omitsButtonsArray() {
+        String result = ComposeAttachment.hero("Title Only").build();
+
+        JsonObject obj     = parse(result);
+        JsonObject content = obj.getJsonObject("content");
+        assertThat(content.containsKey("buttons")).isFalse();
+    }
+
+    @Test
+    void thumbnail_withButton_includesButtonsArray() {
+        String result = ComposeAttachment.thumbnail("Search Result")
+                                         .button("openUrl", "Open", "https://example.com")
+                                         .build();
+
+        JsonObject obj     = parse(result);
+        JsonObject content = obj.getJsonObject("content");
+        assertThat(content.getJsonArray("buttons")).hasSize(1);
+        JsonObject button = content.getJsonArray("buttons").getJsonObject(0);
+        assertThat(button.getString("type")).isEqualTo("openUrl");
+        assertThat(button.getString("title")).isEqualTo("Open");
+        assertThat(button.getString("value")).isEqualTo("https://example.com");
+    }
+
+    @Test
+    void hero_buttonNullType_throwsNullPointerException() {
+        var builder = ComposeAttachment.hero("Product");
+        assertThatNullPointerException().isThrownBy(() -> builder.button(null, "View", "https://example.com"));
+    }
+
+    @Test
+    void hero_buttonNullTitle_throwsNullPointerException() {
+        var builder = ComposeAttachment.hero("Product");
+        assertThatNullPointerException().isThrownBy(() -> builder.button("openUrl", null, "https://example.com"));
+    }
+
+    @Test
+    void hero_buttonNullValue_throwsNullPointerException() {
+        var builder = ComposeAttachment.hero("Product");
+        assertThatNullPointerException().isThrownBy(() -> builder.button("openUrl", "View", null));
     }
 
     @Test
