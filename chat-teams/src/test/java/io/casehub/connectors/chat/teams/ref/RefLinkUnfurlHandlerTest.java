@@ -35,16 +35,20 @@ class RefLinkUnfurlHandlerTest {
     }
 
     @Test
-    void handle_unfurlCardHasNoPreview() {
+    void handle_unfurlCardIsHeroWithTextAndButton() {
         var request = new InvokeRequest("composeExtension/queryLink",
-                Json.createObjectBuilder().add("url", "https://example.com/item/42").build(),
-                "user-1", "channel-1", Map.of());
+                                        Json.createObjectBuilder().add("url", "https://example.com/item/42").build(),
+                                        "user-1", "channel-1", Map.of());
 
-        var result = (InvokeResponse.ComposeResult) handler.handle(request);
+        var        result     = (InvokeResponse.ComposeResult) handler.handle(request);
         JsonObject attachment = parse(result.attachmentsJson().get(0));
 
-        assertThat(attachment.getString("contentType")).isEqualTo("application/vnd.microsoft.card.adaptive");
-        assertThat(attachment.containsKey("preview")).isFalse();
+        assertThat(attachment.getString("contentType")).isEqualTo("application/vnd.microsoft.card.hero");
+        JsonObject content = attachment.getJsonObject("content");
+        assertThat(content.getString("title")).isEqualTo("Link Preview");
+        assertThat(content.getString("text")).isEqualTo("This is a preview of the linked content.");
+        assertThat(content.getJsonArray("buttons")).hasSize(1);
+        assertThat(content.getJsonArray("buttons").getJsonObject(0).getString("type")).isEqualTo("openUrl");
     }
 
     private static JsonObject parse(String json) {
