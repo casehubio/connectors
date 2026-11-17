@@ -429,6 +429,176 @@ class TeamsInboundConnectorTest {
         assertThat(msg.metadata().get("teams-invoke-data")).isEqualTo("{\"data\":\"test\"}");
     }
 
+// ── Messaging extension (composeExtension) activities ────────────────
+
+    @Test
+    void composeExtensionQuery_withHandler_returnsRespondedWithResults() {
+        var handler = new InvokeHandler() {
+            @Override
+            public String name() {return "composeExtension/query";}
+
+            @Override
+            public InvokeResponse handle(InvokeRequest r) {
+                String att = "{\"contentType\":\"application/vnd.microsoft.card.adaptive\",\"content\":{\"type\":\"AdaptiveCard\"},\"preview\":{\"contentType\":\"application/vnd.microsoft.card.thumbnail\",\"content\":{\"title\":\"Result\"}}}";
+                return new InvokeResponse.ComposeResult("list", List.of(att));
+            }
+        };
+        var conn = connectorWithInvoke(new InvokeService(List.of(handler)));
+
+        String body = invokeActivity("composeExtension/query",
+                                     "{\"queryText\":\"search term\",\"queryOptions\":{\"skip\":0,\"count\":25}}");
+        WebhookResult result = conn.handle(postRequest(body));
+
+        assertThat(result).isInstanceOf(WebhookResult.Responded.class);
+        var responded   = (WebhookResult.Responded) result;
+        var responseObj = parseJson(responded.responseBody());
+        var ext         = responseObj.getJsonObject("composeExtension");
+        assertThat(ext.getString("type")).isEqualTo("result");
+        assertThat(ext.getString("attachmentLayout")).isEqualTo("list");
+        assertThat(ext.getJsonArray("attachments")).hasSize(1);
+        assertThat(responded.messages()).hasSize(1);
+        assertThat(responded.messages().get(0).metadata().get("teams-invoke-name"))
+                .isEqualTo("composeExtension/query");
+    }
+
+    @Test
+    void composeExtensionQueryLink_returnsUnfurlCard() {
+        var handler = new InvokeHandler() {
+            @Override
+            public String name() {return "composeExtension/queryLink";}
+
+            @Override
+            public InvokeResponse handle(InvokeRequest r) {
+                String att = "{\"contentType\":\"application/vnd.microsoft.card.adaptive\",\"content\":{\"type\":\"AdaptiveCard\",\"body\":[{\"type\":\"TextBlock\",\"text\":\"Unfurled\"}]}}";
+                return new InvokeResponse.ComposeResult("list", List.of(att));
+            }
+        };
+        var conn = connectorWithInvoke(new InvokeService(List.of(handler)));
+
+        String body = invokeActivity("composeExtension/queryLink",
+                                     "{\"url\":\"https://example.com/item/42\"}");
+        WebhookResult result = conn.handle(postRequest(body));
+
+        assertThat(result).isInstanceOf(WebhookResult.Responded.class);
+        var responded = (WebhookResult.Responded) result;
+        var ext       = parseJson(responded.responseBody()).getJsonObject("composeExtension");
+        assertThat(ext.getString("type")).isEqualTo("result");
+        assertThat(ext.getJsonArray("attachments")).hasSize(1);
+    }
+
+    @Test
+    void composeExtensionSelectItem_returnsSingleCard() {
+        var handler = new InvokeHandler() {
+            @Override
+            public String name() {return "composeExtension/selectItem";}
+
+            @Override
+            public InvokeResponse handle(InvokeRequest r) {
+                String att = "{\"contentType\":\"application/vnd.microsoft.card.adaptive\",\"content\":{\"type\":\"AdaptiveCard\"}}";
+                return new InvokeResponse.ComposeResult("list", List.of(att));
+            }
+        };
+        var conn = connectorWithInvoke(new InvokeService(List.of(handler)));
+
+        String body = invokeActivity("composeExtension/selectItem",
+                                     "{\"id\":\"item-42\"}");
+        WebhookResult result = conn.handle(postRequest(body));
+
+        assertThat(result).isInstanceOf(WebhookResult.Responded.class);
+        var ext = parseJson(((WebhookResult.Responded) result).responseBody())
+                          .getJsonObject("composeExtension");
+        assertThat(ext.getString("type")).isEqualTo("result");
+        assertThat(ext.getJsonArray("attachments")).hasSize(1);
+    }
+
+    @Test
+    void composeExtensionFetchTask_returnsTaskModule() {
+        var handler = new InvokeHandler() {
+            @Override
+            public String name() {return "composeExtension/fetchTask";}
+
+            @Override
+            public InvokeResponse handle(InvokeRequest r) {
+                return new InvokeResponse.ComposeContinue("Action Form",
+                                                          "{\"type\":\"AdaptiveCard\",\"body\":[]}");
+            }
+        };
+        var conn = connectorWithInvoke(new InvokeService(List.of(handler)));
+
+        String body = invokeActivity("composeExtension/fetchTask",
+                                     "{\"commandId\":\"createTicket\"}");
+        WebhookResult result = conn.handle(postRequest(body));
+
+        assertThat(result).isInstanceOf(WebhookResult.Responded.class);
+        var ext = parseJson(((WebhookResult.Responded) result).responseBody())
+                          .getJsonObject("composeExtension");
+        assertThat(ext.getString("type")).isEqualTo("continue");
+        assertThat(ext.getJsonObject("value").getString("title")).isEqualTo("Action Form");
+    }
+
+    @Test
+    void composeExtensionSubmitAction_returnsResult() {
+        var handler = new InvokeHandler() {
+            @Override
+            public String name() {return "composeExtension/submitAction";}
+
+            @Override
+            public InvokeResponse handle(InvokeRequest r) {
+                String att = "{\"contentType\":\"application/vnd.microsoft.card.adaptive\",\"content\":{\"type\":\"AdaptiveCard\"}}";
+                return new InvokeResponse.ComposeResult("list", List.of(att));
+            }
+        };
+        var conn = connectorWithInvoke(new InvokeService(List.of(handler)));
+
+        String body = invokeActivity("composeExtension/submitAction",
+                                     "{\"commandId\":\"createTicket\",\"data\":{\"title\":\"Bug report\"}}");
+        WebhookResult result = conn.handle(postRequest(body));
+
+        assertThat(result).isInstanceOf(WebhookResult.Responded.class);
+        var ext = parseJson(((WebhookResult.Responded) result).responseBody())
+                          .getJsonObject("composeExtension");
+        assertThat(ext.getString("type")).isEqualTo("result");
+    }
+
+    @Test
+    void composeExtensionSetting_returnsAccepted() {
+        var handler = new InvokeHandler() {
+            @Override
+            public String name() {return "composeExtension/setting";}
+
+            @Override
+            public InvokeResponse handle(InvokeRequest r) {
+                return new InvokeResponse.Accepted();
+            }
+        };
+        var conn = connectorWithInvoke(new InvokeService(List.of(handler)));
+
+        String body = invokeActivity("composeExtension/setting",
+                                     "{\"state\":\"saved-settings-json\"}");
+        WebhookResult result = conn.handle(postRequest(body));
+
+        assertThat(result).isInstanceOf(WebhookResult.Responded.class);
+        var responded   = (WebhookResult.Responded) result;
+        var responseObj = parseJson(responded.responseBody());
+        assertThat(responseObj.getInt("statusCode")).isEqualTo(200);
+        assertThat(responseObj.size()).isEqualTo(1);
+    }
+
+    @Test
+    void composeExtension_noHandler_returnsAccepted() {
+        var conn = connectorWithInvoke(new InvokeService(List.of()));
+
+        String body = invokeActivity("composeExtension/query",
+                                     "{\"queryText\":\"test\"}");
+        WebhookResult result = conn.handle(postRequest(body));
+
+        assertThat(result).isInstanceOf(WebhookResult.Responded.class);
+        var responseObj = parseJson(((WebhookResult.Responded) result).responseBody());
+        assertThat(responseObj.getInt("statusCode")).isEqualTo(200);
+        assertThat(responseObj.size()).isEqualTo(1);
+    }
+
+
     private TeamsInboundConnector connectorWithInvoke(InvokeService invokeService) {
         var auth = new BotFrameworkAuth("test-app-id", true,
                 "https://login.botframework.com/v1/.well-known/openidconfiguration",
