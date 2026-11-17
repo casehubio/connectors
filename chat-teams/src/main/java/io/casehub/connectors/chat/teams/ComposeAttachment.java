@@ -1,6 +1,7 @@
 package io.casehub.connectors.chat.teams;
 
 import jakarta.json.Json;
+import jakarta.json.JsonObjectBuilder;
 
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -75,18 +76,9 @@ public final class ComposeAttachment {
                     .add("content", content);
 
             if (previewTitle != null) {
-                var previewContent = Json.createObjectBuilder()
-                        .add("title", previewTitle);
-                if (previewSubtitle != null) {
-                    previewContent.add("subtitle", previewSubtitle);
-                }
-                if (previewImageUrl != null) {
-                    previewContent.add("images", Json.createArrayBuilder()
-                            .add(Json.createObjectBuilder().add("url", previewImageUrl)));
-                }
                 builder.add("preview", Json.createObjectBuilder()
                         .add("contentType", "application/vnd.microsoft.card.thumbnail")
-                        .add("content", previewContent));
+                        .add("content", cardContent(previewTitle, previewSubtitle, previewImageUrl)));
             }
 
             return builder.build().toString();
@@ -128,15 +120,7 @@ public final class ComposeAttachment {
         }
 
         public String build() {
-            var content = Json.createObjectBuilder()
-                              .add("title", title);
-            if (subtitle != null) {
-                content.add("subtitle", subtitle);
-            }
-            if (imageUrl != null) {
-                content.add("images", Json.createArrayBuilder()
-                                          .add(Json.createObjectBuilder().add("url", imageUrl)));
-            }
+            var content = cardContent(title, subtitle, imageUrl);
             if (buttons != null) {
                 var buttonsArray = Json.createArrayBuilder();
                 for (var b : buttons) {
@@ -160,4 +144,14 @@ public final class ComposeAttachment {
         }
     }
 
+
+    private static JsonObjectBuilder cardContent(String title, String subtitle, String imageUrl) {
+        var content = Json.createObjectBuilder().add("title", title);
+        if (subtitle != null) {content.add("subtitle", subtitle);}
+        if (imageUrl != null) {
+            content.add("images", Json.createArrayBuilder()
+                                      .add(Json.createObjectBuilder().add("url", imageUrl)));
+        }
+        return content;
+    }
 }
