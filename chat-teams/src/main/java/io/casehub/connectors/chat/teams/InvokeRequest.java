@@ -8,4 +8,8 @@ public record InvokeRequest(
         JsonObject value,
         String senderId,
         String channelRef,
-        Map<String, String> metadata) {}
+        Map<String, String> metadata) {
+    public InvokeRequest {
+        metadata = Map.copyOf(metadata);
+    }
+}
