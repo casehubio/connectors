@@ -24,14 +24,14 @@ public final class ComposeAttachment {
         }
 
         public Builder preview(String title, String subtitle) {
-            this.previewTitle = title;
+            this.previewTitle    = Objects.requireNonNull(title, "title");
             this.previewSubtitle = subtitle;
             this.previewImageUrl = null;
             return this;
         }
 
         public Builder preview(String title, String subtitle, String imageUrl) {
-            this.previewTitle = title;
+            this.previewTitle    = Objects.requireNonNull(title, "title");
             this.previewSubtitle = subtitle;
             this.previewImageUrl = imageUrl;
             return this;

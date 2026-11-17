@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import java.io.StringReader;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 
 class ComposeAttachmentTest {
 
@@ -90,6 +91,18 @@ class ComposeAttachmentTest {
         assertThat(attachment.getString("contentType")).isEqualTo("application/vnd.microsoft.card.adaptive");
         assertThat(attachment.getJsonObject("preview").getJsonObject("content")
                              .getString("title")).isEqualTo("Search Result");
+    }
+
+    @Test
+    void preview_nullTitle_throwsNullPointerException() {
+        var builder = ComposeAttachment.adaptive("{\"type\":\"AdaptiveCard\",\"body\":[]}");
+        assertThatNullPointerException().isThrownBy(() -> builder.preview(null, "subtitle"));
+    }
+
+    @Test
+    void preview_withImage_nullTitle_throwsNullPointerException() {
+        var builder = ComposeAttachment.adaptive("{\"type\":\"AdaptiveCard\",\"body\":[]}");
+        assertThatNullPointerException().isThrownBy(() -> builder.preview(null, "subtitle", "https://img.example.com/thumb.png"));
     }
 
 
