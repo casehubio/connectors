@@ -5,9 +5,11 @@ import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import org.junit.jupiter.api.Test;
 
 class InboundMessageTest {
@@ -46,6 +48,37 @@ class InboundMessageTest {
                 new InboundMessage("slack-inbound", null, "U123", "C456",
                         "hello", List.of(), Instant.now(), Map.of(), null))
                 .withMessageContaining("connectorType");
+    }
+
+    @Test
+    void metadata_defensivelyCopied() {
+        var mutable = new HashMap<>(Map.of("key", "original"));
+        var msg = new InboundMessage(
+                "slack-inbound", "slack", "U123", "C456",
+                "hello", List.of(), Instant.now(), mutable, null);
+
+        mutable.put("key", "mutated");
+
+        assertThat(msg.metadata().get("key")).isEqualTo("original");
+    }
+
+    @Test
+    void metadata_isUnmodifiable() {
+        var msg = new InboundMessage(
+                "slack-inbound", "slack", "U123", "C456",
+                "hello", List.of(), Instant.now(), Map.of("key", "value"), null);
+
+        assertThatThrownBy(() -> msg.metadata().put("new", "entry"))
+                .isInstanceOf(UnsupportedOperationException.class);
+    }
+
+    @Test
+    void metadata_nullBecomesEmptyMap() {
+        var msg = new InboundMessage(
+                "slack-inbound", "slack", "U123", "C456",
+                "hello", List.of(), Instant.now(), null, null);
+
+        assertThat(msg.metadata()).isEmpty();
     }
 
     @Test

@@ -31,5 +31,6 @@ public record InboundMessage(
     public InboundMessage {
         Objects.requireNonNull(connectorType, "connectorType");
         attachments = List.copyOf(attachments);
+        metadata = metadata != null ? Map.copyOf(metadata) : Map.of();
     }
 }
