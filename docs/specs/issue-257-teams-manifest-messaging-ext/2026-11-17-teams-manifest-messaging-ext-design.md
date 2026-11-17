@@ -44,7 +44,7 @@ Bullet list of Azure/Teams setup steps, each with a link to the relevant Microso
 
 - Azure Bot registration (or Azure Bot resource)
 - Teams channel enabled on the bot
-- Messaging endpoint URL configured (`https://<host>/webhooks/teams`)
+- Messaging endpoint URL configured (`https://<host>/connectors/teams-inbound/webhook`)
 - App ID and password configured in Quarkus properties
 - Teams app package uploaded to the Teams Admin Center or sideloaded
 

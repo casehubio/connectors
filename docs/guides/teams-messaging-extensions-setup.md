@@ -10,7 +10,7 @@ before configuring your application:
 
 - [ ] **Azure Bot registration** — create an Azure Bot resource or Bot
   Channel Registration with a messaging endpoint pointing to your
-  application's webhook URL (`https://<host>/webhooks/teams`).
+  application's webhook URL (`https://<host>/connectors/teams-inbound/webhook`).
   [Create an Azure Bot](https://learn.microsoft.com/en-us/azure/bot-service/bot-service-quickstart-registration)
 
 - [ ] **Teams channel enabled** — enable the Microsoft Teams channel on
