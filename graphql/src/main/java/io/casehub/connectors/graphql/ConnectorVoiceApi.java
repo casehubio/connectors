@@ -70,7 +70,7 @@ public class ConnectorVoiceApi {
     @PlatformMutation("Transcribe audio to text")
     @RestPath("/transcribe")
     public TranscriptionResult transcribe(
-            @QueryParam("audioBase64") String audioBase64,
+            String audioBase64,
             @QueryParam("audioFormat") String audioFormat,
             @QueryParam("platform") String platform,
             @QueryParam("languageHint") String languageHint) {
@@ -95,9 +95,17 @@ public class ConnectorVoiceApi {
             @QueryParam("capability") String capability,
             @QueryParam("vendor") String vendor) {
 
-        VoiceCapability cap = capability != null
-                ? VoiceCapability.valueOf(capability.toUpperCase())
-                : null;
+        VoiceCapability cap = null;
+        if (capability != null) {
+            try {
+                cap = VoiceCapability.valueOf(capability.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                var valid = java.util.Arrays.stream(VoiceCapability.values())
+                        .map(Enum::name).toList();
+                throw new IllegalArgumentException(
+                        "Unknown capability '" + capability + "'. Valid values: " + valid);
+            }
+        }
         var query = new VoiceQuery(vendor, gender, accent, null,
                 language, style, cap, null);
         return voiceRegistry.query(query);

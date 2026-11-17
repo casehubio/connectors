@@ -128,6 +128,20 @@ class ConnectorVoiceApiTest {
                 () -> api.transcribe(SAMPLE_BASE64, "wav", "tts-only", null));
     }
 
+    @Test
+    void listVoices_unknownCapability_returnsReadableError() {
+        var api = apiWithDefaults();
+
+        var ex = org.junit.jupiter.api.Assertions.assertThrows(
+                IllegalArgumentException.class,
+                () -> api.listVoices(null, null, null, null, "NONEXISTENT", null));
+        assertThat(ex.getMessage())
+                .contains("NONEXISTENT")
+                .contains("TTS")
+                .contains("STT")
+                .contains("BOTH");
+    }
+
     // --- test infrastructure ---
 
     private ConnectorVoiceApi apiWithDefaults() {
