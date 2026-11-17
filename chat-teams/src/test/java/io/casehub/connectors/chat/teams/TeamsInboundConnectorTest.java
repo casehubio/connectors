@@ -585,6 +585,34 @@ class TeamsInboundConnectorTest {
     }
 
     @Test
+    void composeExtensionQuerySettingUrl_returnsAuthResponse() {
+        var handler = new InvokeHandler() {
+            @Override
+            public String name() {return "composeExtension/querySettingUrl";}
+
+            @Override
+            public InvokeResponse handle(InvokeRequest r) {
+                String actions = "{\"actions\":[{\"type\":\"openUrl\",\"value\":\"https://config.example.com/settings\",\"title\":\"Configure\"}]}";
+                return new InvokeResponse.ComposeAuth(actions);
+            }
+        };
+        var conn = connectorWithInvoke(new InvokeService(List.of(handler)));
+
+        String body = invokeActivity("composeExtension/querySettingUrl",
+                                     "{\"state\":\"CfDJ8\"}");
+        WebhookResult result = conn.handle(postRequest(body));
+
+        assertThat(result).isInstanceOf(WebhookResult.Responded.class);
+        var ext = parseJson(((WebhookResult.Responded) result).responseBody())
+                          .getJsonObject("composeExtension");
+        assertThat(ext.getString("type")).isEqualTo("auth");
+        assertThat(ext.getJsonObject("suggestedActions")
+                      .getJsonArray("actions").getJsonObject(0)
+                      .getString("type")).isEqualTo("openUrl");
+    }
+
+
+    @Test
     void composeExtension_noHandler_returnsAccepted() {
         var conn = connectorWithInvoke(new InvokeService(List.of()));
 
