@@ -576,6 +576,28 @@ class ComposeAttachmentTest {
         assertThatNullPointerException().isThrownBy(() -> builder.preview(null, "subtitle"));
     }
 
+    @Test
+    void hero_withPreviewAndImage_includesPreviewWithImage() {
+        String result = ComposeAttachment.hero("Full Product", "Full description")
+                                         .preview("Compact", "£29.99", "https://img.example.com/icon.png")
+                                         .build();
+
+        JsonObject obj = parse(result);
+        JsonObject preview = obj.getJsonObject("preview");
+        JsonObject previewContent = preview.getJsonObject("content");
+        assertThat(previewContent.getString("title")).isEqualTo("Compact");
+        assertThat(previewContent.getString("subtitle")).isEqualTo("£29.99");
+        assertThat(previewContent.getJsonArray("images")).hasSize(1);
+        assertThat(previewContent.getJsonArray("images").getJsonObject(0)
+                                 .getString("url")).isEqualTo("https://img.example.com/icon.png");
+    }
+
+    @Test
+    void hero_previewWithImageNullTitle_throwsNullPointerException() {
+        var builder = ComposeAttachment.hero("Product");
+        assertThatNullPointerException().isThrownBy(() -> builder.preview(null, "sub", "https://img.example.com/x.png"));
+    }
+
     private static JsonObject parse(String json) {
         return Json.createReader(new StringReader(json)).readObject();
     }

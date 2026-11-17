@@ -111,6 +111,7 @@ public final class ComposeAttachment {
         private       String           text;
         private       String           previewTitle;
         private       String           previewSubtitle;
+        private       String           previewImageUrl;
 
         CardBuilder(String contentType, String title, String subtitle, String imageUrl) {
             this.contentType = contentType;
@@ -144,12 +145,17 @@ public final class ComposeAttachment {
         }
 
         public CardBuilder preview(String title) {
-            return preview(title, null);
+            return preview(title, null, null);
         }
 
         public CardBuilder preview(String title, String subtitle) {
+            return preview(title, subtitle, null);
+        }
+
+        public CardBuilder preview(String title, String subtitle, String imageUrl) {
             this.previewTitle    = Objects.requireNonNull(title, "title");
             this.previewSubtitle = subtitle;
+            this.previewImageUrl = imageUrl;
             return this;
         }
 
@@ -177,7 +183,7 @@ public final class ComposeAttachment {
             if (previewTitle != null) {
                 builder.add("preview", Json.createObjectBuilder()
                                            .add("contentType", "application/vnd.microsoft.card.thumbnail")
-                                           .add("content", cardContent(previewTitle, previewSubtitle, null, null)));
+                                           .add("content", cardContent(previewTitle, previewSubtitle, null, previewImageUrl)));
             }
             return builder.build().toString();
         }
