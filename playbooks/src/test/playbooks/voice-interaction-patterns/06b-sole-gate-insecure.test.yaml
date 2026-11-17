@@ -1,0 +1,18 @@
+name: "NEGATIVE TWIN: speaker ID sole gate — proves the insecure pattern works"
+tests:
+  - name: voice-only gate authorises payment without second factor
+    steps:
+      - run-playbook: ../../../main/playbooks/voice-interaction-patterns/06b-sole-gate-insecure.playbook.yaml
+        capture: result
+      - assertThat: result.error
+        equals: ""
+      - assertThat: result.succeeded
+        equals: true
+      # Speaker identified — sole gate passes
+      - assertThat: result.captures.aliceId.identified
+        equals: true
+      # Payment was authorised with voice ID only — this is the vulnerability.
+      # In production, this playbook should NOT be used. See 06-joint-account-confirmation
+      # for the correct multi-factor pattern.
+      - assertThat: result.captures.auditRecord
+        not-null: true

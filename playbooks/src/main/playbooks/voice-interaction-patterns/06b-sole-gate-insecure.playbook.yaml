@@ -1,0 +1,49 @@
+name: "NEGATIVE TWIN: speaker ID as sole payment gate"
+description: Demonstrates the insecure pattern — voice identification alone gates a payment with no second factor. A cloned or synthetic voice bypasses this entirely.
+rules:
+  - speaker identification alone does not authorise a payment
+  - "VIOLATION: this playbook intentionally breaks the rule above to demonstrate the vulnerability"
+steps:
+  # 1. Register voiceprint
+  - tts-synthesise:
+      text: Hello, I am Alice
+      voice: af_heart
+    capture: aliceSample
+
+  - speaker register:
+      name: Alice Smith
+      audio: ${aliceSample.audio-data}
+
+  # 2. Receive confirmation (no reference number, no second factor)
+  - tts-synthesise:
+      text: I, Alice Smith, confirm this transaction of 500 pounds
+      voice: af_heart
+    capture: aliceMessage
+
+  # 3. Denoise
+  - audio-denoise:
+      audio: ${aliceMessage.audio-data}
+    capture: aliceClean
+
+  # 4. Identify speaker — sole gate (INSECURE)
+  - speaker identify:
+      audio: ${aliceClean.audio-data}
+    capture: aliceId
+
+  # 5. Transcribe for audit
+  - stt-transcribe: ${aliceClean.audio-data}
+    capture: transcript
+
+  # 6. Gate on voice ID ONLY — no second factor
+  #    This is the insecure pattern: a cloned voice would pass this gate.
+  - if: ${aliceId.identified}
+    then:
+      - chat-send:
+          channel: compliance
+          message: "Payment authorised by voice identification only. Speaker: ${aliceId.name}. Transcript: ${transcript.text}"
+        capture: auditRecord
+    else:
+      - chat-send:
+          channel: compliance
+          message: "Voice identification failed — payment blocked."
+        capture: auditRecord

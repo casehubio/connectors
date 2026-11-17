@@ -1,5 +1,8 @@
 name: Joint account impostor detection
 description: Register Alice and Bob, but Alice tries to confirm as both — speaker ID catches the duplicate voice
+rules:
+  - speaker identification alone does not authorise a payment
+  - voice identification must be combined with at least one other verification factor
 steps:
   # 1. Register voiceprints from legitimate account holders
   - tts-synthesise:

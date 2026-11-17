@@ -1,6 +1,6 @@
 name: Joint account verbal confirmation tests
 tests:
-  - name: full pipeline — register, confirm, denoise, identify, branch, send
+  - name: multi-factor gate — voice ID and reference number both required
     steps:
       - run-playbook: ../../../main/playbooks/voice-interaction-patterns/06-joint-account-confirmation.playbook.yaml
         capture: result
@@ -8,14 +8,17 @@ tests:
         equals: ""
       - assertThat: result.succeeded
         equals: true
-      # Speaker identification ran on both
+      # Factor 1: speaker identification ran on both
       - assertThat: result.captures.aliceId.identified
         equals: true
       - assertThat: result.captures.bobId.identified
         equals: true
+      # Factor 2: transcript contains reference number for compliance review
+      - assertThat: result.captures.fullTranscript.text
+        contains: TX-7429
       # Combined recording produced
       - assertThat: result.captures.combinedRecording.audio-format
         equals: wav
-      # Transcript contains confirmation language
+      # Transcript contains confirmation language and reference
       - assertThat: result.captures.fullTranscript.text
         contains: confirm
