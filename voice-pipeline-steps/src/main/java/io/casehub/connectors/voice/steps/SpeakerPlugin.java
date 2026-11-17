@@ -57,16 +57,71 @@ public record SpeakerPlugin(
 
     private static io.casehub.connectors.voice.model.SpeakerEmbedding extractFromWav(
             SpeakerEmbeddingExtractor extractor, byte[] wav) {
-        int     offset      = (wav.length > 44 && wav[0] == 'R') ? 44 : 0;
-        int     sampleCount = (wav.length - offset) / 2;
-        float[] samples     = new float[sampleCount];
+        if (wav.length < 44
+                || wav[0] != 'R' || wav[1] != 'I' || wav[2] != 'F' || wav[3] != 'F'
+                || wav[8] != 'W' || wav[9] != 'A' || wav[10] != 'V' || wav[11] != 'E') {
+            throw new IllegalArgumentException("Not a valid WAV file");
+        }
+
+        int audioFormat    = readShortLE(wav, 20);
+        int channels       = readShortLE(wav, 22);
+        int sampleRate     = readIntLE(wav, 24);
+        int bitsPerSample  = readShortLE(wav, 34);
+
+        if (audioFormat != 1) {
+            throw new IllegalArgumentException(
+                    "Unsupported WAV: expected PCM format (1), got " + audioFormat);
+        }
+
+        if (channels != 1) {
+            throw new IllegalArgumentException(
+                    "Unsupported WAV: expected mono (1 channel), got " + channels);
+        }
+        if (sampleRate != 16000) {
+            throw new IllegalArgumentException(
+                    "Unsupported WAV sample rate: expected 16000 Hz, got " + sampleRate);
+        }
+        if (bitsPerSample != 16) {
+            throw new IllegalArgumentException(
+                    "Unsupported WAV: expected 16-bit samples, got " + bitsPerSample + "-bit");
+        }
+
+        int dataOffset = findDataChunk(wav);
+        int dataSize   = readIntLE(wav, dataOffset - 4);
+        int sampleCount = dataSize / 2;
+        float[] samples = new float[sampleCount];
         for (int i = 0; i < sampleCount; i++) {
-            int idx = offset + i * 2;
+            int idx = dataOffset + i * 2;
             if (idx + 1 < wav.length) {
                 short s = (short) ((wav[idx + 1] << 8) | (wav[idx] & 0xFF));
                 samples[i] = s / (float) Short.MAX_VALUE;
             }
         }
-        return extractor.extract(samples, 16000);
+        return extractor.extract(samples, sampleRate);
+    }
+
+    private static int findDataChunk(byte[] wav) {
+        int pos = 12;
+        while (pos + 8 <= wav.length) {
+            if (wav[pos] == 'd' && wav[pos + 1] == 'a'
+                    && wav[pos + 2] == 't' && wav[pos + 3] == 'a') {
+                return pos + 8;
+            }
+            int chunkSize = readIntLE(wav, pos + 4);
+            if (chunkSize <= 0) {
+                throw new IllegalArgumentException("WAV file has corrupt chunk at offset " + pos);
+            }
+            pos += 8 + chunkSize;
+        }
+        throw new IllegalArgumentException("WAV file has no data chunk");
+    }
+
+    private static int readShortLE(byte[] buf, int offset) {
+        return (buf[offset] & 0xFF) | ((buf[offset + 1] & 0xFF) << 8);
+    }
+
+    private static int readIntLE(byte[] buf, int offset) {
+        return (buf[offset] & 0xFF) | ((buf[offset + 1] & 0xFF) << 8)
+                | ((buf[offset + 2] & 0xFF) << 16) | ((buf[offset + 3] & 0xFF) << 24);
     }
 }
