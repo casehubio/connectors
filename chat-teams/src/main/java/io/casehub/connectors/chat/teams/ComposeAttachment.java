@@ -40,11 +40,26 @@ public final class ComposeAttachment {
         return new CardBuilder("application/vnd.microsoft.card.thumbnail", title, subtitle, imageUrl);
     }
 
+    private static JsonObjectBuilder cardContent(String title, String subtitle, String text, String imageUrl) {
+        var content = Json.createObjectBuilder().add("title", title);
+        if (subtitle != null) {
+            content.add("subtitle", subtitle);
+        }
+        if (text != null) {
+            content.add("text", text);
+        }
+        if (imageUrl != null) {
+            content.add("images", Json.createArrayBuilder()
+                                      .add(Json.createObjectBuilder().add("url", imageUrl)));
+        }
+        return content;
+    }
+
     public static final class Builder {
         private final String contentJson;
-        private String previewTitle;
-        private String previewSubtitle;
-        private String previewImageUrl;
+        private       String previewTitle;
+        private       String previewSubtitle;
+        private       String previewImageUrl;
 
         Builder(String contentJson) {
             this.contentJson = Objects.requireNonNull(contentJson, "contentJson");
@@ -71,13 +86,13 @@ public final class ComposeAttachment {
         public String build() {
             var content = Json.createReader(new StringReader(contentJson)).readObject();
             var builder = Json.createObjectBuilder()
-                    .add("contentType", "application/vnd.microsoft.card.adaptive")
-                    .add("content", content);
+                              .add("contentType", "application/vnd.microsoft.card.adaptive")
+                              .add("content", content);
 
             if (previewTitle != null) {
                 builder.add("preview", Json.createObjectBuilder()
-                        .add("contentType", "application/vnd.microsoft.card.thumbnail")
-                        .add("content", cardContent(previewTitle, previewSubtitle, null, previewImageUrl)));
+                                           .add("contentType", "application/vnd.microsoft.card.thumbnail")
+                                           .add("content", cardContent(previewTitle, previewSubtitle, null, previewImageUrl)));
             }
 
             return builder.build().toString();
@@ -87,14 +102,15 @@ public final class ComposeAttachment {
     private record CardAction(String type, String title, String value) {}
 
     public static final class CardBuilder {
-        private final String         contentType;
-        private final String         title;
-        private final String         subtitle;
-        private final String         imageUrl;
+        private final String           contentType;
+        private final String           title;
+        private final String           subtitle;
+        private final String           imageUrl;
         private       List<CardAction> buttons;
         private       CardAction       tap;
         private       String           text;
-
+        private       String           previewTitle;
+        private       String           previewSubtitle;
 
         CardBuilder(String contentType, String title, String subtitle, String imageUrl) {
             this.contentType = contentType;
@@ -119,12 +135,21 @@ public final class ComposeAttachment {
             return this;
         }
 
-
         public CardBuilder tap(String type, String title, String value) {
             Objects.requireNonNull(type, "type");
             Objects.requireNonNull(title, "title");
             Objects.requireNonNull(value, "value");
             this.tap = new CardAction(type, title, value);
+            return this;
+        }
+
+        public CardBuilder preview(String title) {
+            return preview(title, null);
+        }
+
+        public CardBuilder preview(String title, String subtitle) {
+            this.previewTitle    = Objects.requireNonNull(title, "title");
+            this.previewSubtitle = subtitle;
             return this;
         }
 
@@ -146,25 +171,15 @@ public final class ComposeAttachment {
                                        .add("title", tap.title())
                                        .add("value", tap.value()));
             }
-            return Json.createObjectBuilder()
-                       .add("contentType", contentType)
-                       .add("content", content)
-                       .build().toString();
+            var builder = Json.createObjectBuilder()
+                              .add("contentType", contentType)
+                              .add("content", content);
+            if (previewTitle != null) {
+                builder.add("preview", Json.createObjectBuilder()
+                                           .add("contentType", "application/vnd.microsoft.card.thumbnail")
+                                           .add("content", cardContent(previewTitle, previewSubtitle, null, null)));
+            }
+            return builder.build().toString();
         }
-    }
-
-    private static JsonObjectBuilder cardContent(String title, String subtitle, String text, String imageUrl) {
-        var content = Json.createObjectBuilder().add("title", title);
-        if (subtitle != null) {
-            content.add("subtitle", subtitle);
-        }
-        if (text != null) {
-            content.add("text", text);
-        }
-        if (imageUrl != null) {
-            content.add("images", Json.createArrayBuilder()
-                                      .add(Json.createObjectBuilder().add("url", imageUrl)));
-        }
-        return content;
     }
 }

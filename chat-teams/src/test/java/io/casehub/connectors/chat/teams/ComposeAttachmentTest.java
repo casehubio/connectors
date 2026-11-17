@@ -508,6 +508,74 @@ class ComposeAttachmentTest {
         assertThat(content.getJsonArray("buttons")).hasSize(1);
     }
 
+
+    @Test
+    void hero_withPreview_includesPreviewBlock() {
+        String result = ComposeAttachment.hero("Full Product Detail", "Description", "https://img.example.com/large.png")
+                                         .button("openUrl", "View", "https://example.com")
+                                         .preview("Product Name", "£29.99")
+                                         .build();
+
+        JsonObject obj = parse(result);
+        assertThat(obj.getString("contentType")).isEqualTo("application/vnd.microsoft.card.hero");
+        JsonObject content = obj.getJsonObject("content");
+        assertThat(content.getString("title")).isEqualTo("Full Product Detail");
+        assertThat(content.getJsonArray("buttons")).hasSize(1);
+
+        JsonObject preview = obj.getJsonObject("preview");
+        assertThat(preview.getString("contentType")).isEqualTo("application/vnd.microsoft.card.thumbnail");
+        JsonObject previewContent = preview.getJsonObject("content");
+        assertThat(previewContent.getString("title")).isEqualTo("Product Name");
+        assertThat(previewContent.getString("subtitle")).isEqualTo("£29.99");
+    }
+
+    @Test
+    void hero_withPreviewTitleOnly_includesPreviewWithTitleOnly() {
+        String result = ComposeAttachment.hero("Full Detail")
+                                         .preview("Compact Title")
+                                         .build();
+
+        JsonObject obj     = parse(result);
+        JsonObject preview = obj.getJsonObject("preview");
+        assertThat(preview.getString("contentType")).isEqualTo("application/vnd.microsoft.card.thumbnail");
+        JsonObject previewContent = preview.getJsonObject("content");
+        assertThat(previewContent.getString("title")).isEqualTo("Compact Title");
+        assertThat(previewContent.containsKey("subtitle")).isFalse();
+    }
+
+    @Test
+    void hero_withoutPreview_omitsPreviewBlock() {
+        String result = ComposeAttachment.hero("Product").build();
+
+        JsonObject obj = parse(result);
+        assertThat(obj.containsKey("preview")).isFalse();
+    }
+
+    @Test
+    void thumbnail_withPreview_includesPreviewBlock() {
+        String result = ComposeAttachment.thumbnail("Full Search Result", "Long description")
+                                         .preview("Short Title")
+                                         .build();
+
+        JsonObject obj = parse(result);
+        assertThat(obj.getString("contentType")).isEqualTo("application/vnd.microsoft.card.thumbnail");
+        JsonObject preview = obj.getJsonObject("preview");
+        assertThat(preview.getString("contentType")).isEqualTo("application/vnd.microsoft.card.thumbnail");
+        assertThat(preview.getJsonObject("content").getString("title")).isEqualTo("Short Title");
+    }
+
+    @Test
+    void hero_previewNullTitle_throwsNullPointerException() {
+        var builder = ComposeAttachment.hero("Product");
+        assertThatNullPointerException().isThrownBy(() -> builder.preview(null));
+    }
+
+    @Test
+    void hero_previewWithSubtitleNullTitle_throwsNullPointerException() {
+        var builder = ComposeAttachment.hero("Product");
+        assertThatNullPointerException().isThrownBy(() -> builder.preview(null, "subtitle"));
+    }
+
     private static JsonObject parse(String json) {
         return Json.createReader(new StringReader(json)).readObject();
     }

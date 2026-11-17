@@ -20,7 +20,6 @@ public class RefLinkUnfurlHandler implements InvokeHandler {
                 ComposeAttachment.hero("Link Preview")
                                  .text("This is a preview of the linked content.")
                                  .button("openUrl", "View", "https://example.com")
-                                 .build()
-                                                               ));
+                                 .build()));
     }
 }
