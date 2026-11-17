@@ -1,0 +1,88 @@
+{
+  "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.13/MicrosoftTeams.schema.json",
+  "manifestVersion": "1.13",
+  "version": "1.0.0",
+  "id": "{{BOT_APP_ID}}",
+  "developer": {
+    "name": "{{COMPANY_NAME}}",
+    "websiteUrl": "https://{{YOUR_DOMAIN}}",
+    "privacyUrl": "https://{{YOUR_DOMAIN}}/privacy",
+    "termsOfUseUrl": "https://{{YOUR_DOMAIN}}/terms"
+  },
+  "name": {
+    "short": "{{APP_NAME}}",
+    "full": "{{APP_FULL_NAME}}"
+  },
+  "description": {
+    "short": "{{SHORT_DESCRIPTION}}",
+    "full": "{{FULL_DESCRIPTION}}"
+  },
+  "icons": {
+    "outline": "outline.png",
+    "color": "color.png"
+  },
+  "accentColor": "#FFFFFF",
+  "bots": [
+    {
+      "botId": "{{BOT_APP_ID}}",
+      "scopes": ["personal", "team", "groupChat"],
+      "supportsFiles": false,
+      "isNotificationOnly": false,
+      "_comment": "botId must match the Azure Bot registration app ID and the id field above"
+    }
+  ],
+  "composeExtensions": [
+    {
+      "botId": "{{BOT_APP_ID}}",
+      "commands": [
+        {
+          "_comment": "Search command — dispatched as composeExtension/query. The commandId arrives in InvokeRequest.value().getString('commandId')",
+          "id": "searchItems",
+          "type": "query",
+          "title": "Search items",
+          "description": "Search for items by keyword",
+          "initialRun": true,
+          "parameters": [
+            {
+              "name": "query",
+              "title": "Search query",
+              "description": "Enter search terms",
+              "inputType": "text"
+            }
+          ]
+        },
+        {
+          "_comment": "Action command — dispatched as composeExtension/fetchTask (to show form) then composeExtension/submitAction (on submit). Set fetchTask to true to show an Adaptive Card form before submission",
+          "id": "createItem",
+          "type": "action",
+          "title": "Create item",
+          "description": "Create a new item via a form",
+          "fetchTask": true,
+          "parameters": [
+            {
+              "name": "title",
+              "title": "Title",
+              "description": "Item title",
+              "inputType": "text"
+            }
+          ]
+        }
+      ],
+      "messageHandlers": [
+        {
+          "_comment": "Link unfurling — dispatched as composeExtension/queryLink when a user pastes a URL matching these domains",
+          "type": "link",
+          "value": {
+            "domains": [
+              "{{YOUR_DOMAIN}}"
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "permissions": ["identity", "messageTeamMembers"],
+  "validDomains": [
+    "{{YOUR_DOMAIN}}"
+  ]
+}
