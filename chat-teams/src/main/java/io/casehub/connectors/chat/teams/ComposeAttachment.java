@@ -3,6 +3,7 @@ package io.casehub.connectors.chat.teams;
 import jakarta.json.Json;
 
 import java.io.StringReader;
+import java.util.Objects;
 
 public final class ComposeAttachment {
 
@@ -19,12 +20,13 @@ public final class ComposeAttachment {
         private String previewImageUrl;
 
         Builder(String contentJson) {
-            this.contentJson = contentJson;
+            this.contentJson = Objects.requireNonNull(contentJson, "contentJson");
         }
 
         public Builder preview(String title, String subtitle) {
             this.previewTitle = title;
             this.previewSubtitle = subtitle;
+            this.previewImageUrl = null;
             return this;
         }
 
