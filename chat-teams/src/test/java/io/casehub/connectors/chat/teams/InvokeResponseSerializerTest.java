@@ -112,6 +112,43 @@ class InvokeResponseSerializerTest {
     }
 
     @Test
+    void composeResult_multiCardRoundTrip_preservesAllCardTypesAndOrder() {
+        String heroJson = ComposeAttachment.hero("Hero Title", "Hero Subtitle")
+                                           .button("openUrl", "Open", "https://example.com")
+                                           .build();
+        String thumbJson = ComposeAttachment.thumbnail("Thumb Title", "Thumb Subtitle", "https://img.example.com/thumb.png")
+                                            .tap("openUrl", "Tap", "https://example.com/tap")
+                                            .build();
+        String adaptiveJson = ComposeAttachment.adaptive("{\"type\":\"AdaptiveCard\",\"body\":[]}")
+                                               .preview("Preview Title")
+                                               .build();
+
+        String json = InvokeResponseSerializer.toJson(
+                new InvokeResponse.ComposeResult("list", List.of(heroJson, thumbJson, adaptiveJson)));
+        JsonObject obj         = parse(json);
+        var        attachments = obj.getJsonObject("composeExtension").getJsonArray("attachments");
+
+        assertThat(attachments).hasSize(3);
+
+        JsonObject hero = attachments.getJsonObject(0);
+        assertThat(hero.getString("contentType")).isEqualTo("application/vnd.microsoft.card.hero");
+        assertThat(hero.getJsonObject("content").getString("title")).isEqualTo("Hero Title");
+        assertThat(hero.getJsonObject("content").getString("subtitle")).isEqualTo("Hero Subtitle");
+        assertThat(hero.getJsonObject("content").getJsonArray("buttons")).hasSize(1);
+
+        JsonObject thumb = attachments.getJsonObject(1);
+        assertThat(thumb.getString("contentType")).isEqualTo("application/vnd.microsoft.card.thumbnail");
+        assertThat(thumb.getJsonObject("content").getString("title")).isEqualTo("Thumb Title");
+        assertThat(thumb.getJsonObject("content").getJsonObject("tap").getString("type")).isEqualTo("openUrl");
+
+        JsonObject adaptive = attachments.getJsonObject(2);
+        assertThat(adaptive.getString("contentType")).isEqualTo("application/vnd.microsoft.card.adaptive");
+        assertThat(adaptive.getJsonObject("content").getString("type")).isEqualTo("AdaptiveCard");
+        assertThat(adaptive.getJsonObject("preview").getJsonObject("content").getString("title")).isEqualTo("Preview Title");
+    }
+
+
+    @Test
     void composeAuth_serializesWithSuggestedActions() {
         String actions = "{\"actions\":[{\"type\":\"openUrl\",\"value\":\"https://auth.example.com/oauth\",\"title\":\"Sign in\"}]}";
         String json = InvokeResponseSerializer.toJson(
