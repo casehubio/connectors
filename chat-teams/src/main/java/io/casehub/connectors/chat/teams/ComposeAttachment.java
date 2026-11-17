@@ -40,7 +40,6 @@ public final class ComposeAttachment {
         return new CardBuilder("application/vnd.microsoft.card.thumbnail", title, subtitle, imageUrl);
     }
 
-
     public static final class Builder {
         private final String contentJson;
         private String previewTitle;
