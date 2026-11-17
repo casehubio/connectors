@@ -226,6 +226,85 @@ class ComposeAttachmentTest {
     }
 
     @Test
+    void hero_withTap_includesTapObject() {
+        String result = ComposeAttachment.hero("Product", "£29.99")
+                                         .tap("openUrl", "View", "https://example.com/product")
+                                         .build();
+
+        JsonObject obj     = parse(result);
+        JsonObject content = obj.getJsonObject("content");
+        JsonObject tap     = content.getJsonObject("tap");
+        assertThat(tap.getString("type")).isEqualTo("openUrl");
+        assertThat(tap.getString("title")).isEqualTo("View");
+        assertThat(tap.getString("value")).isEqualTo("https://example.com/product");
+    }
+
+    @Test
+    void hero_withTapAndButtons_includesBoth() {
+        String result = ComposeAttachment.hero("Product", "£29.99")
+                                         .tap("openUrl", "View", "https://example.com/product")
+                                         .button("imBack", "Buy", "buy-123")
+                                         .build();
+
+        JsonObject obj     = parse(result);
+        JsonObject content = obj.getJsonObject("content");
+        assertThat(content.getJsonObject("tap").getString("type")).isEqualTo("openUrl");
+        assertThat(content.getJsonArray("buttons")).hasSize(1);
+    }
+
+    @Test
+    void hero_tapReplacePrevious_keepsLastTap() {
+        String result = ComposeAttachment.hero("Product")
+                                         .tap("openUrl", "First", "https://first.com")
+                                         .tap("imBack", "Second", "second-value")
+                                         .build();
+
+        JsonObject obj = parse(result);
+        JsonObject tap = obj.getJsonObject("content").getJsonObject("tap");
+        assertThat(tap.getString("type")).isEqualTo("imBack");
+        assertThat(tap.getString("title")).isEqualTo("Second");
+    }
+
+    @Test
+    void hero_withoutTap_omitsTapProperty() {
+        String result = ComposeAttachment.hero("Title Only").build();
+
+        JsonObject obj = parse(result);
+        assertThat(obj.getJsonObject("content").containsKey("tap")).isFalse();
+    }
+
+    @Test
+    void thumbnail_withTap_includesTapObject() {
+        String result = ComposeAttachment.thumbnail("Search Result")
+                                         .tap("openUrl", "Open", "https://example.com")
+                                         .build();
+
+        JsonObject obj = parse(result);
+        JsonObject tap = obj.getJsonObject("content").getJsonObject("tap");
+        assertThat(tap.getString("type")).isEqualTo("openUrl");
+        assertThat(tap.getString("title")).isEqualTo("Open");
+        assertThat(tap.getString("value")).isEqualTo("https://example.com");
+    }
+
+    @Test
+    void hero_tapNullType_throwsNullPointerException() {
+        var builder = ComposeAttachment.hero("Product");
+        assertThatNullPointerException().isThrownBy(() -> builder.tap(null, "View", "https://example.com"));
+    }
+
+    @Test
+    void hero_tapNullTitle_throwsNullPointerException() {
+        var builder = ComposeAttachment.hero("Product");
+        assertThatNullPointerException().isThrownBy(() -> builder.tap("openUrl", null, "https://example.com"));
+    }
+
+    @Test
+    void hero_tapNullValue_throwsNullPointerException() {
+        var builder = ComposeAttachment.hero("Product");
+        assertThatNullPointerException().isThrownBy(() -> builder.tap("openUrl", "View", null));
+    }
+
+    @Test
     void hero_nullTitle_throwsNullPointerException() {
         assertThatNullPointerException().isThrownBy(() -> ComposeAttachment.hero(null, "sub", null));
     }

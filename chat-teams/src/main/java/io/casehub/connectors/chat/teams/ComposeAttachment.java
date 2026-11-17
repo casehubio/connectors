@@ -99,6 +99,7 @@ public final class ComposeAttachment {
         private final String         subtitle;
         private final String         imageUrl;
         private       List<String[]> buttons;
+        private       String[]       tap;
 
         CardBuilder(String contentType, String title, String subtitle, String imageUrl) {
             this.contentType = contentType;
@@ -115,6 +116,14 @@ public final class ComposeAttachment {
                 buttons = new ArrayList<>();
             }
             buttons.add(new String[]{type, title, value});
+            return this;
+        }
+
+        public CardBuilder tap(String type, String title, String value) {
+            Objects.requireNonNull(type, "type");
+            Objects.requireNonNull(title, "title");
+            Objects.requireNonNull(value, "value");
+            this.tap = new String[]{type, title, value};
             return this;
         }
 
@@ -137,6 +146,12 @@ public final class ComposeAttachment {
                                          .add("value", b[2]));
                 }
                 content.add("buttons", buttonsArray);
+            }
+            if (tap != null) {
+                content.add("tap", Json.createObjectBuilder()
+                                       .add("type", tap[0])
+                                       .add("title", tap[1])
+                                       .add("value", tap[2]));
             }
             return Json.createObjectBuilder()
                        .add("contentType", contentType)
