@@ -442,6 +442,72 @@ class ComposeAttachmentTest {
         assertThatNullPointerException().isThrownBy(() -> ComposeAttachment.thumbnail(null, "sub"));
     }
 
+
+    @Test
+    void hero_withText_includesTextProperty() {
+        String result = ComposeAttachment.hero("Product", "£29.99")
+                                         .text("A premium widget for all your needs.")
+                                         .build();
+
+        JsonObject obj     = parse(result);
+        JsonObject content = obj.getJsonObject("content");
+        assertThat(content.getString("text")).isEqualTo("A premium widget for all your needs.");
+    }
+
+    @Test
+    void hero_withoutText_omitsTextProperty() {
+        String result = ComposeAttachment.hero("Product", "£29.99").build();
+
+        JsonObject obj     = parse(result);
+        JsonObject content = obj.getJsonObject("content");
+        assertThat(content.containsKey("text")).isFalse();
+    }
+
+    @Test
+    void hero_withTextAndImage_emitsTextBeforeImages() {
+        String result = ComposeAttachment.hero("Product", "£29.99", "https://img.example.com/thumb.png")
+                                         .text("Body content here.")
+                                         .build();
+
+        JsonObject obj     = parse(result);
+        JsonObject content = obj.getJsonObject("content");
+        assertThat(content.getString("text")).isEqualTo("Body content here.");
+        assertThat(content.getJsonArray("images")).hasSize(1);
+        var keys = new java.util.ArrayList<>(content.keySet());
+        assertThat(keys.indexOf("text")).isLessThan(keys.indexOf("images"));
+    }
+
+    @Test
+    void thumbnail_withText_includesTextProperty() {
+        String result = ComposeAttachment.thumbnail("Search Result", "Found item")
+                                         .text("Detailed description of the result.")
+                                         .build();
+
+        JsonObject obj     = parse(result);
+        JsonObject content = obj.getJsonObject("content");
+        assertThat(content.getString("text")).isEqualTo("Detailed description of the result.");
+    }
+
+    @Test
+    void hero_withText_roundTrip_throughInvokeResponseSerializer() {
+        String att = ComposeAttachment.hero("Product", "£29.99")
+                                      .text("A premium widget.")
+                                      .button("openUrl", "View", "https://example.com/product")
+                                      .build();
+
+        String serialized = InvokeResponseSerializer.toJson(
+                new InvokeResponse.ComposeResult("list", java.util.List.of(att)));
+
+        JsonObject obj = parse(serialized);
+        JsonObject attachment = obj.getJsonObject("composeExtension")
+                                   .getJsonArray("attachments").getJsonObject(0);
+        JsonObject content = attachment.getJsonObject("content");
+        assertThat(content.getString("title")).isEqualTo("Product");
+        assertThat(content.getString("subtitle")).isEqualTo("£29.99");
+        assertThat(content.getString("text")).isEqualTo("A premium widget.");
+        assertThat(content.getJsonArray("buttons")).hasSize(1);
+    }
+
     private static JsonObject parse(String json) {
         return Json.createReader(new StringReader(json)).readObject();
     }

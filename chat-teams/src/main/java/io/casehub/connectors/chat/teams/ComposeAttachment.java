@@ -77,7 +77,7 @@ public final class ComposeAttachment {
             if (previewTitle != null) {
                 builder.add("preview", Json.createObjectBuilder()
                         .add("contentType", "application/vnd.microsoft.card.thumbnail")
-                        .add("content", cardContent(previewTitle, previewSubtitle, previewImageUrl)));
+                        .add("content", cardContent(previewTitle, previewSubtitle, null, previewImageUrl)));
             }
 
             return builder.build().toString();
@@ -93,6 +93,8 @@ public final class ComposeAttachment {
         private final String         imageUrl;
         private       List<CardAction> buttons;
         private       CardAction       tap;
+        private       String           text;
+
 
         CardBuilder(String contentType, String title, String subtitle, String imageUrl) {
             this.contentType = contentType;
@@ -112,6 +114,12 @@ public final class ComposeAttachment {
             return this;
         }
 
+        public CardBuilder text(String text) {
+            this.text = text;
+            return this;
+        }
+
+
         public CardBuilder tap(String type, String title, String value) {
             Objects.requireNonNull(type, "type");
             Objects.requireNonNull(title, "title");
@@ -121,7 +129,7 @@ public final class ComposeAttachment {
         }
 
         public String build() {
-            var content = cardContent(title, subtitle, imageUrl);
+            var content = cardContent(title, subtitle, text, imageUrl);
             if (buttons != null) {
                 var buttonsArray = Json.createArrayBuilder();
                 for (var b : buttons) {
@@ -145,10 +153,13 @@ public final class ComposeAttachment {
         }
     }
 
-    private static JsonObjectBuilder cardContent(String title, String subtitle, String imageUrl) {
+    private static JsonObjectBuilder cardContent(String title, String subtitle, String text, String imageUrl) {
         var content = Json.createObjectBuilder().add("title", title);
         if (subtitle != null) {
             content.add("subtitle", subtitle);
+        }
+        if (text != null) {
+            content.add("text", text);
         }
         if (imageUrl != null) {
             content.add("images", Json.createArrayBuilder()
