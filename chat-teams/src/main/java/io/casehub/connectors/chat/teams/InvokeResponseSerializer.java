@@ -54,6 +54,37 @@ class InvokeResponseSerializer {
                         .add("code", "Error")
                         .add("message", message))
                     .build().toString();
+
+            case InvokeResponse.ComposeResult(var attachmentLayout, var attachmentsJson) -> {
+                var attachmentsArray = Json.createArrayBuilder();
+                for (String att : attachmentsJson) {
+                    attachmentsArray.add(parseJson(att));
+                }
+                yield Json.createObjectBuilder()
+                    .add("composeExtension", Json.createObjectBuilder()
+                        .add("type", "result")
+                        .add("attachmentLayout", attachmentLayout)
+                        .add("attachments", attachmentsArray))
+                    .build().toString();
+            }
+
+            case InvokeResponse.ComposeAuth(var suggestedActionsJson) ->
+                Json.createObjectBuilder()
+                    .add("composeExtension", Json.createObjectBuilder()
+                        .add("type", "auth")
+                        .add("suggestedActions", parseJson(suggestedActionsJson)))
+                    .build().toString();
+
+            case InvokeResponse.ComposeContinue(var title, var cardJson) ->
+                Json.createObjectBuilder()
+                    .add("composeExtension", Json.createObjectBuilder()
+                        .add("type", "continue")
+                        .add("value", Json.createObjectBuilder()
+                            .add("title", title)
+                            .add("card", Json.createObjectBuilder()
+                                .add("contentType", "application/vnd.microsoft.card.adaptive")
+                                .add("content", parseJson(cardJson)))))
+                    .build().toString();
         };
     }
 
