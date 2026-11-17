@@ -20,10 +20,18 @@ public class RefSearchHandler implements InvokeHandler {
 
     @Override
     public InvokeResponse handle(InvokeRequest request) {
-        return new InvokeResponse.ComposeResult("list", List.of(
-                ComposeAttachment.adaptive(CARD_1).preview("Contoso Widget", "£29.99").build(),
-                ComposeAttachment.adaptive(CARD_2).preview("Northwind Gadget", "£49.99").build(),
-                ComposeAttachment.adaptive(CARD_3).preview("Adventure Gizmo", "£19.99").build()
-        ));
+        String queryText = request.value().getString("queryText", "");
+        record Item(String cardJson, String title, String price) {}
+        var allItems = List.of(
+                new Item(CARD_1, "Contoso Widget", "£29.99"),
+                new Item(CARD_2, "Northwind Gadget", "£49.99"),
+                new Item(CARD_3, "Adventure Gizmo", "£19.99"));
+        var attachments = allItems.stream()
+                                  .filter(item -> queryText.isBlank()
+                                                  || item.title().toLowerCase().contains(queryText.toLowerCase()))
+                                  .map(item -> ComposeAttachment.adaptive(item.cardJson())
+                                                                .preview(item.title(), item.price()).build())
+                                  .toList();
+        return new InvokeResponse.ComposeResult("list", attachments);
     }
 }
