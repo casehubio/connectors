@@ -197,7 +197,7 @@ public class MicrosoftGraphClient {
         }
     }
 
-    private static URI toUri(String rawUrl) {
+    public static URI toUri(String rawUrl) {
         try {
             var parsed = new java.net.URL(rawUrl);
             return new URI(parsed.getProtocol(), parsed.getAuthority(),

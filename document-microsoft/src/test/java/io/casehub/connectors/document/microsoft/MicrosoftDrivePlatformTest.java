@@ -339,6 +339,37 @@ class MicrosoftDrivePlatformTest {
                                      .filter(r -> r.uri().toString().contains("createUploadSession"))
                                      .findFirst().orElseThrow().uri().toString();
             assertThat(sessionUri).doesNotContain("my file.bin");
+            assertThat(sessionUri)
+                    .as("filename must be single-encoded (%%20), not double-encoded (%%2520)")
+                    .contains("my%20file.bin")
+                    .doesNotContain("%2520");
+        }
+
+        @Test
+        void simpleUploadEncodesFilename() {
+            var requests = new java.util.ArrayList<HttpRequest>();
+            var graph = new MicrosoftGraphClient(request -> {
+                requests.add(request);
+                if (request.uri().toString().contains(":/content") && request.method().equals("PUT")) {
+                    return new StubHttpResponse(201,
+                            fileItemJson("file-enc", "my file.txt", "folder-1",
+                                    "text/plain", 256));
+                }
+                return new StubHttpResponse(500, "unexpected");
+            });
+
+            var client = new MicrosoftDriveClient(graph, "/me/drive");
+            client.upload("folder-1", "my file.txt", "text/plain",
+                    "hello".getBytes(), "test-token");
+
+            var uploadUri = requests.stream()
+                    .filter(r -> r.method().equals("PUT"))
+                    .findFirst().orElseThrow().uri().toString();
+            assertThat(uploadUri)
+                    .as("filename must be single-encoded (%%20), not double-encoded (%%2520)")
+                    .contains("my%20file.txt")
+                    .doesNotContain("%2520")
+                    .doesNotContain("my file.txt");
         }
     }
 

@@ -9,9 +9,7 @@ import jakarta.json.JsonObject;
 
 import java.io.StringReader;
 import java.net.URI;
-import java.net.URLEncoder;
 import java.net.http.HttpRequest;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -157,10 +155,9 @@ class MicrosoftDriveClient {
 
     private JsonObject uploadSimple(String folderId, String name, String contentType,
             byte[] content, String token) {
-        String encodedName = URLEncoder.encode(name, StandardCharsets.UTF_8).replace("+", "%20");
         var request = HttpRequest.newBuilder(
-                        URI.create(MicrosoftGraphClient.BASE_URL + basePath
-                                + "/items/" + folderId + ":/" + encodedName + ":/content"))
+                        MicrosoftGraphClient.toUri(MicrosoftGraphClient.BASE_URL + basePath
+                                + "/items/" + folderId + ":/" + name + ":/content"))
                 .header("Authorization", "Bearer " + token)
                 .header("Content-Type", contentType)
                 .PUT(HttpRequest.BodyPublishers.ofByteArray(content))
@@ -177,8 +174,7 @@ class MicrosoftDriveClient {
                         .add("@microsoft.graph.conflictBehavior", "replace")
                         .add("name", name))
                 .build();
-        String encodedName = URLEncoder.encode(name, StandardCharsets.UTF_8).replace("+", "%20");
-        var session = graph.post(basePath + "/items/" + folderId + ":/" + encodedName
+        var session = graph.post(basePath + "/items/" + folderId + ":/" + name
                 + ":/createUploadSession", sessionBody, token);
         String uploadUrl = session.getString("uploadUrl");
 
