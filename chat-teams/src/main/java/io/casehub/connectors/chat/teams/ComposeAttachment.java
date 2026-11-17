@@ -85,13 +85,15 @@ public final class ComposeAttachment {
         }
     }
 
+    private record CardAction(String type, String title, String value) {}
+
     public static final class CardBuilder {
         private final String         contentType;
         private final String         title;
         private final String         subtitle;
         private final String         imageUrl;
-        private       List<String[]> buttons;
-        private       String[]       tap;
+        private       List<CardAction> buttons;
+        private       CardAction       tap;
 
         CardBuilder(String contentType, String title, String subtitle, String imageUrl) {
             this.contentType = contentType;
@@ -107,7 +109,7 @@ public final class ComposeAttachment {
             if (buttons == null) {
                 buttons = new ArrayList<>();
             }
-            buttons.add(new String[]{type, title, value});
+            buttons.add(new CardAction(type, title, value));
             return this;
         }
 
@@ -115,7 +117,7 @@ public final class ComposeAttachment {
             Objects.requireNonNull(type, "type");
             Objects.requireNonNull(title, "title");
             Objects.requireNonNull(value, "value");
-            this.tap = new String[]{type, title, value};
+            this.tap = new CardAction(type, title, value);
             return this;
         }
 
@@ -125,17 +127,17 @@ public final class ComposeAttachment {
                 var buttonsArray = Json.createArrayBuilder();
                 for (var b : buttons) {
                     buttonsArray.add(Json.createObjectBuilder()
-                                         .add("type", b[0])
-                                         .add("title", b[1])
-                                         .add("value", b[2]));
+                                         .add("type", b.type())
+                                         .add("title", b.title())
+                                         .add("value", b.value()));
                 }
                 content.add("buttons", buttonsArray);
             }
             if (tap != null) {
                 content.add("tap", Json.createObjectBuilder()
-                                       .add("type", tap[0])
-                                       .add("title", tap[1])
-                                       .add("value", tap[2]));
+                                       .add("type", tap.type())
+                                       .add("title", tap.title())
+                                       .add("value", tap.value()));
             }
             return Json.createObjectBuilder()
                        .add("contentType", contentType)
