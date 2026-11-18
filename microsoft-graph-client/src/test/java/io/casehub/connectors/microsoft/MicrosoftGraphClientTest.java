@@ -1,12 +1,13 @@
 package io.casehub.connectors.microsoft;
 
 import jakarta.json.Json;
-import jakarta.json.JsonObject;
 import org.junit.jupiter.api.Test;
 
 import java.util.NoSuchElementException;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class MicrosoftGraphClientTest {
 
@@ -142,6 +143,42 @@ class MicrosoftGraphClientTest {
                 json -> json.getString("id"), null))
                 .isInstanceOf(io.casehub.connectors.ProviderAuthException.class);
     }
+
+
+    @Test
+    void toUriEncodesSpacesInPath() {
+        var uri = MicrosoftGraphClient.toUri("https://graph.microsoft.com/v1.0/me/drive/root:/Documents/my file.docx:/content");
+        assertThat(uri.toString()).contains("my%20file.docx");
+        assertThat(uri.getScheme()).isEqualTo("https");
+        assertThat(uri.getAuthority()).isEqualTo("graph.microsoft.com");
+    }
+
+    @Test
+    void toUriPreservesQueryParameters() {
+        var uri = MicrosoftGraphClient.toUri("https://graph.microsoft.com/v1.0/me/messages?$skip=10&$top=25");
+        assertThat(uri.getQuery()).isEqualTo("$skip=10&$top=25");
+        assertThat(uri.getPath()).isEqualTo("/v1.0/me/messages");
+    }
+
+    @Test
+    void toUriHandlesFragment() {
+        var uri = MicrosoftGraphClient.toUri("https://graph.microsoft.com/v1.0/me/messages#section1");
+        assertThat(uri.getFragment()).isEqualTo("section1");
+        assertThat(uri.getPath()).isEqualTo("/v1.0/me/messages");
+    }
+
+    @Test
+    void toUriHandlesPercentInFilename() {
+        var uri = MicrosoftGraphClient.toUri("https://graph.microsoft.com/v1.0/me/drive/root:/Reports/100%25 complete.docx:/content");
+        assertThat(uri.getRawPath()).contains("100%2525%20complete.docx");
+    }
+
+    @Test
+    void toUriHandlesSimplePath() {
+        var uri = MicrosoftGraphClient.toUri("https://graph.microsoft.com/v1.0/me/messages");
+        assertThat(uri.toString()).isEqualTo("https://graph.microsoft.com/v1.0/me/messages");
+    }
+
 
     private static MicrosoftGraphClient clientReturning(int status, String body) {
         return new MicrosoftGraphClient(request -> new StubHttpResponse(status, body));

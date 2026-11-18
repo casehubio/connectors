@@ -69,7 +69,7 @@ public class MicrosoftGraphClient {
     }
 
     public byte[] getBytes(String path, String accessToken) {
-        var request = HttpRequest.newBuilder(URI.create(BASE_URL + path))
+        var request = HttpRequest.newBuilder(toUri(BASE_URL + path))
                 .header("Authorization", "Bearer " + accessToken)
                 .GET().build();
         try {
@@ -88,7 +88,7 @@ public class MicrosoftGraphClient {
 
     public void putBytes(String path, byte[] body, String contentType,
             String accessToken) {
-        var request = HttpRequest.newBuilder(URI.create(BASE_URL + path))
+        var request = HttpRequest.newBuilder(toUri(BASE_URL + path))
                 .header("Authorization", "Bearer " + accessToken)
                 .header("Content-Type", contentType)
                 .PUT(HttpRequest.BodyPublishers.ofByteArray(body))
@@ -112,7 +112,7 @@ public class MicrosoftGraphClient {
     }
 
     public HttpResponse<byte[]> getRaw(String path, String accessToken) {
-        var request = HttpRequest.newBuilder(URI.create(BASE_URL + path))
+        var request = HttpRequest.newBuilder(toUri(BASE_URL + path))
                 .header("Authorization", "Bearer " + accessToken)
                 .GET().build();
         try {
@@ -199,9 +199,27 @@ public class MicrosoftGraphClient {
 
     public static URI toUri(String rawUrl) {
         try {
-            var parsed = new java.net.URL(rawUrl);
-            return new URI(parsed.getProtocol(), parsed.getAuthority(),
-                           parsed.getPath(), parsed.getQuery(), parsed.getRef());
+            int schemeEnd = rawUrl.indexOf("://");
+            if (schemeEnd < 0) {return URI.create(rawUrl);}
+            String scheme         = rawUrl.substring(0, schemeEnd);
+            int    authorityStart = schemeEnd + 3;
+            int    pathStart      = rawUrl.indexOf('/', authorityStart);
+            if (pathStart < 0) {return URI.create(rawUrl);}
+            String authority   = rawUrl.substring(authorityStart, pathStart);
+            String rest        = rawUrl.substring(pathStart);
+            String fragment    = null;
+            int    fragmentIdx = rest.indexOf('#');
+            if (fragmentIdx >= 0) {
+                fragment = rest.substring(fragmentIdx + 1);
+                rest     = rest.substring(0, fragmentIdx);
+            }
+            String query    = null;
+            int    queryIdx = rest.indexOf('?');
+            if (queryIdx >= 0) {
+                query = rest.substring(queryIdx + 1);
+                rest  = rest.substring(0, queryIdx);
+            }
+            return new URI(scheme, authority, rest, query, fragment);
         } catch (Exception e) {
             return URI.create(rawUrl);
         }
