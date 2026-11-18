@@ -25,12 +25,14 @@ steps:
 
   # 2. Send reference numbers via SMS (second factor)
   - mobile-send-sms:
+      platform: ref
       to: "+447700100001"
-      message: "Joint account authorisation ref: TX-7429. Please include this reference in your verbal confirmation."
+      body: "Joint account authorisation ref: TX-7429. Please include this reference in your verbal confirmation."
 
   - mobile-send-sms:
+      platform: ref
       to: "+447700100002"
-      message: "Joint account authorisation ref: TX-7429. Please include this reference in your verbal confirmation."
+      body: "Joint account authorisation ref: TX-7429. Please include this reference in your verbal confirmation."
 
   # 3. Receive confirmation messages (must include the reference number)
   - tts-synthesise:
