@@ -86,4 +86,52 @@ class TextToSpeechContractTest {
         assertThat(result.audioFormat()).isEqualTo("wav");
         assertThat(result.phonemes()).isEmpty();
     }
+
+    @Test
+    void synthesisResultTwoArgConstructorHasEmptyMarks() {
+        final var result = new SynthesisResult(new byte[]{1}, "wav");
+        assertThat(result.marks()).isEmpty();
+    }
+
+    @Test
+    void synthesisResultThreeArgConstructorHasEmptyMarks() {
+        final var result = new SynthesisResult(new byte[]{1}, "wav", List.of());
+        assertThat(result.marks()).isEmpty();
+    }
+
+    @Test
+    void synthesisResultDefensiveCopiesMarks() {
+        final var marks = new java.util.ArrayList<>(List.of(
+                new io.casehub.connectors.voice.model.MarkTiming("w1", 100)));
+        final var result = new SynthesisResult(new byte[]{1}, "wav", List.of(), marks);
+        marks.clear();
+        assertThat(result.marks()).hasSize(1);
+    }
+
+    @Test
+    void synthesisResultNullMarksBecomesEmptyList() {
+        final var result = new SynthesisResult(new byte[]{1}, "wav", List.of(), null);
+        assertThat(result.marks()).isEmpty();
+    }
+
+    @Test
+    void synthesisOptionsDefaultsHasEmptyMarks() {
+        assertThat(SynthesisOptions.defaults().marks()).isEmpty();
+    }
+
+    @Test
+    void synthesisOptionsFourArgConstructorHasEmptyMarks() {
+        final var opts = new SynthesisOptions("v1", "en", "wav", false);
+        assertThat(opts.marks()).isEmpty();
+    }
+
+    @Test
+    void synthesisOptionsDefensiveCopiesMarks() {
+        final var marks = new java.util.ArrayList<>(List.of(
+                new io.casehub.connectors.voice.model.TextMark("w1", 5)));
+        final var opts = new SynthesisOptions("v1", "en", "wav", false, marks);
+        marks.clear();
+        assertThat(opts.marks()).hasSize(1);
+    }
+
 }

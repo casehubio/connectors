@@ -34,6 +34,6 @@ public final class LipSyncEnricher implements TextToSpeech {
             return result;
         }
         List<PhonemeTiming> timing = aligner.align(text, result.audioData(), sampleRate);
-        return new SynthesisResult(result.audioData(), result.audioFormat(), timing);
+        return new SynthesisResult(result.audioData(), result.audioFormat(), timing, result.marks());
     }
 }

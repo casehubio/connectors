@@ -486,7 +486,7 @@ Depends on: `project-spi`, `github-client`, `quarkus-arc`.
 
 ### voice-spi
 
-`VoicePlatform` SPI with `@SimulationEligible` and 2 capability sub-interfaces: `SpeechToText` (transcribe audio from `byte[]` or `Path`, returns `TranscriptionResult` with text, language, confidence, optional `PhonemeTiming`), `TextToSpeech` (synthesise text to `SynthesisResult` with audio bytes, format, optional `PhonemeTiming` for lip-sync, optional `withVocabularyHint`). `VoicePlatformService` routing, `NoOpVoicePlatform` `@DefaultBean` fallback. `StreamingSpeechToText` interface for chunked audio processing.
+`VoicePlatform` SPI with `@SimulationEligible` and 2 capability sub-interfaces: `SpeechToText` (transcribe audio from `byte[]` or `Path`, returns `TranscriptionResult` with text, language, confidence, optional `PhonemeTiming`), `TextToSpeech` (synthesise text to `SynthesisResult` with audio bytes, format, optional `PhonemeTiming` for lip-sync, optional `MarkTiming` for SSML-style word-onset timing, optional `withVocabularyHint`). `VoicePlatformService` routing, `NoOpVoicePlatform` `@DefaultBean` fallback. `StreamingSpeechToText` interface for chunked audio processing. `LipSyncEnricher` decorator enriches phoneme timing via `PhonemeAligner`. `MarkTimingEnricher` decorator provides three-tier mark timing fallback (engine-native, phoneme-proportional, character-proportional) for gesture synchronisation.
 
 Package: `io.casehub.connectors.voice.spi`, model records in `io.casehub.connectors.voice.model`.
 
