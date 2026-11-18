@@ -19,10 +19,18 @@ class BotFrameworkClient {
 
     private final ServiceConnectionProvider connectionProvider;
     private final List<String> allowedHostPatterns;
+    private final List<String> allowedAttachmentHostPatterns;
+
 
     BotFrameworkClient(ServiceConnectionProvider connectionProvider, String serviceUrlAllowlist) {
-        this.connectionProvider = connectionProvider;
-        this.allowedHostPatterns = List.of(serviceUrlAllowlist.split(","));
+        this(connectionProvider, serviceUrlAllowlist, serviceUrlAllowlist);
+    }
+
+    BotFrameworkClient(ServiceConnectionProvider connectionProvider,
+                       String serviceUrlAllowlist, String attachmentUrlAllowlist) {
+        this.connectionProvider            = connectionProvider;
+        this.allowedHostPatterns           = List.of(serviceUrlAllowlist.split(","));
+        this.allowedAttachmentHostPatterns = List.of(attachmentUrlAllowlist.split(","));
     }
 
     String replyToActivity(String serviceUrl, String conversationId,
@@ -74,7 +82,12 @@ class BotFrameworkClient {
 
     io.casehub.connectors.Attachment downloadAttachment(String contentUrl, String contentType, String name) {
         try {
-            URI    uri   = URI.create(contentUrl);
+            URI    uri  = URI.create(contentUrl);
+            String host = uri.getHost();
+            if (host == null || !matchesHostPatterns(host, allowedAttachmentHostPatterns)) {
+                LOG.warning("teams-bot: attachment URL host rejected (SSRF defense) — " + contentUrl);
+                return null;
+            }
             String token = resolveToken();
             var request = HttpRequest.newBuilder()
                                      .uri(uri)
@@ -98,23 +111,16 @@ class BotFrameworkClient {
 
     void validateServiceUrl(String serviceUrl) {
         try {
-            URI uri = URI.create(serviceUrl);
+            URI    uri  = URI.create(serviceUrl);
             String host = uri.getHost();
             if (host == null) {
                 throw new IllegalArgumentException(
                         "teams-bot: no host in serviceUrl: " + serviceUrl);
             }
-            for (String pattern : allowedHostPatterns) {
-                String p = pattern.trim();
-                if (p.startsWith("*.")) {
-                    String suffix = p.substring(1);
-                    if (host.endsWith(suffix) || host.equals(p.substring(2))) return;
-                } else {
-                    if (host.equals(p)) return;
-                }
+            if (!matchesHostPatterns(host, allowedHostPatterns)) {
+                throw new IllegalArgumentException(
+                        "teams-bot: serviceUrl host not in allowlist: " + host);
             }
-            throw new IllegalArgumentException(
-                    "teams-bot: serviceUrl host not in allowlist: " + host);
         } catch (IllegalArgumentException e) {
             throw e;
         } catch (Exception e) {
@@ -151,6 +157,20 @@ class BotFrameworkClient {
         if (connectionProvider == null) return "test-token";
         return connectionProvider.getAccessToken(TeamsChatPlatform.APPLICATION_ACTOR,
                 "microsoft-bot", "default").accessToken();
+    }
+
+
+    static boolean matchesHostPatterns(String host, List<String> patterns) {
+        for (String pattern : patterns) {
+            String p = pattern.trim();
+            if (p.startsWith("*.")) {
+                String suffix = p.substring(1);
+                if (host.endsWith(suffix) || host.equals(p.substring(2))) {return true;}
+            } else {
+                if (host.equals(p)) {return true;}
+            }
+        }
+        return false;
     }
 
     private static String stripTrailingSlash(String url) {

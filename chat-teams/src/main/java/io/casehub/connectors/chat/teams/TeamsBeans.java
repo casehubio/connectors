@@ -33,13 +33,15 @@ public class TeamsBeans {
                                    @ConfigProperty(name = "casehub.connectors.teams-bot.default-tenant-id",
                                                    defaultValue = "") String defaultTenantId,
                                    @ConfigProperty(name = "casehub.connectors.teams-bot.app-id",
-                                                   defaultValue = "") String appId) {
+                                                   defaultValue = "") String appId,
+                                   @ConfigProperty(name = "casehub.connectors.teams-bot.attachment-url-allowlist",
+                                                   defaultValue = "*.sharepoint.com,graph.microsoft.com,*.botframework.com,smba.trafficmanager.net") String attachmentAllowlist) {
         var builder = new TeamsChatPlatform(new TeamsClient(graph), connectionProvider,
                                             defaultTeamId)
                               .withCommands(teamsCommands)
                               .withConversationReferenceStore(conversationReferenceStore);
         if (!defaultServiceUrl.isBlank()) {
-            var botClient = new BotFrameworkClient(connectionProvider, allowlist);
+            var botClient = new BotFrameworkClient(connectionProvider, allowlist, attachmentAllowlist);
             builder.withBotClient(botClient, defaultServiceUrl);
         }
         if (!defaultTenantId.isBlank() && !appId.isBlank()) {
@@ -71,12 +73,14 @@ public class TeamsBeans {
                             defaultValue = "https://login.botframework.com/v1/.well-known/openidconfiguration") String metadataUrl,
             @ConfigProperty(name = "casehub.connectors.teams-bot.issuer",
                             defaultValue = "https://api.botframework.com") String issuer,
+            @ConfigProperty(name = "casehub.connectors.teams-bot.attachment-url-allowlist",
+                            defaultValue = "*.sharepoint.com,graph.microsoft.com,*.botframework.com,smba.trafficmanager.net") String attachmentAllowlist,
             io.casehub.connectors.chat.command.CommandService commandService,
             ServiceConnectionProvider connectionProvider,
             ConversationReferenceStore conversationReferenceStore,
             InvokeService invokeService) {
         var auth   = new BotFrameworkAuth(appId, devMode, metadataUrl, issuer);
-        var client = new BotFrameworkClient(connectionProvider, allowlist);
+        var client = new BotFrameworkClient(connectionProvider, allowlist, attachmentAllowlist);
         return new TeamsInboundConnector(auth, client, commandService, appId,
                 conversationReferenceStore, invokeService);
     }
