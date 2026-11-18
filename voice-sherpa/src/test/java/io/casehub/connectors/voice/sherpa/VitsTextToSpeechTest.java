@@ -1,9 +1,11 @@
 package io.casehub.connectors.voice.sherpa;
 
 import io.casehub.connectors.voice.model.SynthesisOptions;
+import io.casehub.connectors.voice.model.TextMark;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIf;
 
+import java.util.List;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -79,6 +81,37 @@ class VitsTextToSpeechTest {
             assertThat(result.phonemes()).isEmpty();
         }
     }
+
+    @Test
+    void synthesise_withMarks_returnsGuardedExactTimings() throws Exception {
+        try (var tts = createTts()) {
+            var marks = List.of(
+                    new TextMark("hello", 0),
+                    new TextMark("world", 6));
+            var options = new SynthesisOptions(null, null, "wav", false, marks);
+            var result  = tts.synthesise("hello world", options);
+
+            assertThat(result.marks()).hasSize(2);
+            assertThat(result.marks().get(0).id()).isEqualTo("hello");
+            assertThat(result.marks().get(0).offsetMs()).isGreaterThanOrEqualTo(0);
+            assertThat(result.marks().get(1).id()).isEqualTo("world");
+            assertThat(result.marks().get(1).offsetMs()).isGreaterThan(result.marks().get(0).offsetMs());
+        }
+    }
+
+    @Test
+    void synthesise_withMarks_andPhonemes_returnsBoth() throws Exception {
+        try (var tts = createTts()) {
+            var marks   = List.of(new TextMark("world", 6));
+            var options = new SynthesisOptions(null, null, "wav", true, marks);
+            var result  = tts.synthesise("hello world", options);
+
+            assertThat(result.phonemes()).isNotEmpty();
+            assertThat(result.marks()).hasSize(1);
+            assertThat(result.marks().getFirst().id()).isEqualTo("world");
+        }
+    }
+
 
     @Test
     void synthesise_multipleCallsReusesSession() throws Exception {
