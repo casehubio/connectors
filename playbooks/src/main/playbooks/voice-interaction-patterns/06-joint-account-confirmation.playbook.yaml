@@ -13,6 +13,7 @@ steps:
   - speaker register:
       name: Alice Smith
       audio: ${aliceSample.audio-data}
+      supported-sample-rates: [16000, 24000]
 
   - tts-synthesise:
       text: Hello, I am Bob
@@ -22,6 +23,7 @@ steps:
   - speaker register:
       name: Bob Smith
       audio: ${bobSample.audio-data}
+      supported-sample-rates: [16000, 24000]
 
   # 2. Send reference numbers via SMS (second factor)
   - mobile-send-sms:
@@ -57,10 +59,12 @@ steps:
   # 5. Identify speakers (factor 1: voice biometrics)
   - speaker identify:
       audio: ${aliceClean.audio-data}
+      supported-sample-rates: [16000, 24000]
     capture: aliceId
 
   - speaker identify:
       audio: ${bobClean.audio-data}
+      supported-sample-rates: [16000, 24000]
     capture: bobId
 
   # 6. Join and transcribe (always — needed for audit and reference check)

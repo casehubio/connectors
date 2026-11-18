@@ -30,6 +30,7 @@ steps:
     - speaker register:
         name: ${var.alice-name}
         audio: ${aliceSample.audio-data}
+        supported-sample-rates: [16000, 24000]
     - tts-synthesise:
         text: "Hello, I am ${var.bob-name}, joint account holder"
         voice: ${var.bob-voice}
@@ -37,6 +38,7 @@ steps:
     - speaker register:
         name: ${var.bob-name}
         audio: ${bobSample.audio-data}
+        supported-sample-rates: [16000, 24000]
 
   alice-confirms:
     - tts-synthesise:
@@ -59,9 +61,11 @@ steps:
       capture: secondClean
     - speaker identify:
         audio: ${aliceClean.audio-data}
+        supported-sample-rates: [16000, 24000]
       capture: aliceId
     - speaker identify:
         audio: ${secondClean.audio-data}
+        supported-sample-rates: [16000, 24000]
       capture: secondId
     - audio join:
         first: ${aliceClean.audio-data}

@@ -13,6 +13,7 @@ steps:
   - speaker register:
       name: Bob Smith
       audio: ${bobSample.audio-data}
+      supported-sample-rates: [16000, 24000]
 
   # 2. Attacker uses cloned voice (same bm_daniel voice) to impersonate Bob
   - tts-synthesise:
@@ -29,6 +30,7 @@ steps:
   #    The cloned voice matches Bob's voiceprint
   - speaker identify:
       audio: ${attackerClean.audio-data}
+      supported-sample-rates: [16000, 24000]
     capture: speakerId
 
   # 5. Transcribe for audit

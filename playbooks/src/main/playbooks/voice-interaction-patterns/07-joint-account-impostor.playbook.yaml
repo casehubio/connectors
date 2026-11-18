@@ -13,6 +13,7 @@ steps:
   - speaker register:
       name: Alice Smith
       audio: ${aliceSample.audio-data}
+      supported-sample-rates: [16000, 24000]
 
   - tts-synthesise:
       text: Hello, I am Bob Smith, joint account holder
@@ -22,6 +23,7 @@ steps:
   - speaker register:
       name: Bob Smith
       audio: ${bobSample.audio-data}
+      supported-sample-rates: [16000, 24000]
 
   # 2. Alice confirms legitimately as herself
   - tts-synthesise:
@@ -47,10 +49,12 @@ steps:
   # 5. Identify speakers
   - speaker identify:
       audio: ${aliceClean.audio-data}
+      supported-sample-rates: [16000, 24000]
     capture: aliceId
 
   - speaker identify:
       audio: ${impostorClean.audio-data}
+      supported-sample-rates: [16000, 24000]
     capture: impostorId
 
   # 6. Join and transcribe for audit trail

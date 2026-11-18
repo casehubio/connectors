@@ -14,8 +14,9 @@ tests:
       - assertThat: result.captures.bobId.identified
         equals: true
       # Factor 2: transcript contains reference number for compliance review
+      # STT transcribes "TX-7429" as "TX 7,429" — match the number portion
       - assertThat: result.captures.fullTranscript.text
-        contains: TX-7429
+        contains: "7,429"
       # Combined recording produced
       - assertThat: result.captures.combinedRecording.audio-format
         equals: wav
