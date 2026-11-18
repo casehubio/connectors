@@ -113,4 +113,32 @@ class BotFrameworkClientTest {
                                                  "application/pdf", "file.pdf");
         assertThat(result).isNull();
     }
+
+    @Test
+    void checkResponse_429_throwsRateLimited() {
+        assertThatThrownBy(() -> {
+            throw BotFrameworkClient.checkResponse(429, "/v3/conversations", "rate limited");
+        }).isInstanceOf(io.casehub.connectors.ProviderRateLimitedException.class);
+    }
+
+    @Test
+    void checkResponse_401_throwsAuthException() {
+        assertThatThrownBy(() -> {
+            throw BotFrameworkClient.checkResponse(401, "/v3/conversations", "unauthorized");
+        }).isInstanceOf(io.casehub.connectors.ProviderAuthException.class);
+    }
+
+    @Test
+    void checkResponse_403_throwsAuthForbidden() {
+        var ex = BotFrameworkClient.checkResponse(403, "/v3/conversations", "forbidden");
+        assertThat(ex).isInstanceOf(io.casehub.connectors.ProviderAuthException.class);
+    }
+
+    @Test
+    void checkResponse_500_throwsProviderApiException() {
+        var ex = BotFrameworkClient.checkResponse(500, "/v3/conversations", "internal error");
+        assertThat(ex).isInstanceOf(io.casehub.connectors.ProviderApiException.class);
+        assertThat(((io.casehub.connectors.ProviderApiException) ex).statusCode()).isEqualTo(500);
+    }
+
 }

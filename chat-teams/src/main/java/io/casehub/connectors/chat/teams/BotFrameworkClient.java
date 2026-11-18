@@ -141,8 +141,7 @@ class BotFrameworkClient {
             var response = HttpHelper.CLIENT.send(request,
                                                   HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() < 200 || response.statusCode() >= 300) {
-                throw new RuntimeException("teams-bot: outbound call failed: "
-                                           + response.statusCode() + " " + url + " body: " + response.body());
+                throw checkResponse(response.statusCode(), url, response.body());
             }
             return response.body();
         } catch (RuntimeException e) {
@@ -150,6 +149,11 @@ class BotFrameworkClient {
         } catch (Exception e) {
             throw new RuntimeException("teams-bot: outbound call failed: " + url, e);
         }
+    }
+
+    static RuntimeException checkResponse(int statusCode, String url, String body) {
+        return io.casehub.connectors.ProviderErrorMapping.mapStatusCode(
+                statusCode, body, "microsoft-bot", null);
     }
 
 
