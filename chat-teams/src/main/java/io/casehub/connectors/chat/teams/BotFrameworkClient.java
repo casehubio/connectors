@@ -123,26 +123,6 @@ class BotFrameworkClient {
         }
     }
 
-    private void postJson(String url, String body) {
-        try {
-            String token = resolveToken();
-            var request = HttpRequest.newBuilder()
-                    .uri(URI.create(url))
-                    .header("Content-Type", "application/json")
-                    .header("Authorization", "Bearer " + token)
-                    .POST(HttpRequest.BodyPublishers.ofString(body, StandardCharsets.UTF_8))
-                    .build();
-            var response = HttpHelper.CLIENT.send(request,
-                    HttpResponse.BodyHandlers.ofString());
-            if (response.statusCode() < 200 || response.statusCode() >= 300) {
-                LOG.warning("teams-bot: outbound call failed: " + response.statusCode()
-                        + " " + url);
-            }
-        } catch (Exception e) {
-            LOG.log(Level.WARNING, "teams-bot: outbound call failed: " + url, e);
-        }
-    }
-
     String postJsonWithResponse(String url, String body) {
         try {
             String token = resolveToken();

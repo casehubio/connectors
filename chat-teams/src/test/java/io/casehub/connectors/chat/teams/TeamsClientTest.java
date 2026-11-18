@@ -70,6 +70,19 @@ class TeamsClientTest {
     }
 
     @Test
+    void uploadToChannelFolder_emptyContent_throwsIllegalArgument() {
+        var graph  = new MicrosoftGraphClient(request -> new StubHttpResponse(200, "{}"));
+        var client = new TeamsClient(graph);
+
+        org.assertj.core.api.Assertions.assertThatThrownBy(() ->
+                                                                   client.uploadToChannelFolder("drive-1", "folder-1", "empty.pdf",
+                                                                                                "application/pdf", new byte[0], "token"))
+                                       .isInstanceOf(IllegalArgumentException.class)
+                                       .hasMessageContaining("empty");
+    }
+
+
+    @Test
     void uploadToChannelFolderResumablePathUsesUploadSessionWithoutAuthHeader() {
         int    bigSize    = 6 * 1024 * 1024; // 6MB > CHUNK_SIZE (5,242,880) forces 2 chunks
         byte[] bigContent = new byte[bigSize];

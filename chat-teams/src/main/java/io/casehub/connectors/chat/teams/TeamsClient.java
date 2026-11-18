@@ -128,6 +128,9 @@ class TeamsClient {
 
     JsonObject uploadToChannelFolder(String driveId, String folderId, String filename,
                                      String contentType, byte[] content, String token) {
+        if (content.length == 0) {
+            throw new IllegalArgumentException("Attachment content is empty: " + filename);
+        }
         String encodedName = URLEncoder.encode(filename, StandardCharsets.UTF_8).replace("+", "%20");
         if (content.length <= SIMPLE_UPLOAD_LIMIT) {
             return uploadSimple(driveId, folderId, encodedName, contentType, content, token);
