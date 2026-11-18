@@ -8,6 +8,7 @@ import io.casehub.connectors.chat.model.ChatChannelRef;
 import io.casehub.connectors.chat.model.ChatContent;
 import io.casehub.connectors.graphql.dto.ChannelInfo;
 import io.casehub.connectors.graphql.dto.OperationResult;
+import io.casehub.platform.api.mcp.GeneratePlugin;
 import io.casehub.platform.api.mcp.McpDomain;
 import io.casehub.platform.api.mcp.PlatformMutation;
 import io.casehub.platform.api.mcp.PlatformQuery;
@@ -66,6 +67,7 @@ public class ConnectorChatApi {
         }
     }
 
+    @GeneratePlugin(exclude = true)
     @PlatformQuery("Discover channels across all connectors")
     @RestPath("/discover")
     public List<ChannelInfo> listChannels() {
