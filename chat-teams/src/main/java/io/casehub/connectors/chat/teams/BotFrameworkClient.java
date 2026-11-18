@@ -202,7 +202,7 @@ class BotFrameworkClient {
 
     static RuntimeException checkResponse(int statusCode, String url, String body) {
         return io.casehub.connectors.ProviderErrorMapping.mapStatusCode(
-                statusCode, body, "microsoft-bot", null);
+                statusCode, url + " — " + body, "microsoft-bot", null);
     }
 
 

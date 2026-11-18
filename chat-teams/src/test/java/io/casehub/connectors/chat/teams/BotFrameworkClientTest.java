@@ -168,4 +168,12 @@ class BotFrameworkClientTest {
         assertThat(((io.casehub.connectors.ProviderApiException) ex).statusCode()).isEqualTo(500);
     }
 
+    @Test
+    void checkResponse_includesUrlInMessage() {
+        var ex = BotFrameworkClient.checkResponse(500, "https://smba.trafficmanager.net/v3/conv", "server error");
+        assertThat(ex).isInstanceOf(io.casehub.connectors.ProviderApiException.class);
+        assertThat(ex.getMessage()).contains("smba.trafficmanager.net");
+    }
+
+
 }
