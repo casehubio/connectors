@@ -12,7 +12,7 @@ class SttTranscribePluginTest {
 
     @Test
     void transcribesAudioViaVoicePlatform() {
-        var                 plugin = new SttTranscribePlugin(null, null);
+        var                 plugin = new SttTranscribePlugin(null, null, null);
         TranscriptionResult result = plugin.apply(new byte[]{1, 2, 3}, routing);
         assertThat(result.text()).isNotBlank();
         assertThat(result.language()).isEqualTo("en");
@@ -21,8 +21,16 @@ class SttTranscribePluginTest {
 
     @Test
     void passesLanguageHint() {
-        var                 plugin = new SttTranscribePlugin("fr", null);
+        var                 plugin = new SttTranscribePlugin("fr", null, null);
         TranscriptionResult result = plugin.apply(new byte[]{1, 2, 3}, routing);
         assertThat(result).isNotNull();
+    }
+
+    @Test
+    void passesVocabularyHint() {
+        var                 plugin = new SttTranscribePlugin("en", null, "cardiology aortic stenosis");
+        TranscriptionResult result = plugin.apply(new byte[]{1, 2, 3}, routing);
+        assertThat(result).isNotNull();
+        assertThat(result.text()).isNotBlank();
     }
 }

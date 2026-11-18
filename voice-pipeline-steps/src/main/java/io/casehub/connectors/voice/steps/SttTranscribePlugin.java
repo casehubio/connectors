@@ -11,7 +11,8 @@ import io.casehub.yaml.plugin.api.Plugin;
         description = "Transcribe audio bytes to text via VoicePlatform STT")
 public record SttTranscribePlugin(
         @Optional String language,
-        @Optional String model) {
+        @Optional String model,
+        @Optional String vocabularyHint) {
 
     @Execute
     public TranscriptionResult apply(byte[] audio, RoutingVoicePlatformService routing) {
@@ -19,10 +20,13 @@ public record SttTranscribePlugin(
             var resolved = routing.resolve(model);
             var options = TranscriptionOptions.defaults()
                                               .withLanguageHint(language)
-                                              .withModelSize(resolved.descriptor().voiceId());
+                                              .withModelSize(resolved.descriptor().voiceId())
+                                              .withVocabularyHint(vocabularyHint);
             return resolved.platform().speechToText().transcribe(audio, options);
         }
-        var options = TranscriptionOptions.defaults().withLanguageHint(language);
+        var options = TranscriptionOptions.defaults()
+                                          .withLanguageHint(language)
+                                          .withVocabularyHint(vocabularyHint);
         return routing.defaultStt().speechToText().transcribe(audio, options);
     }
 }
