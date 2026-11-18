@@ -3,14 +3,16 @@ package io.casehub.connectors.it;
 import io.casehub.connectors.voice.config.VoiceManifestDefaults;
 import io.casehub.connectors.voice.model.SynthesisOptions;
 import io.casehub.connectors.voice.model.SynthesisResult;
+import io.casehub.connectors.voice.model.TextMark;
 import io.casehub.connectors.voice.model.TranscriptionOptions;
 import io.casehub.connectors.voice.model.TranscriptionResult;
 import io.casehub.connectors.voice.ref.ReferenceVoicePlatform;
+import io.casehub.connectors.voice.spi.MarkTimingEnricher;
 import io.casehub.connectors.voice.spi.NoOpVoicePlatform;
+import io.casehub.connectors.voice.spi.RoutingVoicePlatformService;
 import io.casehub.connectors.voice.spi.SpeechToText;
 import io.casehub.connectors.voice.spi.TextToSpeech;
 import io.casehub.connectors.voice.spi.VoicePlatform;
-import io.casehub.connectors.voice.spi.RoutingVoicePlatformService;
 import io.casehub.connectors.voice.spi.VoicePlatformService;
 import io.casehub.connectors.voice.steps.SttTranscribePlugin;
 import io.casehub.connectors.voice.steps.TtsSynthesisePlugin;
@@ -176,6 +178,66 @@ class VoiceRoundTripTest {
             assertThat(stt.text()).isNotBlank();
             assertThat(stt.confidence()).isEqualTo(0.95);
         }
+    }
+
+    @Test
+    void ttsWithMarksReturnsTimingsWithinAudioDuration() {
+        String text = "Hello world";
+        var marks = List.of(
+                new TextMark("start", 0),
+                new TextMark("mid", 6),
+                new TextMark("end", 11));
+        var options = new SynthesisOptions(null, "en", "wav", false, marks);
+
+        SynthesisResult result = platform.textToSpeech().synthesise(text, options);
+
+        assertThat(result.marks()).hasSize(3);
+        long durationMs = text.length() * 50L;
+        for (var timing : result.marks()) {
+            assertThat(timing.offsetMs()).isGreaterThanOrEqualTo(0);
+            assertThat(timing.offsetMs()).isLessThanOrEqualTo(durationMs);
+        }
+        assertThat(result.marks().get(0).id()).isEqualTo("start");
+        assertThat(result.marks().get(1).id()).isEqualTo("mid");
+        assertThat(result.marks().get(2).id()).isEqualTo("end");
+        assertThat(result.marks().get(0).offsetMs()).isLessThan(result.marks().get(1).offsetMs());
+        assertThat(result.marks().get(1).offsetMs()).isLessThan(result.marks().get(2).offsetMs());
+    }
+
+    @Test
+    void markTimingEnricherPassesThroughNativeMarks() {
+        String text = "Hello world";
+        var marks = List.of(
+                new TextMark("start", 0),
+                new TextMark("end", 11));
+        var options = new SynthesisOptions(null, "en", "wav", false, marks);
+
+        SynthesisResult nativeResult = platform.textToSpeech().synthesise(text, options);
+        assertThat(nativeResult.marks()).isNotEmpty();
+
+        TextToSpeech    enriched       = MarkTimingEnricher.wrap(platform.textToSpeech());
+        SynthesisResult enrichedResult = enriched.synthesise(text, options);
+
+        assertThat(enrichedResult.marks()).isEqualTo(nativeResult.marks());
+    }
+
+    @Test
+    void outOfBoundsCharOffsetClampedAtIntegrationLevel() {
+        String text    = "short";
+        var    marks   = List.of(new TextMark("past", 100));
+        var    options = new SynthesisOptions(null, "en", "wav", false, marks);
+
+        SynthesisResult result = platform.textToSpeech().synthesise(text, options);
+
+        assertThat(result.marks()).hasSize(1);
+        long durationMs = text.length() * 50L;
+        assertThat(result.marks().getFirst().offsetMs()).isEqualTo(durationMs);
+
+        TextToSpeech    enriched       = MarkTimingEnricher.wrap(platform.textToSpeech());
+        SynthesisResult enrichedResult = enriched.synthesise(text, options);
+
+        assertThat(enrichedResult.marks()).hasSize(1);
+        assertThat(enrichedResult.marks().getFirst().offsetMs()).isEqualTo(durationMs);
     }
 
     @Test
