@@ -1,7 +1,10 @@
 package io.casehub.connectors.voice.ref;
 
 import io.casehub.connectors.voice.model.SynthesisOptions;
+import io.casehub.connectors.voice.model.TextMark;
 import io.casehub.connectors.voice.model.TranscriptionOptions;
+
+import java.util.List;
 import io.casehub.connectors.voice.spi.SpeechToText;
 import io.casehub.connectors.voice.spi.TextToSpeech;
 import org.junit.jupiter.api.Test;
@@ -43,4 +46,33 @@ class ReferenceVoicePlatformTest {
                 .transcribe(synthesised.audioData(), TranscriptionOptions.defaults());
         assertThat(transcribed.text()).isEqualTo("hello world");
     }
+
+    @Test
+    void synthesiseWithMarksReturnsCharacterProportionalTimings() {
+        var marks = List.of(
+                new TextMark("start", 0),
+                new TextMark("mid", 5),
+                new TextMark("end", 10)
+                           );
+        var options = new SynthesisOptions(null, "en", "wav", false, marks);
+        var result  = platform.textToSpeech().synthesise("hello world", options);
+
+        assertThat(result.marks()).hasSize(3);
+        assertThat(result.marks().get(0).id()).isEqualTo("start");
+        assertThat(result.marks().get(0).offsetMs()).isZero();
+        assertThat(result.marks().get(1).id()).isEqualTo("mid");
+        assertThat(result.marks().get(1).offsetMs()).isEqualTo(250);
+        assertThat(result.marks().get(2).id()).isEqualTo("end");
+        assertThat(result.marks().get(2).offsetMs()).isEqualTo(500);
+    }
+
+    @Test
+    void synthesiseWithoutMarksReturnsNoTimings() {
+        var options = new SynthesisOptions(null, "en", "wav", false);
+        var result  = platform.textToSpeech().synthesise("hello world", options);
+
+        assertThat(result.marks()).isEmpty();
+    }
+
+
 }

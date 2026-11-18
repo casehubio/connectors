@@ -1,11 +1,15 @@
 package io.casehub.connectors.voice.ref;
 
+import io.casehub.connectors.voice.model.MarkTiming;
 import io.casehub.connectors.voice.model.SynthesisResult;
+import io.casehub.connectors.voice.model.TextMark;
 import io.casehub.connectors.voice.model.TranscriptionResult;
 import io.casehub.connectors.voice.spi.SpeechToText;
 import io.casehub.connectors.voice.spi.TextToSpeech;
 import io.casehub.connectors.voice.spi.VoicePlatform;
 import jakarta.enterprise.context.ApplicationScoped;
+
+import java.util.List;
 
 
 
@@ -78,7 +82,19 @@ public class ReferenceVoicePlatform implements VoicePlatform {
             wav[42] = (byte) (dataSize >> 16);
             wav[43] = (byte) (dataSize >> 24);
             System.arraycopy(payload, 0, wav, 44, payload.length);
-            return new SynthesisResult(wav, "wav");
+
+            List<MarkTiming> marks = List.of();
+            if (options != null && !options.marks().isEmpty() && !text.isEmpty()) {
+                long             durationMs = text.length() * 50L;
+                int              textLen    = text.length();
+                List<MarkTiming> computed   = new java.util.ArrayList<>(options.marks().size());
+                for (TextMark mark : options.marks()) {
+                    long offsetMs = (long) ((double) mark.charOffset() / textLen * durationMs);
+                    computed.add(new MarkTiming(mark.id(), offsetMs));
+                }
+                marks = List.copyOf(computed);
+            }
+            return new SynthesisResult(wav, "wav", List.of(), marks);
         };
     }
 
