@@ -1,25 +1,12 @@
 package io.casehub.connectors.email.google;
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
-import java.time.Instant;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Set;
-
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
+import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.gmail.Gmail;
 import com.google.auth.http.HttpCredentialsAdapter;
 import com.google.auth.oauth2.AccessToken;
 import com.google.auth.oauth2.GoogleCredentials;
-
-import org.jboss.logging.Logger;
-
 import io.casehub.connectors.Page;
 import io.casehub.connectors.PageRequest;
 import io.casehub.connectors.ProviderApiException;
@@ -30,8 +17,17 @@ import io.casehub.connectors.email.model.Mailbox;
 import io.casehub.connectors.email.spi.EmailPlatform;
 import io.casehub.platform.api.authn.RequiresScopes;
 import io.casehub.platform.api.authn.ServiceConnectionProvider;
+import org.jboss.logging.Logger;
 
-import java.util.Date;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.List;
+import java.util.Set;
 
 @RequiresScopes(provider = "google",
     scopes = {"https://www.googleapis.com/auth/gmail.readonly",
@@ -51,15 +47,23 @@ public class GoogleEmailPlatform implements EmailPlatform {
 
     private final ServiceConnectionProvider connectionProvider;
     private final Gmail overrideService;
+    private final NetHttpTransport transport;
+
 
     public GoogleEmailPlatform(ServiceConnectionProvider connectionProvider) {
         this.connectionProvider = connectionProvider;
-        this.overrideService = null;
+        this.overrideService    = null;
+        try {
+            this.transport = GoogleNetHttpTransport.newTrustedTransport();
+        } catch (GeneralSecurityException | IOException e) {
+            throw new RuntimeException("Failed to initialize HTTP transport", e);
+        }
     }
 
     GoogleEmailPlatform(Gmail gmailService) {
         this.connectionProvider = null;
-        this.overrideService = gmailService;
+        this.transport          = new NetHttpTransport();
+        this.overrideService    = gmailService;
     }
 
     @Override
@@ -78,15 +82,15 @@ public class GoogleEmailPlatform implements EmailPlatform {
 
     private Gmail buildService(String actorId) {
         var token = connectionProvider.getAccessToken(actorId, "google", DEFAULT_TENANCY);
-        var credentials = com.google.auth.oauth2.GoogleCredentials.create(
-            new com.google.auth.oauth2.AccessToken(token.accessToken(),
-                java.util.Date.from(token.expiresAt())));
+        var credentials = GoogleCredentials.create(
+                new AccessToken(token.accessToken(),
+                                java.util.Date.from(token.expiresAt())));
         return new Gmail.Builder(
-                new com.google.api.client.http.javanet.NetHttpTransport(),
-                com.google.api.client.json.gson.GsonFactory.getDefaultInstance(),
-                new com.google.auth.http.HttpCredentialsAdapter(credentials))
-            .setApplicationName("casehub-connectors")
-            .build();
+                transport,
+                GsonFactory.getDefaultInstance(),
+                new HttpCredentialsAdapter(credentials))
+                       .setApplicationName("casehub-connectors")
+                       .build();
     }
 
     private class GoogleEmailOperations implements EmailOperations {

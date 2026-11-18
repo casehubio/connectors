@@ -3,6 +3,7 @@ package io.casehub.connectors.document.google;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.client.http.ByteArrayContent;
+import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
@@ -11,12 +12,12 @@ import com.google.auth.http.HttpCredentialsAdapter;
 import com.google.auth.oauth2.AccessToken;
 import com.google.auth.oauth2.GoogleCredentials;
 import io.casehub.connectors.Page;
+import io.casehub.connectors.PageRequest;
 import io.casehub.connectors.ProviderApiException;
 import io.casehub.connectors.ProviderErrorMapping;
 import io.casehub.connectors.SyncRequest;
 import io.casehub.connectors.SyncResult;
 import io.casehub.connectors.SyncTokenExpiredException;
-import io.casehub.connectors.PageRequest;
 import io.casehub.connectors.document.model.DocumentMetadata;
 import io.casehub.connectors.document.model.DocumentSummary;
 import io.casehub.connectors.document.model.Folder;
@@ -32,7 +33,6 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @RequiresScopes(provider = "google",
     scopes = {"https://www.googleapis.com/auth/drive.readonly",
@@ -47,15 +47,23 @@ public class GoogleDocumentPlatform implements DocumentPlatform {
 
     private final ServiceConnectionProvider connectionProvider;
     private final Drive overrideService;
+    private final NetHttpTransport transport;
+
 
     public GoogleDocumentPlatform(ServiceConnectionProvider connectionProvider) {
         this.connectionProvider = connectionProvider;
-        this.overrideService = null;
+        this.overrideService    = null;
+        try {
+            this.transport = GoogleNetHttpTransport.newTrustedTransport();
+        } catch (GeneralSecurityException | IOException e) {
+            throw new RuntimeException("Failed to initialize HTTP transport", e);
+        }
     }
 
     GoogleDocumentPlatform(Drive driveService) {
         this.connectionProvider = null;
-        this.overrideService = driveService;
+        this.transport          = new NetHttpTransport();
+        this.overrideService    = driveService;
     }
 
     @Override
@@ -85,21 +93,21 @@ public class GoogleDocumentPlatform implements DocumentPlatform {
     }
 
     private Drive resolveService(String userId) {
-        if (overrideService != null) return overrideService;
+        if (overrideService != null) {return overrideService;}
         if (connectionProvider == null) {
             throw new IllegalStateException(
                     "Google Drive client not initialised — check credentials configuration");
         }
         var token = connectionProvider.getAccessToken(userId, "google", DEFAULT_TENANCY);
-        var credentials = com.google.auth.oauth2.GoogleCredentials.create(
-            new com.google.auth.oauth2.AccessToken(token.accessToken(),
-                java.util.Date.from(token.expiresAt())));
+        var credentials = GoogleCredentials.create(
+                new AccessToken(token.accessToken(),
+                                java.util.Date.from(token.expiresAt())));
         return new Drive.Builder(
-                new com.google.api.client.http.javanet.NetHttpTransport(),
-                com.google.api.client.json.gson.GsonFactory.getDefaultInstance(),
-                new com.google.auth.http.HttpCredentialsAdapter(credentials))
-            .setApplicationName("casehub-connectors")
-            .build();
+                transport,
+                GsonFactory.getDefaultInstance(),
+                new HttpCredentialsAdapter(credentials))
+                       .setApplicationName("casehub-connectors")
+                       .build();
     }
 
     static DocumentMetadata toMetadata(File file) {
