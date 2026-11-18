@@ -576,6 +576,13 @@ class TeamsChatPlatformTest {
                 }
 
                 @Override
+                String replyToActivity(String serviceUrl, String conversationId,
+                                       String activityId, String text) {
+                    botCalls.add("reply:" + conversationId + ":" + activityId + ":" + text);
+                    return "reply-" + activityId;
+                }
+
+                @Override
                 String createConversation(String serviceUrl, String botAppId,
                                           String aadObjectId, String tenantId) {
                     botCalls.add("create:" + aadObjectId);
@@ -643,5 +650,34 @@ class TeamsChatPlatformTest {
                                                           new ChatContent("Hello")))
                     .isInstanceOf(UnsupportedOperationException.class);
         }
+
+        @Test
+        void userChannel_reply_storeHit_repliesViaBot() {
+            store.store(new ConversationReference("aad-user-1", "existing-conv",
+                                                  "https://smba.trafficmanager.net/teams/", "tenant-1"));
+            var p          = buildProactivePlatform();
+            var channelRef = new ChatChannelRef("user:aad-user-1");
+            var parentRef  = new ChatMessageRef(channelRef, "act-42");
+            var result     = p.threading().reply(parentRef, new ChatContent("Reply to user"));
+            assertThat(result.ok()).isTrue();
+            assertThat(botCalls).containsExactly("reply:existing-conv:act-42:Reply to user");
+            assertThat(result.messageRef().channel().id()).startsWith("personal:");
+            assertThat(result.messageRef().messageId()).isEqualTo("reply-act-42");
+        }
+
+        @Test
+        void userChannel_reply_storeMiss_createsConversationThenReplies() {
+            var p          = buildProactivePlatform();
+            var channelRef = new ChatChannelRef("user:aad-user-1");
+            var parentRef  = new ChatMessageRef(channelRef, "act-99");
+            var result     = p.threading().reply(parentRef, new ChatContent("Cold reply"));
+            assertThat(result.ok()).isTrue();
+            assertThat(botCalls).containsExactly("create:aad-user-1",
+                                                 "reply:created-conv-for-aad-user-1:act-99:Cold reply");
+            assertThat(result.messageRef().channel().id()).isEqualTo("personal:created-conv-for-aad-user-1");
+            assertThat(store.find("aad-user-1")).isPresent();
+        }
+
+
     }
 }

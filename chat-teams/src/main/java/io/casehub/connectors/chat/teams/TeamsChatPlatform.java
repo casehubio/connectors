@@ -127,6 +127,9 @@ public class TeamsChatPlatform {
                                   new ChatMessageRef(parent.channel(), activityId),
                                   java.time.Instant.now(), null);
         }
+        if (isUserChannel(parent.channel().id())) {
+            return replyToUserChannel(extractAadObjectId(parent.channel().id()), parent, content);
+        }
         var tc = TeamsMapper.parseTeamAndChannel(parent.channel().id());
         return TokenRetry.withTokenRetry(this::resolveApplicationToken,
                                          token -> {
@@ -290,6 +293,42 @@ public class TeamsChatPlatform {
         }
 
         String activityId = botClient.sendToConversation(serviceUrl, conversationId, content.text());
+        return new SendResult(true,
+                              new ChatMessageRef(new ChatChannelRef("personal:" + conversationId), activityId),
+                              java.time.Instant.now(), null);
+    }
+
+    private SendResult replyToUserChannel(String aadObjectId, ChatMessageRef parent, ChatContent content) {
+        if (botClient == null || defaultServiceUrl == null || defaultServiceUrl.isBlank()) {
+            throw new UnsupportedOperationException(
+                    "User channel reply requires BotFrameworkClient and default service URL");
+        }
+        String serviceUrl     = defaultServiceUrl;
+        String conversationId = null;
+
+        if (conversationReferenceStore != null) {
+            var existing = conversationReferenceStore.find(aadObjectId);
+            if (existing.isPresent()) {
+                serviceUrl     = existing.get().serviceUrl();
+                conversationId = existing.get().conversationId();
+            }
+        }
+        if (conversationId == null) {
+            if (defaultTenantId == null || defaultTenantId.isBlank()
+                || botAppId == null || botAppId.isBlank()) {
+                throw new UnsupportedOperationException(
+                        "User channel reply cold-start requires default-tenant-id and app-id — "
+                        + "configure casehub.connectors.teams-bot properties");
+            }
+            conversationId = botClient.createConversation(serviceUrl, botAppId, aadObjectId, defaultTenantId);
+            if (conversationReferenceStore != null) {
+                conversationReferenceStore.store(
+                        new ConversationReference(aadObjectId, conversationId, serviceUrl, defaultTenantId));
+            }
+        }
+
+        String activityId = botClient.replyToActivity(serviceUrl, conversationId,
+                                                      parent.messageId(), content.text());
         return new SendResult(true,
                               new ChatMessageRef(new ChatChannelRef("personal:" + conversationId), activityId),
                               java.time.Instant.now(), null);
