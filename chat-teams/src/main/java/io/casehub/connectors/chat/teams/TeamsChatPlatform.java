@@ -155,6 +155,7 @@ public class TeamsChatPlatform {
     }
 
     private List<Member> listMembers(ChatChannelRef channel) {
+        if (isPersonalChannel(channel.id())) return List.of();
         var tc = TeamsMapper.parseTeamAndChannel(channel.id());
         return TokenRetry.withTokenRetry(this::resolveDelegatedToken,
                 token -> client.listMembers(tc[0], token).stream()
@@ -162,6 +163,7 @@ public class TeamsChatPlatform {
     }
 
     private List<ReceivedMessage> listMessageHistory(ChatChannelRef channel, Instant since) {
+        if (isPersonalChannel(channel.id())) return List.of();
         var tc = TeamsMapper.parseTeamAndChannel(channel.id());
         return TokenRetry.withTokenRetry(this::resolveApplicationToken,
                 token -> client.listMessages(tc[0], tc[1], token).stream()
@@ -378,6 +380,7 @@ public class TeamsChatPlatform {
     private class TeamsMemberManagement implements MemberManagement {
         @Override
         public void add(ChatChannelRef channel, Member member) {
+            if (isPersonalChannel(channel.id())) return;
             var tc = TeamsMapper.parseTeamAndChannel(channel.id());
             TokenRetry.withTokenRetryVoid(
                     TeamsChatPlatform.this::resolveDelegatedToken,
@@ -386,6 +389,7 @@ public class TeamsChatPlatform {
 
         @Override
         public void remove(ChatChannelRef channel, MemberRef member) {
+            if (isPersonalChannel(channel.id())) return;
             var tc = TeamsMapper.parseTeamAndChannel(channel.id());
             TokenRetry.withTokenRetryVoid(
                     TeamsChatPlatform.this::resolveDelegatedToken,
@@ -396,6 +400,7 @@ public class TeamsChatPlatform {
     private class TeamsReactions implements io.casehub.connectors.chat.spi.Reactions {
         @Override
         public void add(ChatMessageRef message, String emoji) {
+            if (isPersonalChannel(message.channel().id())) return;
             var tc = TeamsMapper.parseTeamAndChannel(message.channel().id());
             TokenRetry.withTokenRetryVoid(TeamsChatPlatform.this::resolveApplicationToken,
                                           token -> client.setReaction(tc[0], tc[1], message.messageId(), emoji, token));
@@ -403,6 +408,7 @@ public class TeamsChatPlatform {
 
         @Override
         public void remove(ChatMessageRef message, String emoji) {
+            if (isPersonalChannel(message.channel().id())) return;
             var tc = TeamsMapper.parseTeamAndChannel(message.channel().id());
             TokenRetry.withTokenRetryVoid(TeamsChatPlatform.this::resolveApplicationToken,
                                           token -> client.unsetReaction(tc[0], tc[1], message.messageId(), emoji, token));
@@ -410,6 +416,7 @@ public class TeamsChatPlatform {
 
         @Override
         public List<String> list(ChatMessageRef message) {
+            if (isPersonalChannel(message.channel().id())) return List.of();
             var tc = TeamsMapper.parseTeamAndChannel(message.channel().id());
             return TokenRetry.withTokenRetry(TeamsChatPlatform.this::resolveApplicationToken,
                                              token -> {
