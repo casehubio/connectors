@@ -213,6 +213,35 @@ class TeamsInboundTranslatorTest {
     }
 
     @Test
+    void htmlToMarkdown_nestedBoldItalic() {
+        String html = "<b><i>text</i></b>";
+        String md   = TeamsInboundTranslator.htmlToMarkdown(html);
+        assertThat(md).isEqualTo("***text***");
+    }
+
+    @Test
+    void htmlToMarkdown_nestedItalicInsideBold() {
+        String html = "<b>bold and <i>italic</i></b>";
+        String md   = TeamsInboundTranslator.htmlToMarkdown(html);
+        assertThat(md).isEqualTo("**bold and *italic***");
+    }
+
+    @Test
+    void htmlToMarkdown_linkWithBoldText() {
+        String html = "<a href=\"https://example.com\"><b>click</b></a>";
+        String md   = TeamsInboundTranslator.htmlToMarkdown(html);
+        assertThat(md).isEqualTo("[**click**](https://example.com)");
+    }
+
+    @Test
+    void htmlToMarkdown_nestedStrikethroughInsideBold() {
+        String html = "<b><del>removed</del> kept</b>";
+        String md   = TeamsInboundTranslator.htmlToMarkdown(html);
+        assertThat(md).isEqualTo("**~~removed~~ kept**");
+    }
+
+
+    @Test
     void htmlToPlainText_stripsAllTags() {
         String html  = "<p><b>bold</b> and <a href=\"url\">link</a></p>";
         String plain = TeamsInboundTranslator.htmlToPlainText(html);
