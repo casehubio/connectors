@@ -180,7 +180,7 @@ class MicrosoftGraphClientTest {
     }
 
     @Test
-    void toUriHandsHashInGraphDrivePath() {
+    void toUriHandlesHashInGraphDrivePath() {
         var uri = MicrosoftGraphClient.toUri("https://graph.microsoft.com/v1.0/me/drive/root:/Documents/file#1.docx:/content");
         assertThat(uri.getFragment()).isNull();
         assertThat(uri.getRawPath()).contains("file%231.docx");

@@ -124,6 +124,22 @@ class BotFrameworkClientTest {
         assertThat(result).isNull();
     }
 
+    @Test
+    void downloadAttachment_httpScheme_rejected() {
+        var result = client().downloadAttachment(
+                "http://graph.microsoft.com/v1.0/file",
+                "application/pdf", "file.pdf");
+        assertThat(result).isNull();
+    }
+
+    @Test
+    void validateServiceUrl_httpScheme_throws() {
+        assertThatThrownBy(() ->
+                                   client().validateServiceUrl("http://smba.trafficmanager.net/teams/"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("non-HTTPS");
+    }
+
 
     @Test
     void checkResponse_429_throwsRateLimited() {

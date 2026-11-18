@@ -4,9 +4,9 @@ import io.casehub.connectors.http.HttpHelper;
 import io.casehub.platform.api.authn.ServiceConnectionProvider;
 import jakarta.json.Json;
 
-import java.io.StringReader;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -97,6 +97,10 @@ class BotFrameworkClient {
         try {
             URI    uri  = URI.create(contentUrl);
             String host = uri.getHost();
+            if (!"https".equalsIgnoreCase(uri.getScheme())) {
+                LOG.warning("teams-bot: attachment URL rejected (non-HTTPS) — " + contentUrl);
+                return null;
+            }
             if (host == null || !matchesHostPatterns(host, allowedAttachmentHostPatterns)) {
                 LOG.warning("teams-bot: attachment URL host rejected (SSRF defense) — " + contentUrl);
                 return null;
@@ -110,20 +114,20 @@ class BotFrameworkClient {
                                      .build();
             var response = HttpHelper.CLIENT.send(request,
                                                   HttpResponse.BodyHandlers.ofInputStream());
-            if (response.statusCode() != 200) {
-                LOG.warning("teams-bot: attachment download failed: " + response.statusCode()
-                            + " " + contentUrl);
-                return null;
-            }
-            long contentLength = response.headers()
-                    .firstValueAsLong("Content-Length").orElse(-1);
-            if (contentLength > maxAttachmentBytes) {
-                LOG.warning(String.format(
-                        "teams-bot: attachment too large (%d bytes, limit %d) — %s",
-                        contentLength, maxAttachmentBytes, name));
-                return null;
-            }
             try (InputStream in = response.body()) {
+                if (response.statusCode() != 200) {
+                    LOG.warning("teams-bot: attachment download failed: " + response.statusCode()
+                                + " " + contentUrl);
+                    return null;
+                }
+                long contentLength = response.headers()
+                        .firstValueAsLong("Content-Length").orElse(-1);
+                if (contentLength > maxAttachmentBytes) {
+                    LOG.warning(String.format(
+                            "teams-bot: attachment too large (%d bytes, limit %d) — %s",
+                            contentLength, maxAttachmentBytes, name));
+                    return null;
+                }
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
                 byte[] buf = new byte[8192];
                 long total = 0;
@@ -153,6 +157,10 @@ class BotFrameworkClient {
     void validateServiceUrl(String serviceUrl) {
         try {
             URI    uri  = URI.create(serviceUrl);
+            if (!"https".equalsIgnoreCase(uri.getScheme())) {
+                throw new IllegalArgumentException(
+                        "teams-bot: non-HTTPS serviceUrl rejected: " + serviceUrl);
+            }
             String host = uri.getHost();
             if (host == null) {
                 throw new IllegalArgumentException(
