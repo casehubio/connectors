@@ -1,7 +1,9 @@
 package io.casehub.connectors.voice.steps;
 
 import io.casehub.connectors.voice.config.VoiceManifestDefaults;
+import io.casehub.connectors.voice.model.MarkTiming;
 import io.casehub.connectors.voice.model.SynthesisResult;
+import io.casehub.connectors.voice.model.TextMark;
 import io.casehub.connectors.voice.model.VoiceCapability;
 import io.casehub.connectors.voice.model.VoiceDescriptor;
 import io.casehub.connectors.voice.ref.ReferenceVoicePlatform;
@@ -21,7 +23,7 @@ class TtsSynthesisePluginTest {
 
     @Test
     void synthesisesTextViaVoicePlatform() {
-        var             plugin = new TtsSynthesisePlugin(null, "en");
+        var             plugin = new TtsSynthesisePlugin(null, "en", null);
         SynthesisResult result = plugin.apply("Hello world", routing);
         assertThat(result.audioData()).isNotEmpty();
         assertThat(result.audioFormat()).isEqualTo("wav");
@@ -35,13 +37,33 @@ class TtsSynthesisePluginTest {
 
     @Test
     void passesVoiceAndLanguage() {
-        var             plugin = new TtsSynthesisePlugin("af_heart", "fr");
+        var             plugin = new TtsSynthesisePlugin("af_heart", "fr", null);
         SynthesisResult result = plugin.apply("Bonjour", routing);
         assertThat(result).isNotNull();
         assertThat(result.audioData()).isNotEmpty();
         String payload = new String(result.audioData(), 44, result.audioData().length - 44, java.nio.charset.StandardCharsets.UTF_8);
         assertThat(payload).startsWith("[voice:af_heart]");
         assertThat(payload).endsWith("Bonjour");
+    }
+
+    @Test
+    void passesMarksThroughToSynthesisOptions() {
+        var             marks  = List.of(new TextMark("w1", 0), new TextMark("w2", 6));
+        var             plugin = new TtsSynthesisePlugin(null, "en", marks);
+        SynthesisResult result = plugin.apply("Hello world", routing);
+        assertThat(result.marks()).hasSize(2);
+        assertThat(result.marks().get(0)).isEqualTo(new MarkTiming("w1", 0));
+        assertThat(result.marks().get(1).id()).isEqualTo("w2");
+        assertThat(result.marks().get(1).offsetMs()).isGreaterThan(0);
+    }
+
+    @Test
+    void passesMarksWithNamedVoice() {
+        var             marks  = List.of(new TextMark("w1", 0));
+        var             plugin = new TtsSynthesisePlugin("af_heart", "en", marks);
+        SynthesisResult result = plugin.apply("Bonjour", routing);
+        assertThat(result.marks()).hasSize(1);
+        assertThat(result.marks().get(0)).isEqualTo(new MarkTiming("w1", 0));
     }
 
     static RoutingVoicePlatformService buildRouting() {
