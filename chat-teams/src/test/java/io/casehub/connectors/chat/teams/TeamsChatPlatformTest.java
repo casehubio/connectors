@@ -502,6 +502,21 @@ class TeamsChatPlatformTest {
             assertThat(capturedUrls).noneMatch(u -> u.contains("/members"));
         }
 
+        @Test
+        void channelManagementDelete_personalChannel_noOp() {
+            assertThatCode(() -> personalPlatform.channelManagement().delete("personal:conv-123"))
+                    .doesNotThrowAnyException();
+            assertThat(capturedUrls).noneMatch(u -> u.contains("/channels/"));
+        }
+
+        @Test
+        void channelManagementFind_personalChannel_returnsEmpty() {
+            var result = personalPlatform.channelManagement().find("personal:conv-123");
+            assertThat(result).isEmpty();
+            assertThat(capturedUrls).noneMatch(u -> u.contains("/channels/"));
+        }
+
+
     }
 
     @Test

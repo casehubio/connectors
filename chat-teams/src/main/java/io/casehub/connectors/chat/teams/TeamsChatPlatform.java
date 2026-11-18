@@ -393,6 +393,7 @@ public class TeamsChatPlatform {
 
         @Override
         public void delete(String channelId) {
+            if (isPersonalChannel(channelId)) return;
             var tc = TeamsMapper.parseTeamAndChannel(channelId);
             TokenRetry.withTokenRetryVoid(
                     TeamsChatPlatform.this::resolveDelegatedToken,
@@ -401,6 +402,7 @@ public class TeamsChatPlatform {
 
         @Override
         public Optional<Channel> find(String channelId) {
+            if (isPersonalChannel(channelId)) return Optional.empty();
             var tc = TeamsMapper.parseTeamAndChannel(channelId);
             return TokenRetry.withTokenRetry(
                     TeamsChatPlatform.this::resolveDelegatedToken,
