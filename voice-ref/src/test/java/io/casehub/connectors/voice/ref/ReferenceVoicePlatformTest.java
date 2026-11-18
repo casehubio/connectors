@@ -3,11 +3,11 @@ package io.casehub.connectors.voice.ref;
 import io.casehub.connectors.voice.model.SynthesisOptions;
 import io.casehub.connectors.voice.model.TextMark;
 import io.casehub.connectors.voice.model.TranscriptionOptions;
-
-import java.util.List;
 import io.casehub.connectors.voice.spi.SpeechToText;
 import io.casehub.connectors.voice.spi.TextToSpeech;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -67,12 +67,21 @@ class ReferenceVoicePlatformTest {
     }
 
     @Test
+    void synthesiseWithMarkBeyondTextLengthClampsToEnd() {
+        var marks   = List.of(new TextMark("past", 20));
+        var options = new SynthesisOptions(null, "en", "wav", false, marks);
+        var result  = platform.textToSpeech().synthesise("hello world", options);
+
+        long durationMs = 11 * 50L;
+        assertThat(result.marks()).hasSize(1);
+        assertThat(result.marks().getFirst().offsetMs()).isEqualTo(durationMs);
+    }
+
+    @Test
     void synthesiseWithoutMarksReturnsNoTimings() {
         var options = new SynthesisOptions(null, "en", "wav", false);
         var result  = platform.textToSpeech().synthesise("hello world", options);
 
         assertThat(result.marks()).isEmpty();
     }
-
-
 }

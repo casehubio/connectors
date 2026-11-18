@@ -55,7 +55,8 @@ public final class MarkTimingEnricher implements TextToSpeech {
         int textLen = text.length();
         List<MarkTiming> timings = new ArrayList<>(marks.size());
         for (TextMark mark : marks) {
-            double fraction = (double) mark.charOffset() / textLen;
+            int    clampedOffset = Math.min(mark.charOffset(), textLen);
+            double fraction = (double) clampedOffset / textLen;
             double targetMs = baseMs + fraction * totalPhonemeMs;
             long offsetMs = snapToPhonemeStart(phonemes, targetMs);
             timings.add(new MarkTiming(mark.id(), offsetMs));
@@ -80,7 +81,8 @@ public final class MarkTimingEnricher implements TextToSpeech {
         int              textLen = text.length();
         List<MarkTiming> timings = new ArrayList<>(marks.size());
         for (TextMark mark : marks) {
-            long offsetMs = (long) ((double) mark.charOffset() / textLen * durationMs);
+            int  clampedOffset = Math.min(mark.charOffset(), textLen);
+            long offsetMs = (long) ((double) clampedOffset / textLen * durationMs);
             timings.add(new MarkTiming(mark.id(), offsetMs));
         }
         return List.copyOf(timings);

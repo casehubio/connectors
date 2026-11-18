@@ -89,7 +89,8 @@ public class ReferenceVoicePlatform implements VoicePlatform {
                 int              textLen    = text.length();
                 List<MarkTiming> computed   = new java.util.ArrayList<>(options.marks().size());
                 for (TextMark mark : options.marks()) {
-                    long offsetMs = (long) ((double) mark.charOffset() / textLen * durationMs);
+                    int  clampedOffset = Math.min(mark.charOffset(), textLen);
+                    long offsetMs = (long) ((double) clampedOffset / textLen * durationMs);
                     computed.add(new MarkTiming(mark.id(), offsetMs));
                 }
                 marks = List.copyOf(computed);

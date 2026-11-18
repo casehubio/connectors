@@ -207,6 +207,17 @@ class MarkTimingEnricherTest {
     }
 
     @Test
+    void phonemeProportionalClampsCharOffsetBeyondTextLength() {
+        var phonemes = List.of(
+                new PhonemeTiming("a", 0, 250),
+                new PhonemeTiming("b", 250, 500));
+        var              marks   = List.of(new TextMark("past", 10));
+        List<MarkTiming> timings = MarkTimingEnricher.phonemeProportional("abcd", marks, phonemes);
+        assertThat(timings).hasSize(1);
+        assertThat(timings.getFirst().offsetMs()).isEqualTo(250);
+    }
+
+    @Test
     void characterProportionalWithSingleCharText() {
         byte[]           wav     = wavWithDuration(22050, 22050);
         var              marks   = List.of(new TextMark("only", 0));
@@ -219,6 +230,15 @@ class MarkTimingEnricherTest {
     void characterProportionalWithMarkAtTextEnd() {
         byte[]           wav     = wavWithDuration(22050, 22050);
         var              marks   = List.of(new TextMark("end", 4));
+        List<MarkTiming> timings = MarkTimingEnricher.characterProportional("abcd", marks, wav, 22050);
+        assertThat(timings).hasSize(1);
+        assertThat(timings.getFirst().offsetMs()).isEqualTo(1000);
+    }
+
+    @Test
+    void characterProportionalClampsCharOffsetBeyondTextLength() {
+        byte[]           wav     = wavWithDuration(22050, 22050);
+        var              marks   = List.of(new TextMark("past", 10));
         List<MarkTiming> timings = MarkTimingEnricher.characterProportional("abcd", marks, wav, 22050);
         assertThat(timings).hasSize(1);
         assertThat(timings.getFirst().offsetMs()).isEqualTo(1000);
