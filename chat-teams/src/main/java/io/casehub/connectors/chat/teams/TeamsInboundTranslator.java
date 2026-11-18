@@ -59,15 +59,19 @@ public class TeamsInboundTranslator implements InboundTranslator {
         if (html == null || html.isEmpty()) {return html;}
         String s = html;
         s = s.replaceAll("<at[^>]*>.*?</at>", "");
-        s = s.replaceAll("(?i)<b>(.*?)</b>", "**$1**");
-        s = s.replaceAll("(?i)<strong>(.*?)</strong>", "**$1**");
-        s = s.replaceAll("(?i)<i>(.*?)</i>", "*$1*");
-        s = s.replaceAll("(?i)<em>(.*?)</em>", "*$1*");
-        s = s.replaceAll("(?i)<strike>(.*?)</strike>", "~~$1~~");
-        s = s.replaceAll("(?i)<s>(.*?)</s>", "~~$1~~");
-        s = s.replaceAll("(?i)<del>(.*?)</del>", "~~$1~~");
-        s = s.replaceAll("(?i)<code>(.*?)</code>", "`$1`");
-        s = s.replaceAll("(?i)<pre>(.*?)</pre>", "```\n$1\n```");
+        String prev;
+        do {
+            prev = s;
+            s = s.replaceAll("(?i)<b>(.*?)</b>", "**$1**");
+            s = s.replaceAll("(?i)<strong>(.*?)</strong>", "**$1**");
+            s = s.replaceAll("(?i)<i>(.*?)</i>", "*$1*");
+            s = s.replaceAll("(?i)<em>(.*?)</em>", "*$1*");
+            s = s.replaceAll("(?i)<strike>(.*?)</strike>", "~~$1~~");
+            s = s.replaceAll("(?i)<s>(.*?)</s>", "~~$1~~");
+            s = s.replaceAll("(?i)<del>(.*?)</del>", "~~$1~~");
+            s = s.replaceAll("(?i)<code>(.*?)</code>", "`$1`");
+            s = s.replaceAll("(?i)<pre>(.*?)</pre>", "```\n$1\n```");
+        } while (!s.equals(prev));
         s = s.replaceAll("(?i)<a\\s+href=\"([^\"]*)\"[^>]*>(.*?)</a>", "[$2]($1)");
         s = s.replaceAll("(?i)<br\\s*/?>", "\n");
         s = s.replaceAll("(?i)<li>(.*?)</li>", "- $1\n");

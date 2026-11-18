@@ -240,6 +240,13 @@ class TeamsInboundTranslatorTest {
         assertThat(md).isEqualTo("**~~removed~~ kept**");
     }
 
+    @Test
+    void htmlToMarkdown_sameTagNesting() {
+        String html = "<b>a <b>inner</b> outer</b>";
+        String md   = TeamsInboundTranslator.htmlToMarkdown(html);
+        assertThat(md).isEqualTo("**a **inner** outer**");
+    }
+
 
     @Test
     void htmlToPlainText_stripsAllTags() {
