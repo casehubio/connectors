@@ -263,12 +263,12 @@ public class TeamsChatPlatform {
     private ResolvedConversation resolveConversation(String aadObjectId) {
         if (botClient == null) {
             throw new UnsupportedOperationException(
-                    "Proactive messaging requires BotFrameworkClient — configure teams-bot properties");
+                    "User channel operation requires BotFrameworkClient — configure teams-bot properties");
         }
         String serviceUrl = defaultServiceUrl;
         if (serviceUrl == null || serviceUrl.isBlank()) {
             throw new UnsupportedOperationException(
-                    "Proactive messaging requires a default service URL — set casehub.connectors.teams-bot.default-service-url");
+                    "User channel operation requires a default service URL — set casehub.connectors.teams-bot.default-service-url");
         }
 
         if (conversationReferenceStore != null) {
@@ -281,7 +281,7 @@ public class TeamsChatPlatform {
         if (defaultTenantId == null || defaultTenantId.isBlank()
             || botAppId == null || botAppId.isBlank()) {
             throw new UnsupportedOperationException(
-                    "Proactive messaging cold-start requires default-tenant-id and app-id — "
+                    "User channel operation cold-start requires default-tenant-id and app-id — "
                     + "configure casehub.connectors.teams-bot properties");
         }
 
