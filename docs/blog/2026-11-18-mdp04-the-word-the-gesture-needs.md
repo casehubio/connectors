@@ -5,7 +5,7 @@ date: 2026-11-18
 entry_type: note
 subtype: diary
 projects: [casehubio/connectors]
-tags: [voice-spi, mark-timing, gesture-sync, tts, avatar]
+tags: [voice-spi, mark-timing, gesture-sync, tts, avatar, input-validation, decorator-pattern]
 ---
 
 # The Word the Gesture Needs
@@ -66,6 +66,18 @@ This catches exactly the cases where "exact" would be a lie: context-dependent p
 ## Testing without native dependencies
 
 The ref implementation provides a parallel path for integration tests. It doesn't have espeak or a duration model, so it uses a synthetic 50ms-per-character duration and returns character-proportional marks directly. This lets tests verify the full mark-timing contract — SPI, enricher pass-through, result serialisation — without provisioning native libraries. The VITS integration tests, gated by `@EnabledIf("allDepsAvailable")`, cover the real espeak path separately.
+
+## The contract every tier must keep
+
+The fallback chain is only safe if every tier enforces the same input invariant. `TextMark.charOffset()` has a lower bound — the record validates `charOffset >= 0` in its constructor — but no upper bound, because it doesn't know the text. That validation falls to the usage site, and the question is whether every usage site agrees.
+
+VITS clamps: `Math.min(mark.charOffset(), text.length())`. The ref implementation and both enricher tiers did not. For a mark with `charOffset=20` on an 11-character text, the VITS path computes `min(20, 11) / 11 = 1.0` — the mark lands at the audio boundary. The unclamped paths compute `20 / 11 = 1.82` — the mark lands 82% past the end of the audio buffer.
+
+![charOffset clamping across tiers](images/2026-11-18-charoffset-clamp.svg)
+
+The phoneme-proportional path happened to survive because `snapToPhonemeStart` returns the last phoneme start when the target exceeds all boundaries — an accidental safety net, not an intentional clamp. The character-proportional path had no such net.
+
+The fix is one line per tier: clamp before dividing. The principle is general to any decorator chain: if the decorator offers a "worse but correct" fallback for a contract, every fallback must enforce the contract's preconditions independently. A fallback that accepts inputs the primary path rejects is not a fallback — it is a different contract.
 
 ## What this unblocks
 
