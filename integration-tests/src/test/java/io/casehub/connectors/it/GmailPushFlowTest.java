@@ -1,10 +1,5 @@
 package io.casehub.connectors.it;
 
-import java.time.Instant;
-import java.util.Base64;
-import java.util.List;
-import java.util.Map;
-
 import io.casehub.connectors.HttpMethod;
 import io.casehub.connectors.InboundConnectorIds;
 import io.casehub.connectors.WebhookRequest;
@@ -13,19 +8,26 @@ import io.casehub.connectors.email.google.inbound.GmailPushInboundConnector;
 import io.casehub.connectors.email.google.inbound.InMemoryHistoryStore;
 import org.junit.jupiter.api.Test;
 
+import java.util.Base64;
+import java.util.List;
+import java.util.Map;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 class GmailPushFlowTest {
 
+    private static final io.casehub.connectors.email.google.inbound.JwtValidator ACCEPT_ALL = jwt -> true;
+    private static final io.casehub.connectors.email.google.inbound.JwtValidator REJECT_ALL = jwt -> false;
+
     @Test
     void fullPushNotificationFlow() {
-        var store = new InMemoryHistoryStore();
-        var connector = new GmailPushInboundConnector(store, null, "");
+        var store     = new InMemoryHistoryStore();
+        var connector = new GmailPushInboundConnector(store, null, ACCEPT_ALL);
 
         assertThat(connector.id()).isEqualTo(InboundConnectorIds.GMAIL_PUSH);
 
-        String jwt = "any.thing.here";
-        var request = pubsubRequest(jwt, "user@example.com", 12345L);
+        String jwt     = "any.thing.here";
+        var    request = pubsubRequest(jwt, "user@example.com", 12345L);
 
         var result = connector.handle(request);
 
@@ -52,61 +54,31 @@ class GmailPushFlowTest {
     }
 
     @Test
-    void jwtValidationRejectsExpiredToken() {
+    void rejectedJwtReturnsUnauthorized() {
         var connector = new GmailPushInboundConnector(
-                new InMemoryHistoryStore(), null, "my-audience");
+                new InMemoryHistoryStore(), null, REJECT_ALL);
 
-        String expired = fakeJwt("my-audience", "accounts.google.com",
-                Instant.now().getEpochSecond() - 300);
-        var request = pubsubRequest(expired, "user@example.com", 100L);
-
+        var request = pubsubRequest("any.jwt.here", "user@example.com", 100L);
         assertThat(connector.handle(request)).isInstanceOf(WebhookResult.Unauthorized.class);
     }
 
     @Test
-    void jwtValidationRejectsWrongAudience() {
+    void acceptedJwtReturnsDeferredDelivery() {
         var connector = new GmailPushInboundConnector(
-                new InMemoryHistoryStore(), null, "expected-audience");
+                new InMemoryHistoryStore(), null, ACCEPT_ALL);
 
-        String wrong = fakeJwt("wrong-audience", "accounts.google.com",
-                Instant.now().getEpochSecond() + 3600);
-        var request = pubsubRequest(wrong, "user@example.com", 100L);
-
-        assertThat(connector.handle(request)).isInstanceOf(WebhookResult.Unauthorized.class);
-    }
-
-    @Test
-    void jwtValidationAcceptsValidClaims() {
-        var connector = new GmailPushInboundConnector(
-                new InMemoryHistoryStore(), null, "my-audience");
-
-        String valid = fakeJwt("my-audience", "accounts.google.com",
-                Instant.now().getEpochSecond() + 3600);
-        var request = pubsubRequest(valid, "user@example.com", 100L);
-
-        assertThat(connector.handle(request)).isInstanceOf(WebhookResult.DeferredDelivery.class);
-    }
-
-    @Test
-    void jwtValidationAcceptsHttpsIssuer() {
-        var connector = new GmailPushInboundConnector(
-                new InMemoryHistoryStore(), null, "my-audience");
-
-        String valid = fakeJwt("my-audience", "https://accounts.google.com",
-                Instant.now().getEpochSecond() + 3600);
-        var request = pubsubRequest(valid, "user@example.com", 100L);
-
+        var request = pubsubRequest("any.jwt.here", "user@example.com", 100L);
         assertThat(connector.handle(request)).isInstanceOf(WebhookResult.DeferredDelivery.class);
     }
 
     @Test
     void malformedPubsubBodyReturnsIgnored() {
         var connector = new GmailPushInboundConnector(
-                new InMemoryHistoryStore(), null, "");
+                new InMemoryHistoryStore(), null, ACCEPT_ALL);
 
         var request = new WebhookRequest("{\"not\":\"pubsub\"}",
-                Map.of("authorization", List.of("Bearer any.thing.here")),
-                Map.of(), HttpMethod.POST, "https://example.com/webhook");
+                                         Map.of("authorization", List.of("Bearer any.thing.here")),
+                                         Map.of(), HttpMethod.POST, "https://example.com/webhook");
 
         assertThat(connector.handle(request)).isInstanceOf(WebhookResult.Ignored.class);
     }
@@ -114,10 +86,10 @@ class GmailPushFlowTest {
     @Test
     void noAuthorizationHeaderReturnsUnauthorized() {
         var connector = new GmailPushInboundConnector(
-                new InMemoryHistoryStore(), null, "audience");
+                new InMemoryHistoryStore(), null, ACCEPT_ALL);
 
         var request = new WebhookRequest("{}",
-                Map.of(), Map.of(), HttpMethod.POST, "https://example.com/webhook");
+                                         Map.of(), Map.of(), HttpMethod.POST, "https://example.com/webhook");
 
         assertThat(connector.handle(request)).isInstanceOf(WebhookResult.Unauthorized.class);
     }
@@ -127,15 +99,7 @@ class GmailPushFlowTest {
                 ("{\"emailAddress\":\"" + email + "\",\"historyId\":" + historyId + "}").getBytes());
         var body = "{\"message\":{\"data\":\"" + data + "\"}}";
         return new WebhookRequest(body,
-                Map.of("authorization", List.of("Bearer " + jwt)),
-                Map.of(), HttpMethod.POST, "https://example.com/webhook");
-    }
-
-    private static String fakeJwt(String audience, String issuer, long exp) {
-        String header = Base64.getUrlEncoder().withoutPadding().encodeToString(
-                "{\"alg\":\"RS256\"}".getBytes());
-        String payload = Base64.getUrlEncoder().withoutPadding().encodeToString(
-                ("{\"iss\":\"" + issuer + "\",\"aud\":\"" + audience + "\",\"exp\":" + exp + "}").getBytes());
-        return header + "." + payload + ".fake-signature";
+                                  Map.of("authorization", List.of("Bearer " + jwt)),
+                                  Map.of(), HttpMethod.POST, "https://example.com/webhook");
     }
 }

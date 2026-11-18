@@ -6,7 +6,6 @@ import io.casehub.connectors.WebhookRequest;
 import io.casehub.connectors.WebhookResult;
 import org.junit.jupiter.api.Test;
 
-import java.time.Instant;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
@@ -15,106 +14,64 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class GmailPushInboundConnectorTest {
 
+    private static final JwtValidator ACCEPT_ALL = jwt -> true;
+    private static final JwtValidator REJECT_ALL = jwt -> false;
+
     @Test
     void idMatchesConstant() {
-        var connector = createConnector("");
+        var connector = createConnector(ACCEPT_ALL);
         assertThat(connector.id()).isEqualTo(InboundConnectorIds.GMAIL_PUSH);
     }
 
     @Test
     void missingAuthorizationReturnsUnauthorized() {
-        var connector = createConnector("test-audience");
-        var request = new WebhookRequest("{}", Map.of(), Map.of(), HttpMethod.POST, "https://example.com/webhook");
-        var result = connector.handle(request);
+        var connector = createConnector(ACCEPT_ALL);
+        var request   = new WebhookRequest("{}", Map.of(), Map.of(), HttpMethod.POST, "https://example.com/webhook");
+        var result    = connector.handle(request);
         assertThat(result).isInstanceOf(WebhookResult.Unauthorized.class);
     }
 
     @Test
-    void invalidJwtReturnsUnauthorized() {
-        var connector = createConnector("test-audience");
-        var request = pubsubRequest("invalid-jwt", "user@example.com", 12345L);
-        var result = connector.handle(request);
+    void rejectedJwtReturnsUnauthorized() {
+        var connector = createConnector(REJECT_ALL);
+        var request   = pubsubRequest("any.jwt.here", "user@example.com", 12345L);
+        var result    = connector.handle(request);
         assertThat(result).isInstanceOf(WebhookResult.Unauthorized.class);
     }
 
     @Test
-    void validJwtReturnsDeferredDelivery() {
-        var connector = createConnector("test-audience");
-        String jwt = fakeJwt("test-audience", Instant.now().getEpochSecond() + 3600);
-        var request = pubsubRequest(jwt, "user@example.com", 12345L);
-        var result = connector.handle(request);
-        assertThat(result).isInstanceOf(WebhookResult.DeferredDelivery.class);
-    }
-
-    @Test
-    void blankAudienceSkipsValidation() {
-        var connector = createConnector("");
-        String jwt = "any.thing.here";
-        var request = pubsubRequest(jwt, "user@example.com", 12345L);
-        var result = connector.handle(request);
+    void acceptedJwtReturnsDeferredDelivery() {
+        var connector = createConnector(ACCEPT_ALL);
+        var request   = pubsubRequest("valid.jwt.token", "user@example.com", 12345L);
+        var result    = connector.handle(request);
         assertThat(result).isInstanceOf(WebhookResult.DeferredDelivery.class);
     }
 
     @Test
     void malformedBodyReturnsIgnored() {
-        var connector = createConnector("");
-        String jwt = "any.thing.here";
+        var connector = createConnector(ACCEPT_ALL);
         var request = new WebhookRequest("not-json",
-                Map.of("authorization", List.of("Bearer " + jwt)),
-                Map.of(), HttpMethod.POST, "https://example.com/webhook");
+                                         Map.of("authorization", List.of("Bearer valid.jwt.token")),
+                                         Map.of(), HttpMethod.POST, "https://example.com/webhook");
         var result = connector.handle(request);
         assertThat(result).isInstanceOf(WebhookResult.Ignored.class);
     }
 
     @Test
     void missingEmailAddressReturnsIgnored() {
-        var connector = createConnector("");
-        String jwt = "any.thing.here";
-        var data = Base64.getUrlEncoder().withoutPadding().encodeToString("{\"historyId\":100}".getBytes());
-        var body = "{\"message\":{\"data\":\"" + data + "\"}}";
+        var connector = createConnector(ACCEPT_ALL);
+        var data      = Base64.getUrlEncoder().withoutPadding().encodeToString("{\"historyId\":100}".getBytes());
+        var body      = "{\"message\":{\"data\":\"" + data + "\"}}";
         var request = new WebhookRequest(body,
-                Map.of("authorization", List.of("Bearer " + jwt)),
-                Map.of(), HttpMethod.POST, "https://example.com/webhook");
+                                         Map.of("authorization", List.of("Bearer valid.jwt.token")),
+                                         Map.of(), HttpMethod.POST, "https://example.com/webhook");
         var result = connector.handle(request);
         assertThat(result).isInstanceOf(WebhookResult.Ignored.class);
     }
 
-    @Test
-    void expiredJwtReturnsUnauthorized() {
-        var    connector = createConnector("test-audience");
-        String jwt       = fakeJwt("test-audience", Instant.now().getEpochSecond() - 60);
-        var    request   = pubsubRequest(jwt, "user@example.com", 12345L);
-        var    result    = connector.handle(request);
-        assertThat(result).isInstanceOf(WebhookResult.Unauthorized.class);
-    }
-
-    @Test
-    void wrongAudienceReturnsUnauthorized() {
-        var    connector = createConnector("expected-audience");
-        String jwt       = fakeJwt("wrong-audience", Instant.now().getEpochSecond() + 3600);
-        var    request   = pubsubRequest(jwt, "user@example.com", 12345L);
-        var    result    = connector.handle(request);
-        assertThat(result).isInstanceOf(WebhookResult.Unauthorized.class);
-    }
-
-    @Test
-    void wrongIssuerReturnsUnauthorized() {
-        var connector = createConnector("test-audience");
-        String header = Base64.getUrlEncoder().withoutPadding().encodeToString(
-                "{\"alg\":\"RS256\"}".getBytes());
-        String payload = Base64.getUrlEncoder().withoutPadding().encodeToString(
-                ("{\"iss\":\"evil.example.com\",\"aud\":\"test-audience\",\"exp\":"
-                 + (Instant.now().getEpochSecond() + 3600) + "}").getBytes());
-        String jwt     = header + "." + payload + ".fake-signature";
-        var    request = pubsubRequest(jwt, "user@example.com", 12345L);
-        var    result  = connector.handle(request);
-        assertThat(result).isInstanceOf(WebhookResult.Unauthorized.class);
-    }
-
-
-    private GmailPushInboundConnector createConnector(String audience) {
+    private GmailPushInboundConnector createConnector(JwtValidator validator) {
         return new GmailPushInboundConnector(
-                new InMemoryHistoryStore(), null, audience);
+                new InMemoryHistoryStore(), null, validator);
     }
 
     private static WebhookRequest pubsubRequest(String jwt, String email, long historyId) {
@@ -122,15 +79,7 @@ class GmailPushInboundConnectorTest {
                 ("{\"emailAddress\":\"" + email + "\",\"historyId\":" + historyId + "}").getBytes());
         var body = "{\"message\":{\"data\":\"" + data + "\"}}";
         return new WebhookRequest(body,
-                Map.of("authorization", List.of("Bearer " + jwt)),
-                Map.of(), HttpMethod.POST, "https://example.com/webhook");
-    }
-
-    private static String fakeJwt(String audience, long exp) {
-        String header = Base64.getUrlEncoder().withoutPadding().encodeToString(
-                "{\"alg\":\"RS256\"}".getBytes());
-        String payload = Base64.getUrlEncoder().withoutPadding().encodeToString(
-                ("{\"iss\":\"accounts.google.com\",\"aud\":\"" + audience + "\",\"exp\":" + exp + "}").getBytes());
-        return header + "." + payload + ".fake-signature";
+                                  Map.of("authorization", List.of("Bearer " + jwt)),
+                                  Map.of(), HttpMethod.POST, "https://example.com/webhook");
     }
 }

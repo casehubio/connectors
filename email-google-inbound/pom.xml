@@ -34,6 +34,10 @@ and delivers them as InboundMessages via DeferredDelivery.</description>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-scheduler</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.bitbucket.b_c</groupId>
+      <artifactId>jose4j</artifactId>
+    </dependency>
 
     <!-- Testing -->
     <dependency>

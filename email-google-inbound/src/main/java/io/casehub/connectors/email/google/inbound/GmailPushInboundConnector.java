@@ -1,5 +1,14 @@
 package io.casehub.connectors.email.google.inbound;
 
+import io.casehub.connectors.InboundConnectorIds;
+import io.casehub.connectors.InboundConnectorTypes;
+import io.casehub.connectors.InboundMessage;
+import io.casehub.connectors.WebhookInboundConnector;
+import io.casehub.connectors.WebhookRequest;
+import io.casehub.connectors.WebhookResult;
+import jakarta.json.Json;
+import jakarta.json.JsonObject;
+
 import java.io.StringReader;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -11,30 +20,21 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import io.casehub.connectors.InboundConnectorIds;
-import io.casehub.connectors.InboundConnectorTypes;
-import io.casehub.connectors.InboundMessage;
-import io.casehub.connectors.WebhookInboundConnector;
-import io.casehub.connectors.WebhookRequest;
-import io.casehub.connectors.WebhookResult;
-import jakarta.json.Json;
-import jakarta.json.JsonObject;
-
 public class GmailPushInboundConnector extends WebhookInboundConnector {
 
     private static final Logger LOG = Logger.getLogger(GmailPushInboundConnector.class.getName());
 
     private final HistoryStore historyStore;
     private final GmailHistoryClient historyClient;
-    private final String expectedAudience;
+    private final JwtValidator jwtValidator;
     private final ConcurrentHashMap<String, ReentrantLock> emailLocks = new ConcurrentHashMap<>();
 
     public GmailPushInboundConnector(HistoryStore historyStore,
                                       GmailHistoryClient historyClient,
-                                      String expectedAudience) {
+                                      JwtValidator jwtValidator) {
         this.historyStore = historyStore;
         this.historyClient = historyClient;
-        this.expectedAudience = expectedAudience;
+        this.jwtValidator = jwtValidator;
     }
 
     @Override
@@ -54,7 +54,7 @@ public class GmailPushInboundConnector extends WebhookInboundConnector {
 
     private WebhookResult doHandle(WebhookRequest request) {
         String jwt = extractJwt(request);
-        if (jwt == null || !validateJwt(jwt)) {
+        if (jwt == null || !jwtValidator.validate(jwt)) {
             return new WebhookResult.Unauthorized();
         }
 
@@ -114,31 +114,6 @@ public class GmailPushInboundConnector extends WebhookInboundConnector {
         String auth = request.header("authorization");
         if (auth != null && auth.startsWith("Bearer ")) return auth.substring(7);
         return null;
-    }
-
-    boolean validateJwt(String jwt) {
-        if (expectedAudience == null || expectedAudience.isBlank()) {
-            LOG.warning("gmail-push: no audience configured — skipping JWT validation");
-            return true;
-        }
-        try {
-            String[] parts = jwt.split("\\.");
-            if (parts.length < 2) return false;
-            String payload = new String(Base64.getUrlDecoder().decode(parts[1]));
-            var claims = Json.createReader(new StringReader(payload)).readObject();
-            String iss = claims.getString("iss", "");
-            if (!"accounts.google.com".equals(iss)
-                    && !"https://accounts.google.com".equals(iss)) {
-                return false;
-            }
-            String aud = claims.getString("aud", "");
-            if (!expectedAudience.equals(aud)) return false;
-            long exp = claims.getJsonNumber("exp").longValue();
-            return Instant.now().getEpochSecond() < exp;
-        } catch (Exception e) {
-            LOG.warning("gmail-push: JWT validation failed: " + e.getMessage());
-            return false;
-        }
     }
 
     private static JsonObject parseNotification(String body) {

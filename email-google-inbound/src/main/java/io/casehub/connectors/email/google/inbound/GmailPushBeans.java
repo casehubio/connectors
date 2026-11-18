@@ -16,11 +16,21 @@ public class GmailPushBeans {
 
     @Produces
     @ApplicationScoped
+    public JwtValidator gmailJwtValidator(
+            @ConfigProperty(name = "casehub.connectors.gmail.push.pubsub-audience",
+                    defaultValue = "") String audience) {
+        if (audience == null || audience.isBlank()) {
+            return jwt -> true;
+        }
+        return new GoogleOidcJwtValidator(audience);
+    }
+
+    @Produces
+    @ApplicationScoped
     public GmailPushInboundConnector gmailPushInboundConnector(
             HistoryStore historyStore,
             GmailHistoryClient historyClient,
-            @ConfigProperty(name = "casehub.connectors.gmail.push.pubsub-audience",
-                    defaultValue = "") String audience) {
-        return new GmailPushInboundConnector(historyStore, historyClient, audience);
+            JwtValidator jwtValidator) {
+        return new GmailPushInboundConnector(historyStore, historyClient, jwtValidator);
     }
 }
