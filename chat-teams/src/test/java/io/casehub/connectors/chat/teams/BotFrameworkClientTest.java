@@ -115,6 +115,17 @@ class BotFrameworkClientTest {
     }
 
     @Test
+    void downloadAttachment_contentLengthExceedsLimit_returnsNull() {
+        var client = new BotFrameworkClient(null, DEFAULT_ALLOWLIST,
+                                            DEFAULT_ATTACHMENT_ALLOWLIST, 100);
+        var result = client.downloadAttachment(
+                "https://graph.microsoft.com/v1.0/file",
+                "application/pdf", "big.pdf");
+        assertThat(result).isNull();
+    }
+
+
+    @Test
     void checkResponse_429_throwsRateLimited() {
         assertThatThrownBy(() -> {
             throw BotFrameworkClient.checkResponse(429, "/v3/conversations", "rate limited");
