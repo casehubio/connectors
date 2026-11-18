@@ -1,46 +1,47 @@
-name: "NEGATIVE TWIN: speaker ID as sole payment gate"
-description: Demonstrates the insecure pattern — voice identification alone gates a payment with no second factor. A cloned or synthetic voice bypasses this entirely.
+name: "NEGATIVE TWIN: cloned voice bypasses voice-only payment gate"
+description: Demonstrates the attack that multi-factor prevents — an attacker uses a cloned voice (same TTS voice as the victim) to pass speaker identification and authorise a payment with no second factor to catch the clone.
 rules:
   - speaker identification alone does not authorise a payment
   - "VIOLATION: this playbook intentionally breaks the rule above to demonstrate the vulnerability"
 steps:
-  # 1. Register voiceprint
+  # 1. Register Bob's voiceprint
   - tts-synthesise:
-      text: Hello, I am Alice
-      voice: af_heart
-    capture: aliceSample
+      text: Hello, I am Bob
+      voice: bm_daniel
+    capture: bobSample
 
   - speaker register:
-      name: Alice Smith
-      audio: ${aliceSample.audio-data}
+      name: Bob Smith
+      audio: ${bobSample.audio-data}
 
-  # 2. Receive confirmation (no reference number, no second factor)
+  # 2. Attacker uses cloned voice (same bm_daniel voice) to impersonate Bob
   - tts-synthesise:
-      text: I, Alice Smith, confirm this transaction of 500 pounds
-      voice: af_heart
-    capture: aliceMessage
+      text: I, Bob Smith, confirm this transaction of 500 pounds
+      voice: bm_daniel
+    capture: attackerMessage
 
   # 3. Denoise
   - audio-denoise:
-      audio: ${aliceMessage.audio-data}
-    capture: aliceClean
+      audio: ${attackerMessage.audio-data}
+    capture: attackerClean
 
   # 4. Identify speaker — sole gate (INSECURE)
+  #    The cloned voice matches Bob's voiceprint
   - speaker identify:
-      audio: ${aliceClean.audio-data}
-    capture: aliceId
+      audio: ${attackerClean.audio-data}
+    capture: speakerId
 
   # 5. Transcribe for audit
-  - stt-transcribe: ${aliceClean.audio-data}
+  - stt-transcribe: ${attackerClean.audio-data}
     capture: transcript
 
   # 6. Gate on voice ID ONLY — no second factor
-  #    This is the insecure pattern: a cloned voice would pass this gate.
-  - if: ${aliceId.identified}
+  #    The clone passes. No reference number or OTP to catch the impersonation.
+  - if: ${speakerId.identified}
     then:
       - chat-send:
           channel: compliance
-          message: "Payment authorised by voice identification only. Speaker: ${aliceId.name}. Transcript: ${transcript.text}"
+          message: "Payment authorised by voice identification only. Speaker: ${speakerId.name}. Transcript: ${transcript.text}"
         capture: auditRecord
     else:
       - chat-send:

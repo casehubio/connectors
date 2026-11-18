@@ -1,6 +1,6 @@
-name: "NEGATIVE TWIN: speaker ID sole gate — proves the insecure pattern works"
+name: "NEGATIVE TWIN: cloned voice bypasses voice-only gate"
 tests:
-  - name: voice-only gate authorises payment without second factor
+  - name: cloned voice passes speaker identification and authorises payment
     steps:
       - run-playbook: ../../../main/playbooks/voice-interaction-patterns/06b-sole-gate-insecure.playbook.yaml
         capture: result
@@ -8,11 +8,11 @@ tests:
         equals: ""
       - assertThat: result.succeeded
         equals: true
-      # Speaker identified — sole gate passes
-      - assertThat: result.captures.aliceId.identified
+      # Clone passes voice biometrics — this IS the vulnerability
+      - assertThat: result.captures.speakerId.identified
         equals: true
-      # Payment was authorised with voice ID only — this is the vulnerability.
-      # In production, this playbook should NOT be used. See 06-joint-account-confirmation
-      # for the correct multi-factor pattern.
+      - assertThat: result.captures.speakerId.name
+        equals: Bob Smith
+      # Payment authorised with no second factor to catch the impersonation
       - assertThat: result.captures.auditRecord
         not-null: true
