@@ -158,26 +158,28 @@ public class TeamsChatPlatform {
     }
 
     private List<Member> listMembers(ChatChannelRef channel) {
-        if (isPersonalChannel(channel.id())) return List.of();
+        if (isPersonalChannel(channel.id())) {return List.of();}
+        if (isUserChannel(channel.id())) {return List.of();}
         var tc = TeamsMapper.parseTeamAndChannel(channel.id());
         return TokenRetry.withTokenRetry(this::resolveDelegatedToken,
-                token -> client.listMembers(tc[0], token).stream()
-                        .map(TeamsMapper::toMember).toList());
+                                         token -> client.listMembers(tc[0], token).stream()
+                                                        .map(TeamsMapper::toMember).toList());
     }
 
     private List<ReceivedMessage> listMessageHistory(ChatChannelRef channel, Instant since) {
-        if (isPersonalChannel(channel.id())) return List.of();
+        if (isPersonalChannel(channel.id())) {return List.of();}
+        if (isUserChannel(channel.id())) {return List.of();}
         var tc = TeamsMapper.parseTeamAndChannel(channel.id());
         return TokenRetry.withTokenRetry(this::resolveApplicationToken,
-                token -> client.listMessages(tc[0], tc[1], token).stream()
-                        .filter(msg -> {
-                            Instant created = Instant.parse(
-                                    msg.getString("createdDateTime"));
-                            return since == null || created.isAfter(since);
-                        })
-                        .map(msg -> TeamsMapper.toReceivedMessage(
-                                PLATFORM_ID, tc[0], tc[1], msg))
-                        .toList());
+                                         token -> client.listMessages(tc[0], tc[1], token).stream()
+                                                        .filter(msg -> {
+                                                            Instant created = Instant.parse(
+                                                                    msg.getString("createdDateTime"));
+                                                            return since == null || created.isAfter(since);
+                                                        })
+                                                        .map(msg -> TeamsMapper.toReceivedMessage(
+                                                                PLATFORM_ID, tc[0], tc[1], msg))
+                                                        .toList());
     }
 
 
@@ -394,6 +396,7 @@ public class TeamsChatPlatform {
         @Override
         public void delete(String channelId) {
             if (isPersonalChannel(channelId)) return;
+            if (isUserChannel(channelId)) return;
             var tc = TeamsMapper.parseTeamAndChannel(channelId);
             TokenRetry.withTokenRetryVoid(
                     TeamsChatPlatform.this::resolveDelegatedToken,
@@ -403,6 +406,7 @@ public class TeamsChatPlatform {
         @Override
         public Optional<Channel> find(String channelId) {
             if (isPersonalChannel(channelId)) return Optional.empty();
+            if (isUserChannel(channelId)) return Optional.empty();
             var tc = TeamsMapper.parseTeamAndChannel(channelId);
             return TokenRetry.withTokenRetry(
                     TeamsChatPlatform.this::resolveDelegatedToken,
@@ -421,7 +425,8 @@ public class TeamsChatPlatform {
     private class TeamsMemberManagement implements MemberManagement {
         @Override
         public void add(ChatChannelRef channel, Member member) {
-            if (isPersonalChannel(channel.id())) return;
+            if (isPersonalChannel(channel.id())) {return;}
+            if (isUserChannel(channel.id())) {return;}
             var tc = TeamsMapper.parseTeamAndChannel(channel.id());
             TokenRetry.withTokenRetryVoid(
                     TeamsChatPlatform.this::resolveDelegatedToken,
@@ -430,7 +435,8 @@ public class TeamsChatPlatform {
 
         @Override
         public void remove(ChatChannelRef channel, MemberRef member) {
-            if (isPersonalChannel(channel.id())) return;
+            if (isPersonalChannel(channel.id())) {return;}
+            if (isUserChannel(channel.id())) {return;}
             var tc = TeamsMapper.parseTeamAndChannel(channel.id());
             TokenRetry.withTokenRetryVoid(
                     TeamsChatPlatform.this::resolveDelegatedToken,
@@ -441,7 +447,8 @@ public class TeamsChatPlatform {
     private class TeamsReactions implements io.casehub.connectors.chat.spi.Reactions {
         @Override
         public void add(ChatMessageRef message, String emoji) {
-            if (isPersonalChannel(message.channel().id())) return;
+            if (isPersonalChannel(message.channel().id())) {return;}
+            if (isUserChannel(message.channel().id())) {return;}
             var tc = TeamsMapper.parseTeamAndChannel(message.channel().id());
             TokenRetry.withTokenRetryVoid(TeamsChatPlatform.this::resolveApplicationToken,
                                           token -> client.setReaction(tc[0], tc[1], message.messageId(), emoji, token));
@@ -449,7 +456,8 @@ public class TeamsChatPlatform {
 
         @Override
         public void remove(ChatMessageRef message, String emoji) {
-            if (isPersonalChannel(message.channel().id())) return;
+            if (isPersonalChannel(message.channel().id())) {return;}
+            if (isUserChannel(message.channel().id())) {return;}
             var tc = TeamsMapper.parseTeamAndChannel(message.channel().id());
             TokenRetry.withTokenRetryVoid(TeamsChatPlatform.this::resolveApplicationToken,
                                           token -> client.unsetReaction(tc[0], tc[1], message.messageId(), emoji, token));
@@ -457,7 +465,8 @@ public class TeamsChatPlatform {
 
         @Override
         public List<String> list(ChatMessageRef message) {
-            if (isPersonalChannel(message.channel().id())) return List.of();
+            if (isPersonalChannel(message.channel().id())) {return List.of();}
+            if (isUserChannel(message.channel().id())) {return List.of();}
             var tc = TeamsMapper.parseTeamAndChannel(message.channel().id());
             return TokenRetry.withTokenRetry(TeamsChatPlatform.this::resolveApplicationToken,
                                              token -> {

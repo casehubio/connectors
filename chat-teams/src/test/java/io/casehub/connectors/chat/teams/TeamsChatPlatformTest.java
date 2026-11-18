@@ -516,6 +516,80 @@ class TeamsChatPlatformTest {
             assertThat(capturedUrls).noneMatch(u -> u.contains("/channels/"));
         }
 
+        @Test
+        void listMembers_userChannel_returnsEmpty() {
+            var ref     = new ChatChannelRef("user:aad-123");
+            var members = personalPlatform.members().list(ref);
+            assertThat(members).isEmpty();
+            assertThat(capturedUrls).noneMatch(u -> u.contains("/members"));
+        }
+
+        @Test
+        void messageHistory_userChannel_returnsEmpty() {
+            var ref      = new ChatChannelRef("user:aad-123");
+            var messages = personalPlatform.messageHistory().messages(ref, null);
+            assertThat(messages).isEmpty();
+            assertThat(capturedUrls).noneMatch(u -> u.contains("/messages"));
+        }
+
+        @Test
+        void reactionsAdd_userChannel_noOp() {
+            var channelRef = new ChatChannelRef("user:aad-123");
+            var messageRef = new ChatMessageRef(channelRef, "msg-1");
+            assertThatCode(() -> personalPlatform.reactions().add(messageRef, "like"))
+                    .doesNotThrowAnyException();
+            assertThat(capturedUrls).noneMatch(u -> u.contains("/setReaction"));
+        }
+
+        @Test
+        void reactionsRemove_userChannel_noOp() {
+            var channelRef = new ChatChannelRef("user:aad-123");
+            var messageRef = new ChatMessageRef(channelRef, "msg-1");
+            assertThatCode(() -> personalPlatform.reactions().remove(messageRef, "like"))
+                    .doesNotThrowAnyException();
+            assertThat(capturedUrls).noneMatch(u -> u.contains("/unsetReaction"));
+        }
+
+        @Test
+        void reactionsList_userChannel_returnsEmpty() {
+            var channelRef = new ChatChannelRef("user:aad-123");
+            var messageRef = new ChatMessageRef(channelRef, "msg-1");
+            var reactions  = personalPlatform.reactions().list(messageRef);
+            assertThat(reactions).isEmpty();
+            assertThat(capturedUrls).noneMatch(u -> u.contains("/messages/msg-1"));
+        }
+
+        @Test
+        void memberManagementAdd_userChannel_noOp() {
+            var ref    = new ChatChannelRef("user:aad-123");
+            var member = new Member(new MemberRef("user-2"), "Bob");
+            assertThatCode(() -> personalPlatform.memberManagement().add(ref, member))
+                    .doesNotThrowAnyException();
+            assertThat(capturedUrls).noneMatch(u -> u.contains("/members"));
+        }
+
+        @Test
+        void memberManagementRemove_userChannel_noOp() {
+            var ref = new ChatChannelRef("user:aad-123");
+            assertThatCode(() -> personalPlatform.memberManagement().remove(ref, new MemberRef("user-2")))
+                    .doesNotThrowAnyException();
+            assertThat(capturedUrls).noneMatch(u -> u.contains("/members"));
+        }
+
+        @Test
+        void channelManagementDelete_userChannel_noOp() {
+            assertThatCode(() -> personalPlatform.channelManagement().delete("user:aad-123"))
+                    .doesNotThrowAnyException();
+            assertThat(capturedUrls).noneMatch(u -> u.contains("/channels/"));
+        }
+
+        @Test
+        void channelManagementFind_userChannel_returnsEmpty() {
+            var result = personalPlatform.channelManagement().find("user:aad-123");
+            assertThat(result).isEmpty();
+            assertThat(capturedUrls).noneMatch(u -> u.contains("/channels/"));
+        }
+
 
     }
 
