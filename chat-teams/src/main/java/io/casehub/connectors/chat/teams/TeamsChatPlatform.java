@@ -121,10 +121,10 @@ public class TeamsChatPlatform {
                         "Personal chat reply requires BotFrameworkClient and default service URL");
             }
             String conversationId = extractConversationId(parent.channel().id());
-            botClient.replyToActivity(defaultServiceUrl, conversationId,
+            String activityId = botClient.replyToActivity(defaultServiceUrl, conversationId,
                                       parent.messageId(), content.text());
             return new SendResult(true,
-                                  new ChatMessageRef(parent.channel(), ""),
+                                  new ChatMessageRef(parent.channel(), activityId),
                                   java.time.Instant.now(), null);
         }
         var tc = TeamsMapper.parseTeamAndChannel(parent.channel().id());
@@ -246,9 +246,9 @@ public class TeamsChatPlatform {
             throw new UnsupportedOperationException(
                     "Personal chat messaging requires a default service URL — set casehub.connectors.teams-bot.default-service-url");
         }
-        botClient.sendToConversation(serviceUrl, conversationId, content.text());
+        String activityId = botClient.sendToConversation(serviceUrl, conversationId, content.text());
         return new SendResult(true,
-                              new ChatMessageRef(new ChatChannelRef("personal:" + conversationId), ""),
+                              new ChatMessageRef(new ChatChannelRef("personal:" + conversationId), activityId),
                               java.time.Instant.now(), null);
     }
 
@@ -268,9 +268,9 @@ public class TeamsChatPlatform {
             if (existing.isPresent()) {
                 String resolvedServiceUrl = existing.get().serviceUrl();
                 String cachedConversationId = existing.get().conversationId();
-                botClient.sendToConversation(resolvedServiceUrl, cachedConversationId, content.text());
+                String activityId = botClient.sendToConversation(resolvedServiceUrl, cachedConversationId, content.text());
                 return new SendResult(true,
-                                      new ChatMessageRef(new ChatChannelRef("personal:" + cachedConversationId), ""),
+                                      new ChatMessageRef(new ChatChannelRef("personal:" + cachedConversationId), activityId),
                                       java.time.Instant.now(), null);
             }
         }
@@ -289,9 +289,9 @@ public class TeamsChatPlatform {
                     new ConversationReference(aadObjectId, conversationId, serviceUrl, defaultTenantId));
         }
 
-        botClient.sendToConversation(serviceUrl, conversationId, content.text());
+        String activityId = botClient.sendToConversation(serviceUrl, conversationId, content.text());
         return new SendResult(true,
-                              new ChatMessageRef(new ChatChannelRef("personal:" + conversationId), ""),
+                              new ChatMessageRef(new ChatChannelRef("personal:" + conversationId), activityId),
                               java.time.Instant.now(), null);
     }
 

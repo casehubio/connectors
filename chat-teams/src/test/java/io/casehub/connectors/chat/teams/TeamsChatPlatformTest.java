@@ -391,7 +391,18 @@ class TeamsChatPlatformTest {
             });
 
             var botClient = new BotFrameworkClient(null,
-                                                   "*.botframework.com,smba.trafficmanager.net");
+                                                   "*.botframework.com,smba.trafficmanager.net") {
+                @Override
+                String sendToConversation(String serviceUrl, String conversationId, String text) {
+                    return "activity-" + conversationId;
+                }
+
+                @Override
+                String replyToActivity(String serviceUrl, String conversationId,
+                                       String activityId, String text) {
+                    return "reply-" + activityId;
+                }
+            };
 
             personalPlatform = new TeamsChatPlatform(new TeamsClient(graph))
                                        .withBotClient(botClient, "https://smba.trafficmanager.net/teams/")
@@ -559,8 +570,9 @@ class TeamsChatPlatformTest {
             var botClient = new BotFrameworkClient(null,
                                                    "*.botframework.com,smba.trafficmanager.net") {
                 @Override
-                void sendToConversation(String serviceUrl, String conversationId, String text) {
+                String sendToConversation(String serviceUrl, String conversationId, String text) {
                     botCalls.add("send:" + conversationId + ":" + text);
+                    return "activity-" + conversationId;
                 }
 
                 @Override
@@ -608,6 +620,17 @@ class TeamsChatPlatformTest {
             assertThat(store.find("aad-user-1").get().conversationId())
                     .isEqualTo("created-conv-for-aad-user-1");
         }
+
+        @Test
+        void sendToConversation_returnsActivityId() {
+            store.store(new ConversationReference("aad-user-1", "existing-conv",
+                                                  "https://smba.trafficmanager.net/teams/", "tenant-1"));
+            var p      = buildProactivePlatform();
+            var ref    = new ChatChannelRef("user:aad-user-1");
+            var result = p.messaging().send(ref, new ChatContent("Hello"));
+            assertThat(result.messageRef().messageId()).isEqualTo("activity-existing-conv");
+        }
+
 
         @Test
         void userChannel_noBotClient_throws() {

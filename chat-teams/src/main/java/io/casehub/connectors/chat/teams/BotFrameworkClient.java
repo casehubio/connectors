@@ -25,27 +25,33 @@ class BotFrameworkClient {
         this.allowedHostPatterns = List.of(serviceUrlAllowlist.split(","));
     }
 
-    void replyToActivity(String serviceUrl, String conversationId,
-                         String activityId, String text) {
+    String replyToActivity(String serviceUrl, String conversationId,
+                           String activityId, String text) {
         validateServiceUrl(serviceUrl);
         String url = stripTrailingSlash(serviceUrl)
-                + "/v3/conversations/" + conversationId + "/activities/" + activityId;
+                     + "/v3/conversations/" + conversationId + "/activities/" + activityId;
         String body = Json.createObjectBuilder()
-                .add("type", "message")
-                .add("text", text)
-                .build().toString();
-        postJson(url, body);
+                          .add("type", "message")
+                          .add("text", text)
+                          .build().toString();
+        String responseBody = postJsonWithResponse(url, body);
+        try (var reader = Json.createReader(new StringReader(responseBody))) {
+            return reader.readObject().getString("id", "");
+        }
     }
 
-    void sendToConversation(String serviceUrl, String conversationId, String text) {
+    String sendToConversation(String serviceUrl, String conversationId, String text) {
         validateServiceUrl(serviceUrl);
         String url = stripTrailingSlash(serviceUrl)
-                + "/v3/conversations/" + conversationId + "/activities";
+                     + "/v3/conversations/" + conversationId + "/activities";
         String body = Json.createObjectBuilder()
-                .add("type", "message")
-                .add("text", text)
-                .build().toString();
-        postJson(url, body);
+                          .add("type", "message")
+                          .add("text", text)
+                          .build().toString();
+        String responseBody = postJsonWithResponse(url, body);
+        try (var reader = Json.createReader(new StringReader(responseBody))) {
+            return reader.readObject().getString("id", "");
+        }
     }
 
     String createConversation(String serviceUrl, String botAppId,
