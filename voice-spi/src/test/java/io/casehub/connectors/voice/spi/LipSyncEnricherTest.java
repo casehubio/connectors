@@ -84,4 +84,25 @@ class LipSyncEnricherTest {
 
         assertThat(capturedRate[0]).isEqualTo(44100);
     }
+
+    @Test
+    void warmUpDelegatesToWrappedTextToSpeech() {
+        boolean[] warmedUp = {false};
+        TextToSpeech delegate = new TextToSpeech() {
+            @Override
+            public SynthesisResult synthesise(String text, SynthesisOptions options) {
+                return new SynthesisResult(new byte[]{1}, "wav", List.of());
+            }
+
+            @Override
+            public void warmUp() {
+                warmedUp[0] = true;
+            }
+        };
+
+        LipSyncEnricher.wrap(delegate, stubAligner).warmUp();
+
+        assertThat(warmedUp[0]).isTrue();
+    }
+
 }

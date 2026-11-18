@@ -27,6 +27,12 @@ public final class LipSyncEnricher implements TextToSpeech {
         return new LipSyncEnricher(delegate, aligner, sampleRate);
     }
 
+
+    @Override
+    public void warmUp() {
+        delegate.warmUp();
+    }
+
     @Override
     public SynthesisResult synthesise(String text, SynthesisOptions options) {
         SynthesisResult result = delegate.synthesise(text, options);
