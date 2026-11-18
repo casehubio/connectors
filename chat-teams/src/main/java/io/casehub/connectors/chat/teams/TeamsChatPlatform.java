@@ -257,7 +257,10 @@ public class TeamsChatPlatform {
                               java.time.Instant.now(), null);
     }
 
-    private SendResult sendProactiveMessage(String aadObjectId, ChatContent content) {
+
+    private record ResolvedConversation(String serviceUrl, String conversationId) {}
+
+    private ResolvedConversation resolveConversation(String aadObjectId) {
         if (botClient == null) {
             throw new UnsupportedOperationException(
                     "Proactive messaging requires BotFrameworkClient — configure teams-bot properties");
@@ -271,12 +274,7 @@ public class TeamsChatPlatform {
         if (conversationReferenceStore != null) {
             var existing = conversationReferenceStore.find(aadObjectId);
             if (existing.isPresent()) {
-                String resolvedServiceUrl = existing.get().serviceUrl();
-                String cachedConversationId = existing.get().conversationId();
-                String activityId = botClient.sendToConversation(resolvedServiceUrl, cachedConversationId, content.text());
-                return new SendResult(true,
-                                      new ChatMessageRef(new ChatChannelRef("personal:" + cachedConversationId), activityId),
-                                      java.time.Instant.now(), null);
+                return new ResolvedConversation(existing.get().serviceUrl(), existing.get().conversationId());
             }
         }
 
@@ -294,45 +292,24 @@ public class TeamsChatPlatform {
                     new ConversationReference(aadObjectId, conversationId, serviceUrl, defaultTenantId));
         }
 
-        String activityId = botClient.sendToConversation(serviceUrl, conversationId, content.text());
+        return new ResolvedConversation(serviceUrl, conversationId);
+    }
+
+
+    private SendResult sendProactiveMessage(String aadObjectId, ChatContent content) {
+        var    resolved   = resolveConversation(aadObjectId);
+        String activityId = botClient.sendToConversation(resolved.serviceUrl(), resolved.conversationId(), content.text());
         return new SendResult(true,
-                              new ChatMessageRef(new ChatChannelRef("personal:" + conversationId), activityId),
+                              new ChatMessageRef(new ChatChannelRef("personal:" + resolved.conversationId()), activityId),
                               java.time.Instant.now(), null);
     }
 
     private SendResult replyToUserChannel(String aadObjectId, ChatMessageRef parent, ChatContent content) {
-        if (botClient == null || defaultServiceUrl == null || defaultServiceUrl.isBlank()) {
-            throw new UnsupportedOperationException(
-                    "User channel reply requires BotFrameworkClient and default service URL");
-        }
-        String serviceUrl     = defaultServiceUrl;
-        String conversationId = null;
-
-        if (conversationReferenceStore != null) {
-            var existing = conversationReferenceStore.find(aadObjectId);
-            if (existing.isPresent()) {
-                serviceUrl     = existing.get().serviceUrl();
-                conversationId = existing.get().conversationId();
-            }
-        }
-        if (conversationId == null) {
-            if (defaultTenantId == null || defaultTenantId.isBlank()
-                || botAppId == null || botAppId.isBlank()) {
-                throw new UnsupportedOperationException(
-                        "User channel reply cold-start requires default-tenant-id and app-id — "
-                        + "configure casehub.connectors.teams-bot properties");
-            }
-            conversationId = botClient.createConversation(serviceUrl, botAppId, aadObjectId, defaultTenantId);
-            if (conversationReferenceStore != null) {
-                conversationReferenceStore.store(
-                        new ConversationReference(aadObjectId, conversationId, serviceUrl, defaultTenantId));
-            }
-        }
-
-        String activityId = botClient.replyToActivity(serviceUrl, conversationId,
+        var resolved = resolveConversation(aadObjectId);
+        String activityId = botClient.replyToActivity(resolved.serviceUrl(), resolved.conversationId(),
                                                       parent.messageId(), content.text());
         return new SendResult(true,
-                              new ChatMessageRef(new ChatChannelRef("personal:" + conversationId), activityId),
+                              new ChatMessageRef(new ChatChannelRef("personal:" + resolved.conversationId()), activityId),
                               java.time.Instant.now(), null);
     }
 
