@@ -1,9 +1,9 @@
 package io.casehub.connectors.voice.steps;
 
 import io.casehub.connectors.voice.model.SpeakerEmbedding;
+import io.casehub.connectors.voice.model.SpeakerMatch;
 import io.casehub.connectors.voice.spi.SpeakerEmbeddingExtractor;
 import io.casehub.connectors.voice.spi.SpeakerRegistry;
-import io.casehub.connectors.voice.model.SpeakerMatch;
 import io.casehub.yaml.plugin.api.Result;
 import org.junit.jupiter.api.Test;
 
@@ -33,7 +33,7 @@ class SpeakerPluginTest {
         byte[] wav = buildWav(16000, 1, 16, new byte[320]);
         assertThat(wav.length).isEqualTo(44 + 320);
 
-        var plugin = new SpeakerPlugin("register", "alice", wav, null);
+        var plugin = new SpeakerPlugin("register", "alice", wav, null, null);
         var result = plugin.execute(extractor, registry);
         assertThat(result.isSuccess()).isTrue();
     }
@@ -43,7 +43,7 @@ class SpeakerPluginTest {
         byte[] wav = buildWavWithExtraChunk(16000, 1, 16, new byte[320]);
         assertThat(wav.length).isGreaterThan(44 + 320);
 
-        var plugin = new SpeakerPlugin("register", "alice", wav, null);
+        var plugin = new SpeakerPlugin("register", "alice", wav, null, null);
         var result = plugin.execute(extractor, registry);
         assertThat(result.isSuccess()).isTrue();
     }
@@ -51,7 +51,7 @@ class SpeakerPluginTest {
     @Test
     void stereoRejected() {
         byte[] wav = buildWav(16000, 2, 16, new byte[640]);
-        var plugin = new SpeakerPlugin("register", "alice", wav, null);
+        var plugin = new SpeakerPlugin("register", "alice", wav, null, null);
         var result = plugin.execute(extractor, registry);
         assertThat(result.isSuccess()).isFalse();
         assertThat(failureMessage(result)).contains("mono");
@@ -60,16 +60,51 @@ class SpeakerPluginTest {
     @Test
     void wrongSampleRateRejected() {
         byte[] wav = buildWav(44100, 1, 16, new byte[320]);
-        var plugin = new SpeakerPlugin("register", "alice", wav, null);
+        var plugin = new SpeakerPlugin("register", "alice", wav, null, null);
         var result = plugin.execute(extractor, registry);
         assertThat(result.isSuccess()).isFalse();
         assertThat(failureMessage(result)).contains("16000");
     }
 
     @Test
+    void eightKhzAcceptedWhenConfigured() {
+        byte[] wav    = buildWav(8000, 1, 16, new byte[160]);
+        var    plugin = new SpeakerPlugin("register", "alice", wav, null, List.of(8000, 16000));
+        var    result = plugin.execute(extractor, registry);
+        assertThat(result.isSuccess()).isTrue();
+    }
+
+    @Test
+    void fortyEightKhzAcceptedWhenConfigured() {
+        byte[] wav    = buildWav(48000, 1, 16, new byte[960]);
+        var    plugin = new SpeakerPlugin("register", "alice", wav, null, List.of(16000, 48000));
+        var    result = plugin.execute(extractor, registry);
+        assertThat(result.isSuccess()).isTrue();
+    }
+
+    @Test
+    void eightKhzRejectedWhenNotConfigured() {
+        byte[] wav    = buildWav(8000, 1, 16, new byte[160]);
+        var    plugin = new SpeakerPlugin("register", "alice", wav, null, null);
+        var    result = plugin.execute(extractor, registry);
+        assertThat(result.isSuccess()).isFalse();
+        assertThat(failureMessage(result)).contains("16000");
+    }
+
+    @Test
+    void rejectionListsConfiguredRates() {
+        byte[] wav    = buildWav(44100, 1, 16, new byte[320]);
+        var    plugin = new SpeakerPlugin("register", "alice", wav, null, List.of(8000, 16000, 48000));
+        var    result = plugin.execute(extractor, registry);
+        assertThat(result.isSuccess()).isFalse();
+        assertThat(failureMessage(result)).contains("8000", "16000", "48000");
+    }
+
+
+    @Test
     void eightBitRejected() {
         byte[] wav = buildWav(16000, 1, 8, new byte[160]);
-        var plugin = new SpeakerPlugin("register", "alice", wav, null);
+        var plugin = new SpeakerPlugin("register", "alice", wav, null, null);
         var result = plugin.execute(extractor, registry);
         assertThat(result.isSuccess()).isFalse();
         assertThat(failureMessage(result)).contains("16-bit");
@@ -78,7 +113,7 @@ class SpeakerPluginTest {
     @Test
     void nonWavDataRejected() {
         byte[] noise = new byte[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-        var plugin = new SpeakerPlugin("register", "alice", noise, null);
+        var plugin = new SpeakerPlugin("register", "alice", noise, null, null);
         var result = plugin.execute(extractor, registry);
         assertThat(result.isSuccess()).isFalse();
         assertThat(failureMessage(result)).contains("WAV");
@@ -87,7 +122,7 @@ class SpeakerPluginTest {
     @Test
     void compressedWavRejected() {
         byte[] wav = buildWavWithFormat(2, 16000, 1, 16, new byte[320]);
-        var plugin = new SpeakerPlugin("register", "alice", wav, null);
+        var plugin = new SpeakerPlugin("register", "alice", wav, null, null);
         var result = plugin.execute(extractor, registry);
         assertThat(result.isSuccess()).isFalse();
         assertThat(failureMessage(result)).contains("PCM");
@@ -98,7 +133,7 @@ class SpeakerPluginTest {
         byte[] wav = buildWav(16000, 1, 16, new byte[320]);
         wav[16] = 0; wav[17] = 0; wav[18] = 0; wav[19] = 0;
         wav[12] = 'x'; wav[13] = 'x'; wav[14] = 'x'; wav[15] = 'x';
-        var plugin = new SpeakerPlugin("register", "alice", wav, null);
+        var plugin = new SpeakerPlugin("register", "alice", wav, null, null);
         var result = plugin.execute(extractor, registry);
         assertThat(result.isSuccess()).isFalse();
     }
