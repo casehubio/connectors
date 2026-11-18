@@ -179,6 +179,30 @@ class MicrosoftGraphClientTest {
         assertThat(uri.toString()).isEqualTo("https://graph.microsoft.com/v1.0/me/messages");
     }
 
+    @Test
+    void toUriHandsHashInGraphDrivePath() {
+        var uri = MicrosoftGraphClient.toUri("https://graph.microsoft.com/v1.0/me/drive/root:/Documents/file#1.docx:/content");
+        assertThat(uri.getFragment()).isNull();
+        assertThat(uri.getRawPath()).contains("file%231.docx");
+        assertThat(uri.getPath()).contains("file#1.docx");
+    }
+
+    @Test
+    void toUriHandlesQuestionMarkInGraphDrivePath() {
+        var uri = MicrosoftGraphClient.toUri("https://graph.microsoft.com/v1.0/me/drive/root:/Reports/Q?A notes.docx:/content");
+        assertThat(uri.getQuery()).isNull();
+        assertThat(uri.getRawPath()).contains("Q%3FA%20notes.docx");
+        assertThat(uri.getPath()).contains("Q?A notes.docx");
+    }
+
+    @Test
+    void toUriHashInGraphPathWithRealQuery() {
+        var uri = MicrosoftGraphClient.toUri("https://graph.microsoft.com/v1.0/me/drive/root:/file#2.docx:/content?$select=id");
+        assertThat(uri.getFragment()).isNull();
+        assertThat(uri.getQuery()).isEqualTo("$select=id");
+        assertThat(uri.getPath()).contains("file#2.docx");
+    }
+
 
     private static MicrosoftGraphClient clientReturning(int status, String body) {
         return new MicrosoftGraphClient(request -> new StubHttpResponse(status, body));

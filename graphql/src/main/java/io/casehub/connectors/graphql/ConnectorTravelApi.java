@@ -12,7 +12,6 @@ import io.casehub.connectors.travel.model.TransportBookingRequest;
 import io.casehub.connectors.travel.model.TransportMode;
 import io.casehub.connectors.travel.model.TransportOption;
 import io.casehub.connectors.travel.spi.TravelPlatform;
-import io.casehub.platform.api.mcp.GeneratePlugin;
 import io.casehub.connectors.travel.spi.TravelPlatformService;
 import io.casehub.platform.api.mcp.McpDomain;
 import io.casehub.platform.api.mcp.PathParam;

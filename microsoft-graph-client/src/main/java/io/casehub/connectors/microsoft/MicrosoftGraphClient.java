@@ -207,14 +207,15 @@ public class MicrosoftGraphClient {
             if (pathStart < 0) {return URI.create(rawUrl);}
             String authority   = rawUrl.substring(authorityStart, pathStart);
             String rest        = rawUrl.substring(pathStart);
+            int    safeFrom    = graphPathEnd(rest);
             String fragment    = null;
-            int    fragmentIdx = rest.indexOf('#');
+            int    fragmentIdx = rest.indexOf('#', safeFrom);
             if (fragmentIdx >= 0) {
                 fragment = rest.substring(fragmentIdx + 1);
                 rest     = rest.substring(0, fragmentIdx);
             }
             String query    = null;
-            int    queryIdx = rest.indexOf('?');
+            int    queryIdx = rest.indexOf('?', safeFrom);
             if (queryIdx >= 0) {
                 query = rest.substring(queryIdx + 1);
                 rest  = rest.substring(0, queryIdx);
@@ -223,6 +224,21 @@ public class MicrosoftGraphClient {
         } catch (Exception e) {
             return URI.create(rawUrl);
         }
+    }
+
+    // Graph API :/path:/ segments may contain literal # and ? — skip past them.
+    private static int graphPathEnd(String rest) {
+        int searchFrom = 0;
+        int lastEnd    = 0;
+        while (true) {
+            int start = rest.indexOf(":/", searchFrom);
+            if (start < 0) {break;}
+            int end = rest.indexOf(":/", start + 2);
+            if (end < 0) {break;}
+            lastEnd    = end + 2;
+            searchFrom = lastEnd;
+        }
+        return lastEnd;
     }
 
 
