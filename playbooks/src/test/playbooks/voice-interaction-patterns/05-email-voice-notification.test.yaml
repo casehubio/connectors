@@ -1,20 +1,20 @@
 name: Email voice notification tests
-tests:
-  - name: inbox voice alert with transcript follow-up
-    steps:
-      - run-playbook: ../../../main/playbooks/voice-interaction-patterns/05-email-voice-notification.playbook.yaml
-        capture: result
-      - assertThat: result.error
-        equals: ""
-      - assertThat: result.succeeded
-        equals: true
-      - assertThat: result.captures.inbox.count
-        greaterThan: 0
-      - assertThat: result.captures.voiceAlert.audio-format
-        equals: wav
-      - assertThat: result.captures.notification.ok
-        equals: true
-      - assertThat: result.captures.transcript.text
-        contains: messages in your inbox
-      - assertThat: result.captures.followUp.ok
-        equals: true
+---
+name: inbox voice alert with transcript follow-up
+---
+- run-playbook: ../../../main/playbooks/voice-interaction-patterns/05-email-voice-notification.playbook.yaml
+  capture: run
+- assertThat: run.error
+  equals: ""
+- assertThat: run.succeeded
+  equals: true
+- assertThat: run.captures.inbox.count
+  greaterThan: 0
+- assertThat: run.captures.voiceAlert.audio-format
+  equals: wav
+- assertThat: run.captures.notification.ok
+  equals: true
+- assertThat: run.captures.transcript.text
+  contains: messages in your inbox
+- assertThat: run.captures.followUp.ok
+  equals: true

@@ -1,0 +1,14 @@
+name: "How to: check a bank account balance"
+---
+name: balance returned with amount and currency
+---
+- run-playbook: ../../../main/playbooks/tutorials/02-check-bank-balance.playbook.yaml
+  capture: run
+- assertThat: run.succeeded
+  equals: true
+- assertThat: run.captures.balance.accountId
+  equals: acc-100
+- assertThat: run.captures.balance.currency
+  equals: GBP
+- assertThat: run.captures.balance.amount
+  not-null: true

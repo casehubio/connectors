@@ -1,25 +1,25 @@
 name: Joint account verbal confirmation tests
-tests:
-  - name: multi-factor gate — voice ID and reference number both required
-    steps:
-      - run-playbook: ../../../main/playbooks/voice-interaction-patterns/06-joint-account-confirmation.playbook.yaml
-        capture: result
-      - assertThat: result.error
-        equals: ""
-      - assertThat: result.succeeded
-        equals: true
-      # Factor 1: speaker identification ran on both
-      - assertThat: result.captures.aliceId.identified
-        equals: true
-      - assertThat: result.captures.bobId.identified
-        equals: true
-      # Factor 2: transcript contains reference number for compliance review
-      # STT transcribes "TX-7429" as "TX 7,429" — match the number portion
-      - assertThat: result.captures.fullTranscript.text
-        contains: "7,429"
-      # Combined recording produced
-      - assertThat: result.captures.combinedRecording.audio-format
-        equals: wav
-      # Transcript contains confirmation language and reference
-      - assertThat: result.captures.fullTranscript.text
-        contains: confirm
+---
+name: multi-factor gate — voice ID and reference number both required
+---
+- run-playbook: ../../../main/playbooks/voice-interaction-patterns/06-joint-account-confirmation.playbook.yaml
+  capture: run
+- assertThat: run.error
+  equals: ""
+- assertThat: run.succeeded
+  equals: true
+# Factor 1: speaker identification ran on both
+- assertThat: run.captures.aliceId.identified
+  equals: true
+- assertThat: run.captures.bobId.identified
+  equals: true
+# Factor 2: transcript contains reference number for compliance review
+# STT transcribes "TX-7429" as "TX 7,429" — match the number portion
+- assertThat: run.captures.fullTranscript.text
+  contains: "7,429"
+# Combined recording produced
+- assertThat: run.captures.combinedRecording.audio-format
+  equals: wav
+# Transcript contains confirmation language and reference
+- assertThat: run.captures.fullTranscript.text
+  contains: confirm

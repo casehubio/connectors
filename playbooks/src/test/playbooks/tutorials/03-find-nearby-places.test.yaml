@@ -1,0 +1,18 @@
+name: "How to: find nearby restaurants"
+---
+name: search returns places and details include address and phone
+---
+- run-playbook: ../../../main/playbooks/tutorials/03-find-nearby-places.playbook.yaml
+  capture: run
+- assertThat: run.succeeded
+  equals: true
+- assertThat: run.captures.nearby.items
+  not-empty: true
+- assertThat: run.captures.place.name
+  not-null: true
+- assertThat: run.captures.place.formattedAddress
+  not-null: true
+- assertThat: run.captures.place.formattedPhoneNumber
+  not-null: true
+- assertThat: run.captures.place.rating
+  not-null: true
