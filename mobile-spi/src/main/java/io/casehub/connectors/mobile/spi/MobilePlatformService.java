@@ -1,5 +1,6 @@
 package io.casehub.connectors.mobile.spi;
 
+import io.quarkus.arc.All;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
@@ -14,7 +15,7 @@ public class MobilePlatformService {
     private final Map<String, MobilePlatform> platforms;
 
     @Inject
-    public MobilePlatformService(List<MobilePlatform> all) {
+    public MobilePlatformService(@All List<MobilePlatform> all) {
         var map = new LinkedHashMap<String, MobilePlatform>();
         for (var p : all) {
             if (!"none".equals(p.id())) {

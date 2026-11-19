@@ -53,7 +53,10 @@ import io.casehub.platform.api.mcp.McpDomain;
 import io.casehub.platform.api.mcp.PlatformMutation;
 import io.casehub.platform.api.mcp.PlatformQuery;
 
+import io.quarkus.arc.All;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.inject.Instance;
+import jakarta.inject.Inject;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -89,7 +92,36 @@ public class ConnectorOperationsImpl {
     private static final Set<String> ALL_SCOPES = Set.of("chat", "calendar", "bank", "email", "document", "contacts", "project", "commerce", "travel", "location", "mobile");
 
 
+    @Inject
     public ConnectorOperationsImpl(
+            final InboundConnectorService inboundService,
+            final ConnectorService connectorService,
+            final ChatPlatformService chatPlatformService,
+            final CalendarPlatformService calendarPlatformService,
+            final BankPlatformService bankPlatformService,
+            final EmailPlatformService emailPlatformService,
+            final DocumentPlatformService documentPlatformService,
+            final ContactsPlatformService contactsPlatformService,
+            final ProjectPlatformService projectPlatformService,
+            final CommercePlatformService commercePlatformService,
+            final TravelPlatformService travelPlatformService,
+            final LocationPlatformService locationPlatformService,
+            final MobilePlatformService mobilePlatformService,
+            @All final List<Connector> connectors,
+            @All final List<WebhookInboundConnector> webhookConnectors,
+            final Instance<SentMessageCapture> sentMessageCaptureInstance,
+            final CurrentPrincipal currentPrincipal) {
+        this(inboundService, connectorService, chatPlatformService,
+                calendarPlatformService, bankPlatformService, emailPlatformService,
+                documentPlatformService, contactsPlatformService, projectPlatformService,
+                commercePlatformService, travelPlatformService, locationPlatformService,
+                mobilePlatformService, connectors, webhookConnectors,
+                sentMessageCaptureInstance.isResolvable()
+                        ? Optional.of(sentMessageCaptureInstance.get()) : Optional.empty(),
+                currentPrincipal);
+    }
+
+    ConnectorOperationsImpl(
             final InboundConnectorService inboundService,
             final ConnectorService connectorService,
             final ChatPlatformService chatPlatformService,
