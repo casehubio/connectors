@@ -167,6 +167,10 @@ public abstract class WebhookInboundConnector {
 
 **DeferredDelivery:** `WebhookResult.DeferredDelivery` returns an immediate HTTP response to the webhook sender while deferring async work (e.g. media download) to a virtual thread. The router dispatches both the immediate response and the deferred `Runnable`. Used by WhatsApp inbound for media download with 3-attempt exponential backoff.
 
+**Responded:** `WebhookResult.Responded` delivers messages AND returns a response body to the caller. Used by Teams `TeamsInboundConnector` for Bot Framework invoke activities (Adaptive Card actions, task modules, messaging extensions) where the HTTP response body determines client behavior. The router sends the response body with `contentType` and fires events for the included messages.
+
+**InvokeHandler SPI:** Teams messaging extensions (search, action, link unfurling) are handled via `InvokeHandler` CDI beans. Implement `InvokeHandler`, return the matching invoke activity name from `name()`, and return an `InvokeResponse` variant from `handle()`. See `docs/guides/teams-messaging-extensions-setup.md` for the full setup guide.
+
 **Breaking contract:** observers MUST use `@ObservesAsync InboundMessage` -- synchronous `@Observes` will not receive events. At-least-once delivery.
 
 ### InboundMessage Record

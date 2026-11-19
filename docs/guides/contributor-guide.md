@@ -33,6 +33,7 @@ Two transport patterns converge into a single CDI event bus:
 - `Ignored()` -- HTTP 200, no event fired (bot messages, unsupported event types)
 - `Unauthorized()` -- POST returns HTTP 200 + SECURITY WARNING log (suppress retry storms); GET returns HTTP 403 (admin needs clear failure signal)
 - `DeferredDelivery(List<InboundMessage>, Runnable)` -- router processes messages immediately (same as `Delivered`), then dispatches the `Runnable` on a virtual thread for async follow-up work. Used by `WhatsAppInboundConnector` for media download (3-attempt exponential backoff) after the webhook response is sent.
+- `Responded(responseBody, contentType, List<InboundMessage>)` -- router delivers messages AND returns a response body to the caller with HTTP 200. Used by `TeamsInboundConnector` for Bot Framework invoke activities where the HTTP response body determines client behavior (card updates, task module dialogs, compose extension results).
 
 **Exception handling:** the router wraps `handle()` in a try-catch as defense-in-depth, mapping exceptions to HTTP 200. Connectors are still expected to catch their own exceptions and return `Ignored` or `Unauthorized`.
 
@@ -48,6 +49,18 @@ Two transport patterns converge into a single CDI event bus:
 | `TwilioSmsInboundConnector` | HMAC-SHA1 | Twilio algorithm; form-encoded POST; signs full request URL |
 
 **ID validation** -- both `InboundConnectorService` and `WebhookRouter` validate connector IDs at startup against pattern `[a-z0-9][a-z0-9\-]*`. Violations cause startup failure.
+
+### Teams Invoke Architecture
+
+Teams messaging extensions (search commands, action commands, link unfurling, settings) are delivered as Bot Framework `invoke` activities. The architecture has three layers:
+
+1. **`TeamsInboundConnector.handleInvoke()`** -- parses the invoke activity, builds metadata, constructs an `InboundMessage`, and delegates to `InvokeService`
+2. **`InvokeService`** -- CDI-discovered `InvokeHandler` beans, dispatched by activity name (`InvokeHandler.name()` → `InvokeRequest.name()` match). No handler → `InvokeResponse.Accepted()`. Handler exception → logged + `Accepted()` fallback.
+3. **`InvokeResponseSerializer`** -- converts the `InvokeResponse` sealed variant to Bot Framework JSON for the HTTP response body
+
+The `InvokeResponse` sealed hierarchy covers: `Accepted`, `CardUpdate`, `Message`, `TaskModuleContinue`, `TaskModuleMessage`, `Error`, `ComposeResult`, `ComposeAuth`, `ComposeContinue`. The `handleInvoke()` method returns `WebhookResult.Responded` to deliver both the JSON response and the `InboundMessage` event.
+
+Four reference handlers in `io.casehub.connectors.chat.teams.ref` provide working examples (search, fetchTask, submitAction, linkUnfurl). See `docs/guides/teams-messaging-extensions-setup.md` for the consumer-facing guide.
 
 ### CloudEvent Adapter
 

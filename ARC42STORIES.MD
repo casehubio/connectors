@@ -877,7 +877,7 @@ CDI SPI aggregation — `@ApplicationScoped` beans discovered via `@All List<T>`
 **After:** `InboundConnector` (pull lifecycle) and `WebhookInboundConnector` (passive JAX-RS) both deliver to `Event<InboundMessage>.fireAsync()`.
 
 - **Two-type inbound model** — `InboundConnector` has `start(sink)` + `stop()`; `WebhookInboundConnector` has `handle(WebhookRequest) → WebhookResult`. Type system encodes lifecycle — no misleading no-op methods on webhook connectors
-- **Sealed `WebhookResult`** — `Delivered`, `Challenged`, `Ignored`, `Unauthorized` forces exhaustive handling in `WebhookRouter`; `Unauthorized` on POST → HTTP 200 (suppress retry storm), `Unauthorized` on GET → HTTP 403 (admin setup failure must be visible)
+- **Sealed `WebhookResult`** — `Delivered`, `Challenged`, `Ignored`, `Unauthorized`, `DeferredDelivery`, `Responded` forces exhaustive handling in `WebhookRouter`; `Unauthorized` on POST → HTTP 200 (suppress retry storm), `Unauthorized` on GET → HTTP 403 (admin setup failure must be visible); `Responded` returns a JSON response body alongside message delivery (Teams invoke activities)
 - **HMAC per connector** — each `WebhookInboundConnector` verifies its own platform-specific signature; `MessageDigest.isEqual()` (constant-time) in `SigHelper`
 - **Async event delivery** — `fireAsync()` returns before any observer runs; Slack's 3-second deadline is met regardless of observer duration
 
@@ -899,7 +899,7 @@ Not closed here: L3 (IMAP IDLE), L5 (Slack bot inbound).
 - `core/src/main/java/io/casehub/connectors/InboundMessageSink.java` — delivery interface called by pull connectors
 - `core/src/main/java/io/casehub/connectors/InboundConnectorService.java` — fires `Event<InboundMessage>.fireAsync()`
 - `core/src/main/java/io/casehub/connectors/InboundConnectorIds.java` — public `ID` constants for each built-in inbound connector (#11)
-- `core/src/main/java/io/casehub/connectors/WebhookResult.java` — sealed type: `Delivered`, `Challenged`, `Ignored`, `Unauthorized`
+- `core/src/main/java/io/casehub/connectors/WebhookResult.java` — sealed type: `Delivered`, `Challenged`, `Ignored`, `Unauthorized`, `DeferredDelivery`, `Responded`
 - `webhook/src/main/java/io/casehub/connectors/webhook/WebhookRouter.java` — JAX-RS: `GET|POST /connectors/{id}/webhook`
 - `webhook/src/main/java/io/casehub/connectors/webhook/SigHelper.java` — HMAC utilities (constant-time comparison)
 - `webhook/src/main/java/io/casehub/connectors/webhook/SlackInboundConnector.java` — HMAC-SHA256, url_verification, replay prevention, `workspace-id` in metadata
@@ -1471,7 +1471,7 @@ Full decision records with alternatives considered: `docs/adr/`
 | `InboundMessage` | Inbound data record: connectorId, connectorType (non-null semantic label), externalSenderId, externalChannelRef, content, attachments, receivedAt, metadata, tenancyId (nullable). `connectorType` drives CloudEvent `type` field; `tenancyId` drives CloudEvent `tenancyid` extension. |
 | `InboundConnectorTypes` | Semantic transport category constants — `SLACK`, `EMAIL`, `SMS`, `WHATSAPP`, `TEAMS`. Parallel to `InboundConnectorIds` but provider-agnostic (e.g. `SMS` not `twilio-sms`). |
 | `ConnectorsCloudEventAdapter` | CDI adapter in `core`: observes `@ObservesAsync InboundMessage`, fires `Event<CloudEvent>.fireAsync()`. Follows canonical CloudEvent adapter pattern (GE-20260621-629712). |
-| `WebhookResult` | Sealed type: `Delivered`, `Challenged`, `Ignored`, `Unauthorized`. Returned by `handle()`; exhaustive switch in `WebhookRouter`. |
+| `WebhookResult` | Sealed type: `Delivered`, `Challenged`, `Ignored`, `Unauthorized`, `DeferredDelivery`, `Responded`. Returned by `handle()`; exhaustive switch in `WebhookRouter`. |
 | `ConnectorMeshBridge` | SPI called by MCP tools after successful delivery. Enables Qhorus to log agent-initiated sends. `NoOpConnectorMeshBridge @DefaultBean @Unremovable` ships with `core`. |
 | `ConnectorDiscovery` | SPI for runtime-discoverable delivery targets. `discover()` returns `List<DiscoveredTarget>`. Implemented by `SlackBotDiscovery`. |
 | `DiscoveredTarget` | Record: id, displayName. Top-level (not nested) so external implementors can import independently. |
