@@ -3,6 +3,7 @@ package io.casehub.connectors.document.microsoft;
 import io.casehub.connectors.PageRequest;
 import io.casehub.connectors.SyncRequest;
 import io.casehub.connectors.document.spi.DocumentPlatform;
+import io.casehub.connectors.document.spi.SiteDiscovery;
 import io.casehub.connectors.microsoft.MicrosoftGraphClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -432,4 +433,130 @@ class MicrosoftDrivePlatformTest {
                 "createdDateTime":"2026-01-01T00:00:00Z"}"""
                 .formatted(id, name, parentId);
     }
+
+
+    @Nested
+    class MultiSiteTest {
+
+        private MicrosoftDrivePlatform      sharePointPlatform;
+        private java.util.ArrayList<String> requestedUris;
+
+        @BeforeEach
+        void setUp() {
+            requestedUris = new java.util.ArrayList<>();
+            var graph = new MicrosoftGraphClient(request -> {
+                String uri = request.uri().toString();
+                requestedUris.add(uri);
+                String method = request.method();
+
+                if (uri.contains("/children") && uri.contains("$top") && method.equals("GET")) {
+                    return new StubHttpResponse(200, """
+                                                     {"value":[%s]}""".formatted(fileItemJson("file-1", "report.pdf",
+                                                                                              "root", "application/pdf", 1024)));
+                }
+
+                if (uri.matches(".*\\/items\\/[^/]+$") && method.equals("GET")
+                    && !uri.contains("children") && !uri.contains("content")) {
+                    return new StubHttpResponse(200,
+                                                fileItemJson("file-1", "report.pdf", "root",
+                                                             "application/pdf", 1024));
+                }
+
+                if (method.equals("DELETE")) {
+                    return new StubHttpResponse(204, "");
+                }
+
+                if (uri.contains("/children") && method.equals("GET")) {
+                    return new StubHttpResponse(200, """
+                                                     {"value":[%s]}""".formatted(folderItemJson("folder-1",
+                                                                                                "Documents", "root")));
+                }
+
+                if (uri.contains("search(q=")) {
+                    return new StubHttpResponse(200, """
+                                                     {"value":[%s]}""".formatted(fileItemJson("file-1", "report.pdf",
+                                                                                              "root", "application/pdf", 1024)));
+                }
+
+                if (uri.contains("createLink") && method.equals("POST")) {
+                    return new StubHttpResponse(200, """
+                                                     {"link":{"webUrl":"https://1drv.ms/b/s!shared-link"}}""");
+                }
+
+                if (uri.contains("/sites?") && method.equals("GET")) {
+                    return new StubHttpResponse(200, """
+                                                     {"value":[{"id":"site-abc","displayName":"Marketing","description":"Marketing site","webUrl":"https://contoso.sharepoint.com/sites/marketing"},\
+                                                     {"id":"site-def","displayName":"Engineering","description":"Engineering site","webUrl":"https://contoso.sharepoint.com/sites/engineering"}]}""");
+                }
+
+                return new StubHttpResponse(200, """
+                                                 {"value":[]}""");
+            });
+
+            var defaultClient = new MicrosoftDriveClient(graph, "/sites/site-default/drive");
+            sharePointPlatform = new MicrosoftDrivePlatform(defaultClient, graph,
+                                                            MicrosoftDriveClient.DEFAULT_CDN_SUFFIXES, null, "microsoft-sharepoint");
+        }
+
+        @Test
+        void plainIdRoutesToDefaultSite() {
+            sharePointPlatform.files("test-user").get("file-1");
+            assertThat(requestedUris).anyMatch(uri ->
+                                                       uri.contains("/sites/site-default/drive/items/file-1"));
+        }
+
+        @Test
+        void compoundIdRoutesToSpecifiedSite() {
+            sharePointPlatform.files("test-user").get("sp:site-other:file-1");
+            assertThat(requestedUris).anyMatch(uri ->
+                                                       uri.contains("/sites/site-other/drive/items/file-1"));
+        }
+
+        @Test
+        void compoundIdReturnsCompoundIdsInResult() {
+            var meta = sharePointPlatform.files("test-user").get("sp:site-other:file-1");
+            assertThat(meta.id()).startsWith("sp:site-other:");
+            assertThat(meta.folderId()).startsWith("sp:site-other:");
+        }
+
+        @Test
+        void plainIdReturnsPlainIdsInResult() {
+            var meta = sharePointPlatform.files("test-user").get("file-1");
+            assertThat(meta.id()).doesNotStartWith("sp:");
+        }
+
+        @Test
+        void compoundFolderIdRoutesListToSpecifiedSite() {
+            var page = sharePointPlatform.files("test-user")
+                                         .list("sp:site-other:root", PageRequest.first(25));
+            assertThat(requestedUris).anyMatch(uri ->
+                                                       uri.contains("/sites/site-other/drive/items/root/children"));
+            assertThat(page.items().get(0).id()).startsWith("sp:site-other:");
+        }
+
+        @Test
+        void compoundFolderIdRoutesFolderListToSpecifiedSite() {
+            var folders = sharePointPlatform.folders("test-user")
+                                            .list("sp:site-other:root");
+            assertThat(requestedUris).anyMatch(uri ->
+                                                       uri.contains("/sites/site-other/drive/items/root/children"));
+            assertThat(folders.get(0).id()).startsWith("sp:site-other:");
+        }
+
+        @Test
+        void siteDiscoveryIsAccessibleViaAs() {
+            var discovery = sharePointPlatform.as(SiteDiscovery.class);
+            assertThat(discovery).isPresent();
+        }
+
+        @Test
+        void searchSitesReturnsSites() {
+            var discovery = sharePointPlatform.as(SiteDiscovery.class).orElseThrow();
+            var sites     = discovery.searchSites("test-user", "marketing");
+            assertThat(sites).hasSize(2);
+            assertThat(sites.get(0).name()).isEqualTo("Marketing");
+            assertThat(sites.get(0).id()).isEqualTo("site-abc");
+        }
+    }
+
 }

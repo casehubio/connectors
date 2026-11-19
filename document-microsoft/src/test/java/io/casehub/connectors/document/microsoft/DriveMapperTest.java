@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class DriveMapperTest {
 
@@ -71,6 +71,54 @@ class DriveMapperTest {
         assertThat(folder.parentId()).isEqualTo("root");
         assertThat(folder.createdAt()).isEqualTo(Instant.parse("2026-03-10T09:00:00Z"));
     }
+
+    @Test
+    void toSummaryWithSiteIdPrefixesIds() {
+        var json = driveItemJson("file-1", "report.pdf", "parent-1",
+                                 "application/pdf", 1024);
+        var summary = DriveMapper.toSummary(json, "site-abc");
+
+        assertThat(summary.id()).isEqualTo("sp:site-abc:file-1");
+        assertThat(summary.folderId()).isEqualTo("sp:site-abc:parent-1");
+        assertThat(summary.name()).isEqualTo("report.pdf");
+    }
+
+    @Test
+    void toMetadataWithSiteIdPrefixesIds() {
+        var json = driveItemJson("file-2", "doc.docx", "parent-2",
+                                 "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                                 2048);
+        var meta = DriveMapper.toMetadata(json, "site-abc");
+
+        assertThat(meta.id()).isEqualTo("sp:site-abc:file-2");
+        assertThat(meta.folderId()).isEqualTo("sp:site-abc:parent-2");
+    }
+
+    @Test
+    void toFolderWithSiteIdPrefixesIds() {
+        var json = Json.createObjectBuilder()
+                       .add("id", "folder-1")
+                       .add("name", "Documents")
+                       .add("folder", Json.createObjectBuilder().add("childCount", 5))
+                       .add("parentReference", Json.createObjectBuilder().add("id", "root"))
+                       .add("createdDateTime", "2026-03-10T09:00:00Z")
+                       .build();
+        var folder = DriveMapper.toFolder(json, "site-abc");
+
+        assertThat(folder.id()).isEqualTo("sp:site-abc:folder-1");
+        assertThat(folder.parentId()).isEqualTo("sp:site-abc:root");
+    }
+
+    @Test
+    void toSummaryWithNullSiteIdDoesNotPrefix() {
+        var json = driveItemJson("file-1", "report.pdf", "parent-1",
+                                 "application/pdf", 1024);
+        var summary = DriveMapper.toSummary(json, null);
+
+        assertThat(summary.id()).isEqualTo("file-1");
+        assertThat(summary.folderId()).isEqualTo("parent-1");
+    }
+
 
     private static JsonObject driveItemJson(String id, String name, String parentId,
             String mimeType, long size) {

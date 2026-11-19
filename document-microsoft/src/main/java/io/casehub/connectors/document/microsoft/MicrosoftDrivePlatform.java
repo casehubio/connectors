@@ -7,27 +7,42 @@ import io.casehub.connectors.SyncResult;
 import io.casehub.connectors.document.model.DocumentMetadata;
 import io.casehub.connectors.document.model.DocumentSummary;
 import io.casehub.connectors.document.model.Folder;
+import io.casehub.connectors.document.model.Site;
 import io.casehub.connectors.document.spi.DocumentPlatform;
+import io.casehub.connectors.document.spi.SiteDiscovery;
+import io.casehub.connectors.microsoft.MicrosoftGraphClient;
 import io.casehub.connectors.microsoft.TokenRetry;
 import io.casehub.platform.api.authn.ServiceConnectionProvider;
 
 import java.util.List;
+import java.util.Set;
 
-public class MicrosoftDrivePlatform implements DocumentPlatform {
 
-    private final MicrosoftDriveClient client;
+public class MicrosoftDrivePlatform implements DocumentPlatform, SiteDiscovery {
+
+    private final MicrosoftDriveClient      client;
+    private final MicrosoftGraphClient      graph;
+    private final Set<String>               allowedCdnHosts;
     private final ServiceConnectionProvider connectionProvider;
-    private final String platformId;
+    private final String                    platformId;
 
     public MicrosoftDrivePlatform(MicrosoftDriveClient client,
-            ServiceConnectionProvider connectionProvider, String platformId) {
-        this.client = client;
+                                  ServiceConnectionProvider connectionProvider, String platformId) {
+        this(client, null, null, connectionProvider, platformId);
+    }
+
+    public MicrosoftDrivePlatform(MicrosoftDriveClient client,
+                                  MicrosoftGraphClient graph, Set<String> allowedCdnHosts,
+                                  ServiceConnectionProvider connectionProvider, String platformId) {
+        this.client             = client;
+        this.graph              = graph;
+        this.allowedCdnHosts    = allowedCdnHosts;
         this.connectionProvider = connectionProvider;
-        this.platformId = platformId;
+        this.platformId         = platformId;
     }
 
     MicrosoftDrivePlatform(MicrosoftDriveClient client, String platformId) {
-        this(client, null, platformId);
+        this(client, null, null, null, platformId);
     }
 
     @Override
@@ -37,11 +52,11 @@ public class MicrosoftDrivePlatform implements DocumentPlatform {
 
     @Override
     public boolean supports(Class<?> capability) {
-        if (client == null) return false;
+        if (client == null) {return false;}
         return capability == FileOperations.class
-                || capability == FolderOperations.class
-                || capability == SearchOperations.class
-                || capability == SharingOperations.class;
+               || capability == FolderOperations.class
+               || capability == SearchOperations.class
+               || capability == SharingOperations.class;
     }
 
     @Override
@@ -68,6 +83,26 @@ public class MicrosoftDrivePlatform implements DocumentPlatform {
         return new MicrosoftSharingOperations(userId);
     }
 
+    @Override
+    public List<Site> searchSites(String userId, String query) {
+        if (graph == null) {return List.of();}
+        return TokenRetry.withTokenRetry(() -> resolveToken(userId),
+                                         token -> {
+                                             String escaped = query.replace("'", "''");
+                                             var    result  = graph.get("/sites?search=" + escaped, token);
+                                             var    sites   = new java.util.ArrayList<Site>();
+                                             for (var item : result.getJsonArray("value")) {
+                                                 var obj = item.asJsonObject();
+                                                 sites.add(new Site(
+                                                         obj.getString("id"),
+                                                         obj.getString("displayName", null),
+                                                         obj.getString("description", null),
+                                                         obj.getString("webUrl", null)));
+                                             }
+                                             return List.copyOf(sites);
+                                         });
+    }
+
     private void requireConfigured() {
         if (client == null) {
             throw new IllegalStateException(platformId + " provider not configured");
@@ -75,116 +110,153 @@ public class MicrosoftDrivePlatform implements DocumentPlatform {
     }
 
     private String resolveToken(String userId) {
-        if (connectionProvider == null) return "test-token";
+        if (connectionProvider == null) {return "test-token";}
         return connectionProvider.getAccessToken(userId, "microsoft", "default")
-                .accessToken();
+                                 .accessToken();
+    }
+
+    private MicrosoftDriveClient resolveClient(String siteId) {
+        if (siteId == null || graph == null) {return client;}
+        var hosts = allowedCdnHosts != null ? allowedCdnHosts
+                                            : MicrosoftDriveClient.DEFAULT_CDN_SUFFIXES;
+        return new MicrosoftDriveClient(graph, "/sites/" + siteId + "/drive", hosts);
     }
 
     private class MicrosoftFileOperations implements FileOperations {
         private final String userId;
-        MicrosoftFileOperations(String userId) { this.userId = userId; }
+
+        MicrosoftFileOperations(String userId) {this.userId = userId;}
 
         @Override
         public Page<DocumentSummary> list(String folderId, PageRequest pagination) {
+            var parsed      = SharePointId.parse(folderId);
+            var driveClient = resolveClient(parsed.siteId());
             return TokenRetry.withTokenRetry(() -> resolveToken(userId),
-                    token -> {
-                        var page = client.listChildren(folderId, pagination, token);
-                        return new Page<>(
-                                page.items().stream().map(DriveMapper::toSummary).toList(),
-                                page.nextCursor(), page.hasMore());
-                    });
+                                             token -> {
+                                                 var page = driveClient.listChildren(parsed.itemId(), pagination, token);
+                                                 return new Page<>(
+                                                         page.items().stream()
+                                                             .map(item -> DriveMapper.toSummary(item, parsed.siteId()))
+                                                             .toList(),
+                                                         page.nextCursor(), page.hasMore());
+                                             });
         }
 
         @Override
         public DocumentMetadata get(String fileId) {
+            var parsed      = SharePointId.parse(fileId);
+            var driveClient = resolveClient(parsed.siteId());
             return TokenRetry.withTokenRetry(() -> resolveToken(userId),
-                    token -> DriveMapper.toMetadata(client.getItem(fileId, token)));
+                                             token -> DriveMapper.toMetadata(
+                                                     driveClient.getItem(parsed.itemId(), token), parsed.siteId()));
         }
 
         @Override
         public byte[] download(String fileId) {
+            var parsed      = SharePointId.parse(fileId);
+            var driveClient = resolveClient(parsed.siteId());
             return TokenRetry.withTokenRetry(() -> resolveToken(userId),
-                    token -> client.downloadContent(fileId, token));
+                                             token -> driveClient.downloadContent(parsed.itemId(), token));
         }
 
         @Override
         public DocumentMetadata upload(String folderId, String name,
-                String contentType, byte[] content) {
+                                       String contentType, byte[] content) {
+            var parsed      = SharePointId.parse(folderId);
+            var driveClient = resolveClient(parsed.siteId());
             return TokenRetry.withTokenRetry(() -> resolveToken(userId),
-                    token -> DriveMapper.toMetadata(
-                            client.upload(folderId, name, contentType, content, token)));
+                                             token -> DriveMapper.toMetadata(
+                                                     driveClient.upload(parsed.itemId(), name, contentType, content, token),
+                                                     parsed.siteId()));
         }
 
         @Override
         public void delete(String fileId) {
+            var parsed      = SharePointId.parse(fileId);
+            var driveClient = resolveClient(parsed.siteId());
             TokenRetry.withTokenRetryVoid(() -> resolveToken(userId),
-                    token -> client.deleteItem(fileId, token));
+                                          token -> driveClient.deleteItem(parsed.itemId(), token));
         }
 
         @Override
         public SyncResult<DocumentSummary> listSync(SyncRequest request) {
             return TokenRetry.withTokenRetry(() -> resolveToken(userId),
-                    token -> {
-                        var delta = client.deltaSync(request.syncToken(), token);
-                        return new SyncResult<>(
-                                delta.changed().stream()
-                                        .map(DriveMapper::toSummary).toList(),
-                                delta.deletedIds(),
-                                delta.deltaLink(),
-                                false);
-                    });
+                                             token -> {
+                                                 var delta = client.deltaSync(request.syncToken(), token);
+                                                 return new SyncResult<>(
+                                                         delta.changed().stream()
+                                                              .map(DriveMapper::toSummary).toList(),
+                                                         delta.deletedIds(),
+                                                         delta.deltaLink(),
+                                                         false);
+                                             });
         }
     }
 
     private class MicrosoftFolderOperations implements FolderOperations {
         private final String userId;
-        MicrosoftFolderOperations(String userId) { this.userId = userId; }
+
+        MicrosoftFolderOperations(String userId) {this.userId = userId;}
 
         @Override
         public List<Folder> list(String parentId) {
+            var parsed      = SharePointId.parse(parentId);
+            var driveClient = resolveClient(parsed.siteId());
             return TokenRetry.withTokenRetry(() -> resolveToken(userId),
-                    token -> client.listFolders(parentId, token).stream()
-                            .map(DriveMapper::toFolder).toList());
+                                             token -> driveClient.listFolders(parsed.itemId(), token).stream()
+                                                                 .map(item -> DriveMapper.toFolder(item, parsed.siteId()))
+                                                                 .toList());
         }
 
         @Override
         public Folder create(String parentId, String name) {
+            var parsed      = SharePointId.parse(parentId);
+            var driveClient = resolveClient(parsed.siteId());
             return TokenRetry.withTokenRetry(() -> resolveToken(userId),
-                    token -> DriveMapper.toFolder(
-                            client.createFolder(parentId, name, token)));
+                                             token -> DriveMapper.toFolder(
+                                                     driveClient.createFolder(parsed.itemId(), name, token),
+                                                     parsed.siteId()));
         }
 
         @Override
         public void move(String fileId, String targetFolderId) {
+            var parsed       = SharePointId.parse(fileId);
+            var targetParsed = SharePointId.parse(targetFolderId);
+            var driveClient  = resolveClient(parsed.siteId());
             TokenRetry.withTokenRetryVoid(() -> resolveToken(userId),
-                    token -> client.moveItem(fileId, targetFolderId, token));
+                                          token -> driveClient.moveItem(parsed.itemId(), targetParsed.itemId(), token));
         }
     }
 
     private class MicrosoftSearchOperations implements SearchOperations {
         private final String userId;
-        MicrosoftSearchOperations(String userId) { this.userId = userId; }
+
+        MicrosoftSearchOperations(String userId) {this.userId = userId;}
 
         @Override
         public Page<DocumentSummary> search(String query, PageRequest pagination) {
             return TokenRetry.withTokenRetry(() -> resolveToken(userId),
-                    token -> {
-                        var page = client.search(query, pagination, token);
-                        return new Page<>(
-                                page.items().stream().map(DriveMapper::toSummary).toList(),
-                                page.nextCursor(), page.hasMore());
-                    });
+                                             token -> {
+                                                 var page = client.search(query, pagination, token);
+                                                 return new Page<>(
+                                                         page.items().stream().map(DriveMapper::toSummary).toList(),
+                                                         page.nextCursor(), page.hasMore());
+                                             });
         }
     }
 
     private class MicrosoftSharingOperations implements SharingOperations {
         private final String userId;
-        MicrosoftSharingOperations(String userId) { this.userId = userId; }
+
+        MicrosoftSharingOperations(String userId) {this.userId = userId;}
 
         @Override
         public String getShareLink(String fileId) {
+            var parsed      = SharePointId.parse(fileId);
+            var driveClient = resolveClient(parsed.siteId());
             return TokenRetry.withTokenRetry(() -> resolveToken(userId),
-                    token -> client.createShareLink(fileId, token));
+                                             token -> driveClient.createShareLink(parsed.itemId(), token));
         }
     }
 }
+

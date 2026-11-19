@@ -45,8 +45,9 @@ public class DocumentMicrosoftBeans {
             LOG.warning("SharePoint site-id not configured — microsoft-sharepoint provider degraded");
             return new MicrosoftDrivePlatform(null, connectionProvider, "microsoft-sharepoint");
         }
+        var cdnHosts = Set.copyOf(allowedCdnHosts);
         return new MicrosoftDrivePlatform(
-                new MicrosoftDriveClient(graph, "/sites/" + siteId + "/drive", Set.copyOf(allowedCdnHosts)),
-                connectionProvider, "microsoft-sharepoint");
+                new MicrosoftDriveClient(graph, "/sites/" + siteId + "/drive", cdnHosts),
+                graph, cdnHosts, connectionProvider, "microsoft-sharepoint");
     }
 }

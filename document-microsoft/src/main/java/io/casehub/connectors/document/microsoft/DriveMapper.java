@@ -12,17 +12,26 @@ final class DriveMapper {
     private DriveMapper() {}
 
     static DocumentSummary toSummary(JsonObject item) {
+        return toSummary(item, null);
+    }
+
+    static DocumentSummary toSummary(JsonObject item, String siteId) {
         return new DocumentSummary(
-                item.getString("id"),
+                SharePointId.compose(siteId, item.getString("id")),
                 item.getString("name"),
-                parentId(item),
+                SharePointId.compose(siteId, parentId(item)),
                 mimeType(item),
                 item.getJsonNumber("size").longValue(),
                 parseInstant(item, "createdDateTime"),
                 parseInstant(item, "lastModifiedDateTime"));
     }
 
+
     static DocumentMetadata toMetadata(JsonObject item) {
+        return toMetadata(item, null);
+    }
+
+    static DocumentMetadata toMetadata(JsonObject item, String siteId) {
         String owner = null;
         if (item.containsKey("createdBy")) {
             var createdBy = item.getJsonObject("createdBy");
@@ -31,9 +40,9 @@ final class DriveMapper {
             }
         }
         return new DocumentMetadata(
-                item.getString("id"),
+                SharePointId.compose(siteId, item.getString("id")),
                 item.getString("name"),
-                parentId(item),
+                SharePointId.compose(siteId, parentId(item)),
                 mimeType(item),
                 item.getJsonNumber("size").longValue(),
                 owner,
@@ -42,13 +51,19 @@ final class DriveMapper {
                 parseInstant(item, "lastModifiedDateTime"));
     }
 
+
     static Folder toFolder(JsonObject item) {
+        return toFolder(item, null);
+    }
+
+    static Folder toFolder(JsonObject item, String siteId) {
         return new Folder(
-                item.getString("id"),
+                SharePointId.compose(siteId, item.getString("id")),
                 item.getString("name"),
-                parentId(item),
+                SharePointId.compose(siteId, parentId(item)),
                 parseInstant(item, "createdDateTime"));
     }
+
 
     private static String parentId(JsonObject item) {
         if (item.containsKey("parentReference")) {
