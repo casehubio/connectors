@@ -323,6 +323,29 @@ class TeamsChatPlatformTest {
             assertThatThrownBy(() -> platformWithAtt.messaging().send(ref, content))
                     .isInstanceOf(io.casehub.connectors.ProviderApiException.class);
         }
+
+        @Test
+        void missingParentReferenceThrowsProviderApiException() {
+            var graph = new MicrosoftGraphClient(request -> {
+                if (request.uri().toString().contains("/filesFolder")) {
+                    return new StubHttpResponse(200, """
+                                                     {"id":"folder-1"}""");
+                }
+                return new StubHttpResponse(200, "{\"value\":[]}");
+            });
+            var platformNoRef = new TeamsChatPlatform(new TeamsClient(graph)).build();
+
+            var att = new io.casehub.connectors.Attachment(
+                    "doc.pdf", "application/pdf", new byte[]{1});
+            var content = new ChatContent("text", null,
+                                          java.util.List.of(att), java.util.List.of());
+            var ref = new ChatChannelRef("team-1:ch-1");
+
+            assertThatThrownBy(() -> platformNoRef.messaging().send(ref, content))
+                    .isInstanceOf(io.casehub.connectors.ProviderApiException.class)
+                    .hasMessageContaining("parentReference");
+        }
+
     }
 
 

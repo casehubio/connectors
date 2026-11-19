@@ -206,18 +206,24 @@ public class TeamsChatPlatform {
     }
 
     private List<UploadedRef> uploadAttachments(String teamId, String channelId,
-            List<Attachment> attachments, String token) {
+                                                List<Attachment> attachments, String token) {
         if (attachments.isEmpty()) {
             return List.of();
         }
-        var    folder   = client.getChannelFilesFolder(teamId, channelId, token);
-        String folderId = folder.getString("id");
-        String driveId  = folder.getJsonObject("parentReference").getString("driveId");
-        var    refs     = new ArrayList<UploadedRef>();
+        var    folder    = client.getChannelFilesFolder(teamId, channelId, token);
+        String folderId  = folder.getString("id");
+        var    parentRef = folder.getJsonObject("parentReference");
+        if (parentRef == null) {
+            throw new io.casehub.connectors.ProviderApiException(
+                    200, "filesFolder response missing parentReference for channel " + channelId,
+                    "microsoft-teams");
+        }
+        String driveId = parentRef.getString("driveId");
+        var    refs    = new ArrayList<UploadedRef>();
         for (int i = 0; i < attachments.size(); i++) {
             var    att  = attachments.get(i);
             String name = safeAttachmentName(i, att);
-            var    item = client.uploadToChannelFolder(
+            var item = client.uploadToChannelFolder(
                     driveId, folderId, name, att.contentType(), att.content(), token);
             refs.add(new UploadedRef(name, item.getString("webUrl")));
         }
