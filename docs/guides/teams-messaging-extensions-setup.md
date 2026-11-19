@@ -46,6 +46,17 @@ Remove any sections you don't need. Add additional commands by
 duplicating entries in the `commands` array — each command needs a
 unique `id`.
 
+### Stripping comment fields
+
+The template uses `_comment` and `_settingsComment` fields for inline
+documentation. These are non-standard — the Teams Developer Portal
+validator may reject them. Strip all comment fields before packaging
+the manifest into a ZIP for upload:
+
+```bash
+jq 'walk(if type == "object" then with_entries(select(.key | startswith("_") | not)) else . end)' manifest.json > manifest-clean.json
+```
+
 ### Manifest schema version
 
 The template uses schema version **1.13**, the minimum required for all
