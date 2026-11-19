@@ -83,6 +83,13 @@
     </dependency>
     <dependency>
       <groupId>io.casehub</groupId>
+      <artifactId>casehub-connectors-mobile-ref</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.casehub</groupId>
       <artifactId>casehub-connectors-mobile-twilio</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>

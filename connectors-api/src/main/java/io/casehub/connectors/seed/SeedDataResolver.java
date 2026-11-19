@@ -27,7 +27,7 @@ public final class SeedDataResolver {
                 }
             }
         }
-        InputStream is = SeedDataResolver.class.getResourceAsStream("/seed/" + filename);
+        InputStream is = SeedDataResolver.class.getResourceAsStream("/seed/" + domain + "/" + filename);
         return Optional.ofNullable(is);
     }
 

@@ -117,6 +117,34 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-seed-corpus</id>
+                        <phase>package</phase>
+                        <goals><goal>copy-resources</goal></goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/quarkus-app/corpus</outputDirectory>
+                            <resources>
+                                <resource><directory>${project.basedir}/../bank-ref/src/test/resources/seed/bank</directory><targetPath>bank</targetPath></resource>
+                                <resource><directory>${project.basedir}/../calendar-ref/src/test/resources/seed/calendar</directory><targetPath>calendar</targetPath></resource>
+                                <resource><directory>${project.basedir}/../chat-ref/src/test/resources/seed/chat</directory><targetPath>chat</targetPath></resource>
+                                <resource><directory>${project.basedir}/../commerce-ref/src/test/resources/seed/commerce</directory><targetPath>commerce</targetPath></resource>
+                                <resource><directory>${project.basedir}/../contacts-ref/src/test/resources/seed/contacts</directory><targetPath>contacts</targetPath></resource>
+                                <resource><directory>${project.basedir}/../document-ref/src/test/resources/seed/document</directory><targetPath>document</targetPath></resource>
+                                <resource><directory>${project.basedir}/../email-ref/src/test/resources/seed/email</directory><targetPath>email</targetPath></resource>
+                                <resource><directory>${project.basedir}/../health-ref/src/test/resources/seed/health</directory><targetPath>health</targetPath></resource>
+                                <resource><directory>${project.basedir}/../location-ref/src/test/resources/seed/location</directory><targetPath>location</targetPath></resource>
+                                <resource><directory>${project.basedir}/../mobile-ref/src/test/resources/seed/mobile</directory><targetPath>mobile</targetPath></resource>
+                                <resource><directory>${project.basedir}/../project-ref/src/test/resources/seed/project</directory><targetPath>project</targetPath></resource>
+                                <resource><directory>${project.basedir}/../travel-ref/src/test/resources/seed/travel</directory><targetPath>travel</targetPath></resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
@@ -128,7 +156,7 @@
             </activation>
             <properties>
                 <quarkus.native.enabled>true</quarkus.native.enabled>
-                <quarkus.native.resources.includes>seed/*.yaml,seed/*.json</quarkus.native.resources.includes>
+                <quarkus.native.resources.includes>corpus/**/*.yaml</quarkus.native.resources.includes>
             </properties>
         </profile>
     </profiles>

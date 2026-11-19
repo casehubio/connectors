@@ -110,6 +110,13 @@ No production Java — playbooks in src/main/playbooks, tests in src/test/playbo
     </dependency>
     <dependency>
       <groupId>io.casehub</groupId>
+      <artifactId>casehub-connectors-bank-ref</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.casehub</groupId>
       <artifactId>casehub-connectors-chat-spi</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
@@ -122,6 +129,13 @@ No production Java — playbooks in src/main/playbooks, tests in src/test/playbo
     </dependency>
     <dependency>
       <groupId>io.casehub</groupId>
+      <artifactId>casehub-connectors-chat-ref</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.casehub</groupId>
       <artifactId>casehub-connectors-email-spi</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
@@ -130,6 +144,13 @@ No production Java — playbooks in src/main/playbooks, tests in src/test/playbo
       <groupId>io.casehub</groupId>
       <artifactId>casehub-connectors-email-ref</artifactId>
       <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.casehub</groupId>
+      <artifactId>casehub-connectors-email-ref</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -152,6 +173,13 @@ No production Java — playbooks in src/main/playbooks, tests in src/test/playbo
     </dependency>
     <dependency>
       <groupId>io.casehub</groupId>
+      <artifactId>casehub-connectors-mobile-ref</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.casehub</groupId>
       <artifactId>casehub-connectors-location-spi</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
@@ -160,6 +188,13 @@ No production Java — playbooks in src/main/playbooks, tests in src/test/playbo
       <groupId>io.casehub</groupId>
       <artifactId>casehub-connectors-location-ref</artifactId>
       <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.casehub</groupId>
+      <artifactId>casehub-connectors-location-ref</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
       <scope>test</scope>
     </dependency>
     <dependency>
