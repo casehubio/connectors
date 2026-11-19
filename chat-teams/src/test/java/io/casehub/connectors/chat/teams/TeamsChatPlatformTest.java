@@ -416,13 +416,13 @@ class TeamsChatPlatformTest {
             var botClient = new BotFrameworkClient(null,
                                                    "*.botframework.com,smba.trafficmanager.net") {
                 @Override
-                String sendToConversation(String serviceUrl, String conversationId, String text) {
+                String sendToConversation(String serviceUrl, String conversationId, jakarta.json.JsonObject activity) {
                     return "activity-" + conversationId;
                 }
 
                 @Override
                 String replyToActivity(String serviceUrl, String conversationId,
-                                       String activityId, String text) {
+                                       String activityId, jakarta.json.JsonObject activity) {
                     return "reply-" + activityId;
                 }
             };
@@ -449,6 +449,33 @@ class TeamsChatPlatformTest {
             assertThat(result.ok()).isTrue();
             assertThat(capturedUrls).noneMatch(u -> u.contains("/teams/"));
         }
+
+        @Test
+        void sendToPersonalChannel_preservesMarkdown() {
+            var capturedActivities = new java.util.ArrayList<jakarta.json.JsonObject>();
+            var graph = new MicrosoftGraphClient(request ->
+                                                         new StubHttpResponse(200, "{\"value\":[]}"));
+            var botClient = new BotFrameworkClient(null,
+                                                   "*.botframework.com,smba.trafficmanager.net") {
+                @Override
+                String sendToConversation(String serviceUrl, String conversationId, jakarta.json.JsonObject activity) {
+                    capturedActivities.add(activity);
+                    return "activity-" + conversationId;
+                }
+            };
+            var richPlatform = new TeamsChatPlatform(new TeamsClient(graph))
+                                       .withBotClient(botClient, "https://smba.trafficmanager.net/teams/")
+                                       .build();
+
+            var content = new ChatContent("fallback", "**bold**", java.util.List.of(), java.util.List.of());
+            richPlatform.messaging().send(new ChatChannelRef("personal:conv-1"), content);
+
+            assertThat(capturedActivities).hasSize(1);
+            var activity = capturedActivities.getFirst();
+            assertThat(activity.getString("text")).contains("<strong>bold</strong>");
+            assertThat(activity.getString("textFormat")).isEqualTo("xml");
+        }
+
 
         @Test
         void sendToTeamChannel_stillUsesGraphApi() {
@@ -682,15 +709,15 @@ class TeamsChatPlatformTest {
             var botClient = new BotFrameworkClient(null,
                                                    "*.botframework.com,smba.trafficmanager.net") {
                 @Override
-                String sendToConversation(String serviceUrl, String conversationId, String text) {
-                    botCalls.add("send:" + conversationId + ":" + text);
+                String sendToConversation(String serviceUrl, String conversationId, jakarta.json.JsonObject activity) {
+                    botCalls.add("send:" + conversationId + ":" + activity.getString("text"));
                     return "activity-" + conversationId;
                 }
 
                 @Override
                 String replyToActivity(String serviceUrl, String conversationId,
-                                       String activityId, String text) {
-                    botCalls.add("reply:" + conversationId + ":" + activityId + ":" + text);
+                                       String activityId, jakarta.json.JsonObject activity) {
+                    botCalls.add("reply:" + conversationId + ":" + activityId + ":" + activity.getString("text"));
                     return "reply-" + activityId;
                 }
 

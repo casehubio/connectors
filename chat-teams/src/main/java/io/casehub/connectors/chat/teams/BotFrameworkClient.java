@@ -3,6 +3,7 @@ package io.casehub.connectors.chat.teams;
 import io.casehub.connectors.http.HttpHelper;
 import io.casehub.platform.api.authn.ServiceConnectionProvider;
 import jakarta.json.Json;
+import jakarta.json.JsonObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -47,13 +48,12 @@ class BotFrameworkClient {
     }
 
     String replyToActivity(String serviceUrl, String conversationId,
-                           String activityId, String text) {
+                           String activityId, JsonObject activity) {
         validateServiceUrl(serviceUrl);
         String url = stripTrailingSlash(serviceUrl)
                      + "/v3/conversations/" + conversationId + "/activities/" + activityId;
-        String body = Json.createObjectBuilder()
+        String body = Json.createObjectBuilder(activity)
                           .add("type", "message")
-                          .add("text", text)
                           .build().toString();
         String responseBody = postJsonWithResponse(url, body);
         try (var reader = Json.createReader(new StringReader(responseBody))) {
@@ -61,13 +61,12 @@ class BotFrameworkClient {
         }
     }
 
-    String sendToConversation(String serviceUrl, String conversationId, String text) {
+    String sendToConversation(String serviceUrl, String conversationId, JsonObject activity) {
         validateServiceUrl(serviceUrl);
         String url = stripTrailingSlash(serviceUrl)
                      + "/v3/conversations/" + conversationId + "/activities";
-        String body = Json.createObjectBuilder()
+        String body = Json.createObjectBuilder(activity)
                           .add("type", "message")
-                          .add("text", text)
                           .build().toString();
         String responseBody = postJsonWithResponse(url, body);
         try (var reader = Json.createReader(new StringReader(responseBody))) {

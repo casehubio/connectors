@@ -150,6 +150,30 @@ final class TeamsMapper {
         return msg.build();
     }
 
+    static JsonObject toActivity(ChatContent content) {
+        var builder = Json.createObjectBuilder().add("type", "message");
+        if (content.markdown() != null) {
+            builder.add("text", markdownToHtml(content.markdown()));
+            builder.add("textFormat", "xml");
+        } else {
+            builder.add("text", content.text());
+            builder.add("textFormat", "plain");
+        }
+        if (!content.cards().isEmpty()) {
+            var attachments = Json.createArrayBuilder();
+            for (var card : content.cards()) {
+                String cardJson = toAdaptiveCardJson(card);
+                try (var reader = Json.createReader(new java.io.StringReader(cardJson))) {
+                    attachments.add(Json.createObjectBuilder()
+                                        .add("contentType", "application/vnd.microsoft.card.adaptive")
+                                        .add("content", reader.readObject()));
+                }
+            }
+            builder.add("attachments", attachments);
+        }
+        return builder.build();
+    }
+
 
     static String markdownToHtml(String md) {
         String html = escapeHtml(md);

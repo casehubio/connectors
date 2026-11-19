@@ -330,14 +330,15 @@ public class TeamsInboundConnector extends WebhookInboundConnector {
 
         return switch (response) {
             case CommandResponse.Immediate imm -> {
-                client.replyToActivity(serviceUrl, conversationId, activityId, imm.text());
+                client.replyToActivity(serviceUrl, conversationId, activityId,
+                        Json.createObjectBuilder().add("text", imm.text()).add("textFormat", "plain").build());
                 yield new WebhookResult.Ignored();
             }
             case CommandResponse.Deferred def -> {
                 Thread.ofVirtual().name("teams-deferred-cmd").start(() -> {
                     DeferredReply reply = (replyText, ephemeral) ->
-                            client.replyToActivity(serviceUrl, conversationId,
-                                    activityId, replyText);
+                            client.replyToActivity(serviceUrl, conversationId, activityId,
+                                    Json.createObjectBuilder().add("text", replyText).add("textFormat", "plain").build());
                     def.callback().accept(reply);
                 });
                 yield new WebhookResult.Ignored();

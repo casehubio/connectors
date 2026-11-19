@@ -261,6 +261,41 @@ class TeamsMapperTest {
         assertThat(attachments.getJsonObject(1).getString("contentType")).isEqualTo("reference");
     }
 
+
+    @Test
+    void toActivityPlainText() {
+        var content  = new ChatContent("Hello world");
+        var activity = TeamsMapper.toActivity(content);
+        assertThat(activity.getString("type")).isEqualTo("message");
+        assertThat(activity.getString("text")).isEqualTo("Hello world");
+        assertThat(activity.getString("textFormat")).isEqualTo("plain");
+        assertThat(activity.containsKey("attachments")).isFalse();
+    }
+
+    @Test
+    void toActivityWithMarkdown() {
+        var content  = new ChatContent("fallback", "**bold**", List.of(), List.of());
+        var activity = TeamsMapper.toActivity(content);
+        assertThat(activity.getString("type")).isEqualTo("message");
+        assertThat(activity.getString("text")).contains("<strong>bold</strong>");
+        assertThat(activity.getString("textFormat")).isEqualTo("xml");
+    }
+
+    @Test
+    void toActivityWithRichCard() {
+        var card     = RichCard.builder().title("Report").build();
+        var content  = new ChatContent("fallback", null, List.of(), List.of(card));
+        var activity = TeamsMapper.toActivity(content);
+        assertThat(activity.getString("type")).isEqualTo("message");
+        var attachments = activity.getJsonArray("attachments");
+        assertThat(attachments).hasSize(1);
+        assertThat(attachments.getJsonObject(0).getString("contentType"))
+                .isEqualTo("application/vnd.microsoft.card.adaptive");
+        assertThat(attachments.getJsonObject(0).getJsonObject("content")).isNotNull();
+        assertThat(attachments.getJsonObject(0).getJsonObject("content").getString("type"))
+                .isEqualTo("AdaptiveCard");
+    }
+
     private static PresenceStatus presence(String availability) {
         var json = Json.createObjectBuilder()
                 .add("availability", availability)

@@ -122,7 +122,7 @@ public class TeamsChatPlatform {
             }
             String conversationId = extractConversationId(parent.channel().id());
             String activityId = botClient.replyToActivity(defaultServiceUrl, conversationId,
-                                      parent.messageId(), content.text());
+                                                          parent.messageId(), TeamsMapper.toActivity(content));
             return new SendResult(true,
                                   new ChatMessageRef(parent.channel(), activityId),
                                   java.time.Instant.now(), null);
@@ -257,7 +257,7 @@ public class TeamsChatPlatform {
             throw new UnsupportedOperationException(
                     "Personal chat messaging requires a default service URL — set casehub.connectors.teams-bot.default-service-url");
         }
-        String activityId = botClient.sendToConversation(serviceUrl, conversationId, content.text());
+        String activityId = botClient.sendToConversation(serviceUrl, conversationId, TeamsMapper.toActivity(content));
         return new SendResult(true,
                               new ChatMessageRef(new ChatChannelRef("personal:" + conversationId), activityId),
                               java.time.Instant.now(), null);
@@ -304,7 +304,7 @@ public class TeamsChatPlatform {
 
     private SendResult sendProactiveMessage(String aadObjectId, ChatContent content) {
         var    resolved   = resolveConversation(aadObjectId);
-        String activityId = botClient.sendToConversation(resolved.serviceUrl(), resolved.conversationId(), content.text());
+        String activityId = botClient.sendToConversation(resolved.serviceUrl(), resolved.conversationId(), TeamsMapper.toActivity(content));
         return new SendResult(true,
                               new ChatMessageRef(new ChatChannelRef("personal:" + resolved.conversationId()), activityId),
                               java.time.Instant.now(), null);
@@ -313,7 +313,7 @@ public class TeamsChatPlatform {
     private SendResult replyToUserChannel(String aadObjectId, ChatMessageRef parent, ChatContent content) {
         var resolved = resolveConversation(aadObjectId);
         String activityId = botClient.replyToActivity(resolved.serviceUrl(), resolved.conversationId(),
-                                                      parent.messageId(), content.text());
+                                                      parent.messageId(), TeamsMapper.toActivity(content));
         return new SendResult(true,
                               new ChatMessageRef(new ChatChannelRef("personal:" + resolved.conversationId()), activityId),
                               java.time.Instant.now(), null);
