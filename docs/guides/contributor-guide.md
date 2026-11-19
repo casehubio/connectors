@@ -107,9 +107,25 @@ Platform-specific interaction endpoints (`DiscordInteractionEndpoint`, `SlackCom
 
 To add Commands support to a new `ChatPlatform`: (1) implement `Commands` for registration, (2) create a JAX-RS endpoint for receiving invocations, (3) wire into `ChatPlatform.commands()`. **Exception:** platforms with unified webhook transport (e.g. Teams via Bot Framework) embed command dispatch directly in the `WebhookInboundConnector` rather than using a separate JAX-RS endpoint, since all activity types (messages, commands, reactions) arrive at the same webhook.
 
+### User-Scoped Accessor Pattern
+
+SPIs that integrate with per-user OAuth2 providers (Google, Microsoft) use user-scoped capability accessors instead of direct methods on the platform interface. The pattern: `platform.capability(userId)` returns a capability interface whose methods operate in the context of that user's credentials.
+
+| SPI | Accessor | Returns |
+|-----|----------|---------|
+| `CalendarPlatform` | `calendarOps(userId)` | `CalendarOperations` |
+| `DocumentPlatform` | `files(userId)`, `folders(userId)`, `search(userId)`, `sharing(userId)` | capability sub-interfaces |
+| `EmailPlatform` | `emailOps(userId)` | `EmailOperations` |
+| `BankPlatform` | `accountInformation(userId)`, `paymentInitiation(userId)` | capability sub-interfaces |
+| `ContactsPlatform` | `contactRead(userId)`, `contactWrite(userId)`, `groupRead(userId)` | capability sub-interfaces |
+| `CommercePlatform` | `cart(userId)`, `checkout(userId)`, `orderTracking(userId)` | capability sub-interfaces |
+| `ProjectPlatform` | `issues(userId)`, `labels(userId)`, etc. | capability sub-interfaces |
+
+New providers for per-user OAuth SPIs should follow this pattern — the `userId` lets the provider resolve credentials via `GoogleCredentialResolver`, `ServiceConnectionProvider`, or equivalent CDI SPIs.
+
 ### Calendar Platform Architecture
 
-**`CalendarPlatform` SPI** (`calendar-spi`) -- 8 methods: `id()`, `listCalendars()`, `listEvents(calendarId, from, to)`, `getEvent(calendarId, eventId)`, `createEvent(calendarId, EventDetails)`, `updateEvent(calendarId, eventId, EventDetails)`, `deleteEvent(calendarId, eventId)`, `listEventsSync(calendarId, SyncRequest)`. Incremental sync uses the same `SyncResult<T>`/`SyncRequest`/`SyncTokenExpiredException` primitives as `ContactsPlatform`.
+**`CalendarPlatform` SPI** (`calendar-spi`) -- user-scoped accessor: `calendarOps(userId)` returns `CalendarOperations` with 7 methods: `listCalendars()`, `listEvents(calendarId, from, to)`, `getEvent(calendarId, eventId)`, `createEvent(calendarId, EventDetails)`, `updateEvent(calendarId, eventId, EventDetails)`, `deleteEvent(calendarId, eventId)`, `listEventsSync(calendarId, SyncRequest)`. Incremental sync uses the same `SyncResult<T>`/`SyncRequest`/`SyncTokenExpiredException` primitives as `ContactsPlatform`.
 
 **`CalendarPlatformService`** (`calendar-spi`) -- routing service, same `@All List<CalendarPlatform>` pattern.
 
@@ -133,7 +149,7 @@ To add Commands support to a new `ChatPlatform`: (1) implement `Commands` for re
 
 ### Email Platform Architecture
 
-**`EmailPlatform` SPI** (`email-spi`) -- 6 methods: `id()`, `listMailboxes()`, `listMessages(mailboxId, from, to, pagination)`, `getMessage(mailboxId, messageId)`, `getAttachmentContent(mailboxId, messageId, attachmentId)`, `search(query, pagination)`. Annotated with `@SimulationEligible(name = "email-platform")`.
+**`EmailPlatform` SPI** (`email-spi`) -- user-scoped accessor: `emailOps(userId)` returns `EmailOperations` with 5 methods: `listMailboxes()`, `listMessages(mailboxId, from, to, pagination)`, `getMessage(mailboxId, messageId)`, `getAttachmentContent(mailboxId, messageId, attachmentId)`, `search(query, pagination)`. Annotated with `@SimulationEligible(name = "email-platform")`.
 
 **Complements existing email modules:** `EmailConnector` handles outbound delivery (L1), `EmailInboundConnector` handles push inbound (L3), `EmailPlatform` adds query/read capability (platform SPI level). These are architecturally separate layers.
 

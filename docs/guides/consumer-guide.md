@@ -52,7 +52,7 @@ There are 36 active modules in the build (pom.xml `<modules>`):
 | `email-google` | Gmail `EmailPlatform` provider (`GoogleEmailPlatform`) — OAuth2 refresh token auth, label→mailbox mapping, paginated message listing, MIME body parsing, attachment download. Config: `casehub.connectors.email.google.{client-id,client-secret,refresh-token}` |
 | `email-microsoft` | Microsoft Graph Outlook Mail provider (`MicrosoftEmailPlatform`, id `"microsoft"`) — folder→mailbox mapping, OData pagination, HTML body extraction. Config: `ServiceConnectionProvider` with provider `"microsoft"` |
 | `email-google-inbound` | Gmail push notifications via Cloud Pub/Sub (`GmailPushInboundConnector`) — JWT-validated push, Gmail History API for new message IDs, `HistoryStore` SPI for per-user history tracking, `GmailWatchManager` for watch registration lifecycle |
-| `document-spi` | `DocumentPlatform` SPI with `@SimulationEligible` and capability sub-interfaces (`FileOperations` incl. incremental sync, `FolderOperations`, `SearchOperations`, `SharingOperations`), `supports(Class<?>)` introspection, `DocumentPlatformService` routing |
+| `document-spi` | `DocumentPlatform` SPI with `@SimulationEligible` and user-scoped capability accessors (`files(userId)`, `folders(userId)`, `search(userId)`, `sharing(userId)`) for per-user OAuth2 credential resolution, `supports(Class<?>)` introspection, `DocumentPlatformService` routing |
 | `document-ref` | In-memory reference `DocumentPlatform` for testing (`RefDocumentPlatform`) — 3 folders, 7 files, all 4 capabilities including upload/download round-trip, search, sharing, monotonic version tracking for sync |
 | `document-google` | Google Drive `DocumentPlatform` provider (`GoogleDocumentPlatform`) — OAuth2 refresh token auth, file CRUD with direct upload, folder management, full-text search, share links, incremental sync via `changes.list`. Config: `casehub.connectors.document.google.{client-id,client-secret,refresh-token}` |
 | `document-microsoft` | Microsoft Graph OneDrive/SharePoint provider — two CDI beans: `microsoft-onedrive` (`/me/drive`) and `microsoft-sharepoint` (`/sites/{siteId}/drive`). All 4 capabilities, SSRF defense on download redirects, resumable upload for >4MB, delta sync. Config: `casehub.connectors.sharepoint.site-id` (SharePoint only), `ServiceConnectionProvider` with provider `"microsoft"` |
@@ -305,6 +305,11 @@ Calendar integration with full CRUD operations and incremental sync.
 ```java
 public interface CalendarPlatform {
     String id();
+    CalendarOperations calendarOps(String userId);
+    boolean supports(Class<?> capability);
+}
+
+public interface CalendarOperations {
     List<CalendarInfo> listCalendars();
     List<CalendarEvent> listEvents(String calendarId, Instant from, Instant to);
     CalendarEvent getEvent(String calendarId, String eventId);
@@ -314,6 +319,8 @@ public interface CalendarPlatform {
     SyncResult<CalendarEvent> listEventsSync(String calendarId, SyncRequest request);
 }
 ```
+
+Capability accessors are user-scoped — each user has their own OAuth2 credentials. The `userId` parameter lets the provider resolve per-user tokens via `GoogleCredentialResolver` or `ServiceConnectionProvider`.
 
 **CalendarPlatformService** -- inject for routing. Same pattern as `ConnectorService` and `ChatPlatformService`.
 
@@ -523,6 +530,11 @@ Email query/read integration -- mailbox listing, paginated message listing, mess
 @SimulationEligible(name = "email-platform")
 public interface EmailPlatform {
     String id();
+    EmailOperations emailOps(String userId);
+    boolean supports(Class<?> capability);
+}
+
+public interface EmailOperations {
     List<Mailbox> listMailboxes();
     Page<EmailSummary> listMessages(String mailboxId, Instant from, Instant to, PageRequest pagination);
     EmailMessage getMessage(String mailboxId, String messageId);
@@ -530,6 +542,8 @@ public interface EmailPlatform {
     Page<EmailSummary> search(String query, PageRequest pagination);
 }
 ```
+
+Capability accessors are user-scoped — each user has their own OAuth2 credentials for Gmail or Outlook. The `userId` parameter lets the provider resolve per-user tokens.
 
 **EmailPlatformService** -- inject for routing. Same pattern as `CalendarPlatformService`.
 
