@@ -53,6 +53,8 @@ import io.casehub.platform.api.mcp.McpDomain;
 import io.casehub.platform.api.mcp.PlatformMutation;
 import io.casehub.platform.api.mcp.PlatformQuery;
 
+import jakarta.enterprise.context.ApplicationScoped;
+
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -62,6 +64,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+@ApplicationScoped
 @McpDomain(value = "connectors/operations", app = "connectors", summary = "Connector operational status and management")
 public class ConnectorOperationsImpl {
 
