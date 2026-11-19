@@ -657,6 +657,54 @@ class TeamsChatPlatformTest {
     }
 
     @Test
+    void safeAttachmentName_withFilename_prependsIndex() {
+        var att = new io.casehub.connectors.Attachment("report.pdf", "application/pdf", new byte[]{1});
+        assertThat(TeamsChatPlatform.safeAttachmentName(0, att)).isEqualTo("0-report.pdf");
+        assertThat(TeamsChatPlatform.safeAttachmentName(2, att)).isEqualTo("2-report.pdf");
+    }
+
+    @Test
+    void safeAttachmentName_nullFilename_generatesFromMimeType() {
+        var att = new io.casehub.connectors.Attachment(null, "application/pdf", new byte[]{1});
+        assertThat(TeamsChatPlatform.safeAttachmentName(0, att)).isEqualTo("0-attachment-0.pdf");
+    }
+
+    @Test
+    void safeAttachmentName_blankFilename_generatesFromMimeType() {
+        var att = new io.casehub.connectors.Attachment("  ", "image/png", new byte[]{1});
+        assertThat(TeamsChatPlatform.safeAttachmentName(1, att)).isEqualTo("1-attachment-1.png");
+    }
+
+    @Test
+    void safeAttachmentName_nullContentTypeAndNullFilename_usesBinExtension() {
+        var att = new io.casehub.connectors.Attachment(null, null, new byte[]{1});
+        assertThat(TeamsChatPlatform.safeAttachmentName(0, att)).isEqualTo("0-attachment-0.bin");
+    }
+
+    @Test
+    void extensionFromMimeType_knownTypes() {
+        assertThat(TeamsChatPlatform.extensionFromMimeType("application/pdf")).isEqualTo(".pdf");
+        assertThat(TeamsChatPlatform.extensionFromMimeType("image/png")).isEqualTo(".png");
+        assertThat(TeamsChatPlatform.extensionFromMimeType("image/jpeg")).isEqualTo(".jpg");
+        assertThat(TeamsChatPlatform.extensionFromMimeType("image/gif")).isEqualTo(".gif");
+        assertThat(TeamsChatPlatform.extensionFromMimeType("text/plain")).isEqualTo(".txt");
+        assertThat(TeamsChatPlatform.extensionFromMimeType("application/msword")).isEqualTo(".doc");
+        assertThat(TeamsChatPlatform.extensionFromMimeType(
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document")).isEqualTo(".docx");
+    }
+
+    @Test
+    void extensionFromMimeType_unknownType_returnsBin() {
+        assertThat(TeamsChatPlatform.extensionFromMimeType("application/octet-stream")).isEqualTo(".bin");
+    }
+
+    @Test
+    void extensionFromMimeType_null_returnsBin() {
+        assertThat(TeamsChatPlatform.extensionFromMimeType(null)).isEqualTo(".bin");
+    }
+
+
+    @Test
     void sendPersonalWithoutBotClient_throwsUnsupported() {
         var ref = new ChatChannelRef("personal:conv-1");
         assertThatThrownBy(() -> platform.messaging().send(ref, new ChatContent("test")))

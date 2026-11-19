@@ -183,7 +183,7 @@ public class TeamsChatPlatform {
     }
 
 
-    private static String safeAttachmentName(int index, Attachment attachment) {
+    static String safeAttachmentName(int index, Attachment attachment) {
         String name = attachment.filename();
         if (name == null || name.isBlank()) {
             name = "attachment-" + index + extensionFromMimeType(attachment.contentType());
@@ -191,7 +191,7 @@ public class TeamsChatPlatform {
         return index + "-" + name;
     }
 
-    private static String extensionFromMimeType(String contentType) {
+    static String extensionFromMimeType(String contentType) {
         if (contentType == null) {return ".bin";}
         return switch (contentType) {
             case "application/pdf" -> ".pdf";
