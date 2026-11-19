@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.casehub.connectors.calendar.model.CalendarInfo;
+import io.casehub.connectors.seed.SeedDataResolver;
 import io.casehub.yaml.jackson.YamlMappers;
 
 import java.io.IOException;
@@ -20,8 +21,9 @@ final class SeedLoader {
                      List<String> attendees) {}
 
     static List<CalendarInfo> loadCalendars() {
-        try (var is = SeedLoader.class.getResourceAsStream("/seed/calendars.yaml")) {
-            if (is == null) throw new IllegalStateException("Missing /seed/calendars.yaml");
+        var maybeIs = SeedDataResolver.resolve("calendar", "calendars.yaml");
+        if (maybeIs.isEmpty()) return List.of();
+        try (var is = maybeIs.get()) {
             return YAML.readValue(is, new TypeReference<>() {});
         } catch (IOException e) {
             throw new UncheckedIOException(e);
@@ -29,8 +31,9 @@ final class SeedLoader {
     }
 
     static List<EventSeed> loadEvents() {
-        try (var is = SeedLoader.class.getResourceAsStream("/seed/events.yaml")) {
-            if (is == null) throw new IllegalStateException("Missing /seed/events.yaml");
+        var maybeIs = SeedDataResolver.resolve("calendar", "events.yaml");
+        if (maybeIs.isEmpty()) return List.of();
+        try (var is = maybeIs.get()) {
             return YAML.readValue(is, new TypeReference<>() {});
         } catch (IOException e) {
             throw new UncheckedIOException(e);

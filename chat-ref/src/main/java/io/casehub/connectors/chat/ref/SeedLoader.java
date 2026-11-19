@@ -2,6 +2,7 @@ package io.casehub.connectors.chat.ref;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.casehub.connectors.seed.SeedDataResolver;
 import io.casehub.yaml.jackson.YamlMappers;
 
 import java.io.IOException;
@@ -18,8 +19,9 @@ final class SeedLoader {
     record MemberSeed(String id, String displayName) {}
 
     static List<ChannelSeed> loadChannels() {
-        try (var is = SeedLoader.class.getResourceAsStream("/seed/channels.yaml")) {
-            if (is == null) throw new IllegalStateException("Missing /seed/channels.yaml");
+        var maybeIs = SeedDataResolver.resolve("chat", "channels.yaml");
+        if (maybeIs.isEmpty()) return List.of();
+        try (var is = maybeIs.get()) {
             return YAML.readValue(is, new TypeReference<>() {});
         } catch (IOException e) {
             throw new UncheckedIOException(e);
@@ -27,8 +29,9 @@ final class SeedLoader {
     }
 
     static List<MemberSeed> loadMembers() {
-        try (var is = SeedLoader.class.getResourceAsStream("/seed/members.yaml")) {
-            if (is == null) throw new IllegalStateException("Missing /seed/members.yaml");
+        var maybeIs = SeedDataResolver.resolve("chat", "members.yaml");
+        if (maybeIs.isEmpty()) return List.of();
+        try (var is = maybeIs.get()) {
             return YAML.readValue(is, new TypeReference<>() {});
         } catch (IOException e) {
             throw new UncheckedIOException(e);

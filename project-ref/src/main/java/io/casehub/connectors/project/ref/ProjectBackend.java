@@ -264,6 +264,7 @@ public class ProjectBackend {
     @PostConstruct
     void seed() {
         var data = SeedLoader.load();
+        if (data == null) return;
         var repo = new OwnerRepo(data.repo().owner(), data.repo().name());
 
         data.labels().forEach(l ->

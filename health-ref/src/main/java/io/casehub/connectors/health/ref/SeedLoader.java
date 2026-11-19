@@ -14,6 +14,7 @@ import io.casehub.connectors.health.model.RecordType;
 import io.casehub.connectors.health.model.Referral;
 import io.casehub.connectors.health.model.ReferralStatus;
 import io.casehub.connectors.health.model.UrgencyLevel;
+import io.casehub.connectors.seed.SeedDataResolver;
 import io.casehub.yaml.jackson.YamlMappers;
 
 import java.io.IOException;
@@ -30,8 +31,9 @@ final class SeedLoader {
             .registerModule(new JavaTimeModule());
 
     static List<Provider> loadProviders() {
-        try (var is = SeedLoader.class.getResourceAsStream("/seed/providers.yaml")) {
-            if (is == null) throw new IllegalStateException("Missing /seed/providers.yaml");
+        var maybeIs = SeedDataResolver.resolve("health", "providers.yaml");
+        if (maybeIs.isEmpty()) return List.of();
+        try (var is = maybeIs.get()) {
             return YAML.readValue(is, new TypeReference<>() {});
         } catch (IOException e) {
             throw new UncheckedIOException(e);
@@ -39,8 +41,9 @@ final class SeedLoader {
     }
 
     static Map<String, List<Appointment>> loadAppointments() {
-        try (var is = SeedLoader.class.getResourceAsStream("/seed/appointments.yaml")) {
-            if (is == null) throw new IllegalStateException("Missing /seed/appointments.yaml");
+        var maybeIs = SeedDataResolver.resolve("health", "appointments.yaml");
+        if (maybeIs.isEmpty()) return Map.of();
+        try (var is = maybeIs.get()) {
             return YAML.readValue(is, new TypeReference<>() {});
         } catch (IOException e) {
             throw new UncheckedIOException(e);
@@ -48,8 +51,9 @@ final class SeedLoader {
     }
 
     static Map<String, List<MedicalRecord>> loadRecords() {
-        try (var is = SeedLoader.class.getResourceAsStream("/seed/records.yaml")) {
-            if (is == null) throw new IllegalStateException("Missing /seed/records.yaml");
+        var maybeIs = SeedDataResolver.resolve("health", "records.yaml");
+        if (maybeIs.isEmpty()) return Map.of();
+        try (var is = maybeIs.get()) {
             JsonNode root = YAML.readTree(is);
             Map<String, List<MedicalRecord>> result = new HashMap<>();
             var fields = root.fields();

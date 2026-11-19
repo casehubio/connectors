@@ -7,6 +7,7 @@ import io.casehub.connectors.location.model.OpeningHours;
 import io.casehub.connectors.location.model.Photo;
 import io.casehub.connectors.location.model.PriceLevel;
 import io.casehub.connectors.location.model.Review;
+import io.casehub.connectors.seed.SeedDataResolver;
 import io.casehub.yaml.jackson.YamlMappers;
 
 import java.io.IOException;
@@ -28,8 +29,9 @@ final class SeedLoader {
                          String placeId, List<String> types) {}
 
     static List<PlaceSeed> loadPlaces() {
-        try (var is = SeedLoader.class.getResourceAsStream("/seed/places.yaml")) {
-            if (is == null) throw new IllegalStateException("Missing /seed/places.yaml");
+        var maybeIs = SeedDataResolver.resolve("location", "places.yaml");
+        if (maybeIs.isEmpty()) return List.of();
+        try (var is = maybeIs.get()) {
             return YAML.readValue(is, new TypeReference<>() {});
         } catch (IOException e) {
             throw new UncheckedIOException(e);
@@ -37,8 +39,9 @@ final class SeedLoader {
     }
 
     static List<GeocodingSeed> loadGeocoding() {
-        try (var is = SeedLoader.class.getResourceAsStream("/seed/geocoding.yaml")) {
-            if (is == null) throw new IllegalStateException("Missing /seed/geocoding.yaml");
+        var maybeIs = SeedDataResolver.resolve("location", "geocoding.yaml");
+        if (maybeIs.isEmpty()) return List.of();
+        try (var is = maybeIs.get()) {
             return YAML.readValue(is, new TypeReference<>() {});
         } catch (IOException e) {
             throw new UncheckedIOException(e);

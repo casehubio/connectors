@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.casehub.connectors.travel.model.AccommodationDetail;
 import io.casehub.connectors.travel.model.TransportOption;
+import io.casehub.connectors.seed.SeedDataResolver;
 import io.casehub.yaml.jackson.YamlMappers;
 
 import java.io.IOException;
@@ -17,8 +18,9 @@ final class SeedLoader {
             .registerModule(new JavaTimeModule());
 
     static List<TransportOption> loadTransport() {
-        try (var is = SeedLoader.class.getResourceAsStream("/seed/transport.yaml")) {
-            if (is == null) throw new IllegalStateException("Missing /seed/transport.yaml");
+        var maybeIs = SeedDataResolver.resolve("travel", "transport.yaml");
+        if (maybeIs.isEmpty()) return List.of();
+        try (var is = maybeIs.get()) {
             return YAML.readValue(is, new TypeReference<>() {});
         } catch (IOException e) {
             throw new UncheckedIOException(e);
@@ -26,8 +28,9 @@ final class SeedLoader {
     }
 
     static List<AccommodationDetail> loadAccommodation() {
-        try (var is = SeedLoader.class.getResourceAsStream("/seed/accommodation.yaml")) {
-            if (is == null) throw new IllegalStateException("Missing /seed/accommodation.yaml");
+        var maybeIs = SeedDataResolver.resolve("travel", "accommodation.yaml");
+        if (maybeIs.isEmpty()) return List.of();
+        try (var is = maybeIs.get()) {
             return YAML.readValue(is, new TypeReference<>() {});
         } catch (IOException e) {
             throw new UncheckedIOException(e);

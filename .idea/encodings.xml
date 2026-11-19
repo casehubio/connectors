@@ -99,6 +99,8 @@
     <file url="file://$PROJECT_DIR$/location-ref/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/location-spi/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/location-spi/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/mcp-server-connectors/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/mcp-server-connectors/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/mcp/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/mcp/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/microsoft-graph-client/src/main/java" charset="UTF-8" />
@@ -532,6 +534,9 @@
     <file url="file://$PROJECT_DIR$/../platform/mcp-core/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/mcp-core/src/main/playbooks" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/mcp-core/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/mcp-server/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/mcp-server/src/main/playbooks" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../platform/mcp-server/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/mcp-spring-generator/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/mcp-spring-generator/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../platform/mcp-spring/src/main/java" charset="UTF-8" />

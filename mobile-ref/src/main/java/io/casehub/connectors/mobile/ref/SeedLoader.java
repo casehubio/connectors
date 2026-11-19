@@ -3,6 +3,7 @@ package io.casehub.connectors.mobile.ref;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import io.casehub.connectors.seed.SeedDataResolver;
 import io.casehub.yaml.jackson.YamlMappers;
 
 import java.io.IOException;
@@ -17,26 +18,25 @@ final class SeedLoader {
     }
 
     static List<SeedNumber> loadNumbers() {
-        return load("/io/casehub/connectors/mobile/ref/seed/numbers.yaml", new TypeReference<>() {});
+        return load("numbers.yaml", new TypeReference<>() {});
     }
 
     static List<SeedConversation> loadConversations() {
-        return load("/io/casehub/connectors/mobile/ref/seed/conversations.yaml", new TypeReference<>() {});
+        return load("conversations.yaml", new TypeReference<>() {});
     }
 
     static List<SeedVoicemail> loadVoicemails() {
-        return load("/io/casehub/connectors/mobile/ref/seed/voicemails.yaml", new TypeReference<>() {});
+        return load("voicemails.yaml", new TypeReference<>() {});
     }
 
     static List<SeedMessage> loadMessages() {
-        return load("/io/casehub/connectors/mobile/ref/seed/messages.yaml", new TypeReference<>() {});
+        return load("messages.yaml", new TypeReference<>() {});
     }
 
-    private static <T> List<T> load(String resource, TypeReference<List<T>> type) {
-        try (var is = SeedLoader.class.getResourceAsStream(resource)) {
-            if (is == null) {
-                throw new IllegalStateException("Seed data not found: " + resource);
-            }
+    private static <T> List<T> load(String filename, TypeReference<List<T>> type) {
+        var maybeIs = SeedDataResolver.resolve("mobile", filename);
+        if (maybeIs.isEmpty()) return List.of();
+        try (var is = maybeIs.get()) {
             return YAML.readValue(is, type);
         } catch (IOException e) {
             throw new UncheckedIOException(e);

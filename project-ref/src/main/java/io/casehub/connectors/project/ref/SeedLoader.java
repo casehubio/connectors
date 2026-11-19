@@ -3,6 +3,7 @@ package io.casehub.connectors.project.ref;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.casehub.connectors.project.model.ProjectColumn;
+import io.casehub.connectors.seed.SeedDataResolver;
 import io.casehub.yaml.jackson.YamlMappers;
 
 import java.io.IOException;
@@ -27,8 +28,9 @@ final class SeedLoader {
     record BoardSeed(String id, String name, List<ProjectColumn> columns) {}
 
     static ProjectSeed load() {
-        try (var is = SeedLoader.class.getResourceAsStream("/seed/project-data.yaml")) {
-            if (is == null) throw new IllegalStateException("Missing /seed/project-data.yaml");
+        var maybeIs = SeedDataResolver.resolve("project", "project-data.yaml");
+        if (maybeIs.isEmpty()) return null;
+        try (var is = maybeIs.get()) {
             return YAML.readValue(is, ProjectSeed.class);
         } catch (IOException e) {
             throw new UncheckedIOException(e);

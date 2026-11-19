@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.casehub.connectors.contacts.model.Group;
+import io.casehub.connectors.seed.SeedDataResolver;
 import io.casehub.yaml.jackson.YamlMappers;
 
 import java.io.IOException;
@@ -20,8 +21,9 @@ final class SeedLoader {
                        List<String> groups) {}
 
     static List<Group> loadGroups() {
-        try (var is = SeedLoader.class.getResourceAsStream("/seed/groups.yaml")) {
-            if (is == null) throw new IllegalStateException("Missing /seed/groups.yaml");
+        var maybeIs = SeedDataResolver.resolve("contacts", "groups.yaml");
+        if (maybeIs.isEmpty()) return List.of();
+        try (var is = maybeIs.get()) {
             return YAML.readValue(is, new TypeReference<>() {});
         } catch (IOException e) {
             throw new UncheckedIOException(e);
@@ -29,8 +31,9 @@ final class SeedLoader {
     }
 
     static List<ContactSeed> loadContacts() {
-        try (var is = SeedLoader.class.getResourceAsStream("/seed/contacts.yaml")) {
-            if (is == null) throw new IllegalStateException("Missing /seed/contacts.yaml");
+        var maybeIs = SeedDataResolver.resolve("contacts", "contacts.yaml");
+        if (maybeIs.isEmpty()) return List.of();
+        try (var is = maybeIs.get()) {
             return YAML.readValue(is, new TypeReference<>() {});
         } catch (IOException e) {
             throw new UncheckedIOException(e);

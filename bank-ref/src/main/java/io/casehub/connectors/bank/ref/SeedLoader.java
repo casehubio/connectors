@@ -6,6 +6,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.casehub.connectors.bank.model.AccountBalance;
 import io.casehub.connectors.bank.model.AccountInfo;
 import io.casehub.connectors.bank.model.Transaction;
+import io.casehub.connectors.seed.SeedDataResolver;
 import io.casehub.yaml.jackson.YamlMappers;
 
 import java.io.IOException;
@@ -20,8 +21,9 @@ final class SeedLoader {
             .registerModule(new JavaTimeModule());
 
     static List<AccountInfo> loadAccounts() {
-        try (var is = SeedLoader.class.getResourceAsStream("/seed/accounts.yaml")) {
-            if (is == null) throw new IllegalStateException("Missing /seed/accounts.yaml");
+        var maybeIs = SeedDataResolver.resolve("bank", "accounts.yaml");
+        if (maybeIs.isEmpty()) return List.of();
+        try (var is = maybeIs.get()) {
             return List.copyOf(YAML.readValue(is, new TypeReference<List<AccountInfo>>() {}));
         } catch (IOException e) {
             throw new UncheckedIOException(e);
@@ -29,8 +31,9 @@ final class SeedLoader {
     }
 
     static Map<String, AccountBalance> loadBalances() {
-        try (var is = SeedLoader.class.getResourceAsStream("/seed/balances.yaml")) {
-            if (is == null) throw new IllegalStateException("Missing /seed/balances.yaml");
+        var maybeIs = SeedDataResolver.resolve("bank", "balances.yaml");
+        if (maybeIs.isEmpty()) return Map.of();
+        try (var is = maybeIs.get()) {
             List<AccountBalance> list = YAML.readValue(is, new TypeReference<>() {});
             return list.stream().collect(Collectors.toMap(AccountBalance::accountId, b -> b));
         } catch (IOException e) {
@@ -39,8 +42,9 @@ final class SeedLoader {
     }
 
     static List<Transaction> loadTransactions() {
-        try (var is = SeedLoader.class.getResourceAsStream("/seed/transactions.yaml")) {
-            if (is == null) throw new IllegalStateException("Missing /seed/transactions.yaml");
+        var maybeIs = SeedDataResolver.resolve("bank", "transactions.yaml");
+        if (maybeIs.isEmpty()) return List.of();
+        try (var is = maybeIs.get()) {
             return YAML.readValue(is, new TypeReference<>() {});
         } catch (IOException e) {
             throw new UncheckedIOException(e);
