@@ -853,8 +853,22 @@ public final class Provisioner {
 
         Path lockFile = parentDir.resolve(".provisioning.lock");
         try (FileChannel channel = FileChannel.open(lockFile,
-                StandardOpenOption.CREATE, StandardOpenOption.WRITE);
-             FileLock ignored = channel.lock()) {
+                StandardOpenOption.CREATE, StandardOpenOption.WRITE)) {
+            FileLock fileLock = null;
+            for (int attempt = 0; attempt < 120; attempt++) {
+                try {
+                    fileLock = channel.tryLock();
+                } catch (java.nio.channels.OverlappingFileLockException e) {
+                    Thread.sleep(500);
+                    continue;
+                }
+                if (fileLock != null) break;
+                Thread.sleep(500);
+            }
+            if (fileLock == null) {
+                throw new SherpaException("Could not acquire provisioning lock after 60s: " + lockFile);
+            }
+            try {
 
             if (Files.isDirectory(targetDir)) { return targetDir; }
 
@@ -886,8 +900,14 @@ public final class Provisioner {
             LOG.log(System.Logger.Level.INFO, "Done.");
             return targetDir;
 
+            } finally {
+                fileLock.release();
+            }
         } catch (SherpaException e) {
             throw e;
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new SherpaException("Provisioning interrupted for " + url, e);
         } catch (IOException e) {
             throw new SherpaException("Failed to provision from " + url
                 + ". Download manually to " + targetDir, e);
