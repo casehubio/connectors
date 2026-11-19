@@ -28,6 +28,13 @@ jobs:
           server-username: GITHUB_ACTOR
           server-password: GITHUB_TOKEN
 
+      - name: Cache native libraries and models
+        uses: actions/cache@v4
+        with:
+          path: ~/.casehub
+          key: casehub-native-${{ runner.os }}-${{ hashFiles('voice-sherpa/src/main/java/**/SherpaLibrary.java') }}
+          restore-keys: casehub-native-${{ runner.os }}-
+
       - name: Build and test
         run: mvn --batch-mode -U verify
         env:
