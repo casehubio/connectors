@@ -61,7 +61,7 @@ class VoiceRoundTripTest {
         SynthesisResult ttsResult = platform.textToSpeech()
                                             .synthesise("Testing pipeline", new SynthesisOptions(null, "en", "wav", false));
 
-        var                 plugin = new SttTranscribePlugin("en", null);
+        var                 plugin = new SttTranscribePlugin("en", null, null);
         TranscriptionResult result = plugin.apply(ttsResult.audioData(), routing);
 
         assertThat(result.text()).isNotBlank();
