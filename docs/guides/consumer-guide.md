@@ -55,7 +55,7 @@ There are 36 active modules in the build (pom.xml `<modules>`):
 | `document-spi` | `DocumentPlatform` SPI with `@SimulationEligible` and user-scoped capability accessors (`files(userId)`, `folders(userId)`, `search(userId)`, `sharing(userId)`) for per-user OAuth2 credential resolution, `supports(Class<?>)` introspection, `DocumentPlatformService` routing |
 | `document-ref` | In-memory reference `DocumentPlatform` for testing (`RefDocumentPlatform`) — 3 folders, 7 files, all 4 capabilities including upload/download round-trip, search, sharing, monotonic version tracking for sync |
 | `document-google` | Google Drive `DocumentPlatform` provider (`GoogleDocumentPlatform`) — OAuth2 refresh token auth, file CRUD with direct upload, folder management, full-text search, share links, incremental sync via `changes.list`. Config: `casehub.connectors.document.google.{client-id,client-secret,refresh-token}` |
-| `document-microsoft` | Microsoft Graph OneDrive/SharePoint provider — two CDI beans: `microsoft-onedrive` (`/me/drive`) and `microsoft-sharepoint` (`/sites/{siteId}/drive`). All 4 capabilities, SSRF defense on download redirects, resumable upload for >4MB, delta sync. Config: `casehub.connectors.sharepoint.site-id` (SharePoint only), `ServiceConnectionProvider` with provider `"microsoft"` |
+| `document-microsoft` | Microsoft Graph OneDrive/SharePoint provider — two CDI beans: `microsoft-onedrive` (`/me/drive`) and `microsoft-sharepoint` (multi-site via compound IDs `sp:<siteId>:<itemId>`). All 4 capabilities, SSRF defense on download redirects, resumable upload for >4MB, delta sync. Multi-site: pass compound IDs to any file/folder operation to access a specific SharePoint site; plain IDs fall back to the configured default site. `SiteDiscovery` via `PlatformExtensible.as(SiteDiscovery.class)` for site search. Config: `casehub.connectors.sharepoint.site-id` (default site), `ServiceConnectionProvider` with provider `"microsoft"` |
 | `location-spi` | `LocationPlatform` SPI with `@SimulationEligible` and capability sub-interfaces (`PlaceSearch`, `PlaceDetails`, `Geocoding`, `Directions`), user-scoped accessors, `supports(Class<?>)` introspection, `LocationPlatformService` routing |
 | `location-ref` | In-memory reference `LocationPlatform` for testing (`RefLocationPlatform`) — 8 pre-loaded London places with reviews, photos, geocoding entries |
 | `location-google` | Google Maps `LocationPlatform` provider (`GoogleLocationPlatform`) — Places API for search/details, Geocoding API, Directions API |
@@ -621,14 +621,14 @@ All MCP tools call `ConnectorMeshBridge.notifyDelivered()` after successful deli
 All platform SPIs extend `PlatformExtensible`, which provides a type-safe `as()` method for accessing vendor-specific capabilities that don't belong in the general SPI:
 
 ```java
-documentPlatform.as(MicrosoftDriveExtensions.class).ifPresent(msft ->
-    msft.sharePoint().listSites()
+documentPlatform.as(SiteDiscovery.class).ifPresent(discovery ->
+    discovery.searchSites(userId, "marketing")
 );
 ```
 
 `as()` returns `Optional.empty()` for providers that don't implement the extension. It works correctly through CDI proxies and simulation wrappers -- no `instanceof` checks needed.
 
-Extension interfaces live in provider modules (e.g. `document-microsoft`), not in the SPI module. Consumers depend on the provider module only when they need vendor-specific features.
+Extension interfaces may live in the SPI module when they are general (e.g. `SiteDiscovery` in `document-spi`) or in provider modules when vendor-specific. Consumers depend on the provider module only when they need vendor-specific features.
 
 ---
 
