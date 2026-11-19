@@ -34,6 +34,8 @@
   "composeExtensions": [
     {
       "botId": "{{BOT_APP_ID}}",
+      "canUpdateConfiguration": true,
+      "_settingsComment": "canUpdateConfiguration enables the Settings gear icon. Teams dispatches composeExtension/querySettingUrl to fetch the settings URL, then composeExtension/setting when the user saves. Handle both via InvokeHandler.",
       "commands": [
         {
           "_comment": "Search command — dispatched as composeExtension/query. The commandId arrives in InvokeRequest.value().getString('commandId')",
