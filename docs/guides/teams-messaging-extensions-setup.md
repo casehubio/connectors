@@ -204,6 +204,49 @@ public class MultiSearchHandler implements InvokeHandler {
 **Single-command shortcut:** if a handler serves only one command,
 `commandId` routing is unnecessary — process the request directly.
 
+## Reference Handlers
+
+Four reference `InvokeHandler` implementations are provided in the
+`chat-teams` module under `io.casehub.connectors.chat.teams.ref`:
+
+| Class | Activity name |
+|---|---|
+| `RefSearchHandler` | `composeExtension/query` |
+| `RefFetchTaskHandler` | `composeExtension/fetchTask` |
+| `RefSubmitActionHandler` | `composeExtension/submitAction` |
+| `RefLinkUnfurlHandler` | `composeExtension/queryLink` |
+
+These are plain classes — not CDI beans — so they are not auto-discovered.
+To use them in a Quarkus application for development or demo purposes,
+register them via a CDI producer:
+
+```java
+import io.casehub.connectors.chat.teams.InvokeHandler;
+import io.casehub.connectors.chat.teams.ref.*;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.inject.Produces;
+
+@ApplicationScoped
+public class RefInvokeHandlerProducer {
+
+    @Produces @ApplicationScoped
+    InvokeHandler refSearch() { return new RefSearchHandler(); }
+
+    @Produces @ApplicationScoped
+    InvokeHandler refFetchTask() { return new RefFetchTaskHandler(); }
+
+    @Produces @ApplicationScoped
+    InvokeHandler refSubmitAction() { return new RefSubmitActionHandler(); }
+
+    @Produces @ApplicationScoped
+    InvokeHandler refLinkUnfurl() { return new RefLinkUnfurlHandler(); }
+}
+```
+
+This is opt-in — omit the producer class to keep the ref handlers off
+the classpath. Replace individual handlers with your own implementations
+as your application matures.
+
 ## Quarkus Configuration
 
 | Property | Purpose | Default |
