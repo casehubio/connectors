@@ -177,7 +177,7 @@ New providers for per-user OAuth SPIs should follow this pattern — the `userId
 
 **`HistoryStore` SPI** -- tracks per-user `historyId` for incremental delta processing. `InMemoryHistoryStore` (`@DefaultBean`) provides a `ConcurrentHashMap`-backed implementation for dev/test.
 
-**`LocationPlatform` SPI** (`location-spi`) -- nested capability sub-interfaces: `PlaceSearch` (text/nearby/category search with `Page<Place>`), `PlaceDetails` (full place info), `Geocoding` (address↔coordinates), `Directions` (routing with `TravelMode`). User-scoped accessors (`placeSearch(userId)`), `supports(Class<?>)` introspection. Annotated with `@SimulationEligible(name = "location-platform")`.
+**`LocationPlatform` SPI** (`location-spi`) -- nested capability sub-interfaces: `PlaceSearch` (text/nearby/category search with `Page<Place>`), `PlaceDetails` (full place info), `Geocoding` (address↔coordinates), `Directions` (routing with `TravelMode`), `DevicePosition` (host device GPS/WiFi position → `Position(Coordinates, accuracyMeters, timestamp)`), `AssetTracking` (Bluetooth tracker management → `List<TrackedDevice>`, per-device position lookup; `TrackedDevice(id, name, type, Position, BatteryInfo)` with `BatteryInfo(BatteryStatus, levelPercent)` normalised across provider APIs). User-scoped accessors (`placeSearch(userId)`, `devicePosition(userId)`, `assetTracking(userId)`), `supports(Class<?>)` introspection. Annotated with `@SimulationEligible(name = "location-platform")`.
 
 **`LocationPlatformService`** (`location-spi`) -- routing service, same `@All List<LocationPlatform>` pattern.
 
@@ -200,7 +200,7 @@ All ref implementations with pre-loaded data use YAML seed files under `<module>
 | `document-ref` | `folders.yaml`, `files.yaml` | 3 folders, 7 files |
 | `email-ref` | `messages.yaml` | 9 messages across 3 mailboxes |
 | `bank-ref` | `accounts.yaml`, `balances.yaml`, `transactions.yaml` | 3 accounts, 12 transactions |
-| `location-ref` | `places.yaml`, `geocoding.yaml` | 8 London places, 4 geocoding entries |
+| `location-ref` | `places.yaml`, `geocoding.yaml`, `tracked-devices.yaml` | 8 London places, 4 geocoding entries, 3 tracked devices (AirTag/Tile/SmartTag) |
 | `travel-ref` | `transport.yaml`, `accommodation.yaml` | 8 UK transport options, 8 UK accommodations |
 | `project-ref` | `project-data.yaml` | Labels, milestones, issues, comments, board |
 
