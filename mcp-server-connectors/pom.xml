@@ -24,6 +24,12 @@
             <groupId>io.casehub</groupId>
             <artifactId>casehub-platform-mcp</artifactId>
             <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>io.quarkiverse.mcp</groupId>
+                    <artifactId>quarkus-mcp-server-sse</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- Connectors domain APIs (all @McpDomain classes) -->
@@ -87,6 +93,13 @@
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-security</artifactId>
+        </dependency>
+
+        <!-- MCP stdio transport (default for local MCP clients) -->
+        <dependency>
+            <groupId>io.quarkiverse.mcp</groupId>
+            <artifactId>quarkus-mcp-server-stdio</artifactId>
+            <version>${quarkus-mcp-server.version}</version>
         </dependency>
 
         <!-- Test -->
@@ -158,6 +171,19 @@
                 <quarkus.native.enabled>true</quarkus.native.enabled>
                 <quarkus.native.resources.includes>corpus/**/*.yaml</quarkus.native.resources.includes>
             </properties>
+        </profile>
+        <profile>
+            <id>http</id>
+            <activation>
+                <property><name>http</name></property>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>io.quarkiverse.mcp</groupId>
+                    <artifactId>quarkus-mcp-server-sse</artifactId>
+                    <version>${quarkus-mcp-server.version}</version>
+                </dependency>
+            </dependencies>
         </profile>
     </profiles>
 </project>

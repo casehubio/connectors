@@ -12,6 +12,9 @@ class McpServerStartupTest {
 
     @Inject
     ToolManager toolManager;
+    @Inject
+    io.casehub.platform.api.mcp.McpResourceRegistry resourceRegistry;
+
 
     @Test
     void flatModeDoesNotRegisterCasehubAction() {
@@ -42,4 +45,12 @@ class McpServerStartupTest {
     void bankDomainToolsRegistered() {
         assertThat(toolManager.getTool("connectors_bank_listAccounts")).isNotNull();
     }
+
+    @Test
+    void domainResourcesRegistered() {
+        assertThat(resourceRegistry.list()).isNotEmpty();
+        assertThat(resourceRegistry.resolve("casehub-domain-index")).isPresent();
+        assertThat(resourceRegistry.resolve("casehub-domains")).isPresent();
+    }
+
 }
