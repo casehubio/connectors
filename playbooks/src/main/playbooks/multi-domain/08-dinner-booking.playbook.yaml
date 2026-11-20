@@ -1,44 +1,44 @@
 name: Dinner out — find restaurant, get directions, notify
 description: Find nearby restaurant, get walking directions, send details via SMS and chat
-steps:
-  # 1. Find restaurants nearby (Balham coordinates — matches location-ref seed data)
-  - location-search-by-category:
-      platform: ref
-      category: restaurant
-      lat: 51.4430
-      lng: -0.1525
-      radius-meters: 2000
-    capture: restaurants
+---
+# 1. Find restaurants nearby (Balham coordinates — matches location-ref seed data)
+- location-search-by-category:
+    platform: ref
+    category: restaurant
+    lat: 51.4430
+    lng: -0.1525
+    radius-meters: 2000
+  capture: restaurants
 
-  # 2. Get details of the top result
-  - location-place-details:
-      platform: ref
-      place-id: ${restaurants.items[0].id}
-    capture: restaurant
+# 2. Get details of the top result
+- location-place-details:
+    platform: ref
+    place-id: ${restaurants.items[0].id}
+  capture: restaurant
 
-  # 3. Get walking directions from Balham station
-  - location-directions:
-      platform: ref
-      origin-lat: 51.4432
-      origin-lng: -0.1522
-      dest-lat: ${restaurant.location.lat}
-      dest-lng: ${restaurant.location.lng}
-      mode: WALKING
-    capture: directions
+# 3. Get walking directions from Balham station
+- location-directions:
+    platform: ref
+    origin-lat: 51.4432
+    origin-lng: -0.1522
+    dest-lat: ${restaurant.location.lat}
+    dest-lng: ${restaurant.location.lng}
+    mode: WALKING
+  capture: directions
 
-  # 4. SMS the details
-  - mobile-send-sms:
-      platform: ref
-      to: "+447700900000"
-      body: >
-        Found: ${restaurant.name}, ${restaurant.formattedAddress}.
-        Walk: ${directions.duration.text}. Phone: ${restaurant.formattedPhoneNumber}.
-    capture: smsNotification
+# 4. SMS the details
+- mobile-send-sms:
+    platform: ref
+    to: "+447700900000"
+    body: >
+      Found: ${restaurant.name}, ${restaurant.formattedAddress}.
+      Walk: ${directions.duration.text}. Phone: ${restaurant.formattedPhoneNumber}.
+  capture: smsNotification
 
-  # 5. Chat notification
-  - chat-send:
-      channel: personal
-      message: >
-        Dinner option: ${restaurant.name} —
-        ${restaurant.formattedAddress}. ${directions.duration.text} walk.
-    capture: chatNotification
+# 5. Chat notification
+- chat-send:
+    channel: personal
+    message: >
+      Dinner option: ${restaurant.name} —
+      ${restaurant.formattedAddress}. ${directions.duration.text} walk.
+  capture: chatNotification

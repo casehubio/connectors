@@ -3,108 +3,108 @@ description: Register voices, receive confirmations, denoise, identify speakers 
 rules:
   - speaker identification alone does not authorise a payment
   - voice identification must be combined with at least one other verification factor
-steps:
-  # 1. Register voiceprints from sample audio
-  - tts-synthesise:
-      text: Hello, I am Alice
-      voice: af_heart
-    capture: aliceSample
+---
+# 1. Register voiceprints from sample audio
+- tts-synthesise:
+    text: Hello, I am Alice
+    voice: af_heart
+  capture: aliceSample
 
-  - speaker register:
-      name: Alice Smith
-      audio: ${aliceSample.audio-data}
-      supported-sample-rates: [16000, 24000]
+- speaker register:
+    name: Alice Smith
+    audio: ${aliceSample.audio-data}
+    supported-sample-rates: [16000, 24000]
 
-  - tts-synthesise:
-      text: Hello, I am Bob
-      voice: bm_daniel
-    capture: bobSample
+- tts-synthesise:
+    text: Hello, I am Bob
+    voice: bm_daniel
+  capture: bobSample
 
-  - speaker register:
-      name: Bob Smith
-      audio: ${bobSample.audio-data}
-      supported-sample-rates: [16000, 24000]
+- speaker register:
+    name: Bob Smith
+    audio: ${bobSample.audio-data}
+    supported-sample-rates: [16000, 24000]
 
-  # 2. Send reference numbers via SMS (second factor)
-  - mobile-send-sms:
-      platform: ref
-      to: "+447700100001"
-      body: "Joint account authorisation ref: TX-7429. Please include this reference in your verbal confirmation."
+# 2. Send reference numbers via SMS (second factor)
+- mobile-send-sms:
+    platform: ref
+    to: "+447700100001"
+    body: "Joint account authorisation ref: TX-7429. Please include this reference in your verbal confirmation."
 
-  - mobile-send-sms:
-      platform: ref
-      to: "+447700100002"
-      body: "Joint account authorisation ref: TX-7429. Please include this reference in your verbal confirmation."
+- mobile-send-sms:
+    platform: ref
+    to: "+447700100002"
+    body: "Joint account authorisation ref: TX-7429. Please include this reference in your verbal confirmation."
 
-  # 3. Receive confirmation messages (must include the reference number)
-  - tts-synthesise:
-      text: I, Alice Smith, confirm transaction reference TX-7429 for 500 pounds
-      voice: af_heart
-    capture: aliceMessage
+# 3. Receive confirmation messages (must include the reference number)
+- tts-synthesise:
+    text: I, Alice Smith, confirm transaction reference TX-7429 for 500 pounds
+    voice: af_heart
+  capture: aliceMessage
 
-  - tts-synthesise:
-      text: I, Bob Smith, confirm transaction reference TX-7429 for 500 pounds
-      voice: bm_daniel
-    capture: bobMessage
+- tts-synthesise:
+    text: I, Bob Smith, confirm transaction reference TX-7429 for 500 pounds
+    voice: bm_daniel
+  capture: bobMessage
 
-  # 4. Denoise each recording
-  - audio-denoise:
-      audio: ${aliceMessage.audio-data}
-    capture: aliceClean
+# 4. Denoise each recording
+- audio-denoise:
+    audio: ${aliceMessage.audio-data}
+  capture: aliceClean
 
-  - audio-denoise:
-      audio: ${bobMessage.audio-data}
-    capture: bobClean
+- audio-denoise:
+    audio: ${bobMessage.audio-data}
+  capture: bobClean
 
-  # 5. Identify speakers (factor 1: voice biometrics)
-  - speaker identify:
-      audio: ${aliceClean.audio-data}
-      supported-sample-rates: [16000, 24000]
-    capture: aliceId
+# 5. Identify speakers (factor 1: voice biometrics)
+- speaker identify:
+    audio: ${aliceClean.audio-data}
+    supported-sample-rates: [16000, 24000]
+  capture: aliceId
 
-  - speaker identify:
-      audio: ${bobClean.audio-data}
-      supported-sample-rates: [16000, 24000]
-    capture: bobId
+- speaker identify:
+    audio: ${bobClean.audio-data}
+    supported-sample-rates: [16000, 24000]
+  capture: bobId
 
-  # 6. Join and transcribe (always — needed for audit and reference check)
-  - audio join:
-      first: ${aliceClean.audio-data}
-      second: ${bobClean.audio-data}
-    capture: combinedRecording
+# 6. Join and transcribe (always — needed for audit and reference check)
+- audio join:
+    first: ${aliceClean.audio-data}
+    second: ${bobClean.audio-data}
+  capture: combinedRecording
 
-  - stt-transcribe: ${combinedRecording.audio-data}
-    capture: fullTranscript
+- stt-transcribe: ${combinedRecording.audio-data}
+  capture: fullTranscript
 
-  # 7. Multi-factor gate: voice ID (factor 1) + SMS reference in transcript (factor 2)
-  #    Compliance reviewer verifies reference TX-7429 appears in the transcript
-  #    before releasing the payment. Voice ID alone is insufficient.
-  - if: ${aliceId.identified}
-    then:
-      - if: ${bobId.identified}
-        then:
-          - chat-send:
-              channel: compliance
-              message: "Voice identification passed for both speakers: ${aliceId.name} and ${bobId.name}. REQUIRED: verify reference TX-7429 appears in transcript before releasing payment. Transcript: ${fullTranscript.text}"
-              attachment: ${combinedRecording.audio-data}
-              attachment-type: audio/wav
-              attachment-name: joint-authorisation.wav
-            capture: auditRecord
-        else:
-          - chat-send:
-              channel: compliance
-              message: "Voice identification failed for second speaker — authorisation incomplete. Transcript preserved: ${fullTranscript.text}"
-            capture: auditRecord
-          - chat-send:
-              channel: family
-              message: "Your joint account authorisation could not be completed — voice identification failed. Please contact your branch."
-            capture: participantNotice
-    else:
-      - chat-send:
-          channel: compliance
-          message: "Voice identification failed for first speaker — authorisation incomplete. Transcript preserved: ${fullTranscript.text}"
-        capture: auditRecord
-      - chat-send:
-          channel: family
-          message: "Your joint account authorisation could not be completed — voice identification failed. Please contact your branch."
-        capture: participantNotice
+# 7. Multi-factor gate: voice ID (factor 1) + SMS reference in transcript (factor 2)
+#    Compliance reviewer verifies reference TX-7429 appears in the transcript
+#    before releasing the payment. Voice ID alone is insufficient.
+- if: ${aliceId.identified}
+  then:
+    - if: ${bobId.identified}
+      then:
+        - chat-send:
+            channel: compliance
+            message: "Voice identification passed for both speakers: ${aliceId.name} and ${bobId.name}. REQUIRED: verify reference TX-7429 appears in transcript before releasing payment. Transcript: ${fullTranscript.text}"
+            attachment: ${combinedRecording.audio-data}
+            attachment-type: audio/wav
+            attachment-name: joint-authorisation.wav
+          capture: auditRecord
+      else:
+        - chat-send:
+            channel: compliance
+            message: "Voice identification failed for second speaker — authorisation incomplete. Transcript preserved: ${fullTranscript.text}"
+          capture: auditRecord
+        - chat-send:
+            channel: family
+            message: "Your joint account authorisation could not be completed — voice identification failed. Please contact your branch."
+          capture: participantNotice
+  else:
+    - chat-send:
+        channel: compliance
+        message: "Voice identification failed for first speaker — authorisation incomplete. Transcript preserved: ${fullTranscript.text}"
+      capture: auditRecord
+    - chat-send:
+        channel: family
+        message: "Your joint account authorisation could not be completed — voice identification failed. Please contact your branch."
+      capture: participantNotice

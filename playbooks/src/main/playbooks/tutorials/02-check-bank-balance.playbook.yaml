@@ -1,5 +1,5 @@
 name: Check a bank account balance
 description: Look up the balance on a known account
-steps:
-  - bank-balance: acc-100
-    capture: balance
+---
+- bank-balance: acc-100
+  capture: balance

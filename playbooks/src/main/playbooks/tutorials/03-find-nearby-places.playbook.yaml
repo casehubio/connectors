@@ -1,14 +1,14 @@
 name: Find nearby restaurants
 description: Search for restaurants near a location, then get details of the first result
-steps:
-  - location-search-nearby:
-      platform: ref
-      lat: 51.4430
-      lng: -0.1525
-      radius-meters: 2000
-    capture: nearby
+---
+- location-search-nearby:
+    platform: ref
+    lat: 51.4430
+    lng: -0.1525
+    radius-meters: 2000
+  capture: nearby
 
-  - location-place-details:
-      platform: ref
-      place-id: ${nearby.items[0].id}
-    capture: place
+- location-place-details:
+    platform: ref
+    place-id: ${nearby.items[0].id}
+  capture: place

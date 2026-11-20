@@ -1,7 +1,7 @@
 name: Send a chat message
 description: Send a message to a channel and verify delivery
-steps:
-  - chat-send:
-      channel: general
-      message: Hello from the tutorial!
-    capture: sent
+---
+- chat-send:
+    channel: general
+    message: Hello from the tutorial!
+  capture: sent
