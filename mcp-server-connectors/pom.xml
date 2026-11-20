@@ -10,7 +10,7 @@
     </parent>
     <artifactId>casehub-mcp-server-connectors</artifactId>
     <name>CaseHub MCP Server :: Connectors</name>
-    <description>Standalone MCP server exposing connectors' 90+ tools.
+    <description>Standalone MCP server exposing connectors' 130+ tools.
         Run with: java -jar target/quarkus-app/quarkus-run.jar</description>
 
     <dependencies>
@@ -95,13 +95,6 @@
             <artifactId>quarkus-security</artifactId>
         </dependency>
 
-        <!-- MCP stdio transport (default for local MCP clients) -->
-        <dependency>
-            <groupId>io.quarkiverse.mcp</groupId>
-            <artifactId>quarkus-mcp-server-stdio</artifactId>
-            <version>${quarkus-mcp-server.version}</version>
-        </dependency>
-
         <!-- Test -->
         <dependency>
             <groupId>io.quarkus</groupId>
@@ -171,6 +164,19 @@
                 <quarkus.native.enabled>true</quarkus.native.enabled>
                 <quarkus.native.resources.includes>corpus/**/*.yaml</quarkus.native.resources.includes>
             </properties>
+        </profile>
+        <profile>
+            <id>stdio</id>
+            <activation>
+                <property><name>!http</name></property>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>io.quarkiverse.mcp</groupId>
+                    <artifactId>quarkus-mcp-server-stdio</artifactId>
+                    <version>${quarkus-mcp-server.version}</version>
+                </dependency>
+            </dependencies>
         </profile>
         <profile>
             <id>http</id>

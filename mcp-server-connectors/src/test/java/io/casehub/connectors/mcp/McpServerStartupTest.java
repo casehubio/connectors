@@ -27,6 +27,17 @@ class McpServerStartupTest {
     }
 
     @Test
+    void flatModeDoesNotRegisterCasehubModel() {
+        assertThat(toolManager.getTool("casehub_model")).isNull();
+    }
+
+    @Test
+    void flatModeDoesNotRegisterCasehubSearch() {
+        assertThat(toolManager.getTool("casehub_search")).isNull();
+    }
+
+
+    @Test
     void chatDomainToolsRegistered() {
         assertThat(toolManager.getTool("connectors_chat_send")).isNotNull();
     }
