@@ -62,12 +62,12 @@ class EmailInboundConnectorTest {
     private EmailInboundAccount testAccount() {
         return new EmailInboundAccount(
                 "email-inbound", "localhost", GREEN_MAIL.getImap().getPort(),
-                false, "inbox@example.com", "password", "INBOX", 60, null);
+                false, "inbox@example.com", "password", "INBOX", 2, null);
     }
 
     private InboundMessage receive() throws InterruptedException {
-        InboundMessage msg = captured.poll(30, TimeUnit.SECONDS);
-        assertNotNull(msg, "message not delivered within 10s — IDLE did not fire or processUnseen missed it");
+        InboundMessage msg = captured.poll(8, TimeUnit.SECONDS);
+        assertNotNull(msg, "message not delivered within 8s — IDLE did not fire or processUnseen missed it");
         return msg;
     }
 
@@ -170,16 +170,16 @@ class EmailInboundConnectorTest {
     }
 
     @Test
-    @Timeout(60)
+    @Timeout(20)
     void multipleUnseenMessages_allDelivered() throws Exception {
         connector.start(captured::add);
         deliver("a@example.com", "First", "Body A");
         deliver("b@example.com", "Second", "Body B");
 
-        final InboundMessage m1 = captured.poll(30, TimeUnit.SECONDS);
-        assertNotNull(m1, "first message not delivered within 30s");
-        final InboundMessage m2 = captured.poll(30, TimeUnit.SECONDS);
-        assertNotNull(m2, "second message not delivered within 30s");
+        final InboundMessage m1 = captured.poll(8, TimeUnit.SECONDS);
+        assertNotNull(m1, "first message not delivered within 8s");
+        final InboundMessage m2 = captured.poll(8, TimeUnit.SECONDS);
+        assertNotNull(m2, "second message not delivered within 8s");
         assertThat(List.of(m1.content(), m2.content()))
                 .containsExactlyInAnyOrder("Body A", "Body B");
     }
