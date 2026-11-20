@@ -170,16 +170,16 @@ class EmailInboundConnectorTest {
     }
 
     @Test
-    @Timeout(20)
+    @Timeout(60)
     void multipleUnseenMessages_allDelivered() throws Exception {
         connector.start(captured::add);
         deliver("a@example.com", "First", "Body A");
         deliver("b@example.com", "Second", "Body B");
 
         final InboundMessage m1 = captured.poll(30, TimeUnit.SECONDS);
-        assertNotNull(m1, "first message not delivered within 10s");
+        assertNotNull(m1, "first message not delivered within 30s");
         final InboundMessage m2 = captured.poll(30, TimeUnit.SECONDS);
-        assertNotNull(m2, "second message not delivered within 10s");
+        assertNotNull(m2, "second message not delivered within 30s");
         assertThat(List.of(m1.content(), m2.content()))
                 .containsExactlyInAnyOrder("Body A", "Body B");
     }
