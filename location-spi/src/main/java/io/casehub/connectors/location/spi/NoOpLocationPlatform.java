@@ -1,18 +1,20 @@
 package io.casehub.connectors.location.spi;
 
-import java.util.List;
-
+import io.casehub.connectors.Coordinates;
 import io.casehub.connectors.Page;
 import io.casehub.connectors.PageRequest;
 import io.casehub.connectors.UnsupportedCapabilityException;
-import io.casehub.connectors.Coordinates;
 import io.casehub.connectors.location.model.GeocodingResult;
 import io.casehub.connectors.location.model.Place;
 import io.casehub.connectors.location.model.PlaceDetail;
+import io.casehub.connectors.location.model.Position;
 import io.casehub.connectors.location.model.Route;
+import io.casehub.connectors.location.model.TrackedDevice;
 import io.casehub.connectors.location.model.TravelMode;
 import io.quarkus.arc.DefaultBean;
 import jakarta.enterprise.context.ApplicationScoped;
+
+import java.util.List;
 
 @DefaultBean
 @ApplicationScoped
@@ -47,6 +49,40 @@ public class NoOpLocationPlatform implements LocationPlatform {
     public Directions directions(String userId) {
         return NoOpDirections.INSTANCE;
     }
+
+    @Override
+    public DevicePosition devicePosition(String userId) {
+        return NoOpDevicePosition.INSTANCE;
+    }
+
+    @Override
+    public AssetTracking assetTracking(String userId) {
+        return NoOpAssetTracking.INSTANCE;
+    }
+
+    private enum NoOpDevicePosition implements DevicePosition {
+        INSTANCE;
+
+        @Override
+        public Position currentPosition() {
+            throw new UnsupportedCapabilityException("currentPosition", "DevicePosition", "none", List.of());
+        }
+    }
+
+    private enum NoOpAssetTracking implements AssetTracking {
+        INSTANCE;
+
+        @Override
+        public List<TrackedDevice> trackedDevices() {
+            throw new UnsupportedCapabilityException("trackedDevices", "AssetTracking", "none", List.of());
+        }
+
+        @Override
+        public Position devicePosition(String deviceId) {
+            throw new UnsupportedCapabilityException("devicePosition", "AssetTracking", "none", List.of());
+        }
+    }
+
 
     private enum NoOpPlaceSearch implements PlaceSearch {
         INSTANCE;

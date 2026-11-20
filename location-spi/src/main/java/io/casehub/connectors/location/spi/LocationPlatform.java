@@ -1,20 +1,23 @@
 package io.casehub.connectors.location.spi;
 
-import java.util.List;
-
+import io.casehub.connectors.Coordinates;
 import io.casehub.connectors.Page;
 import io.casehub.connectors.PageRequest;
-import io.casehub.connectors.Coordinates;
+import io.casehub.connectors.PlatformExtensible;
 import io.casehub.connectors.location.model.GeocodingResult;
 import io.casehub.connectors.location.model.Place;
 import io.casehub.connectors.location.model.PlaceDetail;
+import io.casehub.connectors.location.model.Position;
 import io.casehub.connectors.location.model.Route;
+import io.casehub.connectors.location.model.TrackedDevice;
 import io.casehub.connectors.location.model.TravelMode;
-import io.casehub.connectors.PlatformExtensible;
 import io.casehub.platform.simulation.SimulationEligible;
 
+import java.util.List;
+
 @SimulationEligible(name = "location-platform",
-    capabilities = {"placeSearch", "placeDetails", "geocoding", "directions"})
+    capabilities = {"placeSearch", "placeDetails", "geocoding", "directions",
+                    "devicePosition", "assetTracking"})
 public interface LocationPlatform extends PlatformExtensible {
 
     String id();
@@ -28,6 +31,21 @@ public interface LocationPlatform extends PlatformExtensible {
     Geocoding geocoding(String userId);
 
     Directions directions(String userId);
+
+    DevicePosition devicePosition(String userId);
+
+    AssetTracking assetTracking(String userId);
+
+    interface DevicePosition {
+        Position currentPosition();
+    }
+
+    interface AssetTracking {
+        List<TrackedDevice> trackedDevices();
+
+        Position devicePosition(String deviceId);
+    }
+
 
     interface PlaceSearch {
 
