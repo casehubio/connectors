@@ -354,6 +354,8 @@ public class ConnectorOperationsImpl {
                 if (lp.supports(LocationPlatform.PlaceDetails.class)) caps.add("PlaceDetails");
                 if (lp.supports(LocationPlatform.Geocoding.class)) caps.add("Geocoding");
                 if (lp.supports(LocationPlatform.Directions.class)) caps.add("Directions");
+                if (lp.supports(LocationPlatform.DevicePosition.class)) caps.add("DevicePosition");
+                if (lp.supports(LocationPlatform.AssetTracking.class)) caps.add("AssetTracking");
                 platforms.put("location", new PlatformInfo(id, "CONNECTED", List.copyOf(caps)));
                 break;
             }

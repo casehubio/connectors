@@ -1,6 +1,7 @@
 package io.casehub.connectors.location.ref;
 
 import io.casehub.connectors.Coordinates;
+import io.casehub.connectors.location.model.BatteryInfo;
 import io.casehub.connectors.location.model.Distance;
 import io.casehub.connectors.location.model.Duration;
 import io.casehub.connectors.location.model.GeocodingResult;
@@ -8,14 +9,17 @@ import io.casehub.connectors.location.model.OpeningHours;
 import io.casehub.connectors.location.model.Photo;
 import io.casehub.connectors.location.model.Place;
 import io.casehub.connectors.location.model.PlaceDetail;
+import io.casehub.connectors.location.model.Position;
 import io.casehub.connectors.location.model.PriceLevel;
 import io.casehub.connectors.location.model.Review;
 import io.casehub.connectors.location.model.Route;
 import io.casehub.connectors.location.model.RouteLeg;
+import io.casehub.connectors.location.model.TrackedDevice;
 import io.casehub.connectors.location.model.TravelMode;
 import io.quarkus.arc.DefaultBean;
 import jakarta.enterprise.context.ApplicationScoped;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -27,9 +31,13 @@ import java.util.concurrent.ConcurrentHashMap;
 @ApplicationScoped
 public class InMemoryLocationBackend implements LocationBackend {
 
+    private static final Coordinates BALHAM_STATION = new Coordinates(51.4430, -0.1525);
+    private static final Instant SEED_TIMESTAMP = Instant.parse("2026-11-20T09:00:00Z");
+
     private final Map<String, Place> places = new ConcurrentHashMap<>();
     private final Map<String, PlaceDetail> details = new ConcurrentHashMap<>();
     private final List<GeocodingEntry> geocodingEntries = new ArrayList<>();
+    private final Map<String, TrackedDevice> trackedDevices = new ConcurrentHashMap<>();
     private int idSeq = 0;
 
     InMemoryLocationBackend() {
@@ -45,6 +53,13 @@ public class InMemoryLocationBackend implements LocationBackend {
                                                    geocodingEntries.add(new GeocodingEntry(
                                                            g.address(), new Coordinates(g.lat(), g.lng()),
                                                            g.placeId(), g.types())));
+        SeedLoader.loadTrackedDevices().forEach(td -> {
+            var position = new Position(new Coordinates(td.lat(), td.lng()),
+                td.accuracyMeters(), SEED_TIMESTAMP);
+            var battery = new BatteryInfo(td.batteryStatus(), td.levelPercent());
+            trackedDevices.put(td.id(), new TrackedDevice(td.id(), td.name(), td.type(),
+                position, battery));
+        });
     }
 
     private void addPlace(String name, String address, double lat, double lng,
@@ -130,6 +145,24 @@ public class InMemoryLocationBackend implements LocationBackend {
         var leg = new RouteLeg("Origin", "Destination", origin, destination, dist, dur);
         return new Route(mode.name().toLowerCase() + " route", dist, dur, List.of(leg));
     }
+
+    @Override
+    public Position currentPosition() {
+        return new Position(BALHAM_STATION, 10.0, SEED_TIMESTAMP);
+    }
+
+    @Override
+    public List<TrackedDevice> trackedDevices() {
+        return List.copyOf(trackedDevices.values());
+    }
+
+    @Override
+    public Position trackedDevicePosition(String deviceId) {
+        var device = trackedDevices.get(deviceId);
+        if (device == null) throw new NoSuchElementException("Tracked device not found: " + deviceId);
+        return device.lastKnownPosition();
+    }
+
 
     private boolean matchesText(Place place, String query) {
         if (place.name().toLowerCase().contains(query)) return true;

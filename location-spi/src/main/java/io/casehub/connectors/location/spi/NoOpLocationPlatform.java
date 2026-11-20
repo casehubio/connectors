@@ -60,30 +60,6 @@ public class NoOpLocationPlatform implements LocationPlatform {
         return NoOpAssetTracking.INSTANCE;
     }
 
-    private enum NoOpDevicePosition implements DevicePosition {
-        INSTANCE;
-
-        @Override
-        public Position currentPosition() {
-            throw new UnsupportedCapabilityException("currentPosition", "DevicePosition", "none", List.of());
-        }
-    }
-
-    private enum NoOpAssetTracking implements AssetTracking {
-        INSTANCE;
-
-        @Override
-        public List<TrackedDevice> trackedDevices() {
-            throw new UnsupportedCapabilityException("trackedDevices", "AssetTracking", "none", List.of());
-        }
-
-        @Override
-        public Position devicePosition(String deviceId) {
-            throw new UnsupportedCapabilityException("devicePosition", "AssetTracking", "none", List.of());
-        }
-    }
-
-
     private enum NoOpPlaceSearch implements PlaceSearch {
         INSTANCE;
 
@@ -136,6 +112,29 @@ public class NoOpLocationPlatform implements LocationPlatform {
         @Override
         public Route route(Coordinates origin, Coordinates destination, TravelMode mode) {
             throw new UnsupportedCapabilityException("route", "Directions", "none", List.of());
+        }
+    }
+
+    private enum NoOpDevicePosition implements DevicePosition {
+        INSTANCE;
+
+        @Override
+        public Position currentPosition() {
+            throw new UnsupportedCapabilityException("currentPosition", "DevicePosition", "none", List.of());
+        }
+    }
+
+    private enum NoOpAssetTracking implements AssetTracking {
+        INSTANCE;
+
+        @Override
+        public List<TrackedDevice> trackedDevices() {
+            throw new UnsupportedCapabilityException("trackedDevices", "AssetTracking", "none", List.of());
+        }
+
+        @Override
+        public Position devicePosition(String deviceId) {
+            throw new UnsupportedCapabilityException("devicePosition", "AssetTracking", "none", List.of());
         }
     }
 }

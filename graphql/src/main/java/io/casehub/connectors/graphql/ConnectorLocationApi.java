@@ -1,13 +1,15 @@
 package io.casehub.connectors.graphql;
 
+import io.casehub.connectors.Coordinates;
 import io.casehub.connectors.Page;
 import io.casehub.connectors.PageRequest;
 import io.casehub.connectors.UnsupportedCapabilityException;
-import io.casehub.connectors.Coordinates;
 import io.casehub.connectors.location.model.GeocodingResult;
 import io.casehub.connectors.location.model.Place;
 import io.casehub.connectors.location.model.PlaceDetail;
+import io.casehub.connectors.location.model.Position;
 import io.casehub.connectors.location.model.Route;
+import io.casehub.connectors.location.model.TrackedDevice;
 import io.casehub.connectors.location.model.TravelMode;
 import io.casehub.connectors.location.spi.LocationPlatform;
 import io.casehub.connectors.location.spi.LocationPlatformService;
@@ -25,7 +27,7 @@ import java.util.List;
 
 @McpDomain(value = "connectors/location", app = "connectors",
     basePath = "/api/connectors/location",
-    summary = "Location connector — place search, details, geocoding, directions")
+    summary = "Location connector — place search, details, geocoding, directions, device position, asset tracking")
 @ApplicationScoped
 public class ConnectorLocationApi {
 
@@ -133,6 +135,35 @@ public class ConnectorLocationApi {
                 travelMode);
     }
 
+    @PlatformQuery("Get current device position")
+    @RestPath("/device/position")
+    public Position devicePosition(
+            @QueryParam("platform") String platform) {
+        LocationPlatform p = locationService.platform(platform);
+        requireCapability(p, LocationPlatform.DevicePosition.class, "devicePosition");
+        return p.devicePosition(userId()).currentPosition();
+    }
+
+    @PlatformQuery("List all tracked devices")
+    @RestPath("/device/tracked")
+    public List<TrackedDevice> trackedDevices(
+            @QueryParam("platform") String platform) {
+        LocationPlatform p = locationService.platform(platform);
+        requireCapability(p, LocationPlatform.AssetTracking.class, "trackedDevices");
+        return p.assetTracking(userId()).trackedDevices();
+    }
+
+    @PlatformQuery("Get position of a specific tracked device")
+    @RestPath("/device/tracked/{deviceId}")
+    public Position trackedDevicePosition(
+            @QueryParam("platform") String platform,
+            @PathParam String deviceId) {
+        LocationPlatform p = locationService.platform(platform);
+        requireCapability(p, LocationPlatform.AssetTracking.class, "trackedDevicePosition");
+        return p.assetTracking(userId()).devicePosition(deviceId);
+    }
+
+
     private static void requireCapability(LocationPlatform platform, Class<?> capability, String operation) {
         if (!platform.supports(capability)) {
             var supported = new ArrayList<String>();
@@ -140,6 +171,8 @@ public class ConnectorLocationApi {
             if (platform.supports(LocationPlatform.PlaceDetails.class)) supported.add("PlaceDetails");
             if (platform.supports(LocationPlatform.Geocoding.class)) supported.add("Geocoding");
             if (platform.supports(LocationPlatform.Directions.class)) supported.add("Directions");
+            if (platform.supports(LocationPlatform.DevicePosition.class)) supported.add("DevicePosition");
+            if (platform.supports(LocationPlatform.AssetTracking.class)) supported.add("AssetTracking");
             throw new UnsupportedCapabilityException(
                     operation, capability.getSimpleName(), platform.id(), supported);
         }

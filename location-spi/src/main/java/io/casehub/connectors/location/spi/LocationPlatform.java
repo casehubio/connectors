@@ -36,17 +36,6 @@ public interface LocationPlatform extends PlatformExtensible {
 
     AssetTracking assetTracking(String userId);
 
-    interface DevicePosition {
-        Position currentPosition();
-    }
-
-    interface AssetTracking {
-        List<TrackedDevice> trackedDevices();
-
-        Position devicePosition(String deviceId);
-    }
-
-
     interface PlaceSearch {
 
         Page<Place> searchByText(String query, PageRequest pagination);
@@ -72,5 +61,17 @@ public interface LocationPlatform extends PlatformExtensible {
     interface Directions {
 
         Route route(Coordinates origin, Coordinates destination, TravelMode mode);
+    }
+
+    interface DevicePosition {
+
+        Position currentPosition();
+    }
+
+    interface AssetTracking {
+
+        List<TrackedDevice> trackedDevices();
+
+        Position devicePosition(String deviceId);
     }
 }

@@ -2,9 +2,15 @@ package io.casehub.connectors.location.ref;
 
 import io.casehub.connectors.Coordinates;
 import io.casehub.connectors.Page;
-import io.casehub.connectors.PaginationHelper;
 import io.casehub.connectors.PageRequest;
-import io.casehub.connectors.location.model.*;
+import io.casehub.connectors.PaginationHelper;
+import io.casehub.connectors.location.model.GeocodingResult;
+import io.casehub.connectors.location.model.Place;
+import io.casehub.connectors.location.model.PlaceDetail;
+import io.casehub.connectors.location.model.Position;
+import io.casehub.connectors.location.model.Route;
+import io.casehub.connectors.location.model.TrackedDevice;
+import io.casehub.connectors.location.model.TravelMode;
 import io.casehub.connectors.location.spi.LocationPlatform;
 
 import java.util.List;
@@ -25,7 +31,8 @@ public class RefLocationPlatform implements LocationPlatform {
 
     private static final Set<Class<?>> SUPPORTED = Set.of(
         PlaceSearch.class, PlaceDetails.class,
-        Geocoding.class, Directions.class
+        Geocoding.class, Directions.class,
+        DevicePosition.class, AssetTracking.class
     );
 
     @Override
@@ -52,6 +59,38 @@ public class RefLocationPlatform implements LocationPlatform {
     public Directions directions(String userId) {
         return new RefDirections();
     }
+
+    @Override
+    public DevicePosition devicePosition(String userId) {
+        return new RefDevicePosition();
+    }
+
+    @Override
+    public AssetTracking assetTracking(String userId) {
+        return new RefAssetTracking();
+    }
+
+    private class RefDevicePosition implements DevicePosition {
+
+        @Override
+        public Position currentPosition() {
+            return backend.currentPosition();
+        }
+    }
+
+    private class RefAssetTracking implements AssetTracking {
+
+        @Override
+        public List<TrackedDevice> trackedDevices() {
+            return backend.trackedDevices();
+        }
+
+        @Override
+        public Position devicePosition(String deviceId) {
+            return backend.trackedDevicePosition(deviceId);
+        }
+    }
+
 
     private class RefPlaceSearch implements PlaceSearch {
 

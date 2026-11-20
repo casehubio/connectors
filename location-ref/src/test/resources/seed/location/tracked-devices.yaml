@@ -1,0 +1,24 @@
+- id: "tracker-1"
+  name: "Keys"
+  type: "airtag"
+  lat: 51.4435
+  lng: -0.1530
+  accuracyMeters: 5.0
+  batteryStatus: "GOOD"
+  levelPercent: 72
+
+- id: "tracker-2"
+  name: "Backpack"
+  type: "tile"
+  lat: 51.5074
+  lng: -0.1278
+  accuracyMeters: 50.0
+  batteryStatus: "LOW"
+
+- id: "tracker-3"
+  name: "Dog Collar"
+  type: "smarttag"
+  lat: 51.4520
+  lng: -0.1680
+  accuracyMeters: 15.0
+  batteryStatus: "FULL"

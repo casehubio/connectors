@@ -16,7 +16,19 @@ import io.casehub.connectors.PageRequest;
 import io.casehub.connectors.ProviderApiException;
 import io.casehub.connectors.ProviderAuthException;
 import io.casehub.connectors.ProviderRateLimitedException;
-import io.casehub.connectors.location.model.*;
+import io.casehub.connectors.UnsupportedCapabilityException;
+import io.casehub.connectors.location.model.Distance;
+import io.casehub.connectors.location.model.Duration;
+import io.casehub.connectors.location.model.GeocodingResult;
+import io.casehub.connectors.location.model.OpeningHours;
+import io.casehub.connectors.location.model.Photo;
+import io.casehub.connectors.location.model.Place;
+import io.casehub.connectors.location.model.PlaceDetail;
+import io.casehub.connectors.location.model.PriceLevel;
+import io.casehub.connectors.location.model.Review;
+import io.casehub.connectors.location.model.Route;
+import io.casehub.connectors.location.model.RouteLeg;
+import io.casehub.connectors.location.model.TravelMode;
 import io.casehub.connectors.location.spi.LocationPlatform;
 import io.casehub.platform.api.authn.StaticCredentialStore;
 import org.jboss.logging.Logger;
@@ -77,6 +89,19 @@ public class GoogleLocationPlatform implements LocationPlatform {
     public Directions directions(String userId) {
         return new GoogleDirections(contextFor(userId));
     }
+
+    @Override
+    public DevicePosition devicePosition(String userId) {
+        throw new UnsupportedCapabilityException("devicePosition", "DevicePosition", id(),
+                                                 List.of("PlaceSearch", "PlaceDetails", "Geocoding", "Directions"));
+    }
+
+    @Override
+    public AssetTracking assetTracking(String userId) {
+        throw new UnsupportedCapabilityException("assetTracking", "AssetTracking", id(),
+                                                 List.of("PlaceSearch", "PlaceDetails", "Geocoding", "Directions"));
+    }
+
 
     private GeoApiContext contextFor(String userId) {
         if (overrideContext != null) return overrideContext;

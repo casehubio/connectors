@@ -3,6 +3,7 @@ package io.casehub.connectors.location.ref;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import io.casehub.connectors.location.model.BatteryStatus;
 import io.casehub.connectors.location.model.OpeningHours;
 import io.casehub.connectors.location.model.Photo;
 import io.casehub.connectors.location.model.PriceLevel;
@@ -47,6 +48,21 @@ final class SeedLoader {
             throw new UncheckedIOException(e);
         }
     }
+
+    record TrackedDeviceSeed(String id, String name, String type,
+                             double lat, double lng, double accuracyMeters,
+                             BatteryStatus batteryStatus, Integer levelPercent) {}
+
+    static List<TrackedDeviceSeed> loadTrackedDevices() {
+        var maybeIs = SeedDataResolver.resolve("location", "tracked-devices.yaml");
+        if (maybeIs.isEmpty()) {return List.of();}
+        try (var is = maybeIs.get()) {
+            return YAML.readValue(is, new TypeReference<>() {});
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
 
     private SeedLoader() {}
 }

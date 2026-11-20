@@ -1,7 +1,9 @@
 package io.casehub.connectors.location.ref;
 
-import io.casehub.connectors.PageRequest;
 import io.casehub.connectors.Coordinates;
+import io.casehub.connectors.PageRequest;
+import io.casehub.connectors.location.model.BatteryStatus;
+import io.casehub.connectors.location.model.TrackedDevice;
 import io.casehub.connectors.location.model.TravelMode;
 import io.casehub.connectors.location.spi.LocationPlatform;
 import org.junit.jupiter.api.BeforeEach;
@@ -9,6 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.within;
 
 class RefLocationPlatformTest {
 
@@ -25,7 +28,7 @@ class RefLocationPlatformTest {
     }
 
     @Test
-    void supportsAllCapabilities() {
+    void supportsPlaceAndNavigationCapabilities() {
         assertThat(platform.supports(LocationPlatform.PlaceSearch.class)).isTrue();
         assertThat(platform.supports(LocationPlatform.PlaceDetails.class)).isTrue();
         assertThat(platform.supports(LocationPlatform.Geocoding.class)).isTrue();
@@ -135,4 +138,64 @@ class RefLocationPlatformTest {
         assertThat(walking.duration().seconds())
             .isGreaterThan(driving.duration().seconds());
     }
+
+    @Test
+    void supportsDevicePosition() {
+        assertThat(platform.supports(LocationPlatform.DevicePosition.class)).isTrue();
+    }
+
+    @Test
+    void supportsAssetTracking() {
+        assertThat(platform.supports(LocationPlatform.AssetTracking.class)).isTrue();
+    }
+
+    @Test
+    void currentPositionReturnsBalhamStation() {
+        var position = platform.devicePosition("user1").currentPosition();
+        assertThat(position.location().lat()).isCloseTo(51.4430, within(0.001));
+        assertThat(position.location().lng()).isCloseTo(-0.1525, within(0.001));
+        assertThat(position.accuracyMeters()).isEqualTo(10.0);
+        assertThat(position.timestamp()).isNotNull();
+    }
+
+    @Test
+    void trackedDevicesReturnsThreeDevices() {
+        var devices = platform.assetTracking("user1").trackedDevices();
+        assertThat(devices).hasSize(3);
+        assertThat(devices).extracting(TrackedDevice::name)
+                           .containsExactlyInAnyOrder("Keys", "Backpack", "Dog Collar");
+    }
+
+    @Test
+    void trackedDeviceTypesAreCorrect() {
+        var devices = platform.assetTracking("user1").trackedDevices();
+        assertThat(devices).extracting(TrackedDevice::type)
+                           .containsExactlyInAnyOrder("airtag", "tile", "smarttag");
+    }
+
+    @Test
+    void trackedDeviceBatteryInfo() {
+        var devices = platform.assetTracking("user1").trackedDevices();
+        var keys    = devices.stream().filter(d -> d.name().equals("Keys")).findFirst().orElseThrow();
+        assertThat(keys.battery().status()).isEqualTo(BatteryStatus.GOOD);
+        assertThat(keys.battery().levelPercent()).isEqualTo(72);
+
+        var backpack = devices.stream().filter(d -> d.name().equals("Backpack")).findFirst().orElseThrow();
+        assertThat(backpack.battery().status()).isEqualTo(BatteryStatus.LOW);
+        assertThat(backpack.battery().levelPercent()).isNull();
+    }
+
+    @Test
+    void devicePositionByIdReturnsCorrectDevice() {
+        var position = platform.assetTracking("user1").devicePosition("tracker-1");
+        assertThat(position).isNotNull();
+        assertThat(position.location()).isNotNull();
+    }
+
+    @Test
+    void devicePositionByIdThrowsForUnknown() {
+        assertThatThrownBy(() -> platform.assetTracking("user1").devicePosition("unknown"))
+                .isInstanceOf(java.util.NoSuchElementException.class);
+    }
+
 }

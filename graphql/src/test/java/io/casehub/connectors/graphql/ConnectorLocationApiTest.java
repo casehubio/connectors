@@ -4,21 +4,25 @@ import io.casehub.connectors.Coordinates;
 import io.casehub.connectors.Page;
 import io.casehub.connectors.PageRequest;
 import io.casehub.connectors.UnsupportedCapabilityException;
+import io.casehub.connectors.location.model.BatteryInfo;
+import io.casehub.connectors.location.model.BatteryStatus;
 import io.casehub.connectors.location.model.Distance;
 import io.casehub.connectors.location.model.Duration;
 import io.casehub.connectors.location.model.GeocodingResult;
 import io.casehub.connectors.location.model.Place;
 import io.casehub.connectors.location.model.PlaceDetail;
+import io.casehub.connectors.location.model.Position;
 import io.casehub.connectors.location.model.PriceLevel;
 import io.casehub.connectors.location.model.Route;
 import io.casehub.connectors.location.model.RouteLeg;
-import io.casehub.connectors.location.model.TravelMode;
+import io.casehub.connectors.location.model.TrackedDevice;
 import io.casehub.connectors.location.spi.LocationPlatform;
 import io.casehub.connectors.location.spi.LocationPlatformService;
 import io.quarkus.security.identity.SecurityIdentity;
 import org.junit.jupiter.api.Test;
 
 import java.security.Principal;
+import java.time.Instant;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -160,6 +164,40 @@ class ConnectorLocationApiTest {
         assertThat(route.distance().meters()).isGreaterThan(0);
     }
 
+    @Test
+    void devicePositionDelegatesWhenSupported() {
+        var api = apiWith(fullService());
+
+        var position = api.devicePosition("full-location");
+
+        assertThat(position).isNotNull();
+        assertThat(position.location()).isNotNull();
+        assertThat(position.accuracyMeters()).isGreaterThan(0);
+        assertThat(position.timestamp()).isNotNull();
+    }
+
+    @Test
+    void trackedDevicesDelegatesWhenSupported() {
+        var api = apiWith(fullService());
+
+        var devices = api.trackedDevices("full-location");
+
+        assertThat(devices).hasSize(1);
+        assertThat(devices.getFirst().name()).isEqualTo("Keys");
+        assertThat(devices.getFirst().type()).isEqualTo("airtag");
+    }
+
+    @Test
+    void trackedDevicePositionDelegatesWhenSupported() {
+        var api = apiWith(fullService());
+
+        var position = api.trackedDevicePosition("full-location", "tracker-1");
+
+        assertThat(position).isNotNull();
+        assertThat(position.location()).isNotNull();
+    }
+
+
     private ConnectorLocationApi apiWith(LocationPlatformService service) {
         var identity = mock(SecurityIdentity.class);
         var principal = mock(Principal.class);
@@ -189,6 +227,8 @@ class ConnectorLocationApiTest {
         @Override public PlaceDetails placeDetails(String u) { throw new UnsupportedOperationException(); }
         @Override public Geocoding geocoding(String u) { throw new UnsupportedOperationException(); }
         @Override public Directions directions(String u) { throw new UnsupportedOperationException(); }
+        @Override public DevicePosition devicePosition(String u) { throw new UnsupportedOperationException(); }
+        @Override public AssetTracking assetTracking(String u) { throw new UnsupportedOperationException(); }
     }
 
     static class FullStubLocationPlatform implements LocationPlatform {
@@ -243,6 +283,23 @@ class ConnectorLocationApiTest {
                 var dur = new Duration(1100, "18 min");
                 var leg = new RouteLeg("Origin", "Destination", origin, destination, dist, dur);
                 return new Route("driving route", dist, dur, List.of(leg));
+            };
+        }
+
+        @Override public DevicePosition devicePosition(String u) {
+            return () -> new Position(new Coordinates(51.4430, -0.1525), 10.0, Instant.now());
+        }
+
+        @Override public AssetTracking assetTracking(String u) {
+            return new AssetTracking() {
+                @Override public List<TrackedDevice> trackedDevices() {
+                    return List.of(new TrackedDevice("tracker-1", "Keys", "airtag",
+                        new Position(new Coordinates(51.4435, -0.1530), 5.0, Instant.now()),
+                        new BatteryInfo(BatteryStatus.GOOD, 72)));
+                }
+                @Override public Position devicePosition(String deviceId) {
+                    return new Position(new Coordinates(51.4435, -0.1530), 5.0, Instant.now());
+                }
             };
         }
     }
