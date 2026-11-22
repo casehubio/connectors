@@ -157,6 +157,29 @@ public class TelegramBotClient {
         }
     }
 
+    public boolean setWebhook(final String token, final String url, final String secretToken) {
+        try {
+            final ObjectNode body = MAPPER.createObjectNode();
+            body.put("url", url);
+            if (secretToken != null && !secretToken.isEmpty()) {
+                body.put("secret_token", secretToken);
+            }
+            return callMethod(token, "setWebhook", body) != null;
+        } catch (final Exception e) {
+            LOG.log(Level.WARNING, "telegram setWebhook error", e);
+            return false;
+        }
+    }
+
+    public boolean deleteWebhook(final String token) {
+        try {
+            return callMethod(token, "deleteWebhook", MAPPER.createObjectNode()) != null;
+        } catch (final Exception e) {
+            LOG.log(Level.WARNING, "telegram deleteWebhook error", e);
+            return false;
+        }
+    }
+
     private JsonNode callMethod(final String token, final String method,
                                  final ObjectNode body) throws Exception {
         final HttpResponse<String> resp = HttpHelper.CLIENT.send(

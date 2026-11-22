@@ -157,4 +157,47 @@ class TelegramBotClientTest {
 
         assertThat(ok).isTrue();
     }
+
+    @Test
+    void setWebhook_returns_true() {
+        wm.stubFor(post(urlPathEqualTo("/bot" + TOKEN + "/setWebhook"))
+                .willReturn(okJson("{\"ok\":true,\"result\":true}")));
+
+        boolean ok = client.setWebhook(TOKEN, "https://example.com/webhook", "my-secret");
+
+        assertThat(ok).isTrue();
+        wm.verify(postRequestedFor(urlPathEqualTo("/bot" + TOKEN + "/setWebhook"))
+                .withRequestBody(matchingJsonPath("$.url", equalTo("https://example.com/webhook")))
+                .withRequestBody(matchingJsonPath("$.secret_token", equalTo("my-secret"))));
+    }
+
+    @Test
+    void setWebhook_without_secret() {
+        wm.stubFor(post(urlPathEqualTo("/bot" + TOKEN + "/setWebhook"))
+                .willReturn(okJson("{\"ok\":true,\"result\":true}")));
+
+        boolean ok = client.setWebhook(TOKEN, "https://example.com/webhook", null);
+
+        assertThat(ok).isTrue();
+    }
+
+    @Test
+    void deleteWebhook_returns_true() {
+        wm.stubFor(post(urlPathEqualTo("/bot" + TOKEN + "/deleteWebhook"))
+                .willReturn(okJson("{\"ok\":true,\"result\":true}")));
+
+        boolean ok = client.deleteWebhook(TOKEN);
+
+        assertThat(ok).isTrue();
+    }
+
+    @Test
+    void getChatMember_returns_null_on_failure() {
+        wm.stubFor(post(urlPathEqualTo("/bot" + TOKEN + "/getChatMember"))
+                .willReturn(aResponse().withStatus(400).withBody("{\"ok\":false}")));
+
+        TelegramChatMember member = client.getChatMember(TOKEN, "100", 55);
+
+        assertThat(member).isNull();
+    }
 }
