@@ -135,6 +135,10 @@ public class TelegramChatPlatform implements ChatPlatform {
         knownChats.put(String.valueOf(chat.id()), chat);
     }
 
+    Set<String> knownChatIds() {
+        return knownChats.keySet();
+    }
+
     private SendResult sendMessage(final ChatChannelRef channel, final ChatContent content) {
         final String text = content.markdown() != null ? content.markdown() : content.text();
         final TelegramMessage msg = client.sendMessage(token, channel.id(), text, null);
