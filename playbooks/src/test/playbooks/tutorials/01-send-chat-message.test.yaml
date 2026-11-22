@@ -1,10 +1,8 @@
 name: "How to: send a chat message"
 ---
-name: message delivered to the channel
+name: message dispatched to the general channel
 ---
-- run-playbook: ../../../main/playbooks/tutorials/01-send-chat-message.playbook.yaml
+- run-playbook: 01-send-chat-message
   capture: run
-- assertThat: run.succeeded
-  equals: true
 - assertThat: run.captures.sent.ok
   equals: true

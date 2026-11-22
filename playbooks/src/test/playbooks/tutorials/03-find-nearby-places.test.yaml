@@ -1,18 +1,18 @@
 name: "How to: find nearby restaurants"
 ---
-name: search returns places and details include address and phone
+name: device position near Balham, two restaurants within 2km
 ---
-- run-playbook: ../../../main/playbooks/tutorials/03-find-nearby-places.playbook.yaml
+- run-playbook: 03-find-nearby-places
   capture: run
-- assertThat: run.succeeded
-  equals: true
+- assertThat: run.captures.myLocation.location
+  matches:
+    lat: 51.443
+    lng: -0.1525
 - assertThat: run.captures.nearby.items
-  not-empty: true
-- assertThat: run.captures.place.name
-  not-null: true
-- assertThat: run.captures.place.formattedAddress
-  not-null: true
-- assertThat: run.captures.place.formattedPhoneNumber
-  not-null: true
-- assertThat: run.captures.place.rating
-  not-null: true
+  hasSize: 2
+- assertThat: run.captures.place
+  matches:
+    name: The Crown Balham
+    formattedAddress: "102 Balham High Road, London SW12 9AA"
+    rating: 4.1
+    formattedPhoneNumber: "+442087721100"

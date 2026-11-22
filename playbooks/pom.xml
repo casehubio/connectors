@@ -215,6 +215,19 @@ No production Java — playbooks in src/main/playbooks, tests in src/test/playbo
   </dependencies>
 
   <build>
+    <resources>
+      <resource>
+        <directory>src/main/playbooks</directory>
+      </resource>
+    </resources>
+    <testResources>
+      <testResource>
+        <directory>src/test/resources</directory>
+      </testResource>
+      <testResource>
+        <directory>src/test/playbooks</directory>
+      </testResource>
+    </testResources>
     <plugins>
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>

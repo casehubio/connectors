@@ -1,10 +1,15 @@
 name: Find nearby restaurants
-description: Search for restaurants near a location, then get details of the first result
+description: Get current position, search for restaurants nearby, then get details of the first result
 ---
-- location-search-nearby:
+- location-device-position:
     platform: ref
-    lat: 51.4430
-    lng: -0.1525
+  capture: myLocation
+
+- location-search-by-category:
+    platform: ref
+    category: restaurant
+    lat: ${myLocation.location.lat}
+    lng: ${myLocation.location.lng}
     radius-meters: 2000
   capture: nearby
 
