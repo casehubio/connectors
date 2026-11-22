@@ -35,6 +35,8 @@ Zero heavy dependencies — HTTP-based connectors use java.net.http only.</descr
     <module>chat-discord</module>
     <module>signal-cli</module>
     <module>chat-signal</module>
+    <module>telegram-bot</module>
+    <module>chat-telegram</module>
     <module>chat-slack</module>
     <module>chat-teams</module>
     <module>notification-bridge</module>
