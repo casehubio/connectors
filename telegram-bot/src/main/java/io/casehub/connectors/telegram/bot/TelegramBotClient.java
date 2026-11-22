@@ -18,7 +18,11 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-@jakarta.enterprise.context.ApplicationScoped
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+
+@ApplicationScoped
 public class TelegramBotClient {
 
     private static final Logger LOG = Logger.getLogger(TelegramBotClient.class.getName());
@@ -27,11 +31,10 @@ public class TelegramBotClient {
 
     private final String baseUrl;
 
-    @jakarta.inject.Inject
+    @Inject
     public TelegramBotClient(
-            @org.eclipse.microprofile.config.inject.ConfigProperty(
-                    name = "casehub.telegram.api-url",
-                    defaultValue = "https://api.telegram.org")
+            @ConfigProperty(name = "casehub.telegram.api-url",
+                            defaultValue = "https://api.telegram.org")
             final String baseUrl) {
         this.baseUrl = baseUrl;
     }

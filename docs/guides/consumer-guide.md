@@ -38,6 +38,8 @@ There are 36 active modules in the build (pom.xml `<modules>`):
 | `chat-slack` | Slack `ChatPlatform` (9 native capabilities -- most complete), RichCard-to-Block Kit translation |
 | `signal-cli` | `SignalClient` HTTP client + `SignalWebSocket` WebSocket client for `signal-cli-rest-api`. Pure `java.net.http` -- no AGPL dependencies |
 | `chat-signal` | Signal `ChatPlatform` (6 native capabilities: Messaging, Discovery, Members, Reactions, ChannelManagement, MemberManagement), `SignalInboundConnector` (WebSocket-based), `SignalInboundTranslator` |
+| `telegram-bot` | `TelegramBotClient` HTTP client for Telegram Bot API. Pure `java.net.http` via `HttpHelper.CLIENT`, call-time token passing |
+| `chat-telegram` | Telegram `ChatPlatform` (5 native capabilities: Messaging, Threading, Discovery, Reactions, Members), `TelegramInboundConnector` (webhook with secret token verification), `TelegramInboundTranslator` |
 | `chat-teams` | Teams `ChatPlatform` (8 native capabilities: Messaging, Threading, Discovery, Presence, Members, ChannelManagement, MemberManagement, MessageHistory). Dual delegated/application token model. Compound `teamId:channelId` channel IDs. Config: `ServiceConnectionProvider` with providers `"microsoft"` (delegated) and `"microsoft-app"` (application). **File attachments** (`ChatContent.attachments()`): uploaded to the channel's SharePoint drive before sending; requires `Files.ReadWrite.All` **application** permission on the Teams app registration (admin-granted) — without it, sends with attachments throw `ProviderAuthException` (403). Sends without attachments are unaffected. **Messaging extensions** (search, action, link unfurling): see `docs/guides/teams-messaging-extensions-setup.md` for manifest template, InvokeHandler wiring, and reference handlers. |
 | `microsoft-graph-client` | Shared Microsoft Graph REST API v1.0 HTTP client (`MicrosoftGraphClient`) — OData pagination with `@odata.nextLink`/`@odata.deltaLink`, `GraphErrorHandler` for Graph-specific error mapping, `TokenRetry` for 401 re-resolve. Used by `email-microsoft`, `calendar-microsoft`, `document-microsoft`, `chat-teams` |
 | `notification-bridge` | Bridges platform notification delivery system to connector SPI. `NotificationBridgeStartup`, `ConnectorNotificationDeliverer`, `DigestFormatter` SPI, `ConfigDestinationResolver` |
@@ -204,6 +206,7 @@ Constants for connector types: `InboundConnectorTypes` (e.g. `SLACK = "slack"`, 
 | `discord-inbound` | `DiscordInboundConnector` | `chat-discord` | Discord Gateway WebSocket | Discord bot token |
 | `irc-inbound` | `IrcInboundConnector` | `chat-irc` | IRC connection | IRC server config |
 | `signal-inbound` | `SignalInboundConnector` | `chat-signal` | signal-cli-rest-api WebSocket | signal-cli URL + registered number |
+| `telegram-inbound` | `TelegramInboundConnector` | `chat-telegram` | Telegram Bot API webhook POST | `X-Telegram-Bot-Api-Secret-Token` header |
 | `gmail-push-inbound` | `GmailPushInboundConnector` | `email-google-inbound` | Google Cloud Pub/Sub push | JWT validation + Gmail History API |
 
 ### ConnectorDiscovery SPI
@@ -296,6 +299,7 @@ Supports `CommandResponse.Immediate` (synchronous) and `CommandResponse.Deferred
 | `DiscordChatPlatform` | `discord` | 9 (all except MemberManagement; Commands conditional on `application-id` config) |
 | `SlackChatPlatform` | `slack` | 10 (most complete; Commands via manifest, endpoint receives slash commands) |
 | `SignalChatPlatform` | `signal` | 6 (Messaging, Discovery, Members, Reactions, ChannelManagement, MemberManagement) |
+| `TelegramChatPlatform` | `telegram` | 5 (Messaging, Threading, Discovery, Reactions, Members; Bot API webhook inbound) |
 | `TeamsChatPlatform` | `microsoft-teams` | 8 (Messaging, Threading, Discovery, Presence, Members, ChannelManagement, MemberManagement, MessageHistory; dual delegated/application tokens) |
 
 ### CalendarPlatform SPI
@@ -673,4 +677,4 @@ GroupId: `io.casehub` -- published to GitHub Packages at `0.2-SNAPSHOT`.
 - Depend on casehub-work, casehub-ledger, or casehub-engine
 - Include vendor SDKs (Slack SDK, Twilio SDK) -- all HTTP-based connectors use `java.net.http.HttpClient` directly
 
-**Consolidation rule:** Do not implement a new Slack, Teams, SMS, email, WhatsApp, Discord, IRC, Signal, or inbound connector in any other repo. All outbound and inbound messaging routes through these SPIs. If a new channel type is needed, add it here.
+**Consolidation rule:** Do not implement a new Slack, Teams, SMS, email, WhatsApp, Discord, IRC, Signal, Telegram, or inbound connector in any other repo. All outbound and inbound messaging routes through these SPIs. If a new channel type is needed, add it here.
