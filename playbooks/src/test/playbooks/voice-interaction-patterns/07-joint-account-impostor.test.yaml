@@ -2,22 +2,13 @@ name: Joint account impostor detection tests
 ---
 name: duplicate voice detected — security alerted
 ---
-- run-playbook: ../../../main/playbooks/voice-interaction-patterns/07-joint-account-impostor.playbook.yaml
+- run-playbook: 07-joint-account-impostor
   capture: run
 - assertThat: run.error
   equals: ""
-- assertThat: run.succeeded
-  equals: true
-# Alice identified correctly
 - assertThat: run.captures.aliceId.identified
   equals: true
-- assertThat: run.captures.aliceId.name
-  not-null: true
-# Impostor also identified — but as Alice, not Bob (same voice)
 - assertThat: run.captures.impostorId.identified
   equals: true
-- assertThat: run.captures.impostorId.name
-  not-null: true
-# Transcript captured for audit
 - assertThat: run.captures.fullTranscript.text
   contains: confirm

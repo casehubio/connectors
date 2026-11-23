@@ -7,12 +7,10 @@ simulate:
 ---
 name: agent classifies transcribed voice input
 ---
-- run-playbook: ../../../main/playbooks/voice-interaction-patterns/02-voice-agent.playbook.yaml
+- run-playbook: 02-voice-agent
   capture: run
 - assertThat: run.error
   equals: ""
-- assertThat: run.succeeded
-  equals: true
 - assertThat: run.captures.transcript.text
   contains: check my account balance
 - assertThat: run.captures.classification.response

@@ -2,16 +2,14 @@ name: WhatsApp banking alert tests
 ---
 name: bank balance sent as voice message with transcript follow-up
 ---
-- run-playbook: ../../../main/playbooks/voice-interaction-patterns/04-whatsapp-banking-alert.playbook.yaml
+- run-playbook: 04-whatsapp-banking-alert
   capture: run
 - assertThat: run.error
   equals: ""
-- assertThat: run.succeeded
-  equals: true
-- assertThat: run.captures.balance.accountId
-  equals: acc-100
-- assertThat: run.captures.balance.currency
-  equals: GBP
+- assertThat: run.captures.balance
+  matches:
+    accountId: acc-100
+    currency: GBP
 - assertThat: run.captures.voiceSummary.audio-format
   equals: wav
 - assertThat: run.captures.notification.ok

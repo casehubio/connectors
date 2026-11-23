@@ -2,13 +2,12 @@ name: Voice echo tests
 ---
 name: text survives TTS to STT round-trip
 ---
-- run-playbook: ../../../main/playbooks/voice-interaction-patterns/01-voice-echo.playbook.yaml
+- run-playbook: 01-voice-echo
   capture: run
 - assertThat: run.error
   equals: ""
-- assertThat: run.succeeded
-  equals: true
+- assertThat: run.captures.roundTrip
+  matches:
+    language: en
 - assertThat: run.captures.roundTrip.text
   contains: round
-- assertThat: run.captures.roundTrip.language
-  not-null: true

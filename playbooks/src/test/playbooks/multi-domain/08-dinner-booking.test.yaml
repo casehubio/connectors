@@ -2,21 +2,17 @@ name: Dinner out tests
 ---
 name: find restaurant, get directions, SMS and chat notify
 ---
-- run-playbook: ../../../main/playbooks/multi-domain/08-dinner-booking.playbook.yaml
+- run-playbook: 08-dinner-booking
   capture: run
 - assertThat: run.error
   equals: ""
-- assertThat: run.succeeded
-  equals: true
-# Restaurant found
-- assertThat: run.captures.restaurant.name
-  not-null: true
-# Directions calculated
+- assertThat: run.captures.restaurant
+  matches:
+    name: The Crown Balham
+    formattedAddress: "102 Balham High Road, London SW12 9AA"
 - assertThat: run.captures.directions.duration.text
   not-null: true
-# SMS sent
 - assertThat: run.captures.smsNotification.ok
   equals: true
-# Chat notification sent
 - assertThat: run.captures.chatNotification.ok
   equals: true

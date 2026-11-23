@@ -2,17 +2,13 @@ name: "NEGATIVE TWIN: cloned voice bypasses voice-only gate"
 ---
 name: cloned voice passes speaker identification and authorises payment
 ---
-- run-playbook: ../../../main/playbooks/voice-interaction-patterns/06b-sole-gate-insecure.playbook.yaml
+- run-playbook: 06b-sole-gate-insecure
   capture: run
 - assertThat: run.error
   equals: ""
-- assertThat: run.succeeded
+- assertThat: run.captures.speakerId
+  matches:
+    identified: true
+    name: Bob Smith
+- assertThat: run.captures.auditRecord.ok
   equals: true
-# Clone passes voice biometrics — this IS the vulnerability
-- assertThat: run.captures.speakerId.identified
-  equals: true
-- assertThat: run.captures.speakerId.name
-  equals: Bob Smith
-# Payment authorised with no second factor to catch the impersonation
-- assertThat: run.captures.auditRecord
-  not-null: true

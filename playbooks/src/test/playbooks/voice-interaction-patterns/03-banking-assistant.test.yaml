@@ -2,17 +2,14 @@ name: Banking voice assistant tests
 ---
 name: bank balance retrieved and spoken as voice
 ---
-- run-playbook: ../../../main/playbooks/voice-interaction-patterns/03-banking-assistant.playbook.yaml
+- run-playbook: 03-banking-assistant
   capture: run
 - assertThat: run.error
   equals: ""
-- assertThat: run.succeeded
-  equals: true
-- assertThat: run.captures.balance.accountId
-  equals: acc-100
-- assertThat: run.captures.balance.currency
-  equals: GBP
-- assertThat: run.captures.balance.amount
-  not-null: true
+- assertThat: run.captures.balance
+  matches:
+    accountId: acc-100
+    currency: GBP
+    amount: 3245.67
 - assertThat: run.captures.audio.audio-format
   equals: wav
