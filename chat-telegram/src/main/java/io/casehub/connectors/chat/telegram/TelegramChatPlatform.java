@@ -9,8 +9,10 @@ import io.casehub.connectors.chat.degraded.NoOpCommands;
 import io.casehub.connectors.chat.degraded.NoOpMemberManagement;
 import io.casehub.connectors.chat.degraded.NoOpReactions;
 import io.casehub.connectors.chat.degraded.UnknownPresence;
+import io.casehub.connectors.chat.command.CommandDefinition;
 import io.casehub.connectors.chat.model.Channel;
 import io.casehub.connectors.chat.model.ChatChannelRef;
+import io.casehub.connectors.chat.model.PresenceStatus;
 import io.casehub.connectors.chat.model.ChatContent;
 import io.casehub.connectors.chat.model.ChatMessageRef;
 import io.casehub.connectors.chat.model.Member;
@@ -51,7 +53,7 @@ public class TelegramChatPlatform implements ChatPlatform {
 
     private static final Set<Class<?>> NATIVE_CAPABILITIES = Set.of(
             Messaging.class, Threading.class, Discovery.class,
-            Reactions.class, Members.class);
+            Reactions.class, Members.class, Presence.class, Commands.class);
 
     private final TelegramBotClient client;
     private final String token;
@@ -92,9 +94,9 @@ public class TelegramChatPlatform implements ChatPlatform {
         threading = this::replyToMessage;
         discovery = this::listChannels;
         reactions = new TelegramReactions();
-        presence = new UnknownPresence();
+        presence = new TelegramPresence();
         members = this::listMembers;
-        commands = new NoOpCommands();
+        commands = new TelegramCommands();
         channelManagement = new NoOpChannelManagement();
         memberManagement = new NoOpMemberManagement();
         messageHistory = new EmptyMessageHistory();
@@ -190,6 +192,51 @@ public class TelegramChatPlatform implements ChatPlatform {
                         new MemberRef(String.valueOf(cm.user().id())),
                         cm.user().firstName() != null ? cm.user().firstName() : String.valueOf(cm.user().id())))
                 .toList();
+    }
+
+    private class TelegramPresence implements Presence {
+        @Override
+        public PresenceStatus of(final MemberRef member) {
+            final long userId;
+            try {
+                userId = Long.parseLong(member.id());
+            } catch (final NumberFormatException e) {
+                return PresenceStatus.UNKNOWN;
+            }
+            for (final String chatId : knownChats.keySet()) {
+                final var cm = client.getChatMember(token, chatId, userId);
+                if (cm != null && cm.status() != null) {
+                    return mapStatus(cm.status());
+                }
+            }
+            return PresenceStatus.UNKNOWN;
+        }
+
+        @Override
+        public void set(final MemberRef member, final PresenceStatus status) {
+            // Telegram does not support setting presence
+        }
+
+        private static PresenceStatus mapStatus(final String status) {
+            return switch (status) {
+                case "creator", "administrator", "member" -> PresenceStatus.ONLINE;
+                case "restricted" -> PresenceStatus.AWAY;
+                case "left", "kicked" -> PresenceStatus.OFFLINE;
+                default -> PresenceStatus.UNKNOWN;
+            };
+        }
+    }
+
+    private class TelegramCommands implements Commands {
+        @Override
+        public void registerAll(final List<CommandDefinition> commandDefs) {
+            final List<TelegramBotClient.BotCommand> botCommands = commandDefs.stream()
+                    .map(def -> new TelegramBotClient.BotCommand(def.name(), def.description()))
+                    .toList();
+            if (!client.setMyCommands(token, botCommands)) {
+                LOG.warning("telegram: failed to register " + commandDefs.size() + " commands");
+            }
+        }
     }
 
     private class TelegramReactions implements Reactions {

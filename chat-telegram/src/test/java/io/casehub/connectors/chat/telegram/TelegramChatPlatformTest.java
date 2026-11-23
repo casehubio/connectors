@@ -3,6 +3,7 @@ package io.casehub.connectors.chat.telegram;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.AfterEach;
@@ -12,9 +13,12 @@ import org.junit.jupiter.api.Test;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 
+import io.casehub.connectors.chat.command.CommandDefinition;
 import io.casehub.connectors.chat.model.ChatChannelRef;
 import io.casehub.connectors.chat.model.ChatContent;
 import io.casehub.connectors.chat.model.ChatMessageRef;
+import io.casehub.connectors.chat.model.MemberRef;
+import io.casehub.connectors.chat.model.PresenceStatus;
 import io.casehub.connectors.chat.model.SendResult;
 import io.casehub.connectors.chat.spi.ChannelManagement;
 import io.casehub.connectors.chat.spi.Commands;
@@ -66,9 +70,13 @@ class TelegramChatPlatformTest {
     }
 
     @Test
+    void supports_presence_and_commands() {
+        assertThat(platform.supports(Presence.class)).isTrue();
+        assertThat(platform.supports(Commands.class)).isTrue();
+    }
+
+    @Test
     void does_not_support_degraded_capabilities() {
-        assertThat(platform.supports(Presence.class)).isFalse();
-        assertThat(platform.supports(Commands.class)).isFalse();
         assertThat(platform.supports(ChannelManagement.class)).isFalse();
         assertThat(platform.supports(MemberManagement.class)).isFalse();
         assertThat(platform.supports(MessageHistory.class)).isFalse();
@@ -158,6 +166,81 @@ class TelegramChatPlatformTest {
 
         assertThat(members).hasSize(1);
         assertThat(members.get(0).displayName()).isEqualTo("Admin");
+    }
+
+    @Test
+    void presence_maps_member_to_online() {
+        platform.registerKnownChat(new TelegramChat(100, "group", "Test", null, null, null, null));
+        wm.stubFor(post(urlPathEqualTo("/bot" + TOKEN + "/getChatMember"))
+                .willReturn(okJson("""
+                    {"ok":true,"result":{"user":{"id":42,"first_name":"Alice","is_bot":false},"status":"member"}}
+                    """)));
+
+        assertThat(platform.presence().of(new MemberRef("42"))).isEqualTo(PresenceStatus.ONLINE);
+    }
+
+    @Test
+    void presence_maps_administrator_to_online() {
+        platform.registerKnownChat(new TelegramChat(100, "group", "Test", null, null, null, null));
+        wm.stubFor(post(urlPathEqualTo("/bot" + TOKEN + "/getChatMember"))
+                .willReturn(okJson("""
+                    {"ok":true,"result":{"user":{"id":42,"first_name":"Admin","is_bot":false},"status":"administrator"}}
+                    """)));
+
+        assertThat(platform.presence().of(new MemberRef("42"))).isEqualTo(PresenceStatus.ONLINE);
+    }
+
+    @Test
+    void presence_maps_restricted_to_away() {
+        platform.registerKnownChat(new TelegramChat(100, "group", "Test", null, null, null, null));
+        wm.stubFor(post(urlPathEqualTo("/bot" + TOKEN + "/getChatMember"))
+                .willReturn(okJson("""
+                    {"ok":true,"result":{"user":{"id":42,"first_name":"Restricted","is_bot":false},"status":"restricted"}}
+                    """)));
+
+        assertThat(platform.presence().of(new MemberRef("42"))).isEqualTo(PresenceStatus.AWAY);
+    }
+
+    @Test
+    void presence_maps_left_to_offline() {
+        platform.registerKnownChat(new TelegramChat(100, "group", "Test", null, null, null, null));
+        wm.stubFor(post(urlPathEqualTo("/bot" + TOKEN + "/getChatMember"))
+                .willReturn(okJson("""
+                    {"ok":true,"result":{"user":{"id":42,"first_name":"Gone","is_bot":false},"status":"left"}}
+                    """)));
+
+        assertThat(platform.presence().of(new MemberRef("42"))).isEqualTo(PresenceStatus.OFFLINE);
+    }
+
+    @Test
+    void presence_maps_kicked_to_offline() {
+        platform.registerKnownChat(new TelegramChat(100, "group", "Test", null, null, null, null));
+        wm.stubFor(post(urlPathEqualTo("/bot" + TOKEN + "/getChatMember"))
+                .willReturn(okJson("""
+                    {"ok":true,"result":{"user":{"id":42,"first_name":"Banned","is_bot":false},"status":"kicked"}}
+                    """)));
+
+        assertThat(platform.presence().of(new MemberRef("42"))).isEqualTo(PresenceStatus.OFFLINE);
+    }
+
+    @Test
+    void presence_returns_unknown_without_known_chats() {
+        assertThat(platform.presence().of(new MemberRef("42"))).isEqualTo(PresenceStatus.UNKNOWN);
+    }
+
+    @Test
+    void commands_register_calls_set_my_commands() {
+        wm.stubFor(post(urlPathEqualTo("/bot" + TOKEN + "/setMyCommands"))
+                .willReturn(okJson("{\"ok\":true,\"result\":true}")));
+
+        platform.commands().registerAll(List.of(
+                new CommandDefinition("help", "Show help", List.of()),
+                new CommandDefinition("status", "Check status", List.of())));
+
+        wm.verify(postRequestedFor(urlPathEqualTo("/bot" + TOKEN + "/setMyCommands"))
+                .withRequestBody(matchingJsonPath("$.commands[0].command", equalTo("help")))
+                .withRequestBody(matchingJsonPath("$.commands[0].description", equalTo("Show help")))
+                .withRequestBody(matchingJsonPath("$.commands[1].command", equalTo("status"))));
     }
 
     @Test
