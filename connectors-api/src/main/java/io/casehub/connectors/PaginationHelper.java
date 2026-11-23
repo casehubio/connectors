@@ -8,7 +8,7 @@ public final class PaginationHelper {
 
     public static <T> Page<T> paginate(List<T> all, PageRequest pagination) {
         int start = 0;
-        if (pagination.cursor() != null && !pagination.cursor().isEmpty()) {
+        if (pagination.cursor() != null && !pagination.cursor().isBlank()) {
             start = Integer.parseInt(pagination.cursor());
         }
         int     size       = pagination.pageSize() > 0 ? pagination.pageSize() : 20;
