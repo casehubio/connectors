@@ -569,6 +569,14 @@ Package: `io.casehub.connectors.mobile.twilio`.
 
 Depends on: `mobile-spi`, `connectors-api`, `casehub-platform-api`, `quarkus-arc`, `jackson-databind`, `jakarta.json-api`.
 
+### mobile-numbrrs
+
+Numbrrs (numbrrs.com) provider. Inbound-only SMS receive via webhook + NumberInfo for configured UK mobile numbers. `NumbrrsClient` REST client (ApiKey auth, `HttpHelper.CLIENT`). `NumbrrsInboundConnector` (`WebhookInboundConnector`) with HMAC-SHA256 verification and 5-minute replay protection. Handles `sms.received` and `voice.received` webhook events. Two capabilities (Sms read-only, NumberInfo). No outbound SMS — `send()` returns `SendResult.failure()`.
+
+Package: `io.casehub.connectors.mobile.numbrrs`.
+
+Depends on: `mobile-spi`, `connectors-api`, `casehub-platform-api`, `quarkus-arc`, `jackson-databind`.
+
 ### email-google-inbound
 
 Gmail push inbound via Google Cloud Pub/Sub. `GmailPushInboundConnector` (`WebhookInboundConnector`) receives Pub/Sub push messages, validates JWT, fetches new message IDs via `GmailHistoryClient`, fires `InboundMessage` events. `GmailWatchManager` handles watch registration lifecycle. `HistoryStore` SPI with `InMemoryHistoryStore` `@DefaultBean` for per-user history ID tracking.

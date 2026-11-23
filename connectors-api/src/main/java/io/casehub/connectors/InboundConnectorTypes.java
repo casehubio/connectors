@@ -21,6 +21,7 @@ public final class InboundConnectorTypes {
     public static final String IRC      = "irc";
     public static final String SIGNAL   = "signal";
     public static final String TELEGRAM = "telegram";
+    public static final String VOICE    = "voice";
 
 
     private InboundConnectorTypes() {}

@@ -21,6 +21,7 @@ public final class InboundConnectorIds {
     public static final String SIGNAL_INBOUND  = "signal-inbound";
     public static final String GMAIL_PUSH      = "gmail-push-inbound";
     public static final String TELEGRAM_INBOUND = "telegram-inbound";
+    public static final String NUMBRRS_SMS     = "numbrrs-sms-inbound";
 
 
     private InboundConnectorIds() {}

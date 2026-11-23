@@ -19,7 +19,7 @@ No Camel, no vendor SDKs -- pure `java.net.http.HttpClient` for HTTP-based conne
 
 ## Module Structure
 
-There are 36 active modules in the build (pom.xml `<modules>`):
+There are 37 active modules in the build (pom.xml `<modules>`):
 
 | Module (artifactId prefix: `casehub-connectors-`) | What consumers need to know |
 |----------------------------------------------------|-----------------------------|
@@ -514,7 +514,7 @@ var caps = platform.numberInfo().lookup("+447700900000");
 // caps.capabilities() → {SMS, VOICE}
 ```
 
-**Provider modules:** `mobile-ref` (in-memory, CI-safe), `mobile-dial` (Dial getdial.ai), `mobile-twilio` (Twilio, absorbs legacy SMS/WhatsApp connectors)
+**Provider modules:** `mobile-ref` (in-memory, CI-safe), `mobile-dial` (Dial getdial.ai), `mobile-twilio` (Twilio, absorbs legacy SMS/WhatsApp connectors), `mobile-numbrrs` (Numbrrs — inbound SMS receive + NumberInfo, UK mobile numbers for Signal/Telegram/WhatsApp testing)
 
 **Dependency:**
 
