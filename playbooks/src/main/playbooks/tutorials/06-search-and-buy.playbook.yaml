@@ -1,0 +1,16 @@
+name: Search products and add to cart
+description: Search for headphones, add the top result to the cart, then view the cart
+---
+- commerce-search-products:
+    platform: ref
+    query: headphones
+  capture: searchResults
+
+- commerce-add-to-cart:
+    platform: ref
+    product-id: ${searchResults.items[0].id}
+  capture: added
+
+- commerce-view-cart:
+    platform: ref
+  capture: cart

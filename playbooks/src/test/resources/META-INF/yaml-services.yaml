@@ -1,2 +1,8 @@
 io.casehub.connectors.graphql.ConnectorLocationApi: io.casehub.connectors.graphql.PlaybookApiServices$Location
 io.casehub.connectors.graphql.ConnectorMobileApi: io.casehub.connectors.graphql.PlaybookApiServices$Mobile
+io.casehub.connectors.graphql.ConnectorCalendarApi: io.casehub.connectors.graphql.PlaybookApiServices$Calendar
+io.casehub.connectors.graphql.ConnectorCommerceApi: io.casehub.connectors.graphql.PlaybookApiServices$Commerce
+io.casehub.connectors.graphql.ConnectorContactsApi: io.casehub.connectors.graphql.PlaybookApiServices$Contacts
+io.casehub.connectors.graphql.ConnectorDocumentApi: io.casehub.connectors.graphql.PlaybookApiServices$Document
+io.casehub.connectors.graphql.ConnectorHealthApi: io.casehub.connectors.graphql.PlaybookApiServices$Health
+io.casehub.connectors.graphql.ConnectorTravelApi: io.casehub.connectors.graphql.PlaybookApiServices$Travel

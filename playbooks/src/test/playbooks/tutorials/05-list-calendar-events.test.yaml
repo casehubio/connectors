@@ -1,0 +1,10 @@
+name: "How to: list calendar events"
+---
+name: Jonny's work week has events including work at Meridian Engineering
+---
+- run-playbook: 05-list-calendar-events
+  capture: run
+- assertThat: run.error
+  equals: ""
+- assertThat: run.captures.calEvents.items
+  not-empty: true

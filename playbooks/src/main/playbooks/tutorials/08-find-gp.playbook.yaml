@@ -1,0 +1,7 @@
+name: Find a GP surgery
+description: Search for a GP by name
+---
+- health-find-provider:
+    platform: ref
+    query: Riverside
+  capture: gps

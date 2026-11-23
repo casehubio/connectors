@@ -1,0 +1,10 @@
+name: "How to: search documents"
+---
+name: passport scans found in family documents
+---
+- run-playbook: 11-search-documents
+  capture: run
+- assertThat: run.error
+  equals: ""
+- assertThat: run.captures.docResults.items
+  not-empty: true

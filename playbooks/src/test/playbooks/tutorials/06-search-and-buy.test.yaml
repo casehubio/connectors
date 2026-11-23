@@ -1,0 +1,12 @@
+name: "How to: search products and add to cart"
+---
+name: Sony headphones found, added to cart, cart contains one item
+---
+- run-playbook: 06-search-and-buy
+  capture: run
+- assertThat: run.error
+  equals: ""
+- assertThat: run.captures.searchResults.items
+  not-empty: true
+- assertThat: run.captures.cart.items
+  hasSize: 1

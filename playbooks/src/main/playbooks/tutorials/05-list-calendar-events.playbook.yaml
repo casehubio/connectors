@@ -1,0 +1,9 @@
+name: List calendar events
+description: List this week's events on Jonny's calendar
+---
+- calendar-list-events:
+    platform: ref
+    calendar-id: cal-jonny
+    from: "2026-10-26T00:00:00Z"
+    to: "2026-10-31T23:59:59Z"
+  capture: calEvents

@@ -1,0 +1,6 @@
+name: Read an email
+description: List inbox messages and read the first one
+---
+- email-messages:
+    mailbox: inbox
+  capture: inbox

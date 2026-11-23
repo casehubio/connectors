@@ -1,0 +1,12 @@
+name: "How to: look up accommodation"
+---
+name: Algarve family villa found with rating and price
+---
+- run-playbook: 07-travel-accommodation
+  capture: run
+- assertThat: run.error
+  equals: ""
+- assertThat: run.captures.villa
+  matches:
+    name: "Casa do Sol — Family Villa"
+    type: HOLIDAY_HOME

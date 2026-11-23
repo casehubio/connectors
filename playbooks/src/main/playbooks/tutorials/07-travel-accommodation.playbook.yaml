@@ -1,0 +1,7 @@
+name: Look up accommodation
+description: Get details of a holiday villa from the travel platform
+---
+- travel-get-accommodation-detail:
+    platform: ref
+    accommodation-id: acc-001
+  capture: villa

@@ -1,0 +1,8 @@
+name: Send an SMS
+description: Send an SMS message to a phone number
+---
+- mobile-send-sms:
+    platform: ref
+    to: "+449876543210"
+    body: Your appointment is confirmed for 2pm tomorrow.
+  capture: sent

@@ -1,0 +1,14 @@
+name: "How to: find a GP"
+---
+name: Riverside Medical Centre found and accepting new patients
+---
+- run-playbook: 08-find-gp
+  capture: run
+- assertThat: run.error
+  equals: ""
+- assertThat: run.captures.gps.items
+  not-empty: true
+- assertThat: run.captures.gps.items[0]
+  matches:
+    name: Riverside Medical Centre
+    acceptingNewPatients: true

@@ -1,0 +1,7 @@
+name: Search documents
+description: Search for passport documents in the family folder
+---
+- documents-search:
+    platform-id: ref
+    query: passport
+  capture: docResults

@@ -1,0 +1,15 @@
+name: "How to: read an email"
+---
+name: inbox has 9 messages, first is appointment confirmation from GP surgery
+---
+- run-playbook: 04-read-email
+  capture: run
+- assertThat: run.error
+  equals: ""
+- assertThat: run.captures.inbox.count
+  equals: 9
+- assertThat: run.captures.inbox.items[0]
+  matches:
+    subject: "Appointment confirmation — Tom Alpha"
+    from: "appointments@elmstreetsurgery.nhs.uk"
+    read: true

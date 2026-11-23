@@ -1,0 +1,12 @@
+name: "How to: look up a contact"
+---
+name: Bob Jenkins found with email and phone
+---
+- run-playbook: 10-search-contacts
+  capture: run
+- assertThat: run.error
+  equals: ""
+- assertThat: run.captures.contactResults.items
+  not-empty: true
+- assertThat: run.captures.contactResults.items[0].name.displayName
+  equals: Bob Jenkins

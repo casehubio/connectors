@@ -1,0 +1,10 @@
+name: "How to: send an SMS"
+---
+name: SMS delivered successfully
+---
+- run-playbook: 09-send-sms
+  capture: run
+- assertThat: run.error
+  equals: ""
+- assertThat: run.captures.sent.ok
+  equals: true

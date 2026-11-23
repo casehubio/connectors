@@ -1,0 +1,7 @@
+name: Look up a contact
+description: Search for a contact by name and get their details
+---
+- contacts-search:
+    platform-id: ref
+    query: Bob Jenkins
+  capture: contactResults

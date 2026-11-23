@@ -1,0 +1,13 @@
+name: "How to: voice round-trip"
+---
+name: text survives TTS to STT round-trip
+---
+- run-playbook: 12-voice-round-trip
+  capture: run
+- assertThat: run.error
+  equals: ""
+- assertThat: run.captures.transcript
+  matches:
+    language: en
+- assertThat: run.captures.transcript.text
+  contains: voice tutorial
