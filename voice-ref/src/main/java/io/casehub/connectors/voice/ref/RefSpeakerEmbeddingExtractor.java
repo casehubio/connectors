@@ -4,6 +4,8 @@ import io.casehub.connectors.voice.model.SpeakerEmbedding;
 import io.casehub.connectors.voice.spi.SpeakerEmbeddingExtractor;
 
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 public class RefSpeakerEmbeddingExtractor implements SpeakerEmbeddingExtractor {
 
@@ -13,13 +15,24 @@ public class RefSpeakerEmbeddingExtractor implements SpeakerEmbeddingExtractor {
         return embeddingFor(voiceId);
     }
 
-    private static SpeakerEmbedding embeddingFor(String voiceId) {
-        float[] vector = new float[8];
-        int     hash   = voiceId.hashCode();
-        for (int i = 0; i < vector.length; i++) {
-            vector[i] = ((hash >> (i * 4)) & 0xF) / 15.0f;
+    private static final int DIMENSIONS = 16;
+
+    static SpeakerEmbedding embeddingFor(String voiceId) {
+        byte[] hash = sha256(voiceId);
+        float[] vector = new float[DIMENSIONS];
+        for (int i = 0; i < DIMENSIONS; i++) {
+            vector[i] = (hash[i] & 0xFF) / 127.5f - 1.0f;
         }
-        return new SpeakerEmbedding(vector, vector.length);
+        return new SpeakerEmbedding(vector, DIMENSIONS);
+    }
+
+    private static byte[] sha256(String input) {
+        try {
+            return MessageDigest.getInstance("SHA-256")
+                                .digest(input.getBytes(StandardCharsets.UTF_8));
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException("SHA-256 not available", e);
+        }
     }
 
     private static String extractVoiceTag(float[] samples) {
