@@ -150,26 +150,25 @@ class McpConnectorsIT {
     }
 
     @Test
-    @Disabled("LangChain4j beta5 NPEs on $ref in JSON Schema — contacts tools use $defs/LabelledValue")
     @EnabledIfEnvironmentVariable(named = "ANTHROPIC_API_KEY", matches = ".+")
     void llmCanUseToolsToAnswerQuestion() {
         ChatModel model = AnthropicChatModel.builder()
-                .apiKey(System.getenv("ANTHROPIC_API_KEY"))
-                .modelName("claude-sonnet-4-20250514")
-                .build();
+                                            .apiKey(System.getenv("ANTHROPIC_API_KEY"))
+                                            .modelName("claude-sonnet-4-20250514")
+                                            .build();
 
         ToolProvider toolProvider = McpToolProvider.builder()
-                .mcpClients(List.of(mcpClient))
-                .build();
+                                                   .mcpClients(List.of(mcpClient))
+                                                   .build();
 
         interface Assistant {
             String chat(String message);
         }
 
         Assistant assistant = AiServices.builder(Assistant.class)
-                .chatModel(model)
-                .toolProvider(toolProvider)
-                .build();
+                                        .chatModel(model)
+                                        .toolProvider(toolProvider)
+                                        .build();
 
         String answer = assistant.chat(
                 "What calendars are available on the 'ref' platform? "
