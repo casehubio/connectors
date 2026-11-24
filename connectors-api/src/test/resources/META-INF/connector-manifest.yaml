@@ -1,0 +1,12 @@
+connector:
+  id: test-fixture
+  platform: test
+  description: "Test fixture connector"
+  auth:
+    type: api-key
+    fields:
+      - name: api-key
+        description: "Test API key"
+  produces:
+    - class: io.casehub.connectors.lifecycle.TestPlatform
+      type: platform
