@@ -24,6 +24,11 @@ public class NumbrrsMobilePlatform implements MobilePlatform {
 
     private final MobilePlatform delegate;
 
+
+    public NumbrrsMobilePlatform(String apiKey, String numbers) {
+        this(new NumbrrsClient(apiKey), parseNumbers(numbers != null ? numbers : ""));
+    }
+
     NumbrrsMobilePlatform(NumbrrsClient client, List<String> numbers) {
         this.delegate = MobilePlatform.builder("numbrrs")
                 .sms(new NumbrrsSms(client))
@@ -100,4 +105,13 @@ public class NumbrrsMobilePlatform implements MobilePlatform {
             return null;
         }
     }
+
+    private static List<String> parseNumbers(String numbers) {
+        if (numbers.isBlank()) {return List.of();}
+        return java.util.Arrays.stream(numbers.split(","))
+                               .map(String::trim)
+                               .filter(s -> !s.isEmpty())
+                               .toList();
+    }
+
 }

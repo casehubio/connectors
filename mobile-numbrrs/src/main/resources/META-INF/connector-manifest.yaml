@@ -1,0 +1,26 @@
+connector:
+  id: numbrrs
+  platform: mobile
+  description: "Numbrrs — UK mobile SIM numbers for inbound SMS and voice"
+  auth:
+    type: api-key
+    fields:
+      - name: api-key
+        description: "Numbrrs API key"
+      - name: signing-secret
+        required: false
+        description: "HMAC-SHA256 signing secret for webhook verification"
+      - name: numbers
+        required: false
+        sensitive: false
+        description: "Comma-separated phone numbers managed by this account"
+  produces:
+    - class: io.casehub.connectors.mobile.numbrrs.NumbrrsMobilePlatform
+      type: platform
+      constructor-args:
+        - field: api-key
+        - field: numbers
+    - class: io.casehub.connectors.mobile.numbrrs.NumbrrsInboundConnector
+      type: inbound-connector
+      constructor-args:
+        - field: signing-secret
