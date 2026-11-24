@@ -9,7 +9,6 @@ import io.casehub.connectors.signal.cli.model.SignalContact;
 import io.casehub.connectors.signal.cli.model.SignalGroup;
 import io.casehub.connectors.http.HttpHelper;
 
-import java.util.Optional;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -19,7 +18,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-@jakarta.enterprise.context.ApplicationScoped
 public class SignalClient {
 
     private static final Logger LOG = Logger.getLogger(SignalClient.class.getName());
@@ -28,15 +26,12 @@ public class SignalClient {
 
     private final String apiUrl;
 
-    @jakarta.inject.Inject
-    public SignalClient(
-            @org.eclipse.microprofile.config.inject.ConfigProperty(name = "casehub.signal.api-url")
-            final Optional<String> apiUrl) {
-        this.apiUrl = apiUrl.orElse("");
+    public SignalClient(String apiUrl) {
+        this.apiUrl = apiUrl != null ? apiUrl : "";
     }
 
     SignalClient() {
-        this(Optional.empty());
+        this("");
     }
 
     public SendResponse send(final String number, final String recipient,

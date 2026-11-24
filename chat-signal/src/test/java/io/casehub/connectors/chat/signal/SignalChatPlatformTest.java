@@ -43,7 +43,7 @@ class SignalChatPlatformTest {
         wm.start();
         wm.stubFor(get(urlEqualTo("/v1/health")).willReturn(aResponse().withStatus(204)));
         platform = new SignalChatPlatform(
-                new SignalClient(Optional.of("http://localhost:" + wm.port())),
+                new SignalClient("http://localhost:" + wm.port()),
                 Optional.of("http://localhost:" + wm.port()),
                 Optional.of("+15551000000"));
         platform.init();
@@ -170,7 +170,7 @@ class SignalChatPlatformTest {
     @Test
     void degrades_when_unconfigured() {
         SignalChatPlatform unconfigured = new SignalChatPlatform(
-                new SignalClient(Optional.of("http://localhost:1")), Optional.empty(), Optional.empty());
+                new SignalClient("http://localhost:1"), Optional.empty(), Optional.empty());
         unconfigured.init();
 
         assertThat(unconfigured.supports(Messaging.class)).isFalse();

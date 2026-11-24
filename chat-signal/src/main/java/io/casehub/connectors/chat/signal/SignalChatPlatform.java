@@ -31,11 +31,6 @@ import io.casehub.connectors.signal.cli.SignalClient;
 import io.casehub.connectors.signal.cli.model.SendResponse;
 import io.casehub.connectors.signal.cli.model.SignalContact;
 import io.casehub.connectors.signal.cli.model.SignalGroup;
-import jakarta.annotation.PostConstruct;
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
-
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -44,7 +39,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Logger;
 
-@ApplicationScoped
 public class SignalChatPlatform implements ChatPlatform {
 
     private static final Logger LOG = Logger.getLogger(SignalChatPlatform.class.getName());
@@ -68,17 +62,19 @@ public class SignalChatPlatform implements ChatPlatform {
     private MemberManagement memberManagement;
     private MessageHistory messageHistory;
 
-    @Inject
-    public SignalChatPlatform(
-            final SignalClient client,
-            @ConfigProperty(name = "casehub.signal.api-url") final Optional<String> apiUrl,
-            @ConfigProperty(name = "casehub.signal.number") final Optional<String> number) {
+    public SignalChatPlatform(SignalClient client, String apiUrl, String number) {
+        this.client = client;
+        this.apiUrl = apiUrl != null ? apiUrl : "";
+        this.number = number != null ? number : "";
+        init();
+    }
+
+    SignalChatPlatform(SignalClient client, Optional<String> apiUrl, Optional<String> number) {
         this.client = client;
         this.apiUrl = apiUrl.orElse("");
         this.number = number.orElse("");
     }
 
-    @PostConstruct
     void init() {
         if (apiUrl.isBlank() || number.isBlank()) {
             LOG.warning("signal: not configured, platform inactive");

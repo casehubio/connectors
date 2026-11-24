@@ -1,0 +1,36 @@
+connector:
+  id: signal
+  platform: chat
+  description: "Signal via signal-cli-rest-api"
+  auth:
+    type: phone-verify
+    fields:
+      - name: api-url
+        sensitive: false
+        description: "signal-cli-rest-api base URL"
+      - name: number
+        sensitive: false
+        description: "Signal phone number (E.164 format)"
+  produces:
+    - class: io.casehub.connectors.signal.cli.SignalClient
+      type: client
+      constructor-args:
+        - field: api-url
+    - class: io.casehub.connectors.chat.signal.SignalChatPlatform
+      type: platform
+      constructor-args:
+        - bean: io.casehub.connectors.signal.cli.SignalClient
+        - field: api-url
+        - field: number
+    - class: io.casehub.connectors.chat.signal.SignalInboundConnector
+      type: inbound-connector
+      constructor-args:
+        - bean: io.casehub.connectors.signal.cli.SignalClient
+        - field: api-url
+        - field: number
+    - class: io.casehub.connectors.chat.signal.SignalInboundTranslator
+      type: translator
+  setup-playbook: playbooks/signal-registration.yaml
+  health:
+    endpoint: "{api-url}/v1/about"
+    interval: "30s"

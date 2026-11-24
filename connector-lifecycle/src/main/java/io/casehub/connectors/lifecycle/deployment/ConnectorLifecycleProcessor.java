@@ -6,7 +6,6 @@ import io.casehub.connectors.lifecycle.ConnectorRegistry;
 import io.casehub.connectors.lifecycle.InMemoryCredentialFacade;
 import io.casehub.connectors.lifecycle.ProviderCredentialFacade;
 import io.quarkus.arc.deployment.SyntheticBeanBuildItem;
-import org.jboss.jandex.AnnotationInstance;
 import io.quarkus.deployment.annotations.BuildStep;
 import jakarta.inject.Singleton;
 import org.jboss.jandex.ClassType;
@@ -52,10 +51,7 @@ public class ConnectorLifecycleProcessor {
                         .param("connectorId", decl.id())
                         .param("className", bean.className())
                         .param("fieldNames", fieldNames)
-                        .param("fieldDefaults", fieldDefaults)
-                        .addQualifier(AnnotationInstance.builder(
-                                DotName.createSimple("jakarta.inject.Named"))
-                                .add("value", decl.id()).build());
+                        .param("fieldDefaults", fieldDefaults);
 
                 configurator.addInjectionPoint(ClassType.create(
                         DotName.createSimple(ProviderCredentialFacade.class.getName())));

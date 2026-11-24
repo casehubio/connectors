@@ -32,8 +32,6 @@ import io.casehub.connectors.chat.spi.Threading;
 import io.casehub.connectors.telegram.bot.TelegramBotClient;
 import io.casehub.connectors.telegram.bot.model.TelegramChat;
 import io.casehub.connectors.telegram.bot.model.TelegramMessage;
-import jakarta.annotation.PostConstruct;
-
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -79,7 +77,6 @@ public class TelegramChatPlatform implements ChatPlatform {
         this.token = token.orElse("");
     }
 
-    @PostConstruct
     void init() {
         if (token.isBlank()) {
             LOG.warning("telegram: not configured, platform inactive");

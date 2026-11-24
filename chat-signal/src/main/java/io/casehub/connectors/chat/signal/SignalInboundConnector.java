@@ -1,18 +1,13 @@
 package io.casehub.connectors.chat.signal;
 
-import java.util.Optional;
 import java.time.Instant;
+import java.util.Optional;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
-
-import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import io.casehub.connectors.Attachment;
 import io.casehub.connectors.InboundConnector;
@@ -24,7 +19,6 @@ import io.casehub.connectors.signal.cli.SignalClient;
 import io.casehub.connectors.signal.cli.SignalWebSocket;
 import io.casehub.connectors.signal.cli.model.SignalMessage;
 
-@ApplicationScoped
 public class SignalInboundConnector implements InboundConnector {
 
     private static final Logger LOG = Logger.getLogger(SignalInboundConnector.class.getName());
@@ -36,11 +30,13 @@ public class SignalInboundConnector implements InboundConnector {
     private volatile SignalWebSocket webSocket;
     private volatile boolean stopping = false;
 
-    @Inject
-    public SignalInboundConnector(
-            final SignalClient client,
-            @ConfigProperty(name = "casehub.signal.api-url") final Optional<String> apiUrl,
-            @ConfigProperty(name = "casehub.signal.number") final Optional<String> number) {
+    public SignalInboundConnector(SignalClient client, String apiUrl, String number) {
+        this.client = client;
+        this.apiUrl = apiUrl != null ? apiUrl : "";
+        this.number = number != null ? number : "";
+    }
+
+    SignalInboundConnector(SignalClient client, Optional<String> apiUrl, Optional<String> number) {
         this.client = client;
         this.apiUrl = apiUrl.orElse("");
         this.number = number.orElse("");

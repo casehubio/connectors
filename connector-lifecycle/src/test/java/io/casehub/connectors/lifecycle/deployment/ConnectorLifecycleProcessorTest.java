@@ -7,7 +7,6 @@ import io.casehub.connectors.lifecycle.ProviderCredentialFacade;
 import io.quarkus.test.QuarkusUnitTest;
 import jakarta.enterprise.inject.Produces;
 import jakarta.inject.Inject;
-import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.junit.jupiter.api.Test;
@@ -55,7 +54,6 @@ class ConnectorLifecycleProcessorTest {
     ConnectorRegistry registry;
 
     @Inject
-    @Named("test-lifecycle")
     TestPlatform testPlatform;
 
     @Test

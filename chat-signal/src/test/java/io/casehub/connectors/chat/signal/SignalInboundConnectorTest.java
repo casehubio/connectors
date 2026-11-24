@@ -19,13 +19,13 @@ class SignalInboundConnectorTest {
     @Test
     void id_returns_signal_inbound() {
         SignalInboundConnector connector = new SignalInboundConnector(
-                new SignalClient(Optional.of("http://localhost:1")), Optional.empty(), Optional.empty());
+                new SignalClient("http://localhost:1"), Optional.empty(), Optional.empty());
         assertThat(connector.id()).isEqualTo("signal-inbound");
     }
 
     @Test
     void handleMessage_delivers_direct_message() {
-        SignalClient client = new SignalClient(Optional.of("http://localhost:1"));
+        SignalClient client = new SignalClient("http://localhost:1");
         SignalInboundConnector connector = new SignalInboundConnector(
                 client, Optional.of("http://localhost:8080"), Optional.of("+15551000000"));
 
@@ -49,7 +49,7 @@ class SignalInboundConnectorTest {
 
     @Test
     void handleMessage_delivers_group_message() {
-        SignalClient client = new SignalClient(Optional.of("http://localhost:1"));
+        SignalClient client = new SignalClient("http://localhost:1");
         SignalInboundConnector connector = new SignalInboundConnector(
                 client, Optional.of("http://localhost:8080"), Optional.of("+15551000000"));
 
@@ -66,7 +66,7 @@ class SignalInboundConnectorTest {
 
     @Test
     void handleMessage_includes_quote_metadata() {
-        SignalClient client = new SignalClient(Optional.of("http://localhost:1"));
+        SignalClient client = new SignalClient("http://localhost:1");
         SignalInboundConnector connector = new SignalInboundConnector(
                 client, Optional.of("http://localhost:8080"), Optional.of("+15551000000"));
 
@@ -85,7 +85,7 @@ class SignalInboundConnectorTest {
     @Test
     void start_does_nothing_when_unconfigured() {
         SignalInboundConnector connector = new SignalInboundConnector(
-                new SignalClient(Optional.of("http://localhost:1")), Optional.empty(), Optional.empty());
+                new SignalClient("http://localhost:1"), Optional.empty(), Optional.empty());
 
         List<InboundMessage> received = new ArrayList<>();
         connector.start(received::add);

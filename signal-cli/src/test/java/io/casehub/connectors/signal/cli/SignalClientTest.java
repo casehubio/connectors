@@ -29,7 +29,7 @@ class SignalClientTest {
     void setUp() {
         wm = new WireMockServer(WireMockConfiguration.wireMockConfig().dynamicPort());
         wm.start();
-        client = new SignalClient(Optional.of("http://localhost:" + wm.port()));
+        client = new SignalClient("http://localhost:" + wm.port());
     }
 
     @AfterEach
@@ -91,7 +91,7 @@ class SignalClientTest {
 
     @Test
     void health_returns_false_when_unreachable() {
-        SignalClient bad = new SignalClient(Optional.of("http://localhost:1"));
+        SignalClient bad = new SignalClient("http://localhost:1");
 
         assertThat(bad.health()).isFalse();
     }
