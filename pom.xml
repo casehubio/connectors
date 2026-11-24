@@ -89,6 +89,7 @@ Zero heavy dependencies — HTTP-based connectors use java.net.http only.</descr
     <module>mobile-dial</module>
     <module>mobile-twilio</module>
     <module>mobile-numbrrs</module>
+    <module>connector-lifecycle</module>
     <module>graphql</module>
     <module>connectors-spring</module>
     <module>mcp-server-connectors</module>

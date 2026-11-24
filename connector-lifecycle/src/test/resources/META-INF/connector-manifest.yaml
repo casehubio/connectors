@@ -1,0 +1,14 @@
+connector:
+  id: test-lifecycle
+  platform: test
+  description: "Test lifecycle connector"
+  auth:
+    type: api-key
+    fields:
+      - name: api-key
+        description: "Test API key"
+  produces:
+    - class: io.casehub.connectors.lifecycle.deployment.TestPlatform
+      type: platform
+      constructor-args:
+        - field: api-key
