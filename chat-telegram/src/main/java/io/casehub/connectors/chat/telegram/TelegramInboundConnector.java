@@ -9,10 +9,8 @@ import io.casehub.connectors.WebhookRequest;
 import io.casehub.connectors.WebhookResult;
 import io.casehub.connectors.telegram.bot.model.TelegramMessage;
 import io.casehub.connectors.telegram.bot.model.TelegramUpdate;
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
-
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
@@ -20,7 +18,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-@ApplicationScoped
 public class TelegramInboundConnector extends WebhookInboundConnector {
 
     private static final Logger LOG = Logger.getLogger(TelegramInboundConnector.class.getName());
@@ -29,11 +26,7 @@ public class TelegramInboundConnector extends WebhookInboundConnector {
     private final String secretToken;
     private final TelegramChatPlatform chatPlatform;
 
-    @Inject
-    public TelegramInboundConnector(
-            @ConfigProperty(name = "casehub.telegram.webhook.secret-token",
-                            defaultValue = "") final String secretToken,
-            final TelegramChatPlatform chatPlatform) {
+    public TelegramInboundConnector(String secretToken, TelegramChatPlatform chatPlatform) {
         this.secretToken = secretToken;
         this.chatPlatform = chatPlatform;
     }
@@ -47,7 +40,9 @@ public class TelegramInboundConnector extends WebhookInboundConnector {
     public WebhookResult handle(final WebhookRequest request) {
         try {
             final String headerToken = request.header("x-telegram-bot-api-secret-token");
-            if (!secretToken.isEmpty() && !secretToken.equals(headerToken)) {
+            if (!secretToken.isEmpty() && (headerToken == null || !MessageDigest.isEqual(
+                    secretToken.getBytes(StandardCharsets.UTF_8),
+                    headerToken.getBytes(StandardCharsets.UTF_8)))) {
                 LOG.warning("telegram-inbound: invalid secret token");
                 return new WebhookResult.Unauthorized();
             }

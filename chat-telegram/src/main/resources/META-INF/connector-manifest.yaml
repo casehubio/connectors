@@ -1,0 +1,38 @@
+connector:
+  id: telegram
+  platform: chat
+  description: "Telegram Bot API"
+  auth:
+    type: bot-token
+    fields:
+      - name: bot-token
+        description: "Telegram bot token from @BotFather"
+      - name: api-url
+        required: false
+        sensitive: false
+        default: "https://api.telegram.org"
+        description: "Telegram Bot API base URL"
+      - name: webhook-secret
+        required: false
+        description: "Webhook secret token for request verification"
+  produces:
+    - class: io.casehub.connectors.telegram.bot.TelegramBotClient
+      type: client
+      constructor-args:
+        - field: api-url
+    - class: io.casehub.connectors.chat.telegram.TelegramChatPlatform
+      type: platform
+      constructor-args:
+        - bean: io.casehub.connectors.telegram.bot.TelegramBotClient
+        - field: bot-token
+    - class: io.casehub.connectors.chat.telegram.TelegramInboundConnector
+      type: inbound-connector
+      constructor-args:
+        - field: webhook-secret
+        - bean: io.casehub.connectors.chat.telegram.TelegramChatPlatform
+    - class: io.casehub.connectors.chat.telegram.TelegramInboundTranslator
+      type: translator
+  setup-playbook: playbooks/telegram-webhook-setup.yaml
+  health:
+    endpoint: "{api-url}/bot{bot-token}/getMe"
+    interval: "30s"

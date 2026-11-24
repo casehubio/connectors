@@ -33,9 +33,6 @@ import io.casehub.connectors.telegram.bot.TelegramBotClient;
 import io.casehub.connectors.telegram.bot.model.TelegramChat;
 import io.casehub.connectors.telegram.bot.model.TelegramMessage;
 import jakarta.annotation.PostConstruct;
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -46,7 +43,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
-@ApplicationScoped
 public class TelegramChatPlatform implements ChatPlatform {
 
     private static final Logger LOG = Logger.getLogger(TelegramChatPlatform.class.getName());
@@ -72,11 +68,13 @@ public class TelegramChatPlatform implements ChatPlatform {
     private MemberManagement memberManagement;
     private MessageHistory messageHistory;
 
-    @Inject
-    public TelegramChatPlatform(
-            final TelegramBotClient client,
-            @ConfigProperty(name = "casehub.telegram.bot.token") final Optional<String> token,
-            @ConfigProperty(name = "casehub.telegram.webhook.secret-token") final Optional<String> webhookSecret) {
+    public TelegramChatPlatform(TelegramBotClient client, String token) {
+        this.client = client;
+        this.token = token != null ? token : "";
+        init();
+    }
+
+    TelegramChatPlatform(TelegramBotClient client, Optional<String> token, Optional<String> webhookSecret) {
         this.client = client;
         this.token = token.orElse("");
     }
