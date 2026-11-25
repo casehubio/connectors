@@ -76,6 +76,14 @@
       <scope>test</scope>
     </dependency>
 
+    <!-- Chat Signal (manifest on classpath for resolver tests) -->
+    <dependency>
+      <groupId>io.casehub</groupId>
+      <artifactId>casehub-connectors-chat-signal</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+
     <!-- Mobile -->
     <dependency>
       <groupId>io.casehub</groupId>

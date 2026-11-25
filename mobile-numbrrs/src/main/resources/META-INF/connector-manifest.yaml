@@ -24,3 +24,7 @@ connector:
       type: inbound-connector
       constructor-args:
         - field: signing-secret
+  provides:
+    - capability: sms
+      sub: [receive]
+    - capability: number-info

@@ -30,6 +30,10 @@ connector:
         - field: number
     - class: io.casehub.connectors.chat.signal.SignalInboundTranslator
       type: translator
+  requires:
+    - capability: sms
+      sub: [receive]
+      reason: "SMS verification code during registration"
   setup-playbook: playbooks/signal-registration.yaml
   health:
     endpoint: "{api-url}/v1/about"
