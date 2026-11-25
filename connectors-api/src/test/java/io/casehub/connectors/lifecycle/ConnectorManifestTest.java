@@ -147,4 +147,91 @@ class ConnectorManifestTest {
         assertThat(manifest.connector().id()).isEqualTo("future");
         assertThat(manifest.connector().auth().type()).isEqualTo("oauth");
     }
+
+    @Test
+    void parses_manifest_with_requires_and_provides() throws Exception {
+        var yaml = """
+                   connector:
+                     id: test-requires
+                     platform: chat
+                     description: "Test with requires"
+                     auth:
+                       type: api-key
+                       fields:
+                         - name: api-key
+                           description: "Key"
+                     produces:
+                       - class: com.example.TestPlatform
+                         type: platform
+                     requires:
+                       - capability: sms
+                         sub: [receive]
+                         reason: "Verification code"
+                     provides:
+                       - capability: chat-messaging
+                         sub: [send, receive]
+                   """;
+        var manifest = MAPPER.readValue(yaml, ConnectorManifest.class);
+
+        assertThat(manifest.connector().requires()).hasSize(1);
+        var req = manifest.connector().requires().getFirst();
+        assertThat(req.capability()).isEqualTo("sms");
+        assertThat(req.sub()).containsExactly("receive");
+        assertThat(req.reason()).isEqualTo("Verification code");
+
+        assertThat(manifest.connector().provides()).hasSize(1);
+        var prov = manifest.connector().provides().getFirst();
+        assertThat(prov.capability()).isEqualTo("chat-messaging");
+        assertThat(prov.sub()).containsExactly("send", "receive");
+    }
+
+    @Test
+    void missing_requires_and_provides_default_gracefully() throws Exception {
+        var yaml = """
+                   connector:
+                     id: no-caps
+                     platform: chat
+                     description: "No capabilities"
+                     auth:
+                       type: api-key
+                       fields:
+                         - name: api-key
+                           description: "Key"
+                     produces:
+                       - class: com.example.TestPlatform
+                         type: platform
+                   """;
+        var manifest = MAPPER.readValue(yaml, ConnectorManifest.class);
+
+        assertThat(manifest.connector().requires()).isNull();
+        assertThat(manifest.connector().provides()).isNull();
+    }
+
+    @Test
+    void parses_provides_without_sub_qualifiers() throws Exception {
+        var yaml = """
+                   connector:
+                     id: simple-provider
+                     platform: mobile
+                     description: "Simple provider"
+                     auth:
+                       type: api-key
+                       fields:
+                         - name: api-key
+                           description: "Key"
+                     produces:
+                       - class: com.example.TestPlatform
+                         type: platform
+                     provides:
+                       - capability: number-info
+                   """;
+        var manifest = MAPPER.readValue(yaml, ConnectorManifest.class);
+
+        assertThat(manifest.connector().provides()).hasSize(1);
+        var prov = manifest.connector().provides().getFirst();
+        assertThat(prov.capability()).isEqualTo("number-info");
+        assertThat(prov.sub()).isEmpty();
+    }
+
+
 }

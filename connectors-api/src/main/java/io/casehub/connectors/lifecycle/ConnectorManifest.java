@@ -11,6 +11,8 @@ public record ConnectorManifest(ConnectorDeclaration connector) {
             String description,
             AuthDeclaration auth,
             List<BeanDeclaration> produces,
+            List<RequirementDeclaration> requires,
+            List<CapabilityDeclaration> provides,
             @JsonProperty("setup-playbook") String setupPlaybook,
             HealthDeclaration health) {}
 
@@ -60,4 +62,24 @@ public record ConnectorManifest(ConnectorDeclaration connector) {
     public record HealthDeclaration(
             String endpoint,
             String interval) {}
+
+    public record CapabilityDeclaration(String capability, List<String> sub) {
+        public CapabilityDeclaration {
+            if (capability == null || capability.isBlank()) {throw new IllegalArgumentException("capability required");}
+            if (sub == null) {sub = List.of();}
+        }
+
+        public CapabilityDeclaration(String capability) {
+            this(capability, List.of());
+        }
+    }
+
+    public record RequirementDeclaration(String capability, List<String> sub, String reason) {
+        public RequirementDeclaration {
+            if (capability == null || capability.isBlank()) {throw new IllegalArgumentException("capability required");}
+            if (sub == null) {sub = List.of();}
+        }
+    }
+
+
 }
