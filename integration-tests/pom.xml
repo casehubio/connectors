@@ -68,6 +68,14 @@
       <scope>test</scope>
     </dependency>
 
+    <!-- Connector Lifecycle (manifest-driven wiring) -->
+    <dependency>
+      <groupId>io.casehub</groupId>
+      <artifactId>casehub-connectors-lifecycle</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+
     <!-- Mobile -->
     <dependency>
       <groupId>io.casehub</groupId>
@@ -91,6 +99,12 @@
     <dependency>
       <groupId>io.casehub</groupId>
       <artifactId>casehub-connectors-mobile-twilio</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.casehub</groupId>
+      <artifactId>casehub-connectors-mobile-numbrrs</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
@@ -136,6 +150,11 @@
     </dependency>
 
     <!-- Testing -->
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-junit</artifactId>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter</artifactId>
