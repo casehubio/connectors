@@ -1,0 +1,14 @@
+name: Telegram webhook registration
+description: Register the webhook URL with Telegram Bot API
+---
+- health-check:
+    url: "{api-url}/bot{bot-token}/getMe"
+  capture: bot-info
+
+- http-post:
+    url: "{api-url}/bot{bot-token}/setWebhook"
+    body:
+      url: "{webhook-base-url}/connectors/telegram-inbound/webhook"
+      secret_token: "{webhook-secret}"
+      allowed_updates: ["message", "edited_message", "channel_post", "callback_query", "my_chat_member"]
+  capture: webhook-result

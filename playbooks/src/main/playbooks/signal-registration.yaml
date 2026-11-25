@@ -1,0 +1,26 @@
+name: Signal phone registration
+description: Register a phone number with Signal using SMS verification via Numbrrs
+---
+- health-check:
+    url: "{api-url}/v1/health"
+
+- connector-status:
+    connector-id: numbrrs
+    require: READY
+
+- http-post:
+    url: "{api-url}/v1/register/{number}"
+    body:
+      use_voice: false
+  capture: register-request
+
+- wait-for-sms:
+    provider: numbrrs
+    to: "{number}"
+    pattern: "Your Signal verification code.*?(\\d{3}-\\d{3})"
+    timeout: 120s
+  capture: verification
+
+- http-post:
+    url: "{api-url}/v1/register/{number}/verify/{verification.code}"
+  capture: verify-result
