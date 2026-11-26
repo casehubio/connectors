@@ -111,6 +111,60 @@ class DependencyResolverTest {
         assertThat(unmet).hasSize(1);
     }
 
+    @Test
+    void email_as_bootstrap_primitive_resolves_like_sms() {
+        var service = manifest("some-service", "chat",
+                               List.of(new RequirementDeclaration("email", List.of("receive"), "Email verification")),
+                               List.of());
+        var gmail = manifest("email-google", "email",
+                             List.of(),
+                             List.of(new CapabilityDeclaration("email", List.of("receive", "send"))));
+        var outlook = manifest("email-microsoft", "email",
+                               List.of(),
+                               List.of(new CapabilityDeclaration("email", List.of("receive", "send"))));
+
+        var resolver = new DependencyResolver(List.of(service, gmail, outlook));
+
+        // Both providers READY — requirement satisfied
+        var registry = registryWith(Map.of("email-google", ConnectorStatus.READY, "email-microsoft", ConnectorStatus.READY));
+        assertThat(resolver.unmetRequirements("some-service", registry)).isEmpty();
+
+        // Neither READY — unmet, both offered as options + manual
+        var emptyRegistry = registryWith(Map.of());
+        var unmet         = resolver.unmetRequirements("some-service", emptyRegistry);
+        assertThat(unmet).hasSize(1);
+        assertThat(unmet.getFirst().capability()).isEqualTo("email");
+        assertThat(unmet.getFirst().options()).hasSize(3); // gmail + outlook + manual
+    }
+
+    @Test
+    void dual_bootstrap_chain_sms_and_email() {
+        var service = manifest("full-service", "platform",
+                               List.of(
+                                       new RequirementDeclaration("sms", List.of("receive"), "SMS verification"),
+                                       new RequirementDeclaration("email", List.of("receive"), "Email verification")),
+                               List.of());
+        var numbrrs = manifest("numbrrs", "mobile",
+                               List.of(),
+                               List.of(new CapabilityDeclaration("sms", List.of("receive"))));
+        var gmail = manifest("email-google", "email",
+                             List.of(),
+                             List.of(new CapabilityDeclaration("email", List.of("receive", "send"))));
+
+        var resolver = new DependencyResolver(List.of(service, numbrrs, gmail));
+
+        // Both primitives available
+        var registry = registryWith(Map.of("numbrrs", ConnectorStatus.READY, "email-google", ConnectorStatus.READY));
+        assertThat(resolver.unmetRequirements("full-service", registry)).isEmpty();
+
+        // Only SMS available — email unmet
+        var smsOnly = registryWith(Map.of("numbrrs", ConnectorStatus.READY));
+        var unmet   = resolver.unmetRequirements("full-service", smsOnly);
+        assertThat(unmet).hasSize(1);
+        assertThat(unmet.getFirst().capability()).isEqualTo("email");
+    }
+
+
     private static ConnectorManifest manifest(String id, String platform,
             List<RequirementDeclaration> requires,
             List<CapabilityDeclaration> provides) {
