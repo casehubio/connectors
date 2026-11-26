@@ -1,0 +1,29 @@
+connector:
+  id: twilio
+  platform: mobile
+  description: "Twilio — SMS, voice, and WhatsApp messaging"
+  auth:
+    type: api-key
+    family: twilio
+    fields:
+      - name: account-sid
+        description: "Twilio Account SID"
+        help: "Find this on your Twilio Console dashboard at console.twilio.com"
+        example: "AC1234567890abcdef1234567890abcdef"
+      - name: auth-token
+        description: "Twilio Auth Token"
+        help: "Found alongside the Account SID on the Twilio Console dashboard"
+        example: "abcdef1234567890abcdef1234567890"
+      - name: from
+        required: false
+        sensitive: false
+        description: "Default sender phone number (E.164 format)"
+        help: "A Twilio phone number from your account — Phone Numbers → Manage → Active Numbers"
+        example: "+15551234567"
+  provides:
+    - capability: sms
+      sub: [send, receive]
+    - capability: voice-call
+    - capability: voice-call-control
+    - capability: messaging
+    - capability: number-info

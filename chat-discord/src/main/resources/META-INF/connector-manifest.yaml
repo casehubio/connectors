@@ -1,0 +1,20 @@
+connector:
+  id: discord
+  platform: chat
+  description: "Discord Bot — channels, threads, reactions, presence via Gateway"
+  auth:
+    type: bot-token
+    fields:
+      - name: token
+        description: "Discord bot token"
+        help: "Discord Developer Portal → Applications → your app → Bot → Token → Copy"
+        example: "MTIzNDU2Nzg5.Gh1jKl.abcdefghijklmnopqrstuvwxyz1234567890"
+      - name: application-id
+        required: false
+        sensitive: false
+        description: "Discord application ID for slash command registration"
+        help: "Discord Developer Portal → Applications → your app → General Information → Application ID"
+        example: "123456789012345678"
+  provides:
+    - capability: chat
+      sub: [messaging, threading, discovery, reactions, presence, members, channel-management, message-history, commands]

@@ -1,0 +1,24 @@
+connector:
+  id: email-microsoft
+  platform: email
+  description: "Outlook Mail — email query, read, search via Microsoft Graph API"
+  auth:
+    type: oauth2
+    family: microsoft
+    fields:
+      - name: tenant-id
+        description: "Azure AD tenant ID"
+        sensitive: false
+        help: "Azure Portal → Azure Active Directory → Overview → Tenant ID"
+        example: "12345678-abcd-efgh-ijkl-123456789012"
+      - name: client-id
+        description: "Azure AD application (client) ID"
+        sensitive: false
+        help: "Azure Portal → App registrations → your app → Overview → Application (client) ID"
+        example: "abcdef12-3456-7890-abcd-ef1234567890"
+      - name: client-secret
+        description: "Azure AD client secret"
+        help: "Azure Portal → App registrations → your app → Certificates & secrets → New client secret"
+  provides:
+    - capability: email
+      sub: [receive, search]
