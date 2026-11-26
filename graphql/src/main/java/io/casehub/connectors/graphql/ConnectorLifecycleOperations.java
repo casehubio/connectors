@@ -4,6 +4,7 @@ import io.casehub.connectors.graphql.dto.ConnectorDetailedStatus;
 import io.casehub.connectors.graphql.dto.ConnectorDiscoverResult;
 import io.casehub.connectors.graphql.dto.ConnectorHealthResult;
 import io.casehub.connectors.graphql.dto.ConnectorSetupResult;
+import io.casehub.connectors.graphql.dto.CredentialInputResult;
 import io.casehub.connectors.lifecycle.ConnectorManifest.FieldDeclaration;
 import io.casehub.connectors.lifecycle.ConnectorRegistry;
 import io.casehub.connectors.lifecycle.ConnectorRegistry.RegisteredConnector;
@@ -13,10 +14,10 @@ import io.casehub.connectors.lifecycle.ProviderCredentialFacade;
 import io.casehub.platform.api.mcp.McpDomain;
 import io.casehub.platform.api.mcp.PlatformMutation;
 import io.casehub.platform.api.mcp.PlatformQuery;
-
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Instance;
 import jakarta.inject.Inject;
+
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,20 +29,30 @@ public class ConnectorLifecycleOperations {
 
     private final ConnectorRegistry registry;
     private final ProviderCredentialFacade credentialFacade;
+    private final CredentialFormService formService;
 
     @Inject
     public ConnectorLifecycleOperations(Instance<ConnectorRegistry> registryInstance,
-                                        Instance<ProviderCredentialFacade> credentialFacadeInstance) {
+                                        Instance<ProviderCredentialFacade> credentialFacadeInstance,
+                                        Instance<CredentialFormService> formServiceInstance) {
         this(registryInstance.isResolvable() ? registryInstance.get() : new ConnectorRegistry(),
              credentialFacadeInstance.isResolvable()
                      ? credentialFacadeInstance.get()
-                     : new InMemoryCredentialFacade(Map.of()));
+                     : new InMemoryCredentialFacade(Map.of()),
+             formServiceInstance.isResolvable() ? formServiceInstance.get() : null);
     }
 
     ConnectorLifecycleOperations(ConnectorRegistry registry,
                                  ProviderCredentialFacade credentialFacade) {
+        this(registry, credentialFacade, null);
+    }
+
+    ConnectorLifecycleOperations(ConnectorRegistry registry,
+                                 ProviderCredentialFacade credentialFacade,
+                                 CredentialFormService formService) {
         this.registry = registry;
         this.credentialFacade = credentialFacade;
+        this.formService = formService;
     }
 
     @PlatformQuery("List all manifest-discovered connectors with auth requirements and configuration status")
@@ -99,6 +110,27 @@ public class ConnectorLifecycleOperations {
                 .toList();
         return new ConnectorHealthResult(entries);
     }
+
+    @PlatformMutation("Open a browser form for secure credential entry — values never enter LLM context")
+    public CredentialInputResult credentialInput(String connectorId) {
+        if (formService == null) {
+            return new CredentialInputResult(connectorId,
+                                             "Credential form service not available", null);
+        }
+        var manifest = registry.manifest(connectorId)
+                               .orElseThrow(() -> new IllegalArgumentException(
+                                       "Unknown connector '" + connectorId + "'. Available: "
+                                       + registry.all().stream().map(r -> r.manifest().connector().id()).toList()));
+
+        var token   = formService.createSession(connectorId, manifest);
+        var formUrl = "/api/connectors/lifecycle/credential-form?token=" + token;
+
+        return new CredentialInputResult(connectorId,
+                                         "Open the form URL to enter credentials securely. "
+                                         + "Values are stored directly — they never appear in this conversation.",
+                                         formUrl);
+    }
+
 
     private ConnectorDiscoverResult.DiscoveredConnector toDiscoveredConnector(RegisteredConnector reg) {
         var decl = reg.manifest().connector();

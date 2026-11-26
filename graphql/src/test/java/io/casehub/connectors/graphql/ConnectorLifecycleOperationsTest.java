@@ -1,9 +1,7 @@
 package io.casehub.connectors.graphql;
 
-import io.casehub.connectors.graphql.dto.ConnectorDetailedStatus;
 import io.casehub.connectors.graphql.dto.ConnectorDiscoverResult;
 import io.casehub.connectors.graphql.dto.ConnectorHealthResult;
-import io.casehub.connectors.graphql.dto.ConnectorSetupResult;
 import io.casehub.connectors.lifecycle.ConnectorManifest;
 import io.casehub.connectors.lifecycle.ConnectorManifest.AuthDeclaration;
 import io.casehub.connectors.lifecycle.ConnectorManifest.BeanDeclaration;
@@ -23,6 +21,8 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+
+
 class ConnectorLifecycleOperationsTest {
 
     private ConnectorRegistry registry;
@@ -34,9 +34,9 @@ class ConnectorLifecycleOperationsTest {
                 "numbrrs", "mobile",
                 "Numbrrs — UK mobile SIM numbers",
                 new AuthDeclaration("api-key", null, List.of(
-                        new FieldDeclaration("api-key", true, "API key", true, null),
-                        new FieldDeclaration("signing-secret", false, "Signing secret", true, null),
-                        new FieldDeclaration("numbers", false, "Phone numbers", false, null))),
+                        new FieldDeclaration("api-key", true, "API key", true, null, null, null),
+                        new FieldDeclaration("signing-secret", false, "Signing secret", true, null, null, null),
+                        new FieldDeclaration("numbers", false, "Phone numbers", false, null, null, null))),
                 List.of(new BeanDeclaration("io.casehub.connectors.mobile.numbrrs.NumbrrsMobilePlatform",
                         null, "platform", null)),
                 List.of(), List.of(), null, null));
@@ -47,10 +47,10 @@ class ConnectorLifecycleOperationsTest {
                 "telegram", "chat",
                 "Telegram Bot API",
                 new AuthDeclaration("bot-token", null, List.of(
-                        new FieldDeclaration("bot-token", true, "Bot token", true, null),
+                        new FieldDeclaration("bot-token", true, "Bot token", true, null, null, null),
                         new FieldDeclaration("api-url", false, "API base URL", false,
-                                "https://api.telegram.org"),
-                        new FieldDeclaration("webhook-secret", false, "Webhook secret", true, null))),
+                                "https://api.telegram.org", null, null),
+                        new FieldDeclaration("webhook-secret", false, "Webhook secret", true, null, null, null))),
                 List.of(new BeanDeclaration("io.casehub.connectors.chat.telegram.TelegramChatPlatform",
                         null, "platform", null)),
                 List.of(), List.of(),
@@ -63,8 +63,8 @@ class ConnectorLifecycleOperationsTest {
                 "signal", "chat",
                 "Signal via signal-cli-rest-api",
                 new AuthDeclaration("phone-verify", null, List.of(
-                        new FieldDeclaration("api-url", true, "signal-cli API URL", false, null),
-                        new FieldDeclaration("number", true, "Phone number", false, null))),
+                        new FieldDeclaration("api-url", true, "signal-cli API URL", false, null, null, null),
+                        new FieldDeclaration("number", true, "Phone number", false, null, null, null))),
                 List.of(new BeanDeclaration("io.casehub.connectors.chat.signal.SignalChatPlatform",
                         null, "platform", null)),
                 List.of(), List.of(),
@@ -258,5 +258,42 @@ class ConnectorLifecycleOperationsTest {
                 .filter(e -> e.id().equals("numbrrs")).findFirst().orElseThrow();
 
         assertThat(numbrrs.healthEndpoint()).isNull();
+    }
+
+// --- credential_input ---
+
+    @Test
+    void credentialInput_returns_form_url_with_token() {
+        var store       = new CredentialFormServiceTest.RecordingCredentialStore();
+        var formService = new CredentialFormService(store);
+        var ops         = new ConnectorLifecycleOperations(registry, credentialFacade, formService);
+
+        var result = ops.credentialInput("numbrrs");
+
+        assertThat(result.connectorId()).isEqualTo("numbrrs");
+        assertThat(result.formUrl()).startsWith("/api/connectors/lifecycle/credential-form?token=");
+        assertThat(result.message()).contains("never appear");
+    }
+
+    @Test
+    void credentialInput_throws_for_unknown_connector() {
+        var store       = new CredentialFormServiceTest.RecordingCredentialStore();
+        var formService = new CredentialFormService(store);
+        var ops         = new ConnectorLifecycleOperations(registry, credentialFacade, formService);
+
+        assertThatThrownBy(() -> ops.credentialInput("unknown"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("unknown");
+    }
+
+    @Test
+    void credentialInput_returns_error_when_form_service_unavailable() {
+        var ops = new ConnectorLifecycleOperations(registry, credentialFacade);
+
+        var result = ops.credentialInput("numbrrs");
+
+        assertThat(result.connectorId()).isEqualTo("numbrrs");
+        assertThat(result.formUrl()).isNull();
+        assertThat(result.message()).contains("not available");
     }
 }
