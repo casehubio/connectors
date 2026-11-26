@@ -1,0 +1,19 @@
+connector:
+  id: truelayer
+  platform: bank
+  description: "TrueLayer — UK Open Banking (AISP + PISP) via PSD2 consent"
+  auth:
+    type: oauth2
+    fields:
+      - name: client-id
+        description: "TrueLayer application client ID"
+        sensitive: false
+      - name: client-secret
+        description: "TrueLayer application client secret"
+  provides:
+    - capability: bank
+      sub: [account-information, payment-initiation]
+  requires:
+    - capability: email
+      sub: [receive]
+      reason: "PSD2 consent flow sends verification emails to the account holder"

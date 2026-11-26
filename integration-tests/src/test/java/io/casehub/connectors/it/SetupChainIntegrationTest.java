@@ -84,12 +84,14 @@ class SetupChainIntegrationTest {
         var requirement = unmet.getFirst();
         assertThat(requirement.reason()).isEqualTo("SMS verification code during registration");
 
-        var providerOption = requirement.options().stream()
+        var providerOptions = requirement.options().stream()
                 .filter(o -> o instanceof ResolutionOption.ProviderOption)
                 .map(o -> (ResolutionOption.ProviderOption) o)
-                .findFirst().orElseThrow();
-        assertThat(providerOption.connectorId()).isEqualTo("numbrrs");
-        assertThat(providerOption.status()).isEqualTo(ConnectorStatus.UNCONFIGURED);
+                .toList();
+        assertThat(providerOptions).extracting(ResolutionOption.ProviderOption::connectorId)
+                .contains("numbrrs");
+        assertThat(providerOptions).allSatisfy(p ->
+                assertThat(p.status()).isEqualTo(ConnectorStatus.UNCONFIGURED));
 
         // 4. Simulate credential-input flow: browser form stores credentials
         //    (CredentialFormService is tested in the graphql module;
@@ -171,6 +173,77 @@ class SetupChainIntegrationTest {
         var numbers = fields.stream().filter(f -> f.name().equals("numbers")).findFirst().orElseThrow();
         assertThat(numbers.isSensitive()).isFalse();
         assertThat(numbers.isRequired()).isFalse();
+    }
+
+    // --- Email capability chain: TrueLayer → email[receive] → Google/Microsoft ---
+
+    @Test
+    void truelayer_requires_email_receive() {
+        var truelayerManifest = manifests.stream()
+                .filter(m -> m.connector().id().equals("truelayer"))
+                .findFirst().orElseThrow();
+
+        assertThat(truelayerManifest.connector().requires()).isNotEmpty();
+        var req = truelayerManifest.connector().requires().getFirst();
+        assertThat(req.capability()).isEqualTo("email");
+        assertThat(req.sub()).containsExactly("receive");
+        assertThat(req.reason()).contains("PSD2");
+    }
+
+    @Test
+    void resolver_finds_email_providers_for_truelayer() {
+        var unmet = resolver.unmetRequirements("truelayer", registry);
+
+        assertThat(unmet).hasSize(1);
+        var requirement = unmet.getFirst();
+        assertThat(requirement.capability()).isEqualTo("email");
+
+        var providers = requirement.options().stream()
+                .filter(o -> o instanceof ResolutionOption.ProviderOption)
+                .map(o -> (ResolutionOption.ProviderOption) o)
+                .toList();
+        assertThat(providers).extracting(ResolutionOption.ProviderOption::connectorId)
+                .containsAnyOf("email-google", "email-microsoft");
+    }
+
+    @Test
+    void email_chain_satisfied_when_provider_ready() {
+        var emailGoogleManifest = manifests.stream()
+                .filter(m -> m.connector().id().equals("email-google"))
+                .findFirst().orElseThrow();
+        registry.register(emailGoogleManifest, ConnectorStatus.READY);
+
+        var unmet = resolver.unmetRequirements("truelayer", registry);
+        assertThat(unmet).isEmpty();
+    }
+
+    @Test
+    void email_require_capability_step_mirrors_sms_pattern() {
+        var plugin = new RequireCapabilityPlugin("email", List.of("receive"));
+        var result = plugin.execute(resolver, registry);
+
+        assertThat(result).isInstanceOf(Result.Failure.class);
+        var failure = (Result.Failure) result;
+        assertThat(failure.category()).isEqualTo("unmet-requirement");
+
+        @SuppressWarnings("unchecked")
+        var options = (List<Map<String, Object>>) failure.detail().get("options");
+        assertThat(options).anySatisfy(o -> {
+            assertThat(o.get("type")).isEqualTo("provider");
+            assertThat(o.get("status")).isEqualTo("UNCONFIGURED");
+        });
+        assertThat(options).anySatisfy(o ->
+                assertThat(o.get("type")).isEqualTo("manual"));
+
+        // After configuring an email provider, the step succeeds
+        var emailGoogleManifest = manifests.stream()
+                .filter(m -> m.connector().id().equals("email-google"))
+                .findFirst().orElseThrow();
+        registry.register(emailGoogleManifest, ConnectorStatus.READY);
+
+        var retry = plugin.execute(resolver, registry);
+        assertThat(retry).isInstanceOf(Result.Success.class);
+        assertThat(retry.output().get("provider")).isEqualTo("email-google");
     }
 
     // --- Test credential store ---
