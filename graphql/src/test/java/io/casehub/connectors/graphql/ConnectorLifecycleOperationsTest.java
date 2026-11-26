@@ -39,7 +39,7 @@ class ConnectorLifecycleOperationsTest {
                         new FieldDeclaration("numbers", false, "Phone numbers", false, null))),
                 List.of(new BeanDeclaration("io.casehub.connectors.mobile.numbrrs.NumbrrsMobilePlatform",
                         null, "platform", null)),
-                null, null));
+                List.of(), List.of(), null, null));
     }
 
     private static ConnectorManifest telegramManifest() {
@@ -53,6 +53,7 @@ class ConnectorLifecycleOperationsTest {
                         new FieldDeclaration("webhook-secret", false, "Webhook secret", true, null))),
                 List.of(new BeanDeclaration("io.casehub.connectors.chat.telegram.TelegramChatPlatform",
                         null, "platform", null)),
+                List.of(), List.of(),
                 "playbooks/telegram-webhook-setup.yaml",
                 new HealthDeclaration("{api-url}/bot{bot-token}/getMe", "30s")));
     }
@@ -66,6 +67,7 @@ class ConnectorLifecycleOperationsTest {
                         new FieldDeclaration("number", true, "Phone number", false, null))),
                 List.of(new BeanDeclaration("io.casehub.connectors.chat.signal.SignalChatPlatform",
                         null, "platform", null)),
+                List.of(), List.of(),
                 "playbooks/signal-registration.yaml", null));
     }
 
