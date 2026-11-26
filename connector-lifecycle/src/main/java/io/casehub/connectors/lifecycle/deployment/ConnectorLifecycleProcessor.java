@@ -3,7 +3,7 @@ package io.casehub.connectors.lifecycle.deployment;
 import io.casehub.connectors.lifecycle.ConnectorManifest;
 import io.casehub.connectors.lifecycle.ConnectorManifestLoader;
 import io.casehub.connectors.lifecycle.ConnectorRegistry;
-import io.casehub.connectors.lifecycle.InMemoryCredentialFacade;
+import io.casehub.connectors.lifecycle.DependencyResolver;
 import io.casehub.connectors.lifecycle.ProviderCredentialFacade;
 import io.quarkus.arc.deployment.SyntheticBeanBuildItem;
 import io.quarkus.deployment.annotations.BuildStep;
@@ -93,6 +93,16 @@ public class ConnectorLifecycleProcessor {
                         DotName.createSimple(ProviderCredentialFacade.class.getName())))
                 .done();
     }
+
+    @BuildStep
+    SyntheticBeanBuildItem registerDependencyResolver() {
+        return SyntheticBeanBuildItem.configure(DependencyResolver.class)
+                                     .scope(Singleton.class)
+                                     .setRuntimeInit()
+                                     .creator(DependencyResolverCreator.class)
+                                     .done();
+    }
+
 
     private static String[] extractFieldNames(ConnectorManifest.ConnectorDeclaration decl) {
         if (decl.auth() == null || decl.auth().fields() == null) return new String[0];

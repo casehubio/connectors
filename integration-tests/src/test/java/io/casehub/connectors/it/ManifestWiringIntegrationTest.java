@@ -7,6 +7,7 @@ import io.casehub.connectors.lifecycle.DependencyResolver;
 import io.casehub.connectors.lifecycle.InMemoryCredentialFacade;
 import io.casehub.connectors.lifecycle.ProviderCredentialFacade;
 import io.casehub.connectors.lifecycle.ResolutionOption;
+import io.casehub.connectors.steps.RequireCapabilityPlugin;
 import io.casehub.connectors.mobile.numbrrs.NumbrrsInboundConnector;
 import io.casehub.connectors.mobile.numbrrs.NumbrrsMobilePlatform;
 import io.casehub.connectors.mobile.spi.MobilePlatform;
@@ -35,6 +36,9 @@ class ManifestWiringIntegrationTest {
 
     @Inject
     NumbrrsInboundConnector numbrrsInbound;
+    @Inject
+    DependencyResolver      dependencyResolver;
+
 
     @Test
     void registry_discovers_numbrrs_manifest() {
@@ -93,6 +97,24 @@ class ManifestWiringIntegrationTest {
         assertThat(unmet.getFirst().options()).anyMatch(o -> o instanceof ResolutionOption.ProviderOption p
                                                              && p.connectorId().equals("numbrrs"));
         assertThat(unmet.getFirst().options()).anyMatch(o -> o instanceof ResolutionOption.ManualOption);
+    }
+
+    @Test
+    void dependency_resolver_is_injectable_as_cdi_bean() {
+        assertThat(dependencyResolver).isNotNull();
+        var unmet = dependencyResolver.unmetRequirements("signal", registry);
+        assertThat(unmet).isEmpty();
+    }
+
+    @Test
+    void require_capability_step_succeeds_when_provider_ready() {
+        var plugin = new RequireCapabilityPlugin("sms", java.util.List.of("receive"));
+        var result = plugin.execute(dependencyResolver, registry);
+
+        assertThat(result).isInstanceOf(io.casehub.yaml.plugin.api.Result.Success.class);
+        assertThat(result.output().get("capability")).isEqualTo("sms");
+        assertThat(result.output().get("satisfied")).isEqualTo(true);
+        assertThat(result.output().get("provider")).isEqualTo("numbrrs");
     }
 
 
