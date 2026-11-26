@@ -112,12 +112,17 @@ public class EmailInboundConnector implements InboundConnector {
                 consecutiveFailures = 0;
                 LOG.info("email-inbound: IDLE connected for account " + account.id());
 
-                // Catch messages already in the mailbox before IDLE started
-                processUnseen(folder, account, sink);
-
                 while (!stopping) {
-                    folder.idle(true); // blocks until one server notification, then returns
-                    processUnseen(folder, account, sink);
+                    // Always check for unseen messages before entering IDLE.
+                    // When messages were found, loop back immediately — this
+                    // avoids the gap between processUnseen() and idle() where
+                    // an IDLE notification for a newly-arrived message could
+                    // be lost (the message arrives after the search but before
+                    // IDLE starts watching).
+                    final int found = processUnseen(folder, account, sink);
+                    if (found == 0 && !stopping) {
+                        folder.idle(true); // block until server notifies
+                    }
                 }
 
             } catch (final FolderClosedException | StoreClosedException e) {
@@ -152,8 +157,8 @@ public class EmailInboundConnector implements InboundConnector {
         return store;
     }
 
-    private void processUnseen(final IMAPFolder folder, final EmailInboundAccount account,
-                                final InboundMessageSink sink) {
+    private int processUnseen(final IMAPFolder folder, final EmailInboundAccount account,
+                              final InboundMessageSink sink) {
         try {
             final Message[] unseen = folder.search(
                     new FlagTerm(new Flags(Flags.Flag.SEEN), false));
@@ -173,9 +178,11 @@ public class EmailInboundConnector implements InboundConnector {
                     }
                 }
             }
+            return unseen.length;
         } catch (final Exception e) {
             LOG.log(Level.WARNING, "email-inbound: processUnseen failed for account "
                     + account.id(), e);
+            return 0;
         }
     }
 
