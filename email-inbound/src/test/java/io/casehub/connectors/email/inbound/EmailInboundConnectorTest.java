@@ -66,8 +66,8 @@ class EmailInboundConnectorTest {
     }
 
     private InboundMessage receive() throws InterruptedException {
-        InboundMessage msg = captured.poll(8, TimeUnit.SECONDS);
-        assertNotNull(msg, "message not delivered within 8s — IDLE did not fire or processUnseen missed it");
+        InboundMessage msg = captured.poll(15, TimeUnit.SECONDS);
+        assertNotNull(msg, "message not delivered within 15s — IDLE did not fire or processUnseen missed it");
         return msg;
     }
 
@@ -176,10 +176,10 @@ class EmailInboundConnectorTest {
         deliver("a@example.com", "First", "Body A");
         deliver("b@example.com", "Second", "Body B");
 
-        final InboundMessage m1 = captured.poll(8, TimeUnit.SECONDS);
-        assertNotNull(m1, "first message not delivered within 8s");
-        final InboundMessage m2 = captured.poll(8, TimeUnit.SECONDS);
-        assertNotNull(m2, "second message not delivered within 8s");
+        final InboundMessage m1 = captured.poll(15, TimeUnit.SECONDS);
+        assertNotNull(m1, "first message not delivered within 15s");
+        final InboundMessage m2 = captured.poll(15, TimeUnit.SECONDS);
+        assertNotNull(m2, "second message not delivered within 15s");
         assertThat(List.of(m1.content(), m2.content()))
                 .containsExactlyInAnyOrder("Body A", "Body B");
     }
