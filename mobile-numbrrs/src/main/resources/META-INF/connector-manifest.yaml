@@ -7,13 +7,19 @@ connector:
     fields:
       - name: api-key
         description: "Numbrrs API key"
+        help: "Log in to your Numbrrs dashboard at getdial.ai → Settings → API Keys"
+        example: "nmbr_sk_1a2b3c4d5e6f"
       - name: signing-secret
         required: false
         description: "HMAC-SHA256 signing secret for webhook verification"
+        help: "Found alongside the API key in Settings → API Keys → Webhook section"
+        example: "whsec_abcdef123456"
       - name: numbers
         required: false
         sensitive: false
         description: "Comma-separated phone numbers managed by this account"
+        help: "Your allocated UK mobile numbers, visible on the Numbers page"
+        example: "+447700900001,+447700900002"
   produces:
     - class: io.casehub.connectors.mobile.numbrrs.NumbrrsMobilePlatform
       type: platform

@@ -233,5 +233,38 @@ class ConnectorManifestTest {
         assertThat(prov.sub()).isEmpty();
     }
 
+    @Test
+    void parses_field_with_help_and_example() throws Exception {
+        var yaml = """
+                   connector:
+                     id: test-help
+                     platform: mobile
+                     description: "Test with help"
+                     auth:
+                       type: api-key
+                       fields:
+                         - name: api-key
+                           description: "API key"
+                           help: "Find this in your dashboard at Settings → API Keys"
+                           example: "sk_1a2b3c4d5e6f"
+                         - name: webhook-url
+                           required: false
+                           sensitive: false
+                           description: "Webhook URL"
+                     produces:
+                       - class: com.example.TestPlatform
+                         type: platform
+                   """;
+        var manifest = MAPPER.readValue(yaml, ConnectorManifest.class);
+
+        var apiKey = manifest.connector().auth().fields().getFirst();
+        assertThat(apiKey.help()).isEqualTo("Find this in your dashboard at Settings → API Keys");
+        assertThat(apiKey.example()).isEqualTo("sk_1a2b3c4d5e6f");
+
+        var webhook = manifest.connector().auth().fields().get(1);
+        assertThat(webhook.help()).isNull();
+        assertThat(webhook.example()).isNull();
+    }
+
 
 }

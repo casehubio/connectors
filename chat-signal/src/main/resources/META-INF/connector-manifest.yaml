@@ -8,9 +8,13 @@ connector:
       - name: api-url
         sensitive: false
         description: "signal-cli-rest-api base URL"
+        help: "The URL where your signal-cli-rest-api Docker container is running"
+        example: "http://localhost:8080"
       - name: number
         sensitive: false
         description: "Signal phone number (E.164 format)"
+        help: "The phone number to register with Signal — must be able to receive SMS"
+        example: "+447700900001"
   produces:
     - class: io.casehub.connectors.signal.cli.SignalClient
       type: client

@@ -7,6 +7,8 @@ connector:
     fields:
       - name: bot-token
         description: "Telegram bot token from @BotFather"
+        help: "Open Telegram, message @BotFather, send /newbot or /mybots, copy the token"
+        example: "123456789:ABCdefGHIjklMNOpqrsTUVwxyz"
       - name: api-url
         required: false
         sensitive: false
@@ -15,6 +17,8 @@ connector:
       - name: webhook-secret
         required: false
         description: "Webhook secret token for request verification"
+        help: "Any random string — used to verify incoming webhook requests are from Telegram"
+        example: "my-secret-token-2026"
   produces:
     - class: io.casehub.connectors.telegram.bot.TelegramBotClient
       type: client

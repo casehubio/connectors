@@ -26,7 +26,9 @@ public record ConnectorManifest(ConnectorDeclaration connector) {
             Boolean required,
             String description,
             Boolean sensitive,
-            @JsonProperty("default") String defaultValue) {
+            @JsonProperty("default") String defaultValue,
+            String help,
+            String example) {
 
         public FieldDeclaration {
             if (name == null || name.isBlank()) {throw new IllegalArgumentException("field name required");}
@@ -35,7 +37,7 @@ public record ConnectorManifest(ConnectorDeclaration connector) {
         }
 
         public FieldDeclaration(String name, String description) {
-            this(name, true, description, true, null);
+            this(name, true, description, true, null, null, null);
         }
 
         public boolean isRequired()  {return required;}
