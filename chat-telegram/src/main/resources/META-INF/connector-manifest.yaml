@@ -32,6 +32,9 @@ connector:
         - bean: io.casehub.connectors.chat.telegram.TelegramChatPlatform
     - class: io.casehub.connectors.chat.telegram.TelegramInboundTranslator
       type: translator
+  provides:
+    - capability: chat
+      sub: [messaging, threading, discovery, reactions, members, presence, commands]
   setup-playbook: playbooks/telegram-webhook-setup.yaml
   health:
     endpoint: "{api-url}/bot{bot-token}/getMe"

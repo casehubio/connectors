@@ -30,6 +30,9 @@ connector:
         - field: number
     - class: io.casehub.connectors.chat.signal.SignalInboundTranslator
       type: translator
+  provides:
+    - capability: chat
+      sub: [messaging, discovery, members, reactions, channel-management, member-management]
   requires:
     - capability: sms
       sub: [receive]
