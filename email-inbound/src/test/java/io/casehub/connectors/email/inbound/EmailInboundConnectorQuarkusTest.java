@@ -57,8 +57,8 @@ class EmailInboundConnectorQuarkusTest {
             transport.sendMessage(msg, msg.getAllRecipients());
         }
 
-        // IDLE delivers near-immediately on message arrival; 2s is ample headroom for CDI async dispatch
-        final InboundMessage delivered = capture.poll(2, TimeUnit.SECONDS);
+        // IDLE delivers near-immediately on message arrival; 15s headroom for slow CI runners
+        final InboundMessage delivered = capture.poll(15, TimeUnit.SECONDS);
         assertThat(delivered).isNotNull();
         assertThat(delivered.connectorId()).isEqualTo("email-inbound");
         assertThat(delivered.externalSenderId()).isEqualTo("sender@example.com");
