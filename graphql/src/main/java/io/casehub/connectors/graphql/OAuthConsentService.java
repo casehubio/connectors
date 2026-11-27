@@ -60,7 +60,6 @@ public class OAuthConsentService {
                                         defaultValue = "http://localhost:8080")
                                 String callbackBaseUrl) {
         this(oauthConfigsInstance.isResolvable() ? oauthConfigsInstance.get() : new OAuthConfigRegistry(Map.of()),
-
              credentialFacadeInstance.isResolvable() ? credentialFacadeInstance.get() : null,
              credentialStoreInstance.isResolvable() ? credentialStoreInstance.get() : null,
              registryInstance.isResolvable() ? registryInstance.get() : new ConnectorRegistry(),
@@ -183,7 +182,7 @@ public class OAuthConsentService {
         }
     }
 
-    String postTokenRequest(String tokenUrl, String body) throws IOException, InterruptedException {
+    protected String postTokenRequest(String tokenUrl, String body) throws IOException, InterruptedException {
         var request = HttpRequest.newBuilder()
                 .uri(URI.create(tokenUrl))
                 .header("Content-Type", "application/x-www-form-urlencoded")

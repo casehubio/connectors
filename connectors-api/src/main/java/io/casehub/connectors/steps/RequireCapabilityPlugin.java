@@ -49,6 +49,11 @@ public record RequireCapabilityPlugin(@Required String capability, List<String> 
                     entry.put("type", "manual");
                     entry.put("capability", m.capability());
                 }
+                case ResolutionOption.FamilyOAuthOption f -> {
+                    entry.put("type", "family-oauth");
+                    entry.put("family-id", f.familyId());
+                    entry.put("member-connectors", f.memberConnectorIds());
+                }
             }
             optionsList.add(entry);
         }

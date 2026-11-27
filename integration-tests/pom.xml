@@ -76,6 +76,7 @@
       <scope>test</scope>
     </dependency>
 
+
     <!-- Email Google (manifest on classpath for resolver tests) -->
     <dependency>
       <groupId>io.casehub</groupId>

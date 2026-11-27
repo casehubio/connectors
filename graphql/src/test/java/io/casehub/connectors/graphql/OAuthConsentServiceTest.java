@@ -363,7 +363,7 @@ class OAuthConsentServiceTest {
         }
 
         @Override
-        String postTokenRequest(String tokenUrl, String body) throws IOException {
+        protected String postTokenRequest(String tokenUrl, String body) throws IOException {
             this.lastTokenUrl = tokenUrl;
             this.lastTokenRequestBody = body;
             if (tokenResponse == null) {

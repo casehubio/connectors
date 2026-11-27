@@ -9,12 +9,20 @@ public class DependencyResolver {
 
     private final Map<String, ConnectorManifest> manifestsById;
     private final Map<String, List<ProviderEntry>> providersByCapability;
+    private final Map<String, List<String>> familyMembers;
+    private final ProviderCredentialFacade credentialFacade;
 
     private record ProviderEntry(String connectorId, List<String> sub, String setupPlaybook) {}
 
     public DependencyResolver(List<ConnectorManifest> manifests) {
+        this(manifests, null);
+    }
+
+    public DependencyResolver(List<ConnectorManifest> manifests, ProviderCredentialFacade credentialFacade) {
+        this.credentialFacade = credentialFacade;
         this.manifestsById = new HashMap<>();
         this.providersByCapability = new HashMap<>();
+        this.familyMembers = new HashMap<>();
         for (var m : manifests) {
             var decl = m.connector();
             manifestsById.put(decl.id(), m);
@@ -25,24 +33,44 @@ public class DependencyResolver {
                             .add(new ProviderEntry(decl.id(), cap.sub(), decl.setupPlaybook()));
                 }
             }
+            var auth = decl.auth();
+            if (auth != null && "oauth2".equals(auth.type()) && auth.family() != null) {
+                familyMembers.computeIfAbsent(auth.family(), k -> new ArrayList<>()).add(decl.id());
+            }
         }
     }
 
     public List<UnmetRequirement> unmetRequirements(String connectorId, ConnectorRegistry registry) {
         var manifest = manifestsById.get(connectorId);
-        if (manifest == null || manifest.connector().requires() == null) return List.of();
+        if (manifest == null) return List.of();
 
         var result = new ArrayList<UnmetRequirement>();
-        for (var req : manifest.connector().requires()) {
-            var options = resolutionOptions(req.capability(), req.sub(), registry);
-            boolean satisfied = options.stream()
-                    .filter(o -> o instanceof ResolutionOption.ProviderOption)
-                    .map(o -> (ResolutionOption.ProviderOption) o)
-                    .anyMatch(p -> p.status() == ConnectorStatus.READY);
-            if (!satisfied) {
-                result.add(new UnmetRequirement(req.capability(), req.sub(), req.reason(), options));
+
+        if (manifest.connector().requires() != null) {
+            for (var req : manifest.connector().requires()) {
+                var options = resolutionOptions(req.capability(), req.sub(), registry);
+                boolean satisfied = options.stream()
+                        .filter(o -> o instanceof ResolutionOption.ProviderOption)
+                        .map(o -> (ResolutionOption.ProviderOption) o)
+                        .anyMatch(p -> p.status() == ConnectorStatus.READY);
+                if (!satisfied) {
+                    result.add(new UnmetRequirement(req.capability(), req.sub(), req.reason(), options));
+                }
             }
         }
+
+        var auth = manifest.connector().auth();
+        if (credentialFacade != null && auth != null && "oauth2".equals(auth.type()) && auth.family() != null) {
+            var familyId = auth.family();
+            boolean hasToken = credentialFacade.resolve(familyId, "access-token").isPresent();
+            if (!hasToken) {
+                var members = familyMembers.getOrDefault(familyId, List.of());
+                var option = new ResolutionOption.FamilyOAuthOption(familyId, List.copyOf(members));
+                result.add(new UnmetRequirement("oauth2", List.of(familyId),
+                        "OAuth consent required for " + familyId + " family", List.of(option)));
+            }
+        }
+
         return List.copyOf(result);
     }
 

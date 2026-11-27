@@ -12,6 +12,7 @@ import io.casehub.platform.api.authn.ServiceConnectionStatus;
 
 import io.quarkus.arc.DefaultBean;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.inject.Instance;
 import jakarta.inject.Inject;
 import jakarta.json.Json;
 import java.io.StringReader;
@@ -36,6 +37,7 @@ public class FamilyConnectionProvider implements ServiceConnectionProvider {
 
     private final ProviderCredentialFacade facade;
     private final Map<String, FamilyManifest> families;
+    private final Map<String, Object> refreshLocks = new java.util.concurrent.ConcurrentHashMap<>();
 
     public FamilyConnectionProvider(ProviderCredentialFacade facade,
                                      Map<String, FamilyManifest> families) {
@@ -44,14 +46,19 @@ public class FamilyConnectionProvider implements ServiceConnectionProvider {
     }
 
     @Inject
-    public FamilyConnectionProvider(ProviderCredentialFacade facade) {
-        this(facade, FamilyManifestLoader.discover());
+    public FamilyConnectionProvider(Instance<ProviderCredentialFacade> facadeInstance) {
+        this(facadeInstance.isResolvable() ? facadeInstance.get() : null,
+             FamilyManifestLoader.discover());
     }
 
     @Override
     public ServiceAccessToken getAccessToken(String actorId, String provider, String tenancyId) {
         if (!families.containsKey(provider)) {
             throw new ServiceConnectionException("No family for provider: " + provider,
+                    provider, actorId, Set.of(), Set.of(), Set.of());
+        }
+        if (facade == null) {
+            throw new ServiceConnectionException("No credential store available",
                     provider, actorId, Set.of(), Set.of(), Set.of());
         }
         var accessToken = facade.resolve(provider, "access-token")
@@ -73,7 +80,7 @@ public class FamilyConnectionProvider implements ServiceConnectionProvider {
 
     @Override
     public ServiceConnection getConnection(String actorId, String provider, String tenancyId) {
-        if (!families.containsKey(provider)) {
+        if (!families.containsKey(provider) || facade == null) {
             return new ServiceConnection(actorId, provider, tenancyId,
                     ServiceConnectionStatus.DISCONNECTED, Set.of(), Set.of(), null);
         }
@@ -96,6 +103,19 @@ public class FamilyConnectionProvider implements ServiceConnectionProvider {
     }
 
     ServiceAccessToken refreshAndReturn(String provider, String actorId) {
+        var lock = refreshLocks.computeIfAbsent(provider, k -> new Object());
+        synchronized (lock) {
+            var currentExpiry = facade.resolve(provider, "expires-at").map(Instant::parse).orElse(null);
+            if (currentExpiry != null && currentExpiry.isAfter(Instant.now())) {
+                var scopes = parseScopes(facade.resolve(provider, "granted-scopes").orElse(""));
+                return new ServiceAccessToken(facade.resolve(provider, "access-token").orElseThrow(),
+                        currentExpiry, scopes);
+            }
+            return doRefresh(provider, actorId);
+        }
+    }
+
+    private ServiceAccessToken doRefresh(String provider, String actorId) {
         var refreshToken = facade.resolve(provider, "refresh-token")
                 .orElseThrow(() -> new ServiceConnectionException(
                         "No refresh token for provider: " + provider,

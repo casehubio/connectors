@@ -75,7 +75,7 @@ public class ConnectorManifestLoader {
         return List.copyOf(byId.values());
     }
 
-    static List<ConnectorManifest> resolveFamilies(
+    public static List<ConnectorManifest> resolveFamilies(
             List<ConnectorManifest> connectors, Map<String, FamilyManifest> families) {
         return connectors.stream().map(m -> {
             var auth = m.connector().auth();
