@@ -21,7 +21,13 @@ public record FamilyManifest(FamilyDeclaration family) {
     public record FlowDeclaration(
             GrantType grant,
             List<String> scopes,
-            @JsonProperty("token-url") String tokenUrl) {}
+            @JsonProperty("token-url") String tokenUrl,
+            @JsonProperty("per-user") Boolean perUser) {
+
+        public boolean isPerUser() {
+            return perUser != null && perUser;
+        }
+    }
 
 
     public record OAuthDeclaration(

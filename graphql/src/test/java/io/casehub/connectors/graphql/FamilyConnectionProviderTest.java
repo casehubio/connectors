@@ -277,14 +277,14 @@ class FamilyConnectionProviderTest {
         var flows = Map.of(
                 "delegated", new FamilyManifest.FlowDeclaration(
                         FamilyManifest.GrantType.AUTHORIZATION_CODE,
-                        List.of("Calendars.ReadWrite"), null),
+                        List.of("Calendars.ReadWrite"), null, null),
                 "app", new FamilyManifest.FlowDeclaration(
                         FamilyManifest.GrantType.CLIENT_CREDENTIALS,
-                        List.of("https://graph.microsoft.com/.default"), null),
+                        List.of("https://graph.microsoft.com/.default"), null, null),
                 "bot", new FamilyManifest.FlowDeclaration(
                         FamilyManifest.GrantType.CLIENT_CREDENTIALS,
                         List.of("https://api.botframework.com/.default"),
-                        "https://login.microsoftonline.com/botframework.com/oauth2/v2.0/token"));
+                        "https://login.microsoftonline.com/botframework.com/oauth2/v2.0/token", null));
         return new FamilyManifest(new FamilyManifest.FamilyDeclaration(
                 "microsoft", "Microsoft 365", FamilyManifest.ConsentStrategy.AGGREGATED,
                 oauth, flows, List.of()));

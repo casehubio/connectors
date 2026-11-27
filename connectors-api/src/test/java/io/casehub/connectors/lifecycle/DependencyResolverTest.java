@@ -248,10 +248,10 @@ class DependencyResolverTest {
         var flows = Map.of(
                 "delegated", new FamilyManifest.FlowDeclaration(
                         FamilyManifest.GrantType.AUTHORIZATION_CODE,
-                        List.of("User.Read"), null),
+                        List.of("User.Read"), null, null),
                 "app", new FamilyManifest.FlowDeclaration(
                         FamilyManifest.GrantType.CLIENT_CREDENTIALS,
-                        List.of("https://graph.microsoft.com/.default"), null));
+                        List.of("https://graph.microsoft.com/.default"), null, null));
         var family = new FamilyManifest(new FamilyManifest.FamilyDeclaration(
                 "microsoft", "Microsoft 365", FamilyManifest.ConsentStrategy.AGGREGATED,
                 new FamilyManifest.OAuthDeclaration(null, null, null, null, null, null),
@@ -285,10 +285,10 @@ class DependencyResolverTest {
         var flows = Map.of(
                 "delegated", new FamilyManifest.FlowDeclaration(
                         FamilyManifest.GrantType.AUTHORIZATION_CODE,
-                        List.of("User.Read"), null),
+                        List.of("User.Read"), null, null),
                 "app", new FamilyManifest.FlowDeclaration(
                         FamilyManifest.GrantType.CLIENT_CREDENTIALS,
-                        List.of("https://graph.microsoft.com/.default"), null));
+                        List.of("https://graph.microsoft.com/.default"), null, null));
         var family = new FamilyManifest(new FamilyManifest.FamilyDeclaration(
                 "microsoft", "Microsoft 365", FamilyManifest.ConsentStrategy.AGGREGATED,
                 new FamilyManifest.OAuthDeclaration(null, null, null, null, null, null),

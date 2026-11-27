@@ -164,6 +164,63 @@ class FamilyManifestTest {
                 "https://www.googleapis.com/auth/calendar.readonly");
     }
 
+    @Test
+    void parses_flow_with_per_user_flag() throws Exception {
+        var yaml = """
+                   family:
+                     id: truelayer-test
+                     description: "Test"
+                     consent: aggregated
+                     oauth:
+                       auth-url: "https://auth.example.com"
+                       token-url: "https://auth.example.com/token"
+                       redirect-uri: "http://localhost/callback"
+                     flows:
+                       delegated:
+                         grant: authorization_code
+                         scopes:
+                           - accounts
+                         per-user: true
+                       app:
+                         grant: client_credentials
+                         scopes:
+                           - "https://api.example.com/.default"
+                     fields:
+                       - name: client-id
+                         sensitive: false
+                   """;
+        var family    = MAPPER.readValue(yaml, FamilyManifest.class);
+        var delegated = family.family().flows().get("delegated");
+        assertThat(delegated.isPerUser()).isTrue();
+
+        var app = family.family().flows().get("app");
+        assertThat(app.isPerUser()).isFalse();
+    }
+
+    @Test
+    void flow_without_per_user_defaults_to_false() throws Exception {
+        var yaml = """
+                   family:
+                     id: google-test
+                     description: "Test"
+                     consent: incremental
+                     oauth:
+                       auth-url: "https://accounts.google.com"
+                       token-url: "https://oauth2.googleapis.com/token"
+                       redirect-uri: "http://localhost/callback"
+                     flows:
+                       delegated:
+                         grant: authorization_code
+                         scopes:
+                           - calendar.readonly
+                     fields:
+                       - name: client-id
+                         sensitive: false
+                   """;
+        var family = MAPPER.readValue(yaml, FamilyManifest.class);
+        assertThat(family.family().flows().get("delegated").isPerUser()).isFalse();
+    }
+
 
     @Test
     void constructor_arg_value_variant_works() {
