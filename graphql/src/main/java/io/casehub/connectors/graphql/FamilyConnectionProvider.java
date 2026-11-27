@@ -130,9 +130,7 @@ public class FamilyConnectionProvider implements ServiceConnectionProvider {
                 return new ServiceAccessToken(currentToken, currentExpiry, Set.of());
             }
 
-            var tokenUrl = resolved.flow().tokenUrl() != null
-                           ? resolved.flow().tokenUrl()
-                           : resolved.family().family().oauth().tokenUrl();
+            var tokenUrl = resolveTokenUrl(resolved.family(), resolved.flow());
 
             var clientId = facade.resolve(resolved.familyId(), "client-id")
                                  .orElseThrow(() -> new ServiceConnectionException(
@@ -224,7 +222,7 @@ public class FamilyConnectionProvider implements ServiceConnectionProvider {
                         provider, actorId, Set.of(), Set.of(), Set.of()));
 
         var family = families.get(provider);
-        var tokenUrl = family.family().oauth().tokenUrl();
+        var tokenUrl = resolveTokenUrl(family, null);
         var clientId = facade.resolve(provider, "client-id").orElseThrow(() ->
                 new ServiceConnectionException("No client-id for provider: " + provider,
                         provider, actorId, Set.of(), Set.of(), Set.of()));
@@ -285,6 +283,23 @@ public class FamilyConnectionProvider implements ServiceConnectionProvider {
         return Arrays.stream(scopeStr.split("\\s+"))
                 .filter(s -> !s.isBlank())
                 .collect(Collectors.toUnmodifiableSet());
+    }
+
+
+    private String resolveTokenUrl(FamilyManifest family, FamilyManifest.FlowDeclaration flow) {
+        var url = flow != null && flow.tokenUrl() != null
+                  ? flow.tokenUrl()
+                  : family.family().oauth().tokenUrl();
+        var familyId = family.family().id();
+        int start;
+        while ((start = url.indexOf('{')) >= 0) {
+            int end = url.indexOf('}', start);
+            if (end < 0) {break;}
+            var varName = url.substring(start + 1, end);
+            var value   = facade.resolve(familyId, varName).orElse("");
+            url = url.substring(0, start) + value + url.substring(end + 1);
+        }
+        return url;
     }
 
     private static String encode(String value) {

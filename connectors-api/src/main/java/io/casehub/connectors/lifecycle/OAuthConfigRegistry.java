@@ -17,7 +17,7 @@ public class OAuthConfigRegistry {
             if (flows != null && flows.containsKey("delegated")) {
                 return flows.get("delegated").scopes();
             }
-            return oauth.scopes();
+            return oauth.scopes() != null ? oauth.scopes() : List.of();
         }
     }
 
