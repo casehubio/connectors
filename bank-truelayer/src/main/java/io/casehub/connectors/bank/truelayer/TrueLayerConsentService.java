@@ -20,35 +20,45 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-public class TrueLayerConsentService {
+public class TrueLayerConsentService implements io.casehub.connectors.lifecycle.UserTokenResolver {
 
-    private static final Logger LOG = Logger.getLogger(TrueLayerConsentService.class);
-    private static final int STATE_TTL_SECONDS = 600;
-    private static final SecureRandom RANDOM = new SecureRandom();
+    private static final Logger       LOG               = Logger.getLogger(TrueLayerConsentService.class);
+    private static final int          STATE_TTL_SECONDS = 600;
+    private static final SecureRandom RANDOM            = new SecureRandom();
 
-    private final String clientId;
-    private final String clientSecret;
-    private final String authBaseUrl;
+    private final String     clientId;
+    private final String     clientSecret;
+    private final String     authBaseUrl;
     private final OidcClient oidcClient;
 
     private final Map<String, PendingConsent> pendingStates = new ConcurrentHashMap<>();
-    private final ConsentTokenStore store;
-    private final Map<String, Object> refreshLocks = new ConcurrentHashMap<>();
+    private final ConsentTokenStore           store;
+    private final Map<String, Object>         refreshLocks  = new ConcurrentHashMap<>();
 
     record PendingConsent(String userId, List<ConsentScope> scopes, Instant expiry) {}
 
     public TrueLayerConsentService(String clientId, String clientSecret,
-                                    String authBaseUrl, OidcClient oidcClient,
-                                    ConsentTokenStore store) {
-        this.clientId = clientId;
+                                   String authBaseUrl, OidcClient oidcClient,
+                                   ConsentTokenStore store) {
+        this.clientId     = clientId;
         this.clientSecret = clientSecret;
-        this.authBaseUrl = authBaseUrl;
-        this.oidcClient = oidcClient;
-        this.store = store;
+        this.authBaseUrl  = authBaseUrl;
+        this.oidcClient   = oidcClient;
+        this.store        = store;
+    }
+
+    @Override
+    public String providerId() {
+        return "truelayer";
+    }
+
+    @Override
+    public java.util.Optional<String> getAccessToken(String userId) {
+        return java.util.Optional.ofNullable(getUserToken(userId));
     }
 
     public AuthLink generateAuthLink(String userId, List<ConsentScope> scopes,
-                                      String redirectUri) {
+                                     String redirectUri) {
         byte[] bytes = new byte[16];
         RANDOM.nextBytes(bytes);
         String state = HexFormat.of().formatHex(bytes);
@@ -57,15 +67,15 @@ public class TrueLayerConsentService {
                 userId, scopes, Instant.now().plusSeconds(STATE_TTL_SECONDS)));
 
         String scopeStr = scopes.stream()
-                .map(s -> s.name().toLowerCase())
-                .collect(Collectors.joining(" "));
+                                .map(s -> s.name().toLowerCase())
+                                .collect(Collectors.joining(" "));
 
         String url = authBaseUrl + "/connect/auth"
-                + "?response_type=code"
-                + "&client_id=" + URLEncoder.encode(clientId, StandardCharsets.UTF_8)
-                + "&scope=" + URLEncoder.encode(scopeStr, StandardCharsets.UTF_8)
-                + "&redirect_uri=" + URLEncoder.encode(redirectUri, StandardCharsets.UTF_8)
-                + "&state=" + state;
+                     + "?response_type=code"
+                     + "&client_id=" + URLEncoder.encode(clientId, StandardCharsets.UTF_8)
+                     + "&scope=" + URLEncoder.encode(scopeStr, StandardCharsets.UTF_8)
+                     + "&redirect_uri=" + URLEncoder.encode(redirectUri, StandardCharsets.UTF_8)
+                     + "&state=" + state;
 
         return new AuthLink(url);
     }
@@ -73,40 +83,40 @@ public class TrueLayerConsentService {
     public ConsentInfo exchangeCode(String code, String state) {
         PendingConsent pending = pendingStates.remove(state);
         if (pending == null || Instant.now().isAfter(pending.expiry())) {
-            if (pending != null) pendingStates.remove(state);
+            if (pending != null) {pendingStates.remove(state);}
             throw new InvalidStateException("Unknown or expired state parameter");
         }
 
-        String userId = pending.userId();
+        String             userId = pending.userId();
         List<ConsentScope> scopes = pending.scopes();
 
         try {
             String body = "grant_type=authorization_code"
-                    + "&code=" + URLEncoder.encode(code, StandardCharsets.UTF_8)
-                    + "&client_id=" + URLEncoder.encode(clientId, StandardCharsets.UTF_8)
-                    + "&client_secret=" + URLEncoder.encode(clientSecret, StandardCharsets.UTF_8);
+                          + "&code=" + URLEncoder.encode(code, StandardCharsets.UTF_8)
+                          + "&client_id=" + URLEncoder.encode(clientId, StandardCharsets.UTF_8)
+                          + "&client_secret=" + URLEncoder.encode(clientSecret, StandardCharsets.UTF_8);
 
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(authBaseUrl + "/connect/token"))
-                    .header("Content-Type", "application/x-www-form-urlencoded")
-                    .POST(HttpRequest.BodyPublishers.ofString(body))
-                    .build();
+                                             .uri(URI.create(authBaseUrl + "/connect/token"))
+                                             .header("Content-Type", "application/x-www-form-urlencoded")
+                                             .POST(HttpRequest.BodyPublishers.ofString(body))
+                                             .build();
 
             HttpResponse<String> response = HttpHelper.CLIENT.send(
                     request, HttpResponse.BodyHandlers.ofString());
 
             if (response.statusCode() < 200 || response.statusCode() >= 300) {
                 throw new TrueLayerApiException(response.statusCode(),
-                        "Token exchange failed: " + response.body());
+                                                "Token exchange failed: " + response.body());
             }
 
             JsonObject json;
             try (var reader = Json.createReader(new StringReader(response.body()))) {
                 json = reader.readObject();
             }
-            String accessToken = json.getString("access_token");
+            String accessToken  = json.getString("access_token");
             String refreshToken = json.getString("refresh_token", null);
-            int expiresIn = json.getInt("expires_in", 3600);
+            int    expiresIn    = json.getInt("expires_in", 3600);
 
             Instant now = Instant.now();
             StoredConsent consent = new StoredConsent(
@@ -117,7 +127,7 @@ public class TrueLayerConsentService {
             store.store(userId, consent);
 
             return new ConsentInfo(userId, ConsentStatus.ACTIVE,
-                    now, consent.consentExpiry(), scopes);
+                                   now, consent.consentExpiry(), scopes);
 
         } catch (TrueLayerApiException e) {
             throw e;
@@ -128,7 +138,7 @@ public class TrueLayerConsentService {
 
     public ConsentInfo consentStatus(String userId) {
         StoredConsent consent = store.find(userId);
-        if (consent == null) return null;
+        if (consent == null) {return null;}
 
         ConsentStatus status;
         if (Instant.now().isAfter(consent.consentExpiry())) {
@@ -138,7 +148,7 @@ public class TrueLayerConsentService {
         }
 
         return new ConsentInfo(userId, status,
-                consent.grantedAt(), consent.consentExpiry(), consent.scopes());
+                               consent.grantedAt(), consent.consentExpiry(), consent.scopes());
     }
 
     public void revokeConsent(String userId) {
@@ -148,7 +158,7 @@ public class TrueLayerConsentService {
 
     public String getUserToken(String userId) {
         StoredConsent consent = store.find(userId);
-        if (consent == null) return null;
+        if (consent == null) {return null;}
 
         if (Instant.now().isBefore(consent.accessTokenExpiry())) {
             return consent.accessToken();
@@ -170,21 +180,21 @@ public class TrueLayerConsentService {
         synchronized (lock) {
             StoredConsent latest = store.find(userId);
             if (latest != null && latest != current
-                    && Instant.now().isBefore(latest.accessTokenExpiry())) {
+                && Instant.now().isBefore(latest.accessTokenExpiry())) {
                 return latest.accessToken();
             }
 
             try {
                 String body = "grant_type=refresh_token"
-                        + "&refresh_token=" + URLEncoder.encode(current.refreshToken(), StandardCharsets.UTF_8)
-                        + "&client_id=" + URLEncoder.encode(clientId, StandardCharsets.UTF_8)
-                        + "&client_secret=" + URLEncoder.encode(clientSecret, StandardCharsets.UTF_8);
+                              + "&refresh_token=" + URLEncoder.encode(current.refreshToken(), StandardCharsets.UTF_8)
+                              + "&client_id=" + URLEncoder.encode(clientId, StandardCharsets.UTF_8)
+                              + "&client_secret=" + URLEncoder.encode(clientSecret, StandardCharsets.UTF_8);
 
                 HttpRequest request = HttpRequest.newBuilder()
-                        .uri(URI.create(authBaseUrl + "/connect/token"))
-                        .header("Content-Type", "application/x-www-form-urlencoded")
-                        .POST(HttpRequest.BodyPublishers.ofString(body))
-                        .build();
+                                                 .uri(URI.create(authBaseUrl + "/connect/token"))
+                                                 .header("Content-Type", "application/x-www-form-urlencoded")
+                                                 .POST(HttpRequest.BodyPublishers.ofString(body))
+                                                 .build();
 
                 HttpResponse<String> response = HttpHelper.CLIENT.send(
                         request, HttpResponse.BodyHandlers.ofString());
@@ -197,7 +207,7 @@ public class TrueLayerConsentService {
 
                 if (response.statusCode() < 200 || response.statusCode() >= 300) {
                     LOG.warnf("Token refresh failed for user '%s': HTTP %d",
-                            userId, response.statusCode());
+                              userId, response.statusCode());
                     return null;
                 }
 
@@ -205,9 +215,9 @@ public class TrueLayerConsentService {
                 try (var reader = Json.createReader(new StringReader(response.body()))) {
                     json = reader.readObject();
                 }
-                String newAccessToken = json.getString("access_token");
+                String newAccessToken  = json.getString("access_token");
                 String newRefreshToken = json.getString("refresh_token", current.refreshToken());
-                int expiresIn = json.getInt("expires_in", 3600);
+                int    expiresIn       = json.getInt("expires_in", 3600);
 
                 StoredConsent refreshed = new StoredConsent(
                         newAccessToken, newRefreshToken,

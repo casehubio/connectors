@@ -112,6 +112,29 @@ class TrueLayerConsentServiceTest {
         assertThat(service.consentStatus("user-1")).isNull();
     }
 
+    @Test
+    void implements_UserTokenResolver_with_correct_providerId() {
+        assertThat(service.providerId()).isEqualTo("truelayer");
+    }
+
+    @Test
+    void getAccessToken_returns_token_via_getUserToken() {
+        service.storeConsent("user1", new StoredConsent(
+                "access-token-1", "refresh-token-1",
+                Instant.now().plusSeconds(3600), Instant.now().plusSeconds(86400 * 90),
+                List.of(ConsentScope.ACCOUNTS), Instant.now()));
+
+        var result = service.getAccessToken("user1");
+        assertThat(result).isPresent().hasValue("access-token-1");
+    }
+
+    @Test
+    void getAccessToken_returns_empty_when_no_consent() {
+        var result = service.getAccessToken("unknown-user");
+        assertThat(result).isEmpty();
+    }
+
+
     private String extractState(String url) {
         int stateIdx = url.indexOf("state=");
         if (stateIdx < 0) return "";
