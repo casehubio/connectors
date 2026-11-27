@@ -47,8 +47,8 @@ class OAuthConsentServiceTest {
                 List.of("Calendars.ReadWrite", "Mail.Read"),
                 null, null);
         oauthConfigs = new OAuthConfigRegistry(Map.of(
-                "google", googleOauth,
-                "microsoft", microsoftOauth));
+                "google", new OAuthConfigRegistry.OAuthConfig(googleOauth, FamilyManifest.ConsentStrategy.INCREMENTAL),
+                "microsoft", new OAuthConfigRegistry.OAuthConfig(microsoftOauth, FamilyManifest.ConsentStrategy.AGGREGATED)));
 
         credentialStore = new CredentialFormServiceTest.RecordingCredentialStore();
         credentialFacade = new StoreBackedFacade(credentialStore, Map.of(
@@ -225,6 +225,58 @@ class OAuthConsentServiceTest {
                 .isInstanceOf(OAuthConsentService.InvalidOAuthStateException.class);
     }
 
+    // --- incremental consent ---
+
+    @Test
+    void buildAuthorizationUrl_includes_granted_scopes_for_incremental_family() {
+        var request = service.buildAuthorizationUrl("google");
+        var params = parseQueryParams(request.url());
+        assertThat(params.get("include_granted_scopes")).isEqualTo("true");
+    }
+
+    @Test
+    void buildAuthorizationUrl_omits_granted_scopes_for_aggregated_family() {
+        var request = service.buildAuthorizationUrl("microsoft");
+        var params = parseQueryParams(request.url());
+        assertThat(params).doesNotContainKey("include_granted_scopes");
+    }
+
+    @Test
+    void buildAuthorizationUrl_uses_scope_override_when_provided() {
+        var overrideScopes = java.util.Set.of("https://www.googleapis.com/auth/calendar.readonly");
+        var request = service.buildAuthorizationUrl("google", overrideScopes);
+        var params = parseQueryParams(request.url());
+        assertThat(params.get("scope")).contains("calendar.readonly");
+        assertThat(params.get("scope")).doesNotContain("drive.readonly");
+    }
+
+    // --- expires-at and granted-scopes ---
+
+    @Test
+    void exchangeCode_stores_expires_at_in_facade() {
+        service.setTokenResponse("""
+                {"access_token":"ya29.test","refresh_token":"1//test","expires_in":3600}""");
+
+        var request = service.buildAuthorizationUrl("google");
+        service.exchangeCode("auth-code", request.state());
+
+        assertThat(credentialFacade.resolve("google", "expires-at")).isPresent();
+        var expiresAt = java.time.Instant.parse(credentialFacade.resolve("google", "expires-at").get());
+        assertThat(expiresAt).isAfter(java.time.Instant.now().plusSeconds(3500));
+    }
+
+    @Test
+    void exchangeCode_stores_granted_scopes_in_facade() {
+        service.setTokenResponse("""
+                {"access_token":"ya29.test","refresh_token":"1//test","expires_in":3600,"scope":"calendar.readonly drive.readonly"}""");
+
+        var request = service.buildAuthorizationUrl("google");
+        service.exchangeCode("auth-code", request.state());
+
+        assertThat(credentialFacade.resolve("google", "granted-scopes"))
+                .hasValue("calendar.readonly drive.readonly");
+    }
+
     // --- helpers ---
 
     private static Map<String, String> parseQueryParams(String url) {
@@ -244,6 +296,7 @@ class OAuthConsentServiceTest {
     static class StoreBackedFacade implements ProviderCredentialFacade {
         private final CredentialFormServiceTest.RecordingCredentialStore store;
         private final Map<String, Map<String, String>> staticCredentials;
+        private final Map<String, Map<String, String>> dynamicCredentials = new java.util.concurrent.ConcurrentHashMap<>();
 
         StoreBackedFacade(CredentialFormServiceTest.RecordingCredentialStore store,
                           Map<String, Map<String, String>> staticCredentials) {
@@ -253,6 +306,9 @@ class OAuthConsentServiceTest {
 
         @Override
         public Optional<String> resolve(String providerId, String field) {
+            var dynamicVal = Optional.ofNullable(
+                    dynamicCredentials.getOrDefault(providerId, Map.of()).get(field));
+            if (dynamicVal.isPresent()) return dynamicVal;
             var staticVal = Optional.ofNullable(
                     staticCredentials.getOrDefault(providerId, Map.of()).get(field));
             if (staticVal.isPresent()) return staticVal;
@@ -273,6 +329,11 @@ class OAuthConsentServiceTest {
         @Override
         public CredentialSource source(String providerId, String field) {
             return resolve(providerId, field).isPresent() ? CredentialSource.CREDENTIAL_STORE : CredentialSource.NONE;
+        }
+
+        @Override
+        public void store(String providerId, String field, String value) {
+            dynamicCredentials.computeIfAbsent(providerId, k -> new java.util.concurrent.ConcurrentHashMap<>()).put(field, value);
         }
     }
 

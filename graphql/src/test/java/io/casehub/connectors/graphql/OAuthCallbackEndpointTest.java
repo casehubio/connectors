@@ -24,7 +24,7 @@ class OAuthCallbackEndpointTest {
                 "{callback-base-url}/oauth/callback/google",
                 List.of("https://www.googleapis.com/auth/calendar.readonly"),
                 "offline", "consent");
-        var oauthConfigs = new OAuthConfigRegistry(Map.of("google", googleOauth));
+        var oauthConfigs = new OAuthConfigRegistry(Map.of("google", new OAuthConfigRegistry.OAuthConfig(googleOauth, FamilyManifest.ConsentStrategy.INCREMENTAL)));
 
         var credentialStore = new CredentialFormServiceTest.RecordingCredentialStore();
         var credentialFacade = new OAuthConsentServiceTest.StoreBackedFacade(credentialStore, Map.of(

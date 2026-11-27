@@ -322,7 +322,9 @@ class ConnectorLifecycleOperationsTest {
         var oauthFacade = new InMemoryCredentialFacade(Map.of(
                 "google", Map.of("client-id", "test-client-id", "client-secret", "test-secret")));
         var oauthConfigs = new io.casehub.connectors.lifecycle.OAuthConfigRegistry(Map.of(
-                "google", googleCalendarManifest().connector().auth().oauth()));
+                "google", new io.casehub.connectors.lifecycle.OAuthConfigRegistry.OAuthConfig(
+                        googleCalendarManifest().connector().auth().oauth(),
+                        io.casehub.connectors.lifecycle.FamilyManifest.ConsentStrategy.INCREMENTAL)));
         var consentService = new OAuthConsentServiceTest.TestableOAuthConsentService(
                 oauthConfigs, oauthFacade, new CredentialFormServiceTest.RecordingCredentialStore(),
                 registry, "http://localhost:8080");

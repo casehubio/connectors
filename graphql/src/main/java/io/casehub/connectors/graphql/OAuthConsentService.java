@@ -2,6 +2,7 @@ package io.casehub.connectors.graphql;
 
 import io.casehub.connectors.http.HttpHelper;
 import io.casehub.connectors.lifecycle.ConnectorRegistry;
+import io.casehub.connectors.lifecycle.FamilyManifest;
 import io.casehub.connectors.lifecycle.OAuthConfigRegistry;
 import io.casehub.connectors.lifecycle.ProviderCredentialFacade;
 import io.casehub.platform.api.authn.CredentialType;
@@ -59,6 +60,7 @@ public class OAuthConsentService {
                                         defaultValue = "http://localhost:8080")
                                 String callbackBaseUrl) {
         this(oauthConfigsInstance.isResolvable() ? oauthConfigsInstance.get() : new OAuthConfigRegistry(Map.of()),
+
              credentialFacadeInstance.isResolvable() ? credentialFacadeInstance.get() : null,
              credentialStoreInstance.isResolvable() ? credentialStoreInstance.get() : null,
              registryInstance.isResolvable() ? registryInstance.get() : new ConnectorRegistry(),
@@ -78,9 +80,14 @@ public class OAuthConsentService {
     }
 
     public AuthorizationRequest buildAuthorizationUrl(String credentialKey) {
-        var oauth = oauthConfigs.lookup(credentialKey)
+        return buildAuthorizationUrl(credentialKey, null);
+    }
+
+    public AuthorizationRequest buildAuthorizationUrl(String credentialKey, java.util.Set<String> scopeOverride) {
+        var config = oauthConfigs.lookupConfig(credentialKey)
                 .orElseThrow(() -> new IllegalArgumentException(
                         "No OAuth config for credential key '" + credentialKey + "'"));
+        var oauth = config.oauth();
 
         var clientId = credentialFacade.resolve(credentialKey, "client-id")
                 .orElseThrow(() -> new IllegalStateException(
@@ -98,7 +105,8 @@ public class OAuthConsentService {
 
         var authUrl = resolveTemplate(oauth.authUrl(), credentialKey);
         var redirectUri = resolveTemplate(oauth.redirectUri(), credentialKey);
-        var scopeStr = String.join(" ", oauth.scopes());
+        var scopes = scopeOverride != null ? scopeOverride : new java.util.LinkedHashSet<>(oauth.scopes());
+        var scopeStr = String.join(" ", scopes);
 
         var sb = new StringBuilder(authUrl)
                 .append("?response_type=code")
@@ -113,6 +121,9 @@ public class OAuthConsentService {
         }
         if (oauth.prompt() != null) {
             sb.append("&prompt=").append(encode(oauth.prompt()));
+        }
+        if (config.consent() == FamilyManifest.ConsentStrategy.INCREMENTAL) {
+            sb.append("&include_granted_scopes=true");
         }
 
         return new AuthorizationRequest(sb.toString(), state);
@@ -153,6 +164,11 @@ public class OAuthConsentService {
                 storeToken(credentialKey, "access-token", accessToken, now, expiresAt);
                 if (refreshToken != null) {
                     storeToken(credentialKey, "refresh-token", refreshToken, now, null);
+                }
+                credentialFacade.store(credentialKey, "expires-at", expiresAt.toString());
+                var grantedScope = json.getString("scope", null);
+                if (grantedScope != null) {
+                    credentialFacade.store(credentialKey, "granted-scopes", grantedScope);
                 }
 
                 registry.updateStatusByCredentialKey(credentialKey);
