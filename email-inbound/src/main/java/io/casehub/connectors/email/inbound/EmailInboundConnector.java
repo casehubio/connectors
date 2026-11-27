@@ -110,19 +110,30 @@ public class EmailInboundConnector implements InboundConnector {
                 folder.open(Folder.READ_WRITE);
                 backoffSeconds = 1;
                 consecutiveFailures = 0;
+
+                // Register listener BEFORE first processUnseen — eliminates
+                // the race between processUnseen() returning 0 and idle()
+                // starting. The listener fires on the IDLE thread the instant
+                // the server pushes a new-message notification.
+                final IMAPFolder listenerFolder = folder;
+                folder.addMessageCountListener(new jakarta.mail.event.MessageCountAdapter() {
+                    @Override
+                    public void messagesAdded(jakarta.mail.event.MessageCountEvent e) {
+                        try {
+                            processUnseen(listenerFolder, account, sink);
+                        } catch (Exception ex) {
+                            LOG.log(Level.WARNING, "email-inbound: listener processUnseen failed", ex);
+                        }
+                    }
+                });
+
                 LOG.info("email-inbound: IDLE connected for account " + account.id());
 
+                // Initial sweep for messages that arrived before the listener.
+                processUnseen(folder, account, sink);
+
                 while (!stopping) {
-                    // Always check for unseen messages before entering IDLE.
-                    // When messages were found, loop back immediately — this
-                    // avoids the gap between processUnseen() and idle() where
-                    // an IDLE notification for a newly-arrived message could
-                    // be lost (the message arrives after the search but before
-                    // IDLE starts watching).
-                    final int found = processUnseen(folder, account, sink);
-                    if (found == 0 && !stopping) {
-                        folder.idle(true); // block until server notifies
-                    }
+                    folder.idle(true);
                 }
 
             } catch (final FolderClosedException | StoreClosedException e) {
