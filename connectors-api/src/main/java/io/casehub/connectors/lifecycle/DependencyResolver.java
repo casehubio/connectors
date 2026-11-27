@@ -74,11 +74,11 @@ public class DependencyResolver {
 
             if (declaredFlows != null && family != null && family.family().flows() != null) {
                 var flowEntries = family.family().flows();
-                var primaryFlowName = flowEntries.keySet().iterator().next();
                 for (var flowName : declaredFlows) {
                     var flow = flowEntries.get(flowName);
                     if (flow == null) continue;
-                    var providerKey = flowName.equals(primaryFlowName) ? familyId : familyId + "-" + flowName;
+                    var providerKey = flow.grant() == FamilyManifest.GrantType.AUTHORIZATION_CODE
+                            ? familyId : familyId + "-" + flowName;
                     if (flow.grant() == FamilyManifest.GrantType.AUTHORIZATION_CODE) {
                         boolean hasToken = credentialFacade.resolve(providerKey, "access-token").isPresent();
                         if (!hasToken) {

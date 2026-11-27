@@ -26,8 +26,10 @@ public class OAuthConfigRegistryCreator implements BeanCreator<OAuthConfigRegist
                         consent = family.family().consent();
                     }
                 }
+                var flows = auth.family() != null && families.containsKey(auth.family())
+                        ? families.get(auth.family()).family().flows() : null;
                 configs.putIfAbsent(m.connector().credentialKey(),
-                        new OAuthConfigRegistry.OAuthConfig(auth.oauth(), consent));
+                        new OAuthConfigRegistry.OAuthConfig(auth.oauth(), consent, flows));
             }
         }
         return new OAuthConfigRegistry(configs);

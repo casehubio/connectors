@@ -104,7 +104,7 @@ public class OAuthConsentService {
 
         var authUrl = resolveTemplate(oauth.authUrl(), credentialKey);
         var redirectUri = resolveTemplate(oauth.redirectUri(), credentialKey);
-        var scopes = scopeOverride != null ? scopeOverride : new java.util.LinkedHashSet<>(oauth.scopes());
+        var scopes = scopeOverride != null ? scopeOverride : new java.util.LinkedHashSet<>(config.delegatedScopes());
         var scopeStr = String.join(" ", scopes);
 
         var sb = new StringBuilder(authUrl)

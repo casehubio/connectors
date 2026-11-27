@@ -1,11 +1,25 @@
 package io.casehub.connectors.lifecycle;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 public class OAuthConfigRegistry {
 
-    public record OAuthConfig(FamilyManifest.OAuthDeclaration oauth, FamilyManifest.ConsentStrategy consent) {}
+    public record OAuthConfig(FamilyManifest.OAuthDeclaration oauth, FamilyManifest.ConsentStrategy consent,
+                               Map<String, FamilyManifest.FlowDeclaration> flows) {
+
+        public OAuthConfig(FamilyManifest.OAuthDeclaration oauth, FamilyManifest.ConsentStrategy consent) {
+            this(oauth, consent, null);
+        }
+
+        public List<String> delegatedScopes() {
+            if (flows != null && flows.containsKey("delegated")) {
+                return flows.get("delegated").scopes();
+            }
+            return oauth.scopes();
+        }
+    }
 
     private final Map<String, OAuthConfig> configs;
 
