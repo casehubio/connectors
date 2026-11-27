@@ -11,15 +11,22 @@ public class DependencyResolver {
     private final Map<String, List<ProviderEntry>> providersByCapability;
     private final Map<String, List<String>> familyMembers;
     private final ProviderCredentialFacade credentialFacade;
+    private final Map<String, FamilyManifest> families;
 
     private record ProviderEntry(String connectorId, List<String> sub, String setupPlaybook) {}
 
     public DependencyResolver(List<ConnectorManifest> manifests) {
-        this(manifests, null);
+        this(manifests, null, Map.of());
     }
 
     public DependencyResolver(List<ConnectorManifest> manifests, ProviderCredentialFacade credentialFacade) {
+        this(manifests, credentialFacade, Map.of());
+    }
+
+    public DependencyResolver(List<ConnectorManifest> manifests, ProviderCredentialFacade credentialFacade,
+                               Map<String, FamilyManifest> families) {
         this.credentialFacade = credentialFacade;
+        this.families = families != null ? Map.copyOf(families) : Map.of();
         this.manifestsById = new HashMap<>();
         this.providersByCapability = new HashMap<>();
         this.familyMembers = new HashMap<>();
@@ -62,12 +69,42 @@ public class DependencyResolver {
         var auth = manifest.connector().auth();
         if (credentialFacade != null && auth != null && "oauth2".equals(auth.type()) && auth.family() != null) {
             var familyId = auth.family();
-            boolean hasToken = credentialFacade.resolve(familyId, "access-token").isPresent();
-            if (!hasToken) {
-                var members = familyMembers.getOrDefault(familyId, List.of());
-                var option = new ResolutionOption.FamilyOAuthOption(familyId, List.copyOf(members));
-                result.add(new UnmetRequirement("oauth2", List.of(familyId),
-                        "OAuth consent required for " + familyId + " family", List.of(option)));
+            var family = families.get(familyId);
+            var declaredFlows = auth.flows();
+
+            if (declaredFlows != null && family != null && family.family().flows() != null) {
+                var flowEntries = family.family().flows();
+                var primaryFlowName = flowEntries.keySet().iterator().next();
+                for (var flowName : declaredFlows) {
+                    var flow = flowEntries.get(flowName);
+                    if (flow == null) continue;
+                    var providerKey = flowName.equals(primaryFlowName) ? familyId : familyId + "-" + flowName;
+                    if (flow.grant() == FamilyManifest.GrantType.AUTHORIZATION_CODE) {
+                        boolean hasToken = credentialFacade.resolve(providerKey, "access-token").isPresent();
+                        if (!hasToken) {
+                            var members = familyMembers.getOrDefault(familyId, List.of());
+                            result.add(new UnmetRequirement("oauth2", List.of(flowName),
+                                    "OAuth consent required for " + familyId + " " + flowName + " flow",
+                                    List.of(new ResolutionOption.FamilyOAuthOption(familyId, List.copyOf(members)))));
+                        }
+                    } else {
+                        boolean hasCreds = credentialFacade.resolve(familyId, "client-id").isPresent()
+                                && credentialFacade.resolve(familyId, "client-secret").isPresent();
+                        if (!hasCreds) {
+                            result.add(new UnmetRequirement("oauth2", List.of(flowName),
+                                    "Client credentials required for " + familyId + " " + flowName + " flow",
+                                    List.of(new ResolutionOption.FamilyClientCredentialsOption(familyId, flowName))));
+                        }
+                    }
+                }
+            } else {
+                boolean hasToken = credentialFacade.resolve(familyId, "access-token").isPresent();
+                if (!hasToken) {
+                    var members = familyMembers.getOrDefault(familyId, List.of());
+                    result.add(new UnmetRequirement("oauth2", List.of(familyId),
+                            "OAuth consent required for " + familyId + " family",
+                            List.of(new ResolutionOption.FamilyOAuthOption(familyId, List.copyOf(members)))));
+                }
             }
         }
 

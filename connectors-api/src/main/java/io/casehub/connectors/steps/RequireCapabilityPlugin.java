@@ -54,6 +54,11 @@ public record RequireCapabilityPlugin(@Required String capability, List<String> 
                     entry.put("family-id", f.familyId());
                     entry.put("member-connectors", f.memberConnectorIds());
                 }
+                case ResolutionOption.FamilyClientCredentialsOption cc -> {
+                    entry.put("type", "family-client-credentials");
+                    entry.put("family-id", cc.familyId());
+                    entry.put("flow-name", cc.flowName());
+                }
             }
             optionsList.add(entry);
         }

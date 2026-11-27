@@ -243,6 +243,86 @@ class DependencyResolverTest {
         assertThat(unmet).isEmpty();
     }
 
+    @Test
+    void multi_flow_generates_separate_unmet_per_flow() {
+        var flows = Map.of(
+                "delegated", new FamilyManifest.FlowDeclaration(
+                        FamilyManifest.GrantType.AUTHORIZATION_CODE,
+                        List.of("User.Read"), null),
+                "app", new FamilyManifest.FlowDeclaration(
+                        FamilyManifest.GrantType.CLIENT_CREDENTIALS,
+                        List.of("https://graph.microsoft.com/.default"), null));
+        var family = new FamilyManifest(new FamilyManifest.FamilyDeclaration(
+                "microsoft", "Microsoft 365", FamilyManifest.ConsentStrategy.AGGREGATED,
+                new FamilyManifest.OAuthDeclaration(null, null, null, null, null, null),
+                flows, List.of()));
+        var manifest = new ConnectorManifest(new ConnectorDeclaration(
+                "chat-teams", "chat", null,
+                new ConnectorManifest.AuthDeclaration("oauth2", "microsoft",
+                                                      List.of("delegated", "app"), null, null),
+                null, null, null, null, null));
+        var facade = new InMemoryCredentialFacade(Map.of());
+        var resolver = new DependencyResolver(List.of(manifest), facade,
+                                              Map.of("microsoft", family));
+
+        var unmet = resolver.unmetRequirements("chat-teams", new ConnectorRegistry());
+        assertThat(unmet).hasSize(2);
+
+        var delegatedReq = unmet.stream()
+                                .filter(u -> u.sub().contains("delegated")).findFirst().orElseThrow();
+        assertThat(delegatedReq.options().getFirst()).isInstanceOf(ResolutionOption.FamilyOAuthOption.class);
+
+        var appReq = unmet.stream()
+                          .filter(u -> u.sub().contains("app")).findFirst().orElseThrow();
+        assertThat(appReq.options().getFirst()).isInstanceOf(ResolutionOption.FamilyClientCredentialsOption.class);
+        var ccOption = (ResolutionOption.FamilyClientCredentialsOption) appReq.options().getFirst();
+        assertThat(ccOption.familyId()).isEqualTo("microsoft");
+        assertThat(ccOption.flowName()).isEqualTo("app");
+    }
+
+    @Test
+    void multi_flow_satisfied_when_delegated_token_and_credentials_present() {
+        var flows = Map.of(
+                "delegated", new FamilyManifest.FlowDeclaration(
+                        FamilyManifest.GrantType.AUTHORIZATION_CODE,
+                        List.of("User.Read"), null),
+                "app", new FamilyManifest.FlowDeclaration(
+                        FamilyManifest.GrantType.CLIENT_CREDENTIALS,
+                        List.of("https://graph.microsoft.com/.default"), null));
+        var family = new FamilyManifest(new FamilyManifest.FamilyDeclaration(
+                "microsoft", "Microsoft 365", FamilyManifest.ConsentStrategy.AGGREGATED,
+                new FamilyManifest.OAuthDeclaration(null, null, null, null, null, null),
+                flows, List.of()));
+        var manifest = new ConnectorManifest(new ConnectorDeclaration(
+                "chat-teams", "chat", null,
+                new ConnectorManifest.AuthDeclaration("oauth2", "microsoft",
+                                                      List.of("delegated", "app"), null, null),
+                null, null, null, null, null));
+        var facade = new InMemoryCredentialFacade(Map.of(
+                "microsoft", Map.of("access-token", "user-token",
+                                    "client-id", "cid", "client-secret", "cs")));
+        var resolver = new DependencyResolver(List.of(manifest), facade,
+                                              Map.of("microsoft", family));
+
+        var unmet = resolver.unmetRequirements("chat-teams", new ConnectorRegistry());
+        assertThat(unmet).isEmpty();
+    }
+
+    @Test
+    void legacy_single_flow_still_works_without_families_map() {
+        var googleManifest = new ConnectorManifest(new ConnectorDeclaration(
+                "calendar-google", "calendar", "Google Calendar",
+                new ConnectorManifest.AuthDeclaration("oauth2", "google", null, null, List.of()),
+                null, null, List.of(new CapabilityDeclaration("calendar")), null, null));
+        var facade   = new InMemoryCredentialFacade(Map.of());
+        var resolver = new DependencyResolver(List.of(googleManifest), facade);
+
+        var unmet = resolver.unmetRequirements("calendar-google", new ConnectorRegistry());
+        assertThat(unmet).hasSize(1);
+        assertThat(unmet.getFirst().options().getFirst()).isInstanceOf(ResolutionOption.FamilyOAuthOption.class);
+    }
+
+
     private static ConnectorManifest manifest(String id, String platform,
             List<RequirementDeclaration> requires,
             List<CapabilityDeclaration> provides) {
