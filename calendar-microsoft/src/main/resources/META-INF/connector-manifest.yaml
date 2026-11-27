@@ -1,0 +1,19 @@
+connector:
+  id: calendar-microsoft
+  platform: calendar
+  description: "Microsoft Graph Calendar (Outlook) — delegated access"
+  auth:
+    type: oauth2
+    family: microsoft
+    flows:
+      - delegated
+  provides:
+    - capability: calendar
+      sub:
+        - list-calendars
+        - list-events
+        - get-event
+        - create-event
+        - update-event
+        - delete-event
+        - sync-events

@@ -125,7 +125,7 @@ class GoogleFamilyConsentIntegrationTest {
             String description, List<CapabilityDeclaration> provides) {
         return new ConnectorManifest(new ConnectorDeclaration(
                 id, platform, description,
-                new AuthDeclaration("oauth2", "google", null, List.of()),
+                new AuthDeclaration("oauth2", "google", null, null, List.of()),
                 null, null, provides, null, null));
     }
 }

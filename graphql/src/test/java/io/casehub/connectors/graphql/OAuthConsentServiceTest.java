@@ -202,7 +202,7 @@ class OAuthConsentServiceTest {
 
         var googleManifest = new ConnectorManifest(new ConnectorDeclaration(
                 "calendar-google", "calendar", "Google Calendar",
-                new AuthDeclaration("oauth2", "google", null,
+                new AuthDeclaration("oauth2", "google", null, null,
                         List.of(new ConnectorManifest.FieldDeclaration("access-token", "Access token"))),
                 List.of(), List.of(), List.of(), null, null));
         registry.register(googleManifest, ConnectorStatus.UNCONFIGURED);

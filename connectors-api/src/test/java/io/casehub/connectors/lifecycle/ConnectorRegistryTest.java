@@ -167,7 +167,7 @@ class ConnectorRegistryTest {
 
     private ConnectorManifest manifWithFields(String id, String family,
                                               java.util.List<ConnectorManifest.FieldDeclaration> fields) {
-        var auth = new ConnectorManifest.AuthDeclaration("oauth2", family, null, fields);
+        var auth = new ConnectorManifest.AuthDeclaration("oauth2", family, null, null, fields);
         var decl = new ConnectorManifest.ConnectorDeclaration(
                 id, "test", "desc", auth, null, null, null, null, null);
         return new ConnectorManifest(decl);

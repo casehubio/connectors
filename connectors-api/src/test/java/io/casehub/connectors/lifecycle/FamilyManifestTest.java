@@ -214,7 +214,7 @@ class FamilyManifestTest {
 
     @Test
     void credentialKey_returns_family_when_set() {
-        var auth = new ConnectorManifest.AuthDeclaration("oauth2", "google", null, null);
+        var auth = new ConnectorManifest.AuthDeclaration("oauth2", "google", null, null, null);
         var decl = new ConnectorManifest.ConnectorDeclaration(
                 "calendar-google", "calendar", "desc", auth, null, null, null, null, null);
         assertThat(decl.credentialKey()).isEqualTo("google");
@@ -222,7 +222,7 @@ class FamilyManifestTest {
 
     @Test
     void credentialKey_returns_id_when_no_family() {
-        var auth = new ConnectorManifest.AuthDeclaration("api-key", null, null, null);
+        var auth = new ConnectorManifest.AuthDeclaration("api-key", null, null, null, null);
         var decl = new ConnectorManifest.ConnectorDeclaration(
                 "numbrrs", "mobile", "desc", auth, null, null, null, null, null);
         assertThat(decl.credentialKey()).isEqualTo("numbrrs");
@@ -261,4 +261,43 @@ class FamilyManifestTest {
         assertThat(manifest.connector().auth().oauth().scopes()).containsExactly("repo", "project");
         assertThat(manifest.connector().auth().family()).isNull();
     }
+
+    @Test
+    void auth_declaration_parses_flows_list() throws Exception {
+        var yaml = """
+                   connector:
+                     id: chat-teams
+                     platform: chat
+                     auth:
+                       type: oauth2
+                       family: microsoft
+                       flows:
+                         - delegated
+                         - application
+                         - bot
+                     provides:
+                       - capability: chat
+                   """;
+        var manifest = MAPPER.readValue(yaml, ConnectorManifest.class);
+        assertThat(manifest.connector().auth().flows())
+                .containsExactly("delegated", "application", "bot");
+        assertThat(manifest.connector().auth().family()).isEqualTo("microsoft");
+    }
+
+    @Test
+    void auth_declaration_without_flows_has_null_flows() throws Exception {
+        var yaml = """
+                   connector:
+                     id: calendar-google
+                     platform: calendar
+                     auth:
+                       type: oauth2
+                       family: google
+                     provides:
+                       - capability: calendar
+                   """;
+        var manifest = MAPPER.readValue(yaml, ConnectorManifest.class);
+        assertThat(manifest.connector().auth().flows()).isNull();
+    }
+
 }

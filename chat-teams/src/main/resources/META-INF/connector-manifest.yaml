@@ -1,0 +1,23 @@
+connector:
+  id: chat-teams
+  platform: chat
+  description: "Microsoft Teams — delegated + application + Bot Framework"
+  auth:
+    type: oauth2
+    family: microsoft
+    flows:
+      - delegated
+      - application
+      - bot
+  provides:
+    - capability: chat
+      sub:
+        - messaging
+        - threading
+        - discovery
+        - presence
+        - reactions
+        - members
+        - channel-management
+        - member-management
+        - message-history

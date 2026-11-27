@@ -1,0 +1,21 @@
+connector:
+  id: document-microsoft
+  platform: document
+  description: "Microsoft Graph OneDrive/SharePoint — delegated access"
+  auth:
+    type: oauth2
+    family: microsoft
+    flows:
+      - delegated
+  produces:
+    - type: document
+      qualifier: microsoft-onedrive
+    - type: document
+      qualifier: microsoft-sharepoint
+  provides:
+    - capability: document
+      sub:
+        - file-operations
+        - folder-operations
+        - search-operations
+        - sharing-operations

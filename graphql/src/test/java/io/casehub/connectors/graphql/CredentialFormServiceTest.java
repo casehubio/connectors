@@ -128,7 +128,7 @@ class CredentialFormServiceTest {
     void generateFormHtml_includes_default_value() {
         var manifest = new ConnectorManifest(new ConnectorDeclaration(
                 "test", "chat", "Test connector",
-                new AuthDeclaration("api-key", null, null, List.of(
+                new AuthDeclaration("api-key", null, null, null, List.of(
                         new FieldDeclaration("url", true, "API URL", false,
                                 "https://api.example.com", null, null))),
                 List.of(), List.of(), List.of(), null, null));
@@ -160,7 +160,7 @@ class CredentialFormServiceTest {
     void generateFormHtml_escapes_xss_in_field_values() {
         var manifest = new ConnectorManifest(new ConnectorDeclaration(
                 "xss", "chat", "<script>alert(1)</script>",
-                new AuthDeclaration("api-key", null, null, List.of(
+                new AuthDeclaration("api-key", null, null, null, List.of(
                         new FieldDeclaration("key", true, "Key <b>bold</b>", true,
                                 null, "Help <script>", "ex<ample"))),
                 List.of(), List.of(), List.of(), null, null));
@@ -236,7 +236,7 @@ class CredentialFormServiceTest {
     void submitCredentials_uses_bot_token_type_for_bot_token_auth() {
         var manifest = new ConnectorManifest(new ConnectorDeclaration(
                 "telegram", "chat", "Telegram",
-                new AuthDeclaration("bot-token", null, null, List.of(
+                new AuthDeclaration("bot-token", null, null, null, List.of(
                         new FieldDeclaration("bot-token", true, "Bot token", true, null, null, null))),
                 List.of(), List.of(), List.of(), null, null));
         var token = service.createSession("telegram", manifest);
@@ -269,7 +269,7 @@ class CredentialFormServiceTest {
         return new ConnectorManifest(new ConnectorDeclaration(
                 "numbrrs", "mobile",
                 "Numbrrs — UK mobile SIM numbers",
-                new AuthDeclaration("api-key", null, null, List.of(
+                new AuthDeclaration("api-key", null, null, null, List.of(
                         new FieldDeclaration("api-key", true, "Numbrrs API key", true, null,
                                 "Log in to your Numbrrs dashboard at Settings → API Keys",
                                 "nmbr_sk_1a2b3c4d5e6f"),

@@ -95,6 +95,7 @@ public class ConnectorManifestLoader {
         var enrichedAuth = new ConnectorManifest.AuthDeclaration(
                 oldAuth.type(),
                 oldAuth.family(),
+                oldAuth.flows(),
                 family.family().oauth(),
                 family.family().fields());
         var enrichedDecl = new ConnectorManifest.ConnectorDeclaration(

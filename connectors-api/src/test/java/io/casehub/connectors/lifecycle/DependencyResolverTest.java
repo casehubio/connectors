@@ -169,7 +169,7 @@ class DependencyResolverTest {
     void family_oauth_connector_has_unmet_requirement_when_no_token() {
         var googleManifest = new ConnectorManifest(new ConnectorDeclaration(
                 "calendar-google", "calendar", "Google Calendar",
-                new ConnectorManifest.AuthDeclaration("oauth2", "google", null, List.of()),
+                new ConnectorManifest.AuthDeclaration("oauth2", "google", null, null, List.of()),
                 null, null, List.of(new CapabilityDeclaration("calendar")), null, null));
 
         var facade = new InMemoryCredentialFacade(Map.of());
@@ -194,7 +194,7 @@ class DependencyResolverTest {
     void family_oauth_connector_has_no_unmet_when_token_present() {
         var googleManifest = new ConnectorManifest(new ConnectorDeclaration(
                 "calendar-google", "calendar", "Google Calendar",
-                new ConnectorManifest.AuthDeclaration("oauth2", "google", null, List.of()),
+                new ConnectorManifest.AuthDeclaration("oauth2", "google", null, null, List.of()),
                 null, null, List.of(new CapabilityDeclaration("calendar")), null, null));
 
         var facade = new InMemoryCredentialFacade(Map.of(
@@ -210,11 +210,11 @@ class DependencyResolverTest {
     void family_oauth_lists_all_family_members_in_resolution() {
         var calendar = new ConnectorManifest(new ConnectorDeclaration(
                 "calendar-google", "calendar", "Google Calendar",
-                new ConnectorManifest.AuthDeclaration("oauth2", "google", null, List.of()),
+                new ConnectorManifest.AuthDeclaration("oauth2", "google", null, null, List.of()),
                 null, null, null, null, null));
         var email = new ConnectorManifest(new ConnectorDeclaration(
                 "email-google", "email", "Gmail",
-                new ConnectorManifest.AuthDeclaration("oauth2", "google", null, List.of()),
+                new ConnectorManifest.AuthDeclaration("oauth2", "google", null, null, List.of()),
                 null, null, null, null, null));
 
         var facade = new InMemoryCredentialFacade(Map.of());
@@ -233,7 +233,7 @@ class DependencyResolverTest {
     void no_facade_skips_family_oauth_check() {
         var googleManifest = new ConnectorManifest(new ConnectorDeclaration(
                 "calendar-google", "calendar", "Google Calendar",
-                new ConnectorManifest.AuthDeclaration("oauth2", "google", null, List.of()),
+                new ConnectorManifest.AuthDeclaration("oauth2", "google", null, null, List.of()),
                 null, null, null, null, null));
 
         var resolver = new DependencyResolver(List.of(googleManifest));

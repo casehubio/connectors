@@ -25,6 +25,7 @@ public record ConnectorManifest(ConnectorDeclaration connector) {
     public record AuthDeclaration(
             String type,
             String family,
+            List<String> flows,
             FamilyManifest.OAuthDeclaration oauth,
             List<FieldDeclaration> fields) {}
 
