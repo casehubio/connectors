@@ -111,25 +111,27 @@ public class EmailInboundConnector implements InboundConnector {
                 backoffSeconds = 1;
                 consecutiveFailures = 0;
 
-                // Register listener BEFORE first processUnseen — eliminates
-                // the race between processUnseen() returning 0 and idle()
-                // starting. The listener fires on the IDLE thread the instant
-                // the server pushes a new-message notification.
-                final IMAPFolder listenerFolder = folder;
+                // Process new messages directly from the IDLE notification
+                // event — no re-scan needed, no SEEN flag race.
                 folder.addMessageCountListener(new jakarta.mail.event.MessageCountAdapter() {
                     @Override
                     public void messagesAdded(jakarta.mail.event.MessageCountEvent e) {
-                        try {
-                            processUnseen(listenerFolder, account, sink);
-                        } catch (Exception ex) {
-                            LOG.log(Level.WARNING, "email-inbound: listener processUnseen failed", ex);
+                        for (Message msg : e.getMessages()) {
+                            try {
+                                final InboundMessage inbound = toInboundMessage(account, msg);
+                                sink.receive(inbound);
+                                msg.setFlag(Flags.Flag.SEEN, true);
+                            } catch (Exception ex) {
+                                LOG.log(Level.WARNING, "email-inbound: listener delivery failed for account "
+                                        + account.id(), ex);
+                            }
                         }
                     }
                 });
 
                 LOG.info("email-inbound: IDLE connected for account " + account.id());
 
-                // Initial sweep for messages that arrived before the listener.
+                // Sweep messages that arrived before the listener was registered.
                 processUnseen(folder, account, sink);
 
                 while (!stopping) {
