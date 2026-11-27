@@ -1,0 +1,9 @@
+connector:
+  id: calendar-google
+  platform: calendar
+  description: "Google Calendar — calendar and event management via Google API"
+  auth:
+    type: oauth2
+    family: google
+  provides:
+    - capability: calendar

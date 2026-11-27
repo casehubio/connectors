@@ -1,0 +1,10 @@
+connector:
+  id: contacts-google
+  platform: contacts
+  description: "Google Contacts — contact and group management via Google People API"
+  auth:
+    type: oauth2
+    family: google
+  provides:
+    - capability: contacts
+      sub: [read, groups, write]

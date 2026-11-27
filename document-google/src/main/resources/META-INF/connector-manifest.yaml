@@ -1,0 +1,10 @@
+connector:
+  id: document-google
+  platform: document
+  description: "Google Drive — file management, search, and sharing via Google API"
+  auth:
+    type: oauth2
+    family: google
+  provides:
+    - capability: document
+      sub: [files, folders, search, sharing]

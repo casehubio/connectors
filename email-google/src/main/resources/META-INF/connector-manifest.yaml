@@ -5,17 +5,6 @@ connector:
   auth:
     type: oauth2
     family: google
-    fields:
-      - name: client-id
-        description: "Google OAuth2 client ID"
-        help: "Google Cloud Console → APIs & Services → Credentials → OAuth 2.0 Client IDs"
-        example: "123456789-abcdef.apps.googleusercontent.com"
-      - name: client-secret
-        description: "Google OAuth2 client secret"
-        help: "Found alongside the client ID in the Google Cloud Console credentials page"
-      - name: refresh-token
-        description: "OAuth2 refresh token for offline access"
-        help: "Obtained during the OAuth2 consent flow — grants persistent access to Gmail"
   provides:
     - capability: email
       sub: [receive, search]
