@@ -245,6 +245,59 @@ class FamilyConnectionProviderTest {
         assertThat(testProvider.lastTokenRequestUrl()).isNull();
     }
 
+    @Test
+    void per_user_flow_delegates_to_UserTokenResolver() {
+        var facade   = mutableFacade(Map.of());
+        var resolver = new TestUserTokenResolver("truelayer", Map.of("user1", "user1-token"));
+        var family   = truelayerFamilyWithPerUserFlow();
+        var provider = new FamilyConnectionProvider(facade,
+                                                    Map.of("truelayer", family), Map.of("truelayer", resolver));
+
+        var token = provider.getAccessToken("user1", "truelayer", "default");
+        assertThat(token.accessToken()).isEqualTo("user1-token");
+    }
+
+    @Test
+    void per_user_flow_throws_when_no_user_token() {
+        var facade   = mutableFacade(Map.of());
+        var resolver = new TestUserTokenResolver("truelayer", Map.of());
+        var family   = truelayerFamilyWithPerUserFlow();
+        var provider = new FamilyConnectionProvider(facade,
+                                                    Map.of("truelayer", family), Map.of("truelayer", resolver));
+
+        assertThatThrownBy(() -> provider.getAccessToken("user1", "truelayer", "default"))
+                .isInstanceOf(ServiceConnectionException.class)
+                .hasMessageContaining("No user token");
+    }
+
+    @Test
+    void non_per_user_flow_ignores_actorId_uses_facade() {
+        var facade = mutableFacade(Map.of(
+                "google", Map.of(
+                        "access-token", "tenant-token",
+                        "expires-at", Instant.now().plusSeconds(3600).toString())));
+        var provider = new FamilyConnectionProvider(facade,
+                                                    Map.of("google", googleFamily()), Map.of());
+
+        var token = provider.getAccessToken("user1", "google", "default");
+        assertThat(token.accessToken()).isEqualTo("tenant-token");
+    }
+
+    @Test
+    void null_actorId_bypasses_per_user_even_if_flow_is_per_user() {
+        var facade = mutableFacade(Map.of(
+                "truelayer", Map.of(
+                        "access-token", "tenant-fallback",
+                        "expires-at", Instant.now().plusSeconds(3600).toString())));
+        var resolver = new TestUserTokenResolver("truelayer", Map.of("user1", "user1-token"));
+        var family   = truelayerFamilyWithPerUserFlow();
+        var provider = new FamilyConnectionProvider(facade,
+                                                    Map.of("truelayer", family), Map.of("truelayer", resolver));
+
+        var token = provider.getAccessToken(null, "truelayer", "default");
+        assertThat(token.accessToken()).isEqualTo("tenant-fallback");
+    }
+
 
     private static FamilyManifest googleFamily() {
         var oauth = new FamilyManifest.OAuthDeclaration(
@@ -287,6 +340,23 @@ class FamilyConnectionProviderTest {
                         "https://login.microsoftonline.com/botframework.com/oauth2/v2.0/token", null));
         return new FamilyManifest(new FamilyManifest.FamilyDeclaration(
                 "microsoft", "Microsoft 365", FamilyManifest.ConsentStrategy.AGGREGATED,
+                oauth, flows, List.of()));
+    }
+
+    private static FamilyManifest truelayerFamilyWithPerUserFlow() {
+        var oauth = new FamilyManifest.OAuthDeclaration(
+                "https://auth.truelayer.com/connect/auth",
+                "https://auth.truelayer.com/connect/token",
+                "http://localhost/callback", null, null, null);
+        var flows = new java.util.LinkedHashMap<String, FamilyManifest.FlowDeclaration>();
+        flows.put("delegated", new FamilyManifest.FlowDeclaration(
+                FamilyManifest.GrantType.AUTHORIZATION_CODE,
+                List.of("accounts", "balance"), null, true));
+        flows.put("app", new FamilyManifest.FlowDeclaration(
+                FamilyManifest.GrantType.CLIENT_CREDENTIALS,
+                List.of("https://api.truelayer.com/.default"), null, null));
+        return new FamilyManifest(new FamilyManifest.FamilyDeclaration(
+                "truelayer", "TrueLayer", FamilyManifest.ConsentStrategy.AGGREGATED,
                 oauth, flows, List.of()));
     }
 
@@ -351,5 +421,24 @@ class FamilyConnectionProviderTest {
             return tokenResponse;
         }
     }
+
+    static class TestUserTokenResolver implements io.casehub.connectors.lifecycle.UserTokenResolver {
+        private final String              provider;
+        private final Map<String, String> tokens;
+
+        TestUserTokenResolver(String provider, Map<String, String> tokens) {
+            this.provider = provider;
+            this.tokens   = tokens;
+        }
+
+        @Override
+        public String providerId() {return provider;}
+
+        @Override
+        public java.util.Optional<String> getAccessToken(String userId) {
+            return java.util.Optional.ofNullable(tokens.get(userId));
+        }
+    }
+
 
 }

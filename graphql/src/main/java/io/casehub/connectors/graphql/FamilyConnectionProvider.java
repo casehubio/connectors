@@ -38,6 +38,8 @@ public class FamilyConnectionProvider implements ServiceConnectionProvider {
     private final ProviderCredentialFacade facade;
     private final Map<String, FamilyManifest> families;
     private final Map<String, Object> refreshLocks = new java.util.concurrent.ConcurrentHashMap<>();
+    private final Map<String, io.casehub.connectors.lifecycle.UserTokenResolver> userTokenResolvers;
+
 
     record ResolvedFlow(FamilyManifest family, FamilyManifest.FlowDeclaration flow, String familyId) {}
 
@@ -76,20 +78,57 @@ public class FamilyConnectionProvider implements ServiceConnectionProvider {
 
 
     public FamilyConnectionProvider(ProviderCredentialFacade facade,
-                                     Map<String, FamilyManifest> families) {
-        this.facade = facade;
-        this.families = Map.copyOf(families);
+                                    Map<String, FamilyManifest> families,
+                                    Map<String, io.casehub.connectors.lifecycle.UserTokenResolver> userTokenResolvers) {
+        this.facade             = facade;
+        this.families           = Map.copyOf(families);
+        this.userTokenResolvers = userTokenResolvers != null ? Map.copyOf(userTokenResolvers) : Map.of();
     }
 
-    @Inject
-    public FamilyConnectionProvider(Instance<ProviderCredentialFacade> facadeInstance) {
-        this(facadeInstance.isResolvable() ? facadeInstance.get() : null,
-             FamilyManifestLoader.discover());
+    public FamilyConnectionProvider(ProviderCredentialFacade facade,
+                                    Map<String, FamilyManifest> families) {
+        this(facade, families, Map.of());
     }
+
+
+    @Inject
+    public FamilyConnectionProvider(Instance<ProviderCredentialFacade> facadeInstance,
+                                    Instance<io.casehub.connectors.lifecycle.UserTokenResolver> resolverInstances) {
+        this(facadeInstance.isResolvable() ? facadeInstance.get() : null,
+             FamilyManifestLoader.discover(),
+             buildResolverMap(resolverInstances));
+    }
+
+    private static Map<String, io.casehub.connectors.lifecycle.UserTokenResolver> buildResolverMap(
+            Instance<io.casehub.connectors.lifecycle.UserTokenResolver> instances) {
+        var map = new java.util.HashMap<String, io.casehub.connectors.lifecycle.UserTokenResolver>();
+        if (instances.isResolvable()) {
+            for (var r : instances) {
+                map.put(r.providerId(), r);
+            }
+        }
+        return map;
+    }
+
 
     @Override
     public ServiceAccessToken getAccessToken(String actorId, String provider, String tenancyId) {
         var resolved = resolveFamily(provider);
+
+        if (actorId != null && resolved.flow() != null && resolved.flow().isPerUser()) {
+            var resolver = userTokenResolvers.get(resolved.familyId());
+            if (resolver == null) {
+                resolver = userTokenResolvers.get(provider);
+            }
+            if (resolver != null) {
+                var token = resolver.getAccessToken(actorId)
+                                    .orElseThrow(() -> new ServiceConnectionException(
+                                            "No user token for " + provider + " user " + actorId,
+                                            provider, actorId, Set.of(), Set.of(), Set.of()));
+                return new ServiceAccessToken(token, null, Set.of());
+            }
+        }
+
         if (facade == null) {
             throw new ServiceConnectionException("No credential store available",
                                                  provider, actorId, Set.of(), Set.of(), Set.of());
