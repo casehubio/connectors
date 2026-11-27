@@ -1,0 +1,17 @@
+family:
+  id: test-family
+  description: "Test family for unit tests"
+  consent: aggregated
+  oauth:
+    auth-url: "https://auth.test.example.com/authorize"
+    token-url: "https://auth.test.example.com/token"
+    redirect-uri: "{callback-base-url}/oauth/callback/test-family"
+    scopes:
+      - "test-scope-a"
+      - "test-scope-b"
+  fields:
+    - name: client-id
+      sensitive: false
+      description: "Test client ID"
+    - name: client-secret
+      description: "Test client secret"

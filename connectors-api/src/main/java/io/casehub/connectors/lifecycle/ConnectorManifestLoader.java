@@ -11,6 +11,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 public class ConnectorManifestLoader {
@@ -34,7 +35,8 @@ public class ConnectorManifestLoader {
         } catch (IOException e) {
             throw new UncheckedIOException("Failed to discover connector manifests from classpath", e);
         }
-        return List.copyOf(result);
+        var families = FamilyManifestLoader.discover();
+        return List.copyOf(resolveFamilies(result, families));
     }
 
     public static List<ConnectorManifest> discover() {
@@ -72,4 +74,34 @@ public class ConnectorManifestLoader {
         }
         return List.copyOf(byId.values());
     }
+
+    static List<ConnectorManifest> resolveFamilies(
+            List<ConnectorManifest> connectors, Map<String, FamilyManifest> families) {
+        return connectors.stream().map(m -> {
+            var auth = m.connector().auth();
+            if (auth == null || auth.family() == null) {return m;}
+            var family = families.get(auth.family());
+            if (family == null) {
+                LOG.warning("Family '" + auth.family() + "' not found for connector " + m.connector().id());
+                return m;
+            }
+            return enrichWithFamily(m, family);
+        }).toList();
+    }
+
+    private static ConnectorManifest enrichWithFamily(ConnectorManifest manifest, FamilyManifest family) {
+        var oldDecl = manifest.connector();
+        var oldAuth = oldDecl.auth();
+        var enrichedAuth = new ConnectorManifest.AuthDeclaration(
+                oldAuth.type(),
+                oldAuth.family(),
+                family.family().oauth(),
+                family.family().fields());
+        var enrichedDecl = new ConnectorManifest.ConnectorDeclaration(
+                oldDecl.id(), oldDecl.platform(), oldDecl.description(),
+                enrichedAuth, oldDecl.produces(), oldDecl.requires(), oldDecl.provides(),
+                oldDecl.setupPlaybook(), oldDecl.health());
+        return new ConnectorManifest(enrichedDecl);
+    }
+
 }
