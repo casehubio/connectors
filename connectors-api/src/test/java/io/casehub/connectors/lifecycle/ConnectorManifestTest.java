@@ -113,14 +113,14 @@ class ConnectorManifestTest {
 
     @Test
     void constructor_arg_rejects_both_field_and_bean() {
-        assertThatThrownBy(() -> new ConnectorManifest.ConstructorArg("api-key", "com.example.Bean"))
+        assertThatThrownBy(() -> new ConnectorManifest.ConstructorArg("api-key", "com.example.Bean", null))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("exactly one");
     }
 
     @Test
     void constructor_arg_rejects_neither_field_nor_bean() {
-        assertThatThrownBy(() -> new ConnectorManifest.ConstructorArg(null, null))
+        assertThatThrownBy(() -> new ConnectorManifest.ConstructorArg(null, null, null))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("exactly one");
     }

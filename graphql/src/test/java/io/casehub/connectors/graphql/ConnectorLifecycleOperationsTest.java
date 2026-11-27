@@ -33,12 +33,12 @@ class ConnectorLifecycleOperationsTest {
         return new ConnectorManifest(new ConnectorDeclaration(
                 "numbrrs", "mobile",
                 "Numbrrs — UK mobile SIM numbers",
-                new AuthDeclaration("api-key", null, List.of(
+                new AuthDeclaration("api-key", null, null, List.of(
                         new FieldDeclaration("api-key", true, "API key", true, null, null, null),
                         new FieldDeclaration("signing-secret", false, "Signing secret", true, null, null, null),
                         new FieldDeclaration("numbers", false, "Phone numbers", false, null, null, null))),
                 List.of(new BeanDeclaration("io.casehub.connectors.mobile.numbrrs.NumbrrsMobilePlatform",
-                        null, "platform", null)),
+                        null, "platform", null, null)),
                 List.of(), List.of(), null, null));
     }
 
@@ -46,13 +46,13 @@ class ConnectorLifecycleOperationsTest {
         return new ConnectorManifest(new ConnectorDeclaration(
                 "telegram", "chat",
                 "Telegram Bot API",
-                new AuthDeclaration("bot-token", null, List.of(
+                new AuthDeclaration("bot-token", null, null, List.of(
                         new FieldDeclaration("bot-token", true, "Bot token", true, null, null, null),
                         new FieldDeclaration("api-url", false, "API base URL", false,
                                 "https://api.telegram.org", null, null),
                         new FieldDeclaration("webhook-secret", false, "Webhook secret", true, null, null, null))),
                 List.of(new BeanDeclaration("io.casehub.connectors.chat.telegram.TelegramChatPlatform",
-                        null, "platform", null)),
+                        null, "platform", null, null)),
                 List.of(), List.of(),
                 "playbooks/telegram-webhook-setup.yaml",
                 new HealthDeclaration("{api-url}/bot{bot-token}/getMe", "30s")));
@@ -62,11 +62,11 @@ class ConnectorLifecycleOperationsTest {
         return new ConnectorManifest(new ConnectorDeclaration(
                 "signal", "chat",
                 "Signal via signal-cli-rest-api",
-                new AuthDeclaration("phone-verify", null, List.of(
+                new AuthDeclaration("phone-verify", null, null, List.of(
                         new FieldDeclaration("api-url", true, "signal-cli API URL", false, null, null, null),
                         new FieldDeclaration("number", true, "Phone number", false, null, null, null))),
                 List.of(new BeanDeclaration("io.casehub.connectors.chat.signal.SignalChatPlatform",
-                        null, "platform", null)),
+                        null, "platform", null, null)),
                 List.of(), List.of(),
                 "playbooks/signal-registration.yaml", null));
     }

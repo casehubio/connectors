@@ -18,7 +18,7 @@ class ConnectorStatusPluginTest {
     private static ConnectorManifest manifest(String id) {
         return new ConnectorManifest(new ConnectorDeclaration(
                 id, "test", "Test " + id,
-                new AuthDeclaration("api-key", null, List.of()), List.of(), null, null, null, null));
+                new AuthDeclaration("api-key", null, null, List.of()), List.of(), null, null, null, null));
     }
 
     @Test

@@ -14,11 +14,18 @@ public record ConnectorManifest(ConnectorDeclaration connector) {
             List<RequirementDeclaration> requires,
             List<CapabilityDeclaration> provides,
             @JsonProperty("setup-playbook") String setupPlaybook,
-            HealthDeclaration health) {}
+            HealthDeclaration health) {
+
+        public String credentialKey() {
+            return auth() != null && auth().family() != null
+                    ? auth().family() : id();
+        }
+    }
 
     public record AuthDeclaration(
             String type,
             String family,
+            FamilyManifest.OAuthDeclaration oauth,
             List<FieldDeclaration> fields) {}
 
     public record FieldDeclaration(
@@ -49,15 +56,19 @@ public record ConnectorManifest(ConnectorDeclaration connector) {
             @JsonProperty("class") String className,
             String scope,
             String type,
+            String qualifier,
             @JsonProperty("constructor-args") List<ConstructorArg> constructorArgs) {}
 
     public record ConstructorArg(
             String field,
-            String bean) {
+            String bean,
+            String value) {
 
         public ConstructorArg {
-            if ((field == null) == (bean == null))
-                throw new IllegalArgumentException("exactly one of field or bean required");
+            long set = java.util.stream.Stream.of(field, bean, value)
+                    .filter(java.util.Objects::nonNull).count();
+            if (set != 1)
+                throw new IllegalArgumentException("exactly one of field, bean, or value required");
         }
     }
 
