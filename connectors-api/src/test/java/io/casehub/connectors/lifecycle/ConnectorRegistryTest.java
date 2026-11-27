@@ -102,6 +102,78 @@ class ConnectorRegistryTest {
         assertThat(registry.configured().getFirst().manifest().connector().id()).isEqualTo("signal");
     }
 
+    @Test
+    void updateStatus_transitions_unconfigured_to_ready() {
+        var facade = new InMemoryCredentialFacade(java.util.Map.of(
+                "numbrrs", java.util.Map.of("api-key", "key-123")));
+        var registry = new ConnectorRegistry(facade);
+
+        var manifest = manifWithFields("numbrrs", null, java.util.List.of(
+                new ConnectorManifest.FieldDeclaration("api-key", "API key")));
+        registry.register(manifest, ConnectorStatus.UNCONFIGURED);
+
+        registry.updateStatus("numbrrs");
+        assertThat(registry.status("numbrrs")).isEqualTo(ConnectorStatus.READY);
+    }
+
+    @Test
+    void updateStatus_transitions_ready_to_unconfigured() {
+        var facade   = new InMemoryCredentialFacade(java.util.Map.of());
+        var registry = new ConnectorRegistry(facade);
+
+        var manifest = manifWithFields("test-conn", null, java.util.List.of(
+                new ConnectorManifest.FieldDeclaration("api-key", "API key")));
+        registry.register(manifest, ConnectorStatus.READY);
+
+        registry.updateStatus("test-conn");
+        assertThat(registry.status("test-conn")).isEqualTo(ConnectorStatus.UNCONFIGURED);
+    }
+
+    @Test
+    void updateStatus_uses_credentialKey_for_family_members() {
+        var facade = new InMemoryCredentialFacade(java.util.Map.of(
+                "google", java.util.Map.of("client-id", "id", "client-secret", "secret")));
+        var registry = new ConnectorRegistry(facade);
+
+        var manifest = manifWithFields("calendar-google", "google", java.util.List.of(
+                new ConnectorManifest.FieldDeclaration("client-id", true, "ID", false, null, null, null),
+                new ConnectorManifest.FieldDeclaration("client-secret", "Secret")));
+        registry.register(manifest, ConnectorStatus.UNCONFIGURED);
+
+        registry.updateStatus("calendar-google");
+        assertThat(registry.status("calendar-google")).isEqualTo(ConnectorStatus.READY);
+    }
+
+    @Test
+    void updateStatusByCredentialKey_updates_all_family_members() {
+        var facade = new InMemoryCredentialFacade(java.util.Map.of(
+                "google", java.util.Map.of("client-id", "id", "client-secret", "secret")));
+        var registry = new ConnectorRegistry(facade);
+
+        var calManifest = manifWithFields("calendar-google", "google", java.util.List.of(
+                new ConnectorManifest.FieldDeclaration("client-id", true, "ID", false, null, null, null),
+                new ConnectorManifest.FieldDeclaration("client-secret", "Secret")));
+        var driveManifest = manifWithFields("document-google", "google", java.util.List.of(
+                new ConnectorManifest.FieldDeclaration("client-id", true, "ID", false, null, null, null),
+                new ConnectorManifest.FieldDeclaration("client-secret", "Secret")));
+
+        registry.register(calManifest, ConnectorStatus.UNCONFIGURED);
+        registry.register(driveManifest, ConnectorStatus.UNCONFIGURED);
+
+        registry.updateStatusByCredentialKey("google");
+        assertThat(registry.status("calendar-google")).isEqualTo(ConnectorStatus.READY);
+        assertThat(registry.status("document-google")).isEqualTo(ConnectorStatus.READY);
+    }
+
+    private ConnectorManifest manifWithFields(String id, String family,
+                                              java.util.List<ConnectorManifest.FieldDeclaration> fields) {
+        var auth = new ConnectorManifest.AuthDeclaration("oauth2", family, null, fields);
+        var decl = new ConnectorManifest.ConnectorDeclaration(
+                id, "test", "desc", auth, null, null, null, null, null);
+        return new ConnectorManifest(decl);
+    }
+
+
     private ConnectorManifest parse(String yaml) {
         try {
             return MAPPER.readValue(yaml, ConnectorManifest.class);

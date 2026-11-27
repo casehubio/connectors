@@ -14,14 +14,14 @@ public class RegistryBeanCreator implements BeanCreator<ConnectorRegistry> {
 
     @Override
     public ConnectorRegistry create(SyntheticCreationalContext<ConnectorRegistry> context) {
-        var registry = new ConnectorRegistry();
-        var manifests = ConnectorManifestLoader.discoverFromClasspath();
         var facade = context.getInjectedReference(ProviderCredentialFacade.class);
+        var registry = new ConnectorRegistry(facade);
+        var manifests = ConnectorManifestLoader.discoverFromClasspath();
 
         for (var manifest : manifests) {
             var decl = manifest.connector();
             var requiredFields = requiredFieldNames(decl);
-            var status = facade.isConfigured(decl.id(), requiredFields)
+            var status = facade.isConfigured(decl.credentialKey(), requiredFields)
                     ? ConnectorStatus.READY
                     : ConnectorStatus.UNCONFIGURED;
             registry.register(manifest, status);
