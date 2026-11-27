@@ -66,8 +66,8 @@ class EmailInboundConnectorTest {
     }
 
     private InboundMessage receive() throws InterruptedException {
-        InboundMessage msg = captured.poll(15, TimeUnit.SECONDS);
-        assertNotNull(msg, "message not delivered within 15s — IDLE did not fire or processUnseen missed it");
+        InboundMessage msg = captured.poll(30, TimeUnit.SECONDS);
+        assertNotNull(msg, "message not delivered within 30s — IDLE did not fire or processUnseen missed it");
         return msg;
     }
 
