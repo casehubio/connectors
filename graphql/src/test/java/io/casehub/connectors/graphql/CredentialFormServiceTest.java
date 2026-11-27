@@ -246,6 +246,23 @@ class CredentialFormServiceTest {
         assertThat(credentialStore.stored.getFirst().type()).isEqualTo(CredentialType.BOT_TOKEN);
     }
 
+    // --- registry status update ---
+
+    @Test
+    void submitCredentials_updates_registry_status() {
+        var facade = new OAuthConsentServiceTest.StoreBackedFacade(credentialStore, Map.of());
+        var registry = new io.casehub.connectors.lifecycle.ConnectorRegistry(facade);
+        var svc = new CredentialFormService(credentialStore, facade, registry);
+
+        registry.register(numbrrsManifest(), io.casehub.connectors.lifecycle.ConnectorStatus.UNCONFIGURED);
+
+        var token = svc.createSession("numbrrs", numbrrsManifest());
+        svc.submitCredentials(token, Map.of("api-key", "real-key"));
+
+        assertThat(registry.status("numbrrs"))
+                .isEqualTo(io.casehub.connectors.lifecycle.ConnectorStatus.READY);
+    }
+
     // --- helpers ---
 
     private static ConnectorManifest numbrrsManifest() {

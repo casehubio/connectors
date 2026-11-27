@@ -2,11 +2,14 @@ package io.casehub.connectors.graphql;
 
 import io.casehub.connectors.lifecycle.ConnectorManifest;
 import io.casehub.connectors.lifecycle.ConnectorManifest.FieldDeclaration;
+import io.casehub.connectors.lifecycle.ConnectorRegistry;
+import io.casehub.connectors.lifecycle.ProviderCredentialFacade;
 import io.casehub.platform.api.authn.CredentialType;
 import io.casehub.platform.api.authn.StaticCredentialRecord;
 import io.casehub.platform.api.authn.StaticCredentialStore;
 
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.inject.Instance;
 import jakarta.inject.Inject;
 import java.time.Instant;
 import java.util.List;
@@ -19,13 +22,35 @@ import java.util.concurrent.ConcurrentHashMap;
 public class CredentialFormService {
 
     private final StaticCredentialStore credentialStore;
+    private final ProviderCredentialFacade credentialFacade;
+    private final ConnectorRegistry registry;
     private final Map<String, FormSession> sessions = new ConcurrentHashMap<>();
 
     record FormSession(String connectorId, ConnectorManifest manifest, boolean consumed) {}
 
     @Inject
-    public CredentialFormService(StaticCredentialStore credentialStore) {
+    public CredentialFormService(StaticCredentialStore credentialStore,
+                                 Instance<ProviderCredentialFacade> credentialFacadeInstance,
+                                 Instance<ConnectorRegistry> registryInstance) {
         this.credentialStore = credentialStore;
+        this.credentialFacade = credentialFacadeInstance.isResolvable()
+                ? credentialFacadeInstance.get() : null;
+        this.registry = registryInstance.isResolvable()
+                ? registryInstance.get() : null;
+    }
+
+    CredentialFormService(StaticCredentialStore credentialStore) {
+        this.credentialStore = credentialStore;
+        this.credentialFacade = null;
+        this.registry = null;
+    }
+
+    CredentialFormService(StaticCredentialStore credentialStore,
+                          ProviderCredentialFacade credentialFacade,
+                          ConnectorRegistry registry) {
+        this.credentialStore = credentialStore;
+        this.credentialFacade = credentialFacade;
+        this.registry = registry;
     }
 
     public String createSession(String connectorId, ConnectorManifest manifest) {
@@ -95,6 +120,7 @@ public class CredentialFormService {
         sessions.put(token, new FormSession(session.connectorId(), session.manifest(), true));
 
         var decl = session.manifest().connector();
+        var credentialKey = decl.credentialKey();
         var authType = decl.auth() != null ? decl.auth().type() : "api-key";
         var credentialType = mapCredentialType(authType);
         var now = Instant.now();
@@ -102,8 +128,15 @@ public class CredentialFormService {
         for (var entry : values.entrySet()) {
             if (entry.getValue() == null || entry.getValue().isBlank()) continue;
             credentialStore.store(new StaticCredentialRecord(
-                    "system", "default", session.connectorId() + "." + entry.getKey(),
+                    "system", "default", credentialKey + "." + entry.getKey(),
                     entry.getValue(), credentialType, now, now));
+            if (credentialFacade != null) {
+                credentialFacade.store(credentialKey, entry.getKey(), entry.getValue());
+            }
+        }
+
+        if (registry != null) {
+            registry.updateStatusByCredentialKey(credentialKey);
         }
         return true;
     }
