@@ -30,29 +30,40 @@ public class ConnectorLifecycleOperations {
     private final ConnectorRegistry registry;
     private final ProviderCredentialFacade credentialFacade;
     private final CredentialFormService formService;
+    private final OAuthConsentService oauthConsentService;
 
     @Inject
     public ConnectorLifecycleOperations(Instance<ConnectorRegistry> registryInstance,
                                         Instance<ProviderCredentialFacade> credentialFacadeInstance,
-                                        Instance<CredentialFormService> formServiceInstance) {
+                                        Instance<CredentialFormService> formServiceInstance,
+                                        Instance<OAuthConsentService> oauthConsentServiceInstance) {
         this(registryInstance.isResolvable() ? registryInstance.get() : new ConnectorRegistry(),
              credentialFacadeInstance.isResolvable()
                      ? credentialFacadeInstance.get()
                      : new InMemoryCredentialFacade(Map.of()),
-             formServiceInstance.isResolvable() ? formServiceInstance.get() : null);
+             formServiceInstance.isResolvable() ? formServiceInstance.get() : null,
+             oauthConsentServiceInstance.isResolvable() ? oauthConsentServiceInstance.get() : null);
     }
 
     ConnectorLifecycleOperations(ConnectorRegistry registry,
                                  ProviderCredentialFacade credentialFacade) {
-        this(registry, credentialFacade, null);
+        this(registry, credentialFacade, null, null);
     }
 
     ConnectorLifecycleOperations(ConnectorRegistry registry,
                                  ProviderCredentialFacade credentialFacade,
                                  CredentialFormService formService) {
+        this(registry, credentialFacade, formService, null);
+    }
+
+    ConnectorLifecycleOperations(ConnectorRegistry registry,
+                                 ProviderCredentialFacade credentialFacade,
+                                 CredentialFormService formService,
+                                 OAuthConsentService oauthConsentService) {
         this.registry = registry;
         this.credentialFacade = credentialFacade;
         this.formService = formService;
+        this.oauthConsentService = oauthConsentService;
     }
 
     @PlatformQuery("List all manifest-discovered connectors with auth requirements and configuration status")
@@ -113,14 +124,25 @@ public class ConnectorLifecycleOperations {
 
     @PlatformMutation("Open a browser form for secure credential entry — values never enter LLM context")
     public CredentialInputResult credentialInput(String connectorId) {
-        if (formService == null) {
-            return new CredentialInputResult(connectorId,
-                                             "Credential form service not available", null);
-        }
         var manifest = registry.manifest(connectorId)
                                .orElseThrow(() -> new IllegalArgumentException(
                                        "Unknown connector '" + connectorId + "'. Available: "
                                        + registry.all().stream().map(r -> r.manifest().connector().id()).toList()));
+
+        var auth = manifest.connector().auth();
+        if (auth != null && auth.oauth() != null && oauthConsentService != null) {
+            var credentialKey = manifest.connector().credentialKey();
+            var request = oauthConsentService.buildAuthorizationUrl(credentialKey);
+            return new CredentialInputResult(connectorId,
+                    "Open the OAuth authorization URL to grant access. "
+                    + "Tokens are stored directly — they never appear in this conversation.",
+                    request.url());
+        }
+
+        if (formService == null) {
+            return new CredentialInputResult(connectorId,
+                                             "Credential form service not available", null);
+        }
 
         var token   = formService.createSession(connectorId, manifest);
         var formUrl = "/api/connectors/lifecycle/credential-form?token=" + token;

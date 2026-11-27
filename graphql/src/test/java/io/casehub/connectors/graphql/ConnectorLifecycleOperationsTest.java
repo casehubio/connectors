@@ -71,6 +71,22 @@ class ConnectorLifecycleOperationsTest {
                 "playbooks/signal-registration.yaml", null));
     }
 
+    private static ConnectorManifest googleCalendarManifest() {
+        var oauth = new io.casehub.connectors.lifecycle.FamilyManifest.OAuthDeclaration(
+                "https://accounts.google.com/o/oauth2/v2/auth",
+                "https://oauth2.googleapis.com/token",
+                "{callback-base-url}/oauth/callback/google",
+                List.of("https://www.googleapis.com/auth/calendar.readonly"),
+                "offline", "consent");
+        return new ConnectorManifest(new ConnectorDeclaration(
+                "calendar-google", "calendar",
+                "Google Calendar",
+                new AuthDeclaration("oauth2", "google", oauth,
+                                    List.of(new FieldDeclaration("access-token", "OAuth access token"))),
+                List.of(), List.of(), List.of(), null, null));
+    }
+
+
     @BeforeEach
     void setUp() {
         registry = new ConnectorRegistry();
@@ -295,5 +311,42 @@ class ConnectorLifecycleOperationsTest {
         assertThat(result.connectorId()).isEqualTo("numbrrs");
         assertThat(result.formUrl()).isNull();
         assertThat(result.message()).contains("not available");
+    }
+
+// --- credential_input OAuth branching ---
+
+    @Test
+    void credentialInput_returns_oauth_url_for_oauth2_connector() {
+        registry.register(googleCalendarManifest(), ConnectorStatus.UNCONFIGURED);
+
+        var oauthFacade = new InMemoryCredentialFacade(Map.of(
+                "google", Map.of("client-id", "test-client-id", "client-secret", "test-secret")));
+        var oauthConfigs = new io.casehub.connectors.lifecycle.OAuthConfigRegistry(Map.of(
+                "google", googleCalendarManifest().connector().auth().oauth()));
+        var consentService = new OAuthConsentServiceTest.TestableOAuthConsentService(
+                oauthConfigs, oauthFacade, new CredentialFormServiceTest.RecordingCredentialStore(),
+                registry, "http://localhost:8080");
+        var store = new CredentialFormServiceTest.RecordingCredentialStore();
+        var formService = new CredentialFormService(store);
+        var ops = new ConnectorLifecycleOperations(registry, oauthFacade, formService, consentService);
+
+        var result = ops.credentialInput("calendar-google");
+
+        assertThat(result.connectorId()).isEqualTo("calendar-google");
+        assertThat(result.formUrl()).contains("accounts.google.com");
+        assertThat(result.formUrl()).contains("client_id=test-client-id");
+        assertThat(result.message()).contains("OAuth");
+    }
+
+    @Test
+    void credentialInput_returns_form_url_for_non_oauth_connector() {
+        var store = new CredentialFormServiceTest.RecordingCredentialStore();
+        var formService = new CredentialFormService(store);
+        var ops = new ConnectorLifecycleOperations(registry, credentialFacade, formService, null);
+
+        var result = ops.credentialInput("numbrrs");
+
+        assertThat(result.connectorId()).isEqualTo("numbrrs");
+        assertThat(result.formUrl()).startsWith("/api/connectors/lifecycle/credential-form?token=");
     }
 }
