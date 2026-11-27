@@ -39,6 +39,42 @@ public class FamilyConnectionProvider implements ServiceConnectionProvider {
     private final Map<String, FamilyManifest> families;
     private final Map<String, Object> refreshLocks = new java.util.concurrent.ConcurrentHashMap<>();
 
+    record ResolvedFlow(FamilyManifest family, FamilyManifest.FlowDeclaration flow, String familyId) {}
+
+    ResolvedFlow resolveFamily(String provider) {
+        var family = families.get(provider);
+        if (family != null) {
+            if (family.family().flows() != null && !family.family().flows().isEmpty()) {
+                var primaryFlow = family.family().flows().values().iterator().next();
+                return new ResolvedFlow(family, primaryFlow, provider);
+            }
+            return new ResolvedFlow(family, null, provider);
+        }
+
+        String         bestFamilyId = null;
+        FamilyManifest bestFamily   = null;
+        for (var entry : families.entrySet()) {
+            var fid = entry.getKey();
+            if (provider.startsWith(fid + "-") &&
+                (bestFamilyId == null || fid.length() > bestFamilyId.length())) {
+                bestFamilyId = fid;
+                bestFamily   = entry.getValue();
+            }
+        }
+
+        if (bestFamily != null && bestFamily.family().flows() != null) {
+            var suffix = provider.substring(bestFamilyId.length() + 1);
+            var flow   = bestFamily.family().flows().get(suffix);
+            if (flow != null) {
+                return new ResolvedFlow(bestFamily, flow, bestFamilyId);
+            }
+        }
+
+        throw new ServiceConnectionException("No family for provider: " + provider,
+                                             provider, null, Set.of(), Set.of(), Set.of());
+    }
+
+
     public FamilyConnectionProvider(ProviderCredentialFacade facade,
                                      Map<String, FamilyManifest> families) {
         this.facade = facade;
@@ -53,22 +89,19 @@ public class FamilyConnectionProvider implements ServiceConnectionProvider {
 
     @Override
     public ServiceAccessToken getAccessToken(String actorId, String provider, String tenancyId) {
-        if (!families.containsKey(provider)) {
-            throw new ServiceConnectionException("No family for provider: " + provider,
-                    provider, actorId, Set.of(), Set.of(), Set.of());
-        }
+        var resolved = resolveFamily(provider);
         if (facade == null) {
             throw new ServiceConnectionException("No credential store available",
-                    provider, actorId, Set.of(), Set.of(), Set.of());
+                                                 provider, actorId, Set.of(), Set.of(), Set.of());
         }
         var accessToken = facade.resolve(provider, "access-token")
-                .orElseThrow(() -> new ServiceConnectionException(
-                        "No access token for provider: " + provider,
-                        provider, actorId, Set.of(), Set.of(), Set.of()));
+                                .orElseThrow(() -> new ServiceConnectionException(
+                                        "No access token for provider: " + provider,
+                                        provider, actorId, Set.of(), Set.of(), Set.of()));
 
         var expiresAt = facade.resolve(provider, "expires-at")
-                .map(Instant::parse)
-                .orElse(null);
+                              .map(Instant::parse)
+                              .orElse(null);
 
         if (expiresAt != null && expiresAt.isBefore(Instant.now())) {
             return refreshAndReturn(provider, actorId);
@@ -80,13 +113,19 @@ public class FamilyConnectionProvider implements ServiceConnectionProvider {
 
     @Override
     public ServiceConnection getConnection(String actorId, String provider, String tenancyId) {
-        if (!families.containsKey(provider) || facade == null) {
+        try {
+            resolveFamily(provider);
+        } catch (ServiceConnectionException e) {
             return new ServiceConnection(actorId, provider, tenancyId,
-                    ServiceConnectionStatus.DISCONNECTED, Set.of(), Set.of(), null);
+                                         ServiceConnectionStatus.DISCONNECTED, Set.of(), Set.of(), null);
+        }
+        if (facade == null) {
+            return new ServiceConnection(actorId, provider, tenancyId,
+                                         ServiceConnectionStatus.DISCONNECTED, Set.of(), Set.of(), null);
         }
         var hasToken = facade.resolve(provider, "access-token").isPresent();
-        var scopes = parseScopes(facade.resolve(provider, "granted-scopes").orElse(""));
-        var status = hasToken ? ServiceConnectionStatus.CONNECTED : ServiceConnectionStatus.DISCONNECTED;
+        var scopes   = parseScopes(facade.resolve(provider, "granted-scopes").orElse(""));
+        var status   = hasToken ? ServiceConnectionStatus.CONNECTED : ServiceConnectionStatus.DISCONNECTED;
         return new ServiceConnection(actorId, provider, tenancyId, status, scopes, Set.of(), null);
     }
 

@@ -16,7 +16,7 @@ family:
         - "Files.ReadWrite.All"
         - "Sites.ReadWrite.All"
         - "User.Read"
-    application:
+    app:
       grant: client_credentials
       scopes:
         - "https://graph.microsoft.com/.default"

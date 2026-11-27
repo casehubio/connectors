@@ -41,13 +41,13 @@ class RealFamilyManifestTest {
         var microsoft = families.get("microsoft");
         assertThat(microsoft).isNotNull();
         assertThat(microsoft.family().flows()).hasSize(3);
-        assertThat(microsoft.family().flows()).containsKeys("delegated", "application", "bot");
+        assertThat(microsoft.family().flows()).containsKeys("delegated", "app", "bot");
 
         var delegated = microsoft.family().flows().get("delegated");
         assertThat(delegated.grant()).isEqualTo(FamilyManifest.GrantType.AUTHORIZATION_CODE);
         assertThat(delegated.scopes()).contains("Calendars.ReadWrite", "Mail.Read", "Mail.Send");
 
-        var app = microsoft.family().flows().get("application");
+        var app = microsoft.family().flows().get("app");
         assertThat(app.grant()).isEqualTo(FamilyManifest.GrantType.CLIENT_CREDENTIALS);
         assertThat(app.scopes()).containsExactly("https://graph.microsoft.com/.default");
 

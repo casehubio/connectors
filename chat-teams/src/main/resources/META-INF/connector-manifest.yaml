@@ -7,7 +7,7 @@ connector:
     family: microsoft
     flows:
       - delegated
-      - application
+      - app
       - bot
   provides:
     - capability: chat

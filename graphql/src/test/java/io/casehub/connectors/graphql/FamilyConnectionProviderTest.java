@@ -133,6 +133,56 @@ class FamilyConnectionProviderTest {
         assertThat(connections).hasSize(2);
     }
 
+    @Test
+    void resolves_microsoft_to_delegated_flow() {
+        var facade = mutableFacade(Map.of(
+                "microsoft", Map.of(
+                        "access-token", "delegated-token",
+                        "expires-at", Instant.now().plusSeconds(3600).toString())));
+        var provider = new FamilyConnectionProvider(facade,
+                                                    Map.of("microsoft", microsoftFamilyWithFlows()));
+
+        var token = provider.getAccessToken(null, "microsoft", "default");
+        assertThat(token.accessToken()).isEqualTo("delegated-token");
+    }
+
+    @Test
+    void resolves_microsoft_app_to_application_flow() {
+        var facade = mutableFacade(Map.of(
+                "microsoft-app", Map.of(
+                        "access-token", "app-token",
+                        "expires-at", Instant.now().plusSeconds(3600).toString())));
+        var provider = new FamilyConnectionProvider(facade,
+                                                    Map.of("microsoft", microsoftFamilyWithFlows()));
+
+        var token = provider.getAccessToken("__application__", "microsoft-app", "default");
+        assertThat(token.accessToken()).isEqualTo("app-token");
+    }
+
+    @Test
+    void resolves_microsoft_bot_to_bot_flow() {
+        var facade = mutableFacade(Map.of(
+                "microsoft-bot", Map.of(
+                        "access-token", "bot-token",
+                        "expires-at", Instant.now().plusSeconds(3600).toString())));
+        var provider = new FamilyConnectionProvider(facade,
+                                                    Map.of("microsoft", microsoftFamilyWithFlows()));
+
+        var token = provider.getAccessToken("__application__", "microsoft-bot", "default");
+        assertThat(token.accessToken()).isEqualTo("bot-token");
+    }
+
+    @Test
+    void unknown_suffixed_provider_throws() {
+        var provider = new FamilyConnectionProvider(
+                mutableFacade(Map.of()), Map.of("microsoft", microsoftFamilyWithFlows()));
+
+        assertThatThrownBy(() -> provider.getAccessToken(null, "microsoft-unknown", "default"))
+                .isInstanceOf(ServiceConnectionException.class)
+                .hasMessageContaining("No family");
+    }
+
+
     private static FamilyManifest googleFamily() {
         var oauth = new FamilyManifest.OAuthDeclaration(
                 "https://accounts.google.com/o/oauth2/v2/auth",
@@ -154,6 +204,29 @@ class FamilyConnectionProviderTest {
         return new FamilyManifest(new FamilyManifest.FamilyDeclaration(
                 "microsoft", "Microsoft 365", FamilyManifest.ConsentStrategy.AGGREGATED, oauth, null, List.of()));
     }
+
+    private static FamilyManifest microsoftFamilyWithFlows() {
+        var oauth = new FamilyManifest.OAuthDeclaration(
+                "https://login.microsoftonline.com/test-tenant/oauth2/v2/authorize",
+                "https://login.microsoftonline.com/test-tenant/oauth2/v2/token",
+                "{callback-base-url}/oauth/callback/microsoft",
+                null, null, null);
+        var flows = Map.of(
+                "delegated", new FamilyManifest.FlowDeclaration(
+                        FamilyManifest.GrantType.AUTHORIZATION_CODE,
+                        List.of("Calendars.ReadWrite"), null),
+                "app", new FamilyManifest.FlowDeclaration(
+                        FamilyManifest.GrantType.CLIENT_CREDENTIALS,
+                        List.of("https://graph.microsoft.com/.default"), null),
+                "bot", new FamilyManifest.FlowDeclaration(
+                        FamilyManifest.GrantType.CLIENT_CREDENTIALS,
+                        List.of("https://api.botframework.com/.default"),
+                        "https://login.microsoftonline.com/botframework.com/oauth2/v2.0/token"));
+        return new FamilyManifest(new FamilyManifest.FamilyDeclaration(
+                "microsoft", "Microsoft 365", FamilyManifest.ConsentStrategy.AGGREGATED,
+                oauth, flows, List.of()));
+    }
+
 
     private static MutableFacade mutableFacade(Map<String, Map<String, String>> initial) {
         return new MutableFacade(initial);
