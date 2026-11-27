@@ -141,7 +141,7 @@ class FamilyConnectionProviderTest {
                 List.of("https://www.googleapis.com/auth/calendar.readonly"),
                 "offline", "consent");
         return new FamilyManifest(new FamilyManifest.FamilyDeclaration(
-                "google", "Google Workspace", FamilyManifest.ConsentStrategy.INCREMENTAL, oauth, List.of()));
+                "google", "Google Workspace", FamilyManifest.ConsentStrategy.INCREMENTAL, oauth, null, List.of()));
     }
 
     private static FamilyManifest microsoftFamily() {
@@ -152,7 +152,7 @@ class FamilyConnectionProviderTest {
                 List.of("Calendars.ReadWrite"),
                 null, null);
         return new FamilyManifest(new FamilyManifest.FamilyDeclaration(
-                "microsoft", "Microsoft 365", FamilyManifest.ConsentStrategy.AGGREGATED, oauth, List.of()));
+                "microsoft", "Microsoft 365", FamilyManifest.ConsentStrategy.AGGREGATED, oauth, null, List.of()));
     }
 
     private static MutableFacade mutableFacade(Map<String, Map<String, String>> initial) {

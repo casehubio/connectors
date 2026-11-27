@@ -1,18 +1,30 @@
 family:
   id: microsoft
-  description: "Microsoft 365 — shared Azure AD consent"
+  description: "Microsoft 365 — shared Azure AD app registration"
   consent: aggregated
   oauth:
     auth-url: "https://login.microsoftonline.com/{tenant-id}/oauth2/v2/authorize"
     token-url: "https://login.microsoftonline.com/{tenant-id}/oauth2/v2/token"
     redirect-uri: "{callback-base-url}/oauth/callback/microsoft"
-    scopes:
-      - "Calendars.ReadWrite"
-      - "Mail.Read"
-      - "Mail.Send"
-      - "Files.ReadWrite.All"
-      - "Sites.ReadWrite.All"
-      - "User.Read"
+  flows:
+    delegated:
+      grant: authorization_code
+      scopes:
+        - "Calendars.ReadWrite"
+        - "Mail.Read"
+        - "Mail.Send"
+        - "Files.ReadWrite.All"
+        - "Sites.ReadWrite.All"
+        - "User.Read"
+    application:
+      grant: client_credentials
+      scopes:
+        - "https://graph.microsoft.com/.default"
+    bot:
+      grant: client_credentials
+      scopes:
+        - "https://api.botframework.com/.default"
+      token-url: "https://login.microsoftonline.com/botframework.com/oauth2/v2.0/token"
   fields:
     - name: tenant-id
       sensitive: false

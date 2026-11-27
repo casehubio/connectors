@@ -29,9 +29,38 @@ class RealFamilyManifestTest {
         var ms = families.get("microsoft");
         assertThat(ms.family().consent()).isEqualTo(FamilyManifest.ConsentStrategy.AGGREGATED);
         assertThat(ms.family().oauth().authUrl()).contains("login.microsoftonline.com");
-        assertThat(ms.family().oauth().scopes()).contains("Calendars.ReadWrite", "Mail.Read", "Files.ReadWrite.All");
+        assertThat(ms.family().oauth().scopes()).isNull();
         assertThat(ms.family().fields()).hasSize(3);
         assertThat(ms.family().fields().stream().map(ConnectorManifest.FieldDeclaration::name).toList())
                 .containsExactly("tenant-id", "client-id", "client-secret");
     }
+
+    @Test
+    void microsoft_family_has_three_named_flows() {
+        var families  = FamilyManifestLoader.discover();
+        var microsoft = families.get("microsoft");
+        assertThat(microsoft).isNotNull();
+        assertThat(microsoft.family().flows()).hasSize(3);
+        assertThat(microsoft.family().flows()).containsKeys("delegated", "application", "bot");
+
+        var delegated = microsoft.family().flows().get("delegated");
+        assertThat(delegated.grant()).isEqualTo(FamilyManifest.GrantType.AUTHORIZATION_CODE);
+        assertThat(delegated.scopes()).contains("Calendars.ReadWrite", "Mail.Read", "Mail.Send");
+
+        var app = microsoft.family().flows().get("application");
+        assertThat(app.grant()).isEqualTo(FamilyManifest.GrantType.CLIENT_CREDENTIALS);
+        assertThat(app.scopes()).containsExactly("https://graph.microsoft.com/.default");
+
+        var bot = microsoft.family().flows().get("bot");
+        assertThat(bot.grant()).isEqualTo(FamilyManifest.GrantType.CLIENT_CREDENTIALS);
+        assertThat(bot.tokenUrl()).contains("botframework.com");
+    }
+
+    @Test
+    void google_family_has_no_flows() {
+        var families = FamilyManifestLoader.discover();
+        var google   = families.get("google");
+        assertThat(google.family().flows()).isNull();
+    }
+
 }

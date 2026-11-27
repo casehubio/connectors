@@ -104,7 +104,7 @@ class GoogleFamilyConsentIntegrationTest {
                 "offline", "consent");
         return new FamilyManifest(new FamilyManifest.FamilyDeclaration(
                 "google", "Google Workspace — shared OAuth2 consent",
-                FamilyManifest.ConsentStrategy.INCREMENTAL, oauth,
+                FamilyManifest.ConsentStrategy.INCREMENTAL, oauth, null,
                 List.of(new ConnectorManifest.FieldDeclaration("client-id", false, "Google OAuth2 client ID", false, null, null, null),
                         new ConnectorManifest.FieldDeclaration("client-secret", true, "Google OAuth2 client secret", true, null, null, null))));
     }

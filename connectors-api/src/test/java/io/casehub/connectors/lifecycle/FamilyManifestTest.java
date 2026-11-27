@@ -88,6 +88,84 @@ class FamilyManifestTest {
     }
 
     @Test
+    void parses_family_manifest_with_named_flows() throws Exception {
+        var yaml = """
+                   family:
+                     id: microsoft
+                     description: "Microsoft 365"
+                     consent: aggregated
+                     oauth:
+                       auth-url: "https://login.microsoftonline.com/{tenant-id}/oauth2/v2/authorize"
+                       token-url: "https://login.microsoftonline.com/{tenant-id}/oauth2/v2/token"
+                       redirect-uri: "{callback-base-url}/oauth/callback/microsoft"
+                     flows:
+                       delegated:
+                         grant: authorization_code
+                         scopes:
+                           - "Calendars.ReadWrite"
+                           - "Mail.Read"
+                       application:
+                         grant: client_credentials
+                         scopes:
+                           - "https://graph.microsoft.com/.default"
+                       bot:
+                         grant: client_credentials
+                         scopes:
+                           - "https://api.botframework.com/.default"
+                         token-url: "https://login.microsoftonline.com/botframework.com/oauth2/v2.0/token"
+                     fields:
+                       - name: tenant-id
+                         sensitive: false
+                       - name: client-id
+                         sensitive: false
+                       - name: client-secret
+                   """;
+        var family = MAPPER.readValue(yaml, FamilyManifest.class);
+        assertThat(family.family().id()).isEqualTo("microsoft");
+        assertThat(family.family().flows()).hasSize(3);
+
+        var delegated = family.family().flows().get("delegated");
+        assertThat(delegated.grant()).isEqualTo(FamilyManifest.GrantType.AUTHORIZATION_CODE);
+        assertThat(delegated.scopes()).containsExactly("Calendars.ReadWrite", "Mail.Read");
+        assertThat(delegated.tokenUrl()).isNull();
+
+        var app = family.family().flows().get("application");
+        assertThat(app.grant()).isEqualTo(FamilyManifest.GrantType.CLIENT_CREDENTIALS);
+        assertThat(app.scopes()).containsExactly("https://graph.microsoft.com/.default");
+
+        var bot = family.family().flows().get("bot");
+        assertThat(bot.grant()).isEqualTo(FamilyManifest.GrantType.CLIENT_CREDENTIALS);
+        assertThat(bot.tokenUrl()).isEqualTo("https://login.microsoftonline.com/botframework.com/oauth2/v2.0/token");
+    }
+
+    @Test
+    void family_manifest_without_flows_has_null_flows() throws Exception {
+        var yaml = """
+                   family:
+                     id: google
+                     description: "Google Workspace"
+                     consent: incremental
+                     oauth:
+                       auth-url: "https://accounts.google.com/o/oauth2/v2/auth"
+                       token-url: "https://oauth2.googleapis.com/token"
+                       redirect-uri: "{callback-base-url}/oauth/callback/google"
+                       scopes:
+                         - "https://www.googleapis.com/auth/calendar.readonly"
+                       access-type: offline
+                       prompt: consent
+                     fields:
+                       - name: client-id
+                         sensitive: false
+                       - name: client-secret
+                   """;
+        var family = MAPPER.readValue(yaml, FamilyManifest.class);
+        assertThat(family.family().flows()).isNull();
+        assertThat(family.family().oauth().scopes()).containsExactly(
+                "https://www.googleapis.com/auth/calendar.readonly");
+    }
+
+
+    @Test
     void constructor_arg_value_variant_works() {
         var arg = new ConnectorManifest.ConstructorArg(null, null, "literal-string");
         assertThat(arg.value()).isEqualTo("literal-string");
