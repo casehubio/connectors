@@ -14,5 +14,8 @@ public interface ProviderCredentialFacade {
 
     CredentialSource source(String providerId, String field);
 
+    default void store(String providerId, String field, String value) {}
+
+
     enum CredentialSource { CREDENTIAL_STORE, CONFIG, ENVIRONMENT, SERVICE_CONNECTION, NONE }
 }
