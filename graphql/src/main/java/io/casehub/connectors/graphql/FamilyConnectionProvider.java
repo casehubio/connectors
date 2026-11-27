@@ -94,22 +94,85 @@ public class FamilyConnectionProvider implements ServiceConnectionProvider {
             throw new ServiceConnectionException("No credential store available",
                                                  provider, actorId, Set.of(), Set.of(), Set.of());
         }
+
+        if (resolved.flow() != null &&
+            resolved.flow().grant() == FamilyManifest.GrantType.CLIENT_CREDENTIALS) {
+            var accessToken = facade.resolve(provider, "access-token").orElse(null);
+            var expiresAt = facade.resolve(provider, "expires-at")
+                                  .map(Instant::parse).orElse(null);
+            if (accessToken == null || (expiresAt != null && expiresAt.isBefore(Instant.now()))) {
+                return acquireApplicationToken(provider, actorId, resolved);
+            }
+            return new ServiceAccessToken(accessToken, expiresAt, Set.of());
+        }
+
         var accessToken = facade.resolve(provider, "access-token")
                                 .orElseThrow(() -> new ServiceConnectionException(
                                         "No access token for provider: " + provider,
                                         provider, actorId, Set.of(), Set.of(), Set.of()));
-
         var expiresAt = facade.resolve(provider, "expires-at")
-                              .map(Instant::parse)
-                              .orElse(null);
-
+                              .map(Instant::parse).orElse(null);
         if (expiresAt != null && expiresAt.isBefore(Instant.now())) {
             return refreshAndReturn(provider, actorId);
         }
-
         var scopes = parseScopes(facade.resolve(provider, "granted-scopes").orElse(""));
         return new ServiceAccessToken(accessToken, expiresAt, scopes);
     }
+
+    private ServiceAccessToken acquireApplicationToken(String provider, String actorId,
+                                                       ResolvedFlow resolved) {
+        var lock = refreshLocks.computeIfAbsent(provider, k -> new Object());
+        synchronized (lock) {
+            var currentToken = facade.resolve(provider, "access-token").orElse(null);
+            var currentExpiry = facade.resolve(provider, "expires-at")
+                                      .map(Instant::parse).orElse(null);
+            if (currentToken != null && currentExpiry != null && currentExpiry.isAfter(Instant.now())) {
+                return new ServiceAccessToken(currentToken, currentExpiry, Set.of());
+            }
+
+            var tokenUrl = resolved.flow().tokenUrl() != null
+                           ? resolved.flow().tokenUrl()
+                           : resolved.family().family().oauth().tokenUrl();
+
+            var clientId = facade.resolve(resolved.familyId(), "client-id")
+                                 .orElseThrow(() -> new ServiceConnectionException(
+                                         "No client-id for family: " + resolved.familyId(),
+                                         provider, actorId, Set.of(), Set.of(), Set.of()));
+            var clientSecret = facade.resolve(resolved.familyId(), "client-secret")
+                                     .orElseThrow(() -> new ServiceConnectionException(
+                                             "No client-secret for family: " + resolved.familyId(),
+                                             provider, actorId, Set.of(), Set.of(), Set.of()));
+
+            var scope = String.join(" ", resolved.flow().scopes());
+            var body = "grant_type=client_credentials"
+                       + "&client_id=" + encode(clientId)
+                       + "&client_secret=" + encode(clientSecret)
+                       + "&scope=" + encode(scope);
+
+            try {
+                var responseBody = postTokenRequest(tokenUrl, body);
+                try (var reader = Json.createReader(new StringReader(responseBody))) {
+                    var json        = reader.readObject();
+                    var accessToken = json.getString("access_token");
+                    var expiresIn   = json.getInt("expires_in", 3600);
+                    var expiresAt   = Instant.now().plusSeconds(expiresIn);
+
+                    facade.store(provider, "access-token", accessToken);
+                    facade.store(provider, "expires-at", expiresAt.toString());
+
+                    LOG.info("Application token acquired for provider '" + provider + "'");
+                    return new ServiceAccessToken(accessToken, expiresAt, Set.of());
+                }
+            } catch (ServiceConnectionException e) {
+                throw e;
+            } catch (Exception e) {
+                throw new ServiceConnectionException(
+                        "Client credentials token acquisition failed: " + e.getMessage(),
+                        provider, actorId, Set.of(), Set.of(), Set.of());
+            }
+        }
+    }
+
 
     @Override
     public ServiceConnection getConnection(String actorId, String provider, String tenancyId) {

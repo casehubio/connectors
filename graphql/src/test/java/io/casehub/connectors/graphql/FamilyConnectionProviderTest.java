@@ -182,6 +182,69 @@ class FamilyConnectionProviderTest {
                 .hasMessageContaining("No family");
     }
 
+    @Test
+    void acquires_app_token_via_client_credentials_when_missing() {
+        var facade = mutableFacade(Map.of(
+                "microsoft", Map.of("client-id", "test-cid", "client-secret", "test-cs")));
+        var testProvider = new TestableFamilyConnectionProvider(facade,
+                                                                Map.of("microsoft", microsoftFamilyWithFlows()));
+        testProvider.setTokenResponse("""
+                                      {"access_token": "acquired-app-token", "expires_in": 3600, "token_type": "Bearer"}""");
+
+        var token = testProvider.getAccessToken("__application__", "microsoft-app", "default");
+        assertThat(token.accessToken()).isEqualTo("acquired-app-token");
+        assertThat(testProvider.lastTokenRequestUrl())
+                .isEqualTo("https://login.microsoftonline.com/test-tenant/oauth2/v2/token");
+        assertThat(testProvider.lastTokenRequestBody())
+                .contains("grant_type=client_credentials")
+                .contains("scope=");
+    }
+
+    @Test
+    void acquires_bot_token_using_flow_specific_token_url() {
+        var facade = mutableFacade(Map.of(
+                "microsoft", Map.of("client-id", "test-cid", "client-secret", "test-cs")));
+        var testProvider = new TestableFamilyConnectionProvider(facade,
+                                                                Map.of("microsoft", microsoftFamilyWithFlows()));
+        testProvider.setTokenResponse("""
+                                      {"access_token": "bot-token", "expires_in": 3600, "token_type": "Bearer"}""");
+
+        var token = testProvider.getAccessToken("__application__", "microsoft-bot", "default");
+        assertThat(token.accessToken()).isEqualTo("bot-token");
+        assertThat(testProvider.lastTokenRequestUrl())
+                .isEqualTo("https://login.microsoftonline.com/botframework.com/oauth2/v2.0/token");
+    }
+
+    @Test
+    void expired_client_credentials_token_reacquires() {
+        var facade = mutableFacade(Map.of(
+                "microsoft", Map.of("client-id", "test-cid", "client-secret", "test-cs"),
+                "microsoft-app", Map.of(
+                        "access-token", "old-token",
+                        "expires-at", Instant.now().minusSeconds(60).toString())));
+        var testProvider = new TestableFamilyConnectionProvider(facade,
+                                                                Map.of("microsoft", microsoftFamilyWithFlows()));
+        testProvider.setTokenResponse("""
+                                      {"access_token": "fresh-token", "expires_in": 3600, "token_type": "Bearer"}""");
+
+        var token = testProvider.getAccessToken("__application__", "microsoft-app", "default");
+        assertThat(token.accessToken()).isEqualTo("fresh-token");
+    }
+
+    @Test
+    void valid_client_credentials_token_returned_without_reacquire() {
+        var facade = mutableFacade(Map.of(
+                "microsoft-app", Map.of(
+                        "access-token", "cached-token",
+                        "expires-at", Instant.now().plusSeconds(3600).toString())));
+        var testProvider = new TestableFamilyConnectionProvider(facade,
+                                                                Map.of("microsoft", microsoftFamilyWithFlows()));
+
+        var token = testProvider.getAccessToken("__application__", "microsoft-app", "default");
+        assertThat(token.accessToken()).isEqualTo("cached-token");
+        assertThat(testProvider.lastTokenRequestUrl()).isNull();
+    }
+
 
     private static FamilyManifest googleFamily() {
         var oauth = new FamilyManifest.OAuthDeclaration(
@@ -265,4 +328,28 @@ class FamilyConnectionProviderTest {
             data.computeIfAbsent(providerId, k -> new ConcurrentHashMap<>()).put(field, value);
         }
     }
+
+    static class TestableFamilyConnectionProvider extends FamilyConnectionProvider {
+        private String tokenResponse;
+        private String lastUrl;
+        private String lastBody;
+
+        TestableFamilyConnectionProvider(ProviderCredentialFacade facade, Map<String, FamilyManifest> families) {
+            super(facade, families);
+        }
+
+        void setTokenResponse(String response) {this.tokenResponse = response;}
+
+        String lastTokenRequestUrl()           {return lastUrl;}
+
+        String lastTokenRequestBody()          {return lastBody;}
+
+        @Override
+        String postTokenRequest(String tokenUrl, String body) {
+            this.lastUrl  = tokenUrl;
+            this.lastBody = body;
+            return tokenResponse;
+        }
+    }
+
 }
