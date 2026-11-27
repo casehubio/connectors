@@ -12,6 +12,8 @@ public class DependencyResolver {
     private final Map<String, List<String>> familyMembers;
     private final ProviderCredentialFacade credentialFacade;
     private final Map<String, FamilyManifest> families;
+    private final java.util.Set<String>       availableUserResolvers;
+
 
     private record ProviderEntry(String connectorId, List<String> sub, String setupPlaybook) {}
 
@@ -24,12 +26,18 @@ public class DependencyResolver {
     }
 
     public DependencyResolver(List<ConnectorManifest> manifests, ProviderCredentialFacade credentialFacade,
-                               Map<String, FamilyManifest> families) {
-        this.credentialFacade = credentialFacade;
-        this.families = families != null ? Map.copyOf(families) : Map.of();
-        this.manifestsById = new HashMap<>();
-        this.providersByCapability = new HashMap<>();
-        this.familyMembers = new HashMap<>();
+                              Map<String, FamilyManifest> families) {
+        this(manifests, credentialFacade, families, java.util.Set.of());
+    }
+
+    public DependencyResolver(List<ConnectorManifest> manifests, ProviderCredentialFacade credentialFacade,
+                              Map<String, FamilyManifest> families, java.util.Set<String> availableUserResolvers) {
+        this.credentialFacade       = credentialFacade;
+        this.families               = families != null ? Map.copyOf(families) : Map.of();
+        this.availableUserResolvers = availableUserResolvers != null ? java.util.Set.copyOf(availableUserResolvers) : java.util.Set.of();
+        this.manifestsById          = new HashMap<>();
+        this.providersByCapability  = new HashMap<>();
+        this.familyMembers          = new HashMap<>();
         for (var m : manifests) {
             var decl = m.connector();
             manifestsById.put(decl.id(), m);
@@ -46,6 +54,7 @@ public class DependencyResolver {
             }
         }
     }
+
 
     public List<UnmetRequirement> unmetRequirements(String connectorId, ConnectorRegistry registry) {
         var manifest = manifestsById.get(connectorId);
@@ -80,12 +89,22 @@ public class DependencyResolver {
                     var providerKey = flow.grant() == FamilyManifest.GrantType.AUTHORIZATION_CODE
                             ? familyId : familyId + "-" + flowName;
                     if (flow.grant() == FamilyManifest.GrantType.AUTHORIZATION_CODE) {
-                        boolean hasToken = credentialFacade.resolve(providerKey, "access-token").isPresent();
-                        if (!hasToken) {
-                            var members = familyMembers.getOrDefault(familyId, List.of());
-                            result.add(new UnmetRequirement("oauth2", List.of(flowName),
-                                    "OAuth consent required for " + familyId + " " + flowName + " flow",
-                                    List.of(new ResolutionOption.FamilyOAuthOption(familyId, List.copyOf(members)))));
+                        if (flow.isPerUser()) {
+                            if (!availableUserResolvers.contains(providerKey) &&
+                                    !availableUserResolvers.contains(familyId)) {
+                                var members = familyMembers.getOrDefault(familyId, List.of());
+                                result.add(new UnmetRequirement("oauth2", List.of(flowName),
+                                        "Per-user consent resolver required for " + familyId + " " + flowName + " flow",
+                                        List.of(new ResolutionOption.FamilyOAuthOption(familyId, List.copyOf(members)))));
+                            }
+                        } else {
+                            boolean hasToken = credentialFacade.resolve(providerKey, "access-token").isPresent();
+                            if (!hasToken) {
+                                var members = familyMembers.getOrDefault(familyId, List.of());
+                                result.add(new UnmetRequirement("oauth2", List.of(flowName),
+                                        "OAuth consent required for " + familyId + " " + flowName + " flow",
+                                        List.of(new ResolutionOption.FamilyOAuthOption(familyId, List.copyOf(members)))));
+                            }
                         }
                     } else {
                         boolean hasCreds = credentialFacade.resolve(familyId, "client-id").isPresent()

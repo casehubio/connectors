@@ -322,6 +322,57 @@ class DependencyResolverTest {
         assertThat(unmet.getFirst().options().getFirst()).isInstanceOf(ResolutionOption.FamilyOAuthOption.class);
     }
 
+    @Test
+    void per_user_flow_checks_resolver_availability_not_stored_token() {
+        var flows = Map.of(
+                "delegated", new FamilyManifest.FlowDeclaration(
+                        FamilyManifest.GrantType.AUTHORIZATION_CODE,
+                        List.of("accounts"), null, true));
+        var family = new FamilyManifest(new FamilyManifest.FamilyDeclaration(
+                "truelayer", "TrueLayer", FamilyManifest.ConsentStrategy.AGGREGATED,
+                new FamilyManifest.OAuthDeclaration(null, null, null, null, null, null),
+                flows, List.of()));
+        var manifest = new ConnectorManifest(new ConnectorDeclaration(
+                "truelayer", "bank", null,
+                new ConnectorManifest.AuthDeclaration("oauth2", "truelayer",
+                                                      List.of("delegated"), null, null),
+                null, null, null, null, null));
+
+        var facade = new InMemoryCredentialFacade(Map.of(
+                "truelayer", Map.of("client-id", "cid", "client-secret", "cs")));
+        var resolver = new DependencyResolver(List.of(manifest), facade,
+                                              Map.of("truelayer", family), java.util.Set.of("truelayer"));
+
+        var unmet = resolver.unmetRequirements("truelayer", new ConnectorRegistry());
+        assertThat(unmet).isEmpty();
+    }
+
+    @Test
+    void per_user_flow_unmet_when_no_resolver_available() {
+        var flows = Map.of(
+                "delegated", new FamilyManifest.FlowDeclaration(
+                        FamilyManifest.GrantType.AUTHORIZATION_CODE,
+                        List.of("accounts"), null, true));
+        var family = new FamilyManifest(new FamilyManifest.FamilyDeclaration(
+                "truelayer", "TrueLayer", FamilyManifest.ConsentStrategy.AGGREGATED,
+                new FamilyManifest.OAuthDeclaration(null, null, null, null, null, null),
+                flows, List.of()));
+        var manifest = new ConnectorManifest(new ConnectorDeclaration(
+                "truelayer", "bank", null,
+                new ConnectorManifest.AuthDeclaration("oauth2", "truelayer",
+                                                      List.of("delegated"), null, null),
+                null, null, null, null, null));
+
+        var facade = new InMemoryCredentialFacade(Map.of());
+        var resolver = new DependencyResolver(List.of(manifest), facade,
+                                              Map.of("truelayer", family), java.util.Set.of());
+
+        var unmet = resolver.unmetRequirements("truelayer", new ConnectorRegistry());
+        assertThat(unmet).hasSize(1);
+        assertThat(unmet.getFirst().options().getFirst())
+                .isInstanceOf(ResolutionOption.FamilyOAuthOption.class);
+    }
+
 
     private static ConnectorManifest manifest(String id, String platform,
             List<RequirementDeclaration> requires,

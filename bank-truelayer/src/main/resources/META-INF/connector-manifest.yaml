@@ -4,6 +4,9 @@ connector:
   description: "TrueLayer — UK Open Banking (AISP + PISP) via PSD2 consent"
   auth:
     type: oauth2
+    family: truelayer
+    flows:
+      - delegated
     fields:
       - name: client-id
         description: "TrueLayer application client ID"

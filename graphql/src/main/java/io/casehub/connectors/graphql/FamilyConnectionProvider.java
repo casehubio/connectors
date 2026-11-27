@@ -102,7 +102,7 @@ public class FamilyConnectionProvider implements ServiceConnectionProvider {
     private static Map<String, io.casehub.connectors.lifecycle.UserTokenResolver> buildResolverMap(
             Instance<io.casehub.connectors.lifecycle.UserTokenResolver> instances) {
         var map = new java.util.HashMap<String, io.casehub.connectors.lifecycle.UserTokenResolver>();
-        if (instances.isResolvable()) {
+        if (!instances.isUnsatisfied()) {
             for (var r : instances) {
                 map.put(r.providerId(), r);
             }

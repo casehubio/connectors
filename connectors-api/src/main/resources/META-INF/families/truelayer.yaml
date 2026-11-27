@@ -1,0 +1,22 @@
+family:
+  id: truelayer
+  description: "TrueLayer — UK Open Banking via PSD2 consent"
+  consent: aggregated
+  oauth:
+    auth-url: "https://auth.truelayer.com/connect/auth"
+    token-url: "https://auth.truelayer.com/connect/token"
+    redirect-uri: "{callback-base-url}/auth/truelayer/callback"
+  flows:
+    delegated:
+      grant: authorization_code
+      scopes:
+        - accounts
+        - balance
+        - transactions
+      per-user: true
+  fields:
+    - name: client-id
+      sensitive: false
+      description: "TrueLayer client ID"
+    - name: client-secret
+      description: "TrueLayer client secret"
