@@ -4,6 +4,7 @@ import io.casehub.connectors.lifecycle.ConnectorManifest;
 import io.casehub.connectors.lifecycle.ConnectorManifestLoader;
 import io.casehub.connectors.lifecycle.ConnectorRegistry;
 import io.casehub.connectors.lifecycle.DependencyResolver;
+import io.casehub.connectors.lifecycle.OAuthConfigRegistry;
 import io.casehub.connectors.lifecycle.ProviderCredentialFacade;
 import io.quarkus.arc.deployment.SyntheticBeanBuildItem;
 import io.quarkus.deployment.annotations.BuildStep;
@@ -65,16 +66,24 @@ public class ConnectorLifecycleProcessor {
                         if (arg.field() != null) {
                             kinds[i] = "field";
                             names[i] = arg.field();
-                        } else {
+                        } else if (arg.bean() != null) {
                             kinds[i] = "bean";
                             names[i] = arg.bean();
                             configurator.addInjectionPoint(ClassType.create(
                                     DotName.createSimple(arg.bean())));
+                        } else {
+                            kinds[i] = "value";
+                            names[i] = arg.value();
                         }
                     }
 
                     configurator.param("argKinds", kinds);
                     configurator.param("argNames", names);
+                }
+
+                if (bean.qualifier() != null) {
+                    configurator.addQualifier().annotation(DotName.createSimple(
+                            "jakarta.inject.Named")).addValue("value", bean.qualifier()).done();
                 }
 
                 result.add(configurator.done());
@@ -100,6 +109,15 @@ public class ConnectorLifecycleProcessor {
                                      .scope(Singleton.class)
                                      .setRuntimeInit()
                                      .creator(DependencyResolverCreator.class)
+                                     .done();
+    }
+
+    @BuildStep
+    SyntheticBeanBuildItem registerOAuthConfigRegistry() {
+        return SyntheticBeanBuildItem.configure(OAuthConfigRegistry.class)
+                                     .scope(Singleton.class)
+                                     .setRuntimeInit()
+                                     .creator(OAuthConfigRegistryCreator.class)
                                      .done();
     }
 

@@ -40,6 +40,9 @@ public class ConnectorBeanCreator implements BeanCreator<Object> {
                             .orElse(defaults.getOrDefault(argNames[i], ""));
                     argValues[i] = value;
                     argTypes[i] = String.class;
+                } else if ("value".equals(argKinds[i])) {
+                    argValues[i] = argNames[i];
+                    argTypes[i] = String.class;
                 } else {
                     var beanClass = Thread.currentThread().getContextClassLoader().loadClass(argNames[i]);
                     argValues[i] = context.getInjectedReference(beanClass);
